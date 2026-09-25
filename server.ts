@@ -281,7 +281,8 @@ app.use((req, res, next) => {
   // Update product
   app.put('/api/products/:id', async (req: Request, res: Response) => {
     try {
-      const updated = await updateProduct(req.params.id, req.body);
+      const productId = req.params.id as string;
+      const updated = await updateProduct(productId, req.body);
       if (!updated) {
         return res.status(404).json({ success: false, error: 'Producto no encontrado' });
       }
@@ -296,9 +297,10 @@ app.use((req, res, next) => {
   // Delete product
   app.delete('/api/products/:id', async (req: Request, res: Response) => {
     try {
-      const deleted = await deleteProduct(req.params.id);
+      const productId = req.params.id as string;
+      const deleted = await deleteProduct(productId);
       if (deleted) {
-        broadcastProductStockUpdate({ id: req.params.id, deleted: true, available: false, stock: 0 });
+        broadcastProductStockUpdate({ id: productId, deleted: true, available: false, stock: 0 });
       }
       res.json({ success: deleted });
     } catch (error: any) {
@@ -319,8 +321,9 @@ app.use((req, res, next) => {
 
   app.post('/api/admin/supplies/:id/stock', async (req: Request, res: Response) => {
     try {
+      const supplyId = req.params.id as string;
       const newStock = Number(req.body.stock);
-      const updated = await updateSupplyStock(req.params.id, newStock);
+      const updated = await updateSupplyStock(supplyId, newStock);
       res.json({ success: true, data: updated });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
@@ -428,7 +431,8 @@ app.use((req, res, next) => {
 
   app.put('/api/admin/portadas/:id', async (req: Request, res: Response) => {
     try {
-      const portada = await updatePortada(req.params.id, req.body);
+      const portadaId = req.params.id as string;
+      const portada = await updatePortada(portadaId, req.body);
       if (!portada) {
         return res.status(404).json({ success: false, error: 'Portada no encontrada' });
       }
@@ -440,7 +444,8 @@ app.use((req, res, next) => {
 
   app.delete('/api/admin/portadas/:id', async (req: Request, res: Response) => {
     try {
-      const success = await deletePortada(req.params.id);
+      const portadaId = req.params.id as string;
+      const success = await deletePortada(portadaId);
       res.json({ success });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
@@ -498,7 +503,7 @@ app.use((req, res, next) => {
   // Orders: Get orders for specific customer email
   app.get('/api/orders/customer/:email', async (req: Request, res: Response) => {
     try {
-      const { email } = req.params;
+      const email = req.params.email as string;
       const orders = await getOrders(undefined, email);
       res.json({ success: true, data: orders });
     } catch (error: any) {
@@ -510,7 +515,7 @@ app.use((req, res, next) => {
   // Orders: Get single order by ID or orderNumber
   app.get('/api/orders/:id', async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const order = await getOrderById(id);
       if (!order) {
         return res.status(404).json({ success: false, error: 'Pedido no encontrado' });
@@ -755,7 +760,7 @@ app.use((req, res, next) => {
   // Products: Update stock and availability (Kitchen/Admin)
   app.patch('/api/products/:id/stock', async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const { available, stock } = req.body;
       const updated = await updateProductStock(id, Boolean(available), typeof stock === 'number' ? stock : undefined);
       if (!updated) {
@@ -836,7 +841,7 @@ app.use((req, res, next) => {
   // Orders: Update status (called by Kitchen KDS and Admin)
   app.patch('/api/orders/:id/status', async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const { status } = req.body;
 
       if (!status) {
