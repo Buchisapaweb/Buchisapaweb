@@ -113,22 +113,7 @@ html, body {
   }
 }
 
-/* HEADER Y NAVEGACIÓN */
-.site-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.header-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 72px;
-}
+/* HEADER Y NAVEGACIÓN (Definidos en /css/encabezado.css) */
 
 .brand-logo {
   display: flex;

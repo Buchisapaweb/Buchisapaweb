@@ -1,17 +1,17 @@
 /* =========================================================
-   BUCHISAPA - ESTILOS DEL ENCABEZADO (public/css/encabezado.css)
+   BUCHISAPA - ESTILOS DEL ENCABEZADO OFICIAL (public/css/encabezado.css)
+   Fiel a la interfaz móvil: Menú hamburguesa rojo, Logo circular, 
+   Pill central suave con pin y texto rojo, Lupa oscura y Bolsa de pedido roja.
    ========================================================= */
 
 /* Header estilo BuchiSapa Oficial */
 .site-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
   width: 100%;
   transition: background 0.2s ease, box-shadow 0.2s ease;
 }
@@ -20,18 +20,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
+  height: 62px;
   max-width: 1380px;
   margin: 0 auto;
   padding: 0 12px;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
   .header-nav {
-    height: 66px;
+    height: 68px;
     padding: 0 20px;
     gap: 14px;
   }
@@ -45,18 +45,17 @@
   }
 }
 
+/* Lado izquierdo: Hamburger y Logo */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 1;
-  min-width: 0;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .header-left {
-    gap: 16px;
-    flex-shrink: 0;
+    gap: 14px;
   }
 }
 
@@ -70,36 +69,40 @@
   }
 }
 
+/* Botón Hamburguesa móvil (3 líneas rojas limpias) */
 .nav-toggle-btn {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: transparent;
+  border: none;
   cursor: pointer;
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  min-height: 38px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 10px;
   flex-shrink: 0;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
 .nav-toggle-btn:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #dc2626;
+  background: #fef2f2;
 }
 
 .nav-toggle-btn:active {
-  background: #fecaca;
-  transform: scale(0.92);
+  background: #fee2e2;
+  transform: scale(0.94);
 }
 
+.nav-toggle-btn svg {
+  stroke: #dc2626;
+}
+
+/* Logotipo Circular */
 .brand-logo {
   display: flex;
   align-items: center;
@@ -109,94 +112,112 @@
 }
 
 .brand-logo:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 
 .brand-logo-img {
-  height: 38px;
-  max-height: 38px;
+  height: 42px;
+  max-height: 42px;
   width: auto;
   object-fit: contain;
-  border-radius: 10px;
+  border-radius: 50%;
 }
 
 @media (min-width: 768px) {
   .brand-logo-img {
-    height: 44px;
-    max-height: 44px;
+    height: 46px;
+    max-height: 46px;
   }
 }
 
 @media (min-width: 1024px) {
   .brand-logo-img {
-    height: 50px;
-    max-height: 50px;
+    height: 52px;
+    max-height: 52px;
   }
 }
 
-/* Selector de ubicación inline */
+/* Selector de ubicación estilo Cápsula / Pill Gourmet */
 .location-picker-inline {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   cursor: pointer;
-  padding: 6px 14px;
+  padding: 8px 14px;
   border-radius: 9999px;
-  background: #fff5f5;
-  border: 1px solid #fecaca;
+  background: #fdf2f2;
+  border: 1px solid #fee2e2;
   user-select: none;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
-  max-width: 180px;
+  max-width: 190px;
   min-width: 0;
   flex-shrink: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 360px) {
+  .location-picker-inline {
+    max-width: 210px;
+    padding: 8px 16px;
+    gap: 7px;
+  }
 }
 
 @media (min-width: 480px) {
   .location-picker-inline {
-    max-width: 240px;
-    padding: 7px 16px;
-    gap: 7px;
+    max-width: 250px;
+    padding: 8px 18px;
+    gap: 8px;
   }
 }
 
 @media (min-width: 768px) {
   .location-picker-inline {
     max-width: none;
-    padding: 8px 18px;
+    padding: 8px 20px;
     gap: 8px;
   }
 }
 
 .location-picker-inline:hover {
   background: #fee2e2;
-  border-color: #f87171;
+  border-color: #fca5a5;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
+  box-shadow: 0 3px 10px rgba(220, 38, 38, 0.1);
+}
+
+.location-picker-inline:active {
+  transform: scale(0.97);
+  background: #fecaca;
 }
 
 .location-pin-icon {
   flex-shrink: 0;
+  stroke: #dc2626;
 }
 
 .location-text-red {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   color: #dc2626;
   letter-spacing: -0.2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 @media (min-width: 768px) {
   .location-text-red {
-    font-size: 14px;
+    font-size: 14.5px;
   }
 }
 
 .location-arrow-svg {
   flex-shrink: 0;
+  stroke: #dc2626;
   transition: transform 0.2s ease;
 }
 
@@ -290,7 +311,7 @@
 .desktop-search-pill-wrap {
   display: none;
   flex: 1;
-  max-width: 340px;
+  max-width: 320px;
   margin: 0 10px;
 }
 
@@ -305,15 +326,16 @@
   width: 100%;
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: #f8fafc;
   border: 1.5px solid #e2e8f0;
   border-radius: 9999px;
   padding: 0 14px;
-  height: 42px;
+  height: 40px;
   transition: all 0.2s ease;
 }
 
 .desktop-search-input-box:focus-within {
+  background: #ffffff;
   border-color: #dc2626;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
 }
@@ -356,25 +378,28 @@
   flex-shrink: 0;
 }
 
-/* Header actions & cart button */
+/* Acciones de Cabecera (Derecha: Lupa y Bolsa) */
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 @media (min-width: 640px) {
   .header-actions {
-    gap: 12px;
+    gap: 10px;
   }
 }
 
+/* Botón de búsqueda en móvil (Lupa minimalista oscura) */
 .header-icon-btn {
   background: transparent;
   border: none;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -382,67 +407,122 @@
   cursor: pointer;
   padding: 0;
   color: #0f172a;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.1s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .header-icon-btn:hover {
   background: #f1f5f9;
 }
 
+.header-icon-btn:active {
+  background: #e2e8f0;
+  transform: scale(0.94);
+}
+
+.header-icon-btn svg {
+  stroke: #0f172a;
+}
+
+/* Botón de Mi Pedido (Bolsa de compras roja minimalista en móvil, botón cápsula en desktop) */
 .desktop-cart-link-btn {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: transparent;
+  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 13px;
-  font-weight: 800;
-  color: #0f172a;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: 50%;
   cursor: pointer;
-  padding: 8px 14px;
-  border-radius: 9999px;
   position: relative;
   font-family: 'Plus Jakarta Sans', sans-serif;
   transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .desktop-cart-link-btn:hover {
-  border-color: #fca5a5;
-  background: #fff5f5;
-  color: #dc2626;
+  background: #fef2f2;
+}
+
+.desktop-cart-link-btn:active {
+  background: #fee2e2;
+  transform: scale(0.94);
 }
 
 .cart-bag-icon {
-  color: #dc2626;
+  stroke: #dc2626;
   flex-shrink: 0;
 }
 
 .desktop-cart-text {
   display: none;
-  letter-spacing: 0.4px;
 }
 
-@media (min-width: 768px) {
+/* Estilo Desktop para el botón del carrito */
+@media (min-width: 992px) {
+  .desktop-cart-link-btn {
+    width: auto;
+    height: auto;
+    min-width: auto;
+    min-height: auto;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .desktop-cart-link-btn:hover {
+    border-color: #fca5a5;
+    background: #fff5f5;
+    color: #dc2626;
+  }
+
   .desktop-cart-text {
     display: inline;
+    letter-spacing: 0.4px;
   }
 }
 
+/* Badge flotante contador del carrito */
 .cart-count-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
   background: #dc2626;
   color: #ffffff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  min-width: 20px;
-  height: 20px;
+  min-width: 18px;
+  height: 18px;
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 5px;
-  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
-  margin-left: 2px;
+  padding: 0 4px;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
+  border: 1.5px solid #ffffff;
+  pointer-events: none;
+}
+
+@media (min-width: 992px) {
+  .cart-count-badge {
+    position: static;
+    margin-left: 2px;
+    border: none;
+    min-width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
 }
 
 /* Search bar movil desplegable */
