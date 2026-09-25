@@ -2,6 +2,31 @@
    BUCHISAPA REAL-TIME ORDER TRACKER STYLES
    ========================================================= */
 
+#order-status-modal.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 800;
+  display: none !important;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+#order-status-modal.modal-backdrop.open,
+#order-status-modal.modal-backdrop.active {
+  display: flex !important;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
 /* Modal Container & Card */
 .tracker-modal-box {
   background: #ffffff;

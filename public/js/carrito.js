@@ -1090,6 +1090,8 @@ const BuchisapaCart = {
     const drawer = document.getElementById('cart-drawer-modal');
     if (drawer) {
       document.body.classList.add('cart-drawer-open');
+      drawer.style.display = 'flex';
+      void drawer.offsetWidth;
       drawer.classList.add('open');
       drawer.classList.add('active');
       document.body.style.overflow = 'hidden';
@@ -1110,6 +1112,7 @@ const BuchisapaCart = {
       document.body.classList.remove('cart-drawer-open');
       drawer.classList.remove('open');
       drawer.classList.remove('active');
+      drawer.style.display = 'none';
       document.body.style.overflow = '';
       this.updateFloatingCartBar();
     }

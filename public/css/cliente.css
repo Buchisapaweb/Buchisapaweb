@@ -2696,22 +2696,25 @@ img.lazy-img.loaded {
   position: fixed;
   inset: 0;
   background: #ffffff;
-  z-index: 300;
-  display: flex;
+  z-index: 700;
+  display: none !important;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   overflow-y: auto;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.22s ease;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
   padding: 0;
   backdrop-filter: none;
 }
 
 #login-modal.modal-backdrop.open,
 #login-modal.modal-backdrop.active {
+  display: flex !important;
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
@@ -5665,19 +5668,23 @@ img.lazy-img.loaded {
   inset: 0;
   background: rgba(15, 23, 42, 0.72);
   backdrop-filter: blur(4px);
-  z-index: 500;
-  display: flex;
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 750;
+  display: none !important;
   align-items: center;
   justify-content: center;
   padding: 12px;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.22s ease;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
 }
 
 #location-modal.modal-backdrop.open,
 #location-modal.modal-backdrop.active {
+  display: flex !important;
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 

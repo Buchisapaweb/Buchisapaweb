@@ -385,6 +385,8 @@ function openLoginModal(viewName = 'login') {
   const modal = document.getElementById('login-modal');
   if (modal) {
     switchAuthView(viewName);
+    modal.style.display = 'flex';
+    void modal.offsetWidth;
     modal.classList.add('active', 'open');
     document.body.style.overflow = 'hidden';
 
@@ -414,6 +416,7 @@ function closeLoginModal(e) {
   const modal = document.getElementById('login-modal');
   if (modal) {
     modal.classList.remove('active', 'open');
+    modal.style.display = 'none';
     document.body.style.overflow = '';
   }
 }
@@ -1234,6 +1237,8 @@ function handleGoogleSignIn() {
   // Abre la ventana de autenticación Google
   const googleModal = document.getElementById('google-auth-modal');
   if (googleModal) {
+    googleModal.style.display = 'flex';
+    void googleModal.offsetWidth;
     googleModal.classList.add('active', 'open');
     document.body.style.overflow = 'hidden';
     
@@ -1262,6 +1267,7 @@ function closeGoogleAuthModal(e) {
   const googleModal = document.getElementById('google-auth-modal');
   if (googleModal) {
     googleModal.classList.remove('active', 'open');
+    googleModal.style.display = 'none';
   }
   // Si no hay otro modal abierto, restaurar overflow
   const loginModal = document.getElementById('login-modal');
@@ -4057,12 +4063,19 @@ async function openCheckoutModal() {
   }
 
   const modal = document.getElementById('checkout-modal');
-  if (modal) modal.classList.add('open');
+  if (modal) {
+    modal.style.display = 'flex';
+    void modal.offsetWidth;
+    modal.classList.add('open');
+  }
 }
 
 function closeCheckoutModal() {
   const modal = document.getElementById('checkout-modal');
-  if (modal) modal.classList.remove('open');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+  }
 }
 
 async function submitOrder(e) {

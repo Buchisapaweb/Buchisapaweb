@@ -1,5 +1,5 @@
 <!-- MODAL DE CHECKOUT -->
-<div class="modal-backdrop" id="checkout-modal">
+<div class="modal-backdrop" id="checkout-modal" style="display: none;">
   <div class="modal-box">
     <div class="modal-header">
       <h3 class="modal-title">Completar Datos de Entrega</h3>
@@ -41,7 +41,7 @@
 </div>
 
 <!-- MODAL BÚSQUEDA RÁPIDA -->
-<div class="search-modal-backdrop" id="search-modal" onclick="toggleSearchModal(event)">
+<div class="search-modal-backdrop" id="search-modal" style="display: none;" onclick="toggleSearchModal(event)">
   <div class="search-modal-box" onclick="event.stopPropagation()">
     <div class="search-modal-bar">
       <div class="search-input-wrapper">
@@ -64,7 +64,7 @@
 </div>
 
 <!-- MODAL DE PLATOS POR CATEGORÍA -->
-<div class="search-modal-backdrop" id="category-modal" onclick="closeCategoryModal(event)">
+<div class="search-modal-backdrop" id="category-modal" style="display: none;" onclick="closeCategoryModal(event)">
   <div class="search-modal-box" onclick="event.stopPropagation()">
     <div class="search-modal-bar">
       <h3 id="category-modal-title" style="font-size: 16px; font-weight: 900; color: #0f172a; text-transform: uppercase;">PLATOS</h3>
