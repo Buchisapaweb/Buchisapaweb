@@ -5,69 +5,6 @@
 
 
 /* =========================================================
-   BARRA DE FILTRADO RÁPIDO DE CATEGORÍAS (QUICK FILTER BAR)
-   ========================================================= */
-.quick-category-nav-wrap {
-  width: 100%;
-  margin: 12px 0 24px;
-  position: relative;
-  z-index: 20;
-}
-
-.quick-category-nav-scroll {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 6px 4px 10px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.quick-category-nav-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.quick-cat-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: #ffffff;
-  color: #334155;
-  border: 1px solid #e2e8f0;
-  border-radius: 9999px;
-  font-size: 13.5px;
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  flex-shrink: 0;
-  user-select: none;
-}
-
-.quick-cat-btn:hover {
-  border-color: #fca5a5;
-  color: #dc2626;
-  background: #fff5f5;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
-}
-
-.quick-cat-btn.active {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
-}
-
-.quick-cat-icon {
-  font-size: 15px;
-  line-height: 1;
-}
-
-/* =========================================================
    ENCABEZADOS DE SECCIÓN EDITORIALES
    ========================================================= */
 .section-title-wrap {
@@ -1205,9 +1142,9 @@ img.lazy-img.loaded {
 .category-banner-card {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 11;
-  min-height: 220px;
-  border-radius: 26px;
+  aspect-ratio: 1 / 1;
+  min-height: unset;
+  border-radius: 28px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -1224,8 +1161,6 @@ img.lazy-img.loaded {
 
 @media (min-width: 640px) {
   .category-banner-card {
-    aspect-ratio: 1 / 1;
-    min-height: unset;
     border-radius: 24px;
   }
 }
