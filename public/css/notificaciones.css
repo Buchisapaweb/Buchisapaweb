@@ -1,0 +1,133 @@
+/**
+ * BUCHISAPA DYNAMIC NOTIFICATIONS & TOASTS STYLES
+ */
+
+.push-permission-banner,
+.push-settings-modal {
+  display: none !important;
+}
+
+/* Contenedor flotante de notificaciones dinámicas */
+.buchisapa-toasts-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  width: calc(100vw - 32px);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .buchisapa-toasts-container {
+    bottom: 84px; /* Deja espacio al botón flotante de carrito móvil */
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+/* Tarjeta Toast individual */
+.buchisapa-dynamic-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-left: 4px solid #dc2626;
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  transform: translateY(20px) scale(0.96);
+  opacity: 0;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.buchisapa-dynamic-toast.toast-show {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.buchisapa-dynamic-toast.toast-hide {
+  transform: translateY(12px) scale(0.94);
+  opacity: 0;
+}
+
+.toast-icon-wrap {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.15);
+}
+
+.toast-body-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+}
+
+.toast-msg {
+  font-size: 12.5px;
+  color: #cbd5e1;
+  margin-top: 2px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast-action-btn {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.toast-action-btn:hover {
+  background: #b91c1c;
+}
+
+.toast-action-btn:active {
+  transform: scale(0.94);
+}
+
+.toast-close-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 14px;
+  padding: 4px;
+  cursor: pointer;
+  line-height: 1;
+  border-radius: 6px;
+  transition: color 0.15s;
+}
+
+.toast-close-btn:hover {
+  color: #ffffff;
+}

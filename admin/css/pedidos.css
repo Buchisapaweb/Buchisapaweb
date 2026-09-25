@@ -1,0 +1,134 @@
+/* ==========================================================================
+   BUCHISAPA ADMIN - ORDERS VIEW STYLES
+   Layer: /admin/css/views-orders.css
+   ========================================================================== */
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.order-card {
+  background: rgba(18, 11, 36, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(224, 36, 195, 0.22);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.order-card:hover {
+  border-color: rgba(0, 240, 255, 0.45);
+  background: rgba(28, 17, 54, 0.88);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 240, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.order-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.order-id-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-number {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.order-type-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.order-timestamp {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+}
+
+.order-customer-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.order-customer-name {
+  color: #fff;
+  font-weight: 700;
+}
+
+.order-items-summary {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.order-item-qty {
+  font-weight: 800;
+  color: var(--accent-orange);
+  margin-right: 6px;
+}
+
+.order-item-name {
+  color: var(--text-main);
+  flex: 1;
+}
+
+.order-item-price {
+  color: #fff;
+  font-weight: 700;
+}
+
+.order-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.order-total-amount {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #10b981;
+}
+
+.order-stage-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

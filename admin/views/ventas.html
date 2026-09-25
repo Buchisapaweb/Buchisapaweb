@@ -1,0 +1,81 @@
+        <!-- ====================================================================
+             4. VISTA VENTAS (ESTADÍSTICAS Y VENTAS COMERCIALES)
+             ==================================================================== -->
+        <section class="admin-view" id="view-ventas">
+          <div class="section-panel">
+            <div class="panel-header">
+              <div>
+                <h3 class="panel-title">Métricas de Ventas y Rendimiento Comercial</h3>
+                <p class="panel-description">Resumen consolidado de ingresos, pedidos atendidos y canales de venta.</p>
+              </div>
+              <button class="btn btn-secondary" onclick="showToast('Exportando reporte comercial a CSV...', 'info')">
+                Exportar Reporte
+              </button>
+            </div>
+
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-icon-wrap green">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Ventas Totales</span>
+                  <span class="metric-value" id="ventas-total-sales">S/ 1,850.50</span>
+                  <span class="metric-hint">38 órdenes atendidas hoy</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap orange">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Ticket Promedio</span>
+                  <span class="metric-value" id="ventas-ticket-promedio">S/ 48.70</span>
+                  <span class="metric-hint">Consumo medio por cliente</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap blue">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Ventas Delivery</span>
+                  <span class="metric-value" id="ventas-delivery-count">24 pedidos</span>
+                  <span class="metric-hint">63% de los pedidos totales</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap amber">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Mostrador / Salón</span>
+                  <span class="metric-value" id="ventas-recojo-count">14 pedidos</span>
+                  <span class="metric-hint">37% de pedidos en tienda</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Resumen de Canales de Cobro -->
+            <div style="background-color: var(--bg-surface); border-radius: var(--radius-lg); padding: 20px; border: 1px solid var(--border-subtle); margin-top: 18px;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 14px;">Distribución de Cobranza por Medio de Pago</h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-card);">
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">📱 Yape &amp; Plin (47.6%)</div>
+                  <div style="font-size: 1.25rem; font-weight: 800; color: #10b981; margin-top: 4px;" id="ventas-yape">S/ 880.50</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-card);">
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">💵 Efectivo (38.9%)</div>
+                  <div style="font-size: 1.25rem; font-weight: 800; color: #ff6200; margin-top: 4px;" id="ventas-efectivo">S/ 720.00</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-card);">
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">💳 Tarjetas POS (13.5%)</div>
+                  <div style="font-size: 1.25rem; font-weight: 800; color: #3b82f6; margin-top: 4px;" id="ventas-tarjeta">S/ 250.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>

@@ -1,0 +1,69 @@
+        <!-- ====================================================================
+             2. VISTA PRODUCTOS (CATÁLOGO OFICIAL)
+             ==================================================================== -->
+        <section class="admin-view" id="view-productos">
+
+          <!-- BARRA DE FILTROS POR CATEGORÍA Y ORDENAMIENTO -->
+          <div class="catalog-toolbar">
+            <div class="category-filter-chips">
+              <button class="category-chip active" data-category="todos">Todos (45)</button>
+              <button class="category-chip" data-category="platos-amazonicos">🌿 Amazónicos</button>
+              <button class="category-chip" data-category="hamburguesas">🍔 Burgers</button>
+              <button class="category-chip" data-category="broaster">🍗 Broaster</button>
+              <button class="category-chip" data-category="salchipapas">🍟 Salchipapas</button>
+              <button class="category-chip" data-category="alitas">🍗 Alitas</button>
+              <button class="category-chip" data-category="bebidas">🥤 Bebidas</button>
+              <button class="category-chip" data-category="refrescos">🍹 Refrescos</button>
+              <button class="category-chip" data-category="infusiones">☕ Infusiones</button>
+              <button class="category-chip" data-category="combos">✨ Combos</button>
+              <button class="category-chip" data-category="extras">🔥 Extras</button>
+            </div>
+
+            <div class="toolbar-controls">
+              <select class="sort-select" id="product-sort-select">
+                <option value="recent">Más recientes</option>
+                <option value="price-asc">Precio: menor a mayor</option>
+                <option value="price-desc">Precio: mayor a menor</option>
+                <option value="stock-desc">Mayor stock disponible</option>
+                <option value="name-asc">Nombre (A - Z)</option>
+              </select>
+
+              <div class="view-mode-toggle">
+                <button class="view-btn active" id="btn-view-grid" title="Vista en tarjetas cuadrícula">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                </button>
+                <button class="view-btn" id="btn-view-table" title="Vista en tabla detallada">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- GRID DE PRODUCTOS -->
+          <div class="products-grid" id="products-grid-container">
+            <!-- Renderizado dinámico vía scripts -->
+          </div>
+
+          <!-- TABLA DE PRODUCTOS (MODO COMPACTO) -->
+          <div class="table-container" id="products-table-container" style="display: none;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Stock</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <!-- Renderizado dinámico vía scripts -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PAGINACIÓN -->
+          <div id="catalog-pagination"></div>
+
+        </section>

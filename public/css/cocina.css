@@ -1,0 +1,592 @@
+/* =========================================================
+   BUCHISAPA RESTAURANTE - PANTALLA KDS DE COCINA (CSS)
+   ========================================================= */
+
+.kds-container {
+  min-height: 100vh;
+  background-color: #0b0f19;
+  color: #f1f5f9;
+  padding: 20px;
+}
+
+.kds-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background: #111827;
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+}
+
+.kds-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #f97316;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kds-columns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.kds-column {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px);
+}
+
+.kds-column-header {
+  padding: 14px 18px;
+  font-size: 15px;
+  font-weight: 800;
+  border-bottom: 1px solid #1f2937;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kds-column-header.recibido { border-top: 4px solid #f59e0b; }
+.kds-column-header.en_preparacion { border-top: 4px solid #3b82f6; }
+.kds-column-header.listo { border-top: 4px solid #10b981; }
+
+.kds-orders-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.kds-order-card {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.kds-order-card.urgent {
+  border-color: #ef4444;
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.kds-order-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.kds-order-num {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fb923c;
+}
+
+.kds-order-time {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.kds-order-client {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e5e7eb;
+  margin-bottom: 10px;
+}
+
+.kds-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #374151;
+}
+
+.kds-item-qty {
+  font-weight: 800;
+  color: #facc15;
+  margin-right: 6px;
+}
+
+.kds-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.kds-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.kds-btn-print {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+.kds-btn-next {
+  background: #f97316;
+  color: #ffffff;
+}
+
+.kds-btn-next:hover {
+  background: #ea580c;
+}
+
+/* =========================================================
+   SISTEMA DE ALERTA SONORA Y NUEVAS COMANDAS (KDS AUDIO)
+   ========================================================= */
+
+.kds-btn-sound {
+  background: #065f46;
+  color: #34d399;
+  border: 1px solid #059669;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  padding: 8px 14px;
+}
+
+.kds-btn-sound.muted {
+  background: #4b5563;
+  color: #d1d5db;
+  border-color: #6b7280;
+}
+
+.kds-btn-test-sound {
+  background: #1e293b;
+  color: #facc15;
+  border: 1px solid #ca8a04;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  padding: 8px 14px;
+}
+
+.kds-btn-test-sound:hover {
+  background: #854d0e;
+  color: #ffffff;
+}
+
+.kds-audio-status-bar {
+  background: linear-gradient(90deg, #1e1b4b 0%, #0f172a 100%);
+  border: 1px solid #4338ca;
+  border-radius: 10px;
+  padding: 10px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.kds-audio-status-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.kds-audio-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  animation: audio-pulse 1.8s infinite;
+}
+
+.kds-audio-dot.suspended {
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+}
+
+.kds-audio-dot.muted {
+  background: #ef4444;
+  box-shadow: none;
+  animation: none;
+}
+
+@keyframes audio-pulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+/* Banner flotante de Nuevo Pedido */
+.kds-new-order-banner {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100000;
+  background: linear-gradient(135deg, #b45309 0%, #dc2626 100%);
+  color: #ffffff;
+  padding: 14px 24px;
+  border-radius: 14px;
+  border: 2px solid #fef08a;
+  box-shadow: 0 20px 40px rgba(220, 38, 38, 0.5), 0 0 25px rgba(254, 240, 138, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  animation: banner-slide-down 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes banner-slide-down {
+  from { transform: translate(-50%, -40px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.kds-new-order-banner-bell {
+  font-size: 28px;
+  animation: bell-ring 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes bell-ring {
+  0% { transform: rotate(-18deg); }
+  100% { transform: rotate(18deg); }
+}
+
+/* Tarjeta recién llegada con destello dorado */
+.kds-order-card.new-arrival-pulse {
+  border: 2px solid #fbbf24 !important;
+  animation: new-card-glow 1.5s infinite alternate ease-in-out !important;
+}
+
+@keyframes new-card-glow {
+  0% {
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5), inset 0 0 10px rgba(251, 191, 36, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.9), inset 0 0 18px rgba(251, 191, 36, 0.4);
+  }
+}
+
+/* IMPRESIÓN LIMPIA DE COMANDA EN COCINA */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #kds-ticket-paper,
+  #kds-ticket-paper * {
+    visibility: visible;
+  }
+
+  #kds-ticket-paper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 !important;
+    padding: 6px !important;
+    box-shadow: none !important;
+    border: none !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+  }
+
+  @page {
+    margin: 0;
+    size: auto;
+  }
+}
+
+/* Clases utilitarias KDS */
+.kds-hidden {
+  display: none !important;
+}
+
+.kds-hidden-frame {
+  display: none;
+}
+
+.text-right {
+  text-align: right;
+}
+  height: 36px;
+  object-fit: contain;
+}
+
+.kds-sub-title {
+  font-size: 16px;
+  color: #94a3b8;
+  font-weight: normal;
+}
+
+.kds-actions-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.kds-btn-stock {
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.kds-btn-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.kds-audio-bar {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #0f172a;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  font-size: 13px;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kds-audio-status-bold {
+  font-weight: 700;
+}
+
+.kds-audio-prompt {
+  display: none;
+  color: #facc15;
+  font-size: 12px;
+  background: rgba(250, 204, 21, 0.15);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.kds-btn-voice {
+  background: #1e293b;
+  color: #93c5fd;
+  border: 1px solid #3b82f6;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.kds-btn-chime {
+  background: #374151;
+  color: #f1f5f9;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.kds-banner-title {
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.kds-banner-subtitle {
+  font-size: 13px;
+  opacity: 0.95;
+}
+
+.kds-banner-close-btn {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.kds-empty-msg {
+  text-align: center;
+  color: #6b7280;
+  padding: 20px;
+}
+
+/* Modales KDS */
+.kds-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.75);
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.kds-modal-box {
+  background: #1e293b;
+  color: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #334155;
+  width: 95%;
+  max-width: 680px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.kds-modal-box-sm {
+  max-width: 440px;
+  max-height: 90vh;
+}
+
+.kds-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0f172a;
+}
+
+.kds-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kds-modal-icon {
+  font-size: 20px;
+}
+
+.kds-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.kds-modal-subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.kds-modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.kds-modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kds-modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #334155;
+  background: #0f172a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kds-modal-footer-col {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kds-modal-note {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.kds-btn-modal-close {
+  background: #334155;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kds-ticket-paper {
+  background: #ffffff;
+  padding: 18px 14px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  font-family: 'Courier New', Courier, monospace;
+  color: #000000;
+  font-size: 13px;
+  line-height: 1.4;
+  border-top: 4px dashed #cbd5e1;
+  border-bottom: 4px dashed #cbd5e1;
+}
+
+.kds-ticket-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.kds-btn-print-native {
+  padding: 10px;
+  background: #ea580c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.kds-btn-print-wifi {
+  padding: 10px;
+  background: #334155;
+  color: #f8fafc;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+

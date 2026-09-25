@@ -1,0 +1,162 @@
+<!-- MODAL CAMBIO DE UBICACIÓN Y VERIFICACIÓN EN TIEMPO REAL -->
+<div class="modal-backdrop" id="location-modal" onclick="if(event.target === this) closeLocationModal()">
+  <div class="location-modal-box" onclick="event.stopPropagation()">
+    
+    <!-- CABECERA DEL MODAL -->
+    <div class="loc-modal-header">
+      <div class="loc-header-left">
+        <div class="loc-header-pin-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <h3 class="loc-modal-title">¿Dónde deseas recibir tu pedido?</h3>
+          <p class="loc-modal-subtitle">Ubicación en tiempo real y servicio las 24 horas</p>
+        </div>
+      </div>
+      <button type="button" class="loc-modal-close-btn" onclick="closeLocationModal()" aria-label="Cerrar">&times;</button>
+    </div>
+
+    <!-- SELECTOR DE MODALIDAD (TABS) -->
+    <div class="loc-tabs-row">
+      <button type="button" class="loc-tab-btn active" id="loc-tab-delivery" onclick="switchLocationTab('delivery')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span>Delivery a Domicilio</span>
+      </button>
+      <button type="button" class="loc-tab-btn" id="loc-tab-pickup" onclick="switchLocationTab('pickup')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Recojo en Tienda</span>
+      </button>
+    </div>
+
+    <!-- CUERPO PRINCIPAL -->
+    <div class="loc-modal-body">
+      
+      <!-- VISTA DELIVERY A DOMICILIO -->
+      <div id="loc-content-delivery">
+        
+        <!-- Input Etiqueta -->
+        <input 
+          type="text" 
+          id="loc-tag-input" 
+          class="loc-text-input" 
+          placeholder="Etiqueta (ej: Mi casa, Casa de mamá)"
+          style="margin-bottom: 8px;"
+        >
+
+        <!-- Chips de Etiquetas Rápidas -->
+        <div class="loc-tag-chips">
+          <button type="button" class="loc-chip" onclick="setAddressTag('Mi casa')">🏠 Mi casa</button>
+          <button type="button" class="loc-chip" onclick="setAddressTag('Casa de mamá')">❤️ Casa de mamá</button>
+          <button type="button" class="loc-chip" onclick="setAddressTag('Trabajo')">💼 Trabajo</button>
+          <button type="button" class="loc-chip" onclick="setAddressTag('Otro')">📍 Otro</button>
+        </div>
+
+        <!-- Input Teléfono -->
+        <label class="loc-field-label" for="loc-phone-input">Número teléfono*</label>
+        <input 
+          type="tel" 
+          id="loc-phone-input" 
+          class="loc-text-input" 
+          placeholder="Requerido para guardar la dirección"
+          maxlength="15"
+          style="margin-bottom: 12px;"
+        >
+
+        <!-- Campos ocultos de apoyo técnico para GPS y geocodificación -->
+        <input type="hidden" id="loc-address-input" value="Avenida 15 de Julio, Huaycán, Ate, Perú">
+        <input type="hidden" id="loc-gps-input" value="GPS: -12.0119, -76.8239">
+
+        <!-- Mapa Interactivo estilo Google/Leaflet -->
+        <div class="loc-map-container" id="loc-map-container">
+          <div id="loc-leaflet-map" class="loc-leaflet-map"></div>
+          <button type="button" class="loc-map-expand-btn" onclick="toggleMapExpand()" title="Expandir mapa" aria-label="Expandir mapa">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
+          <div class="loc-map-watermark-left">Google</div>
+          <div class="loc-map-watermark-right">Datos del mapa ©2026 Google · Condiciones</div>
+        </div>
+
+        <!-- Botón Rojo Confirmar Dirección -->
+        <button type="button" id="loc-confirm-delivery-btn" class="loc-btn-confirm-delivery" onclick="confirmDeliveryAddress()">
+          <span>🛵</span>
+          <span>CONFIRMAR DIRECCIÓN</span>
+        </button>
+      </div>
+
+      <!-- VISTA RECOJO EN TIENDA -->
+      <div id="loc-content-pickup" style="display: none;">
+        <div class="loc-pickup-card">
+          <div class="loc-pickup-title-row">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="loc-pickup-name">Sede Principal Buchisapa - Santa Clara, Ate</span>
+          </div>
+          <div class="loc-pickup-address">Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara) Ate, Lima 🇵🇪</div>
+          <div class="loc-pickup-hours">
+            <span style="font-weight: 900; color: #16a34a;">🕕</span>
+            <span>Horario de atención: <strong>Lunes a Domingo, de 6:00 PM a 5:00 AM</strong></span>
+          </div>
+          <p class="loc-pickup-desc">Tu pedido estará empacado térmicamente y listo en aproximadamente 15–20 minutos para que pases a recogerlo en nuestro mostrador.</p>
+        </div>
+
+        <button type="button" class="loc-btn-confirm-pickup" onclick="confirmPickupStore()">
+          CONFIRMAR RECOJO EN SALÓN
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE DIAGNÓSTICO GPS -->
+<div class="modal-backdrop" id="device-gps-diag-modal" style="display: none; z-index: 100000; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(6px); align-items: center; justify-content: center;" onclick="if(event.target === this) closeDeviceGpsModal()">
+  <div style="background: #1e293b; color: #f8fafc; border-radius: 20px; padding: 20px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.12); margin: 16px;" onclick="event.stopPropagation()">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+          🛰️
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #ffffff;">Datos GPS del Dispositivo</h3>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">Verificación y telemetría en tiempo real</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeDeviceGpsModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 4px;" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div style="background: rgba(15, 23, 42, 0.6); border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 13px;">
+      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <span style="color: #94a3b8;">📡 Estado del Sensor:</span>
+        <span id="index-diag-sensor-state" style="font-weight: 700; color: #34d399;">● Activo y Transmitiendo</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <span style="color: #94a3b8;">🔐 Permiso del Navegador:</span>
+        <span id="index-diag-perm-state" style="font-weight: 700; color: #38bdf8;">Concedido</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <span style="color: #94a3b8;">📍 Latitud / Longitud:</span>
+        <span id="index-diag-coords" style="font-weight: 700; font-family: monospace; color: #f1f5f9;">-12.0119, -76.8239</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <span style="color: #94a3b8;">🎯 Margen de Error:</span>
+        <span id="index-diag-accuracy" style="font-weight: 700; color: #f1f5f9;">± 15 metros</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <span style="color: #94a3b8;">⚡ Desplazamiento:</span>
+        <span id="index-diag-speed" style="font-weight: 700; color: #f1f5f9;">0.0 km/h (Estático)</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 9px 0;">
+        <span style="color: #94a3b8;">⏱️ Última Verificación:</span>
+        <span id="index-diag-time" style="font-weight: 700; color: #f1f5f9;">Ahora mismo</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px;">
+      <button type="button" onclick="triggerLocationDetection(false); updateDeviceGpsModalData(); if(window.BuchisapaPush) window.BuchisapaPush.showToast('GPS actualizado', '📡');" style="flex: 1; padding: 11px; background: #0284c7; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <span>🔄 Re-verificar GPS</span>
+      </button>
+      <button type="button" onclick="closeDeviceGpsModal()" style="padding: 11px 18px; background: #334155; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer;">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

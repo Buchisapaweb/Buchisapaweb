@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Buchisapa Delivery - Ubicación y Cobertura en Vivo</title>
+  <meta name="description" content="Selecciona tu punto de entrega con GPS en vivo o recojo en tienda en nuestra sede Santa Clara, Ate. Delivery nocturno 6:00 PM - 5:00 AM.">
+  <link rel="icon" type="image/png" href="/imagenes/logo/logo-buchisapa.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="/css/ubicacion.css">
+</head>
+<body>
+
+  <!-- HEADER PRINCIPAL ESTILO APP MÓVIL (Sin botón de ampliar) -->
+  <header class="app-loc-header">
+    <a href="/" class="app-back-btn" title="Volver al Menú">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m15 18-6-6 6-6"/></svg>
+      <span>Volver</span>
+    </a>
+
+    <div class="app-header-center">
+      <div class="app-logo-avatar">
+        <img src="/imagenes/logo/logo-buchisapa.png" alt="Buchisapa">
+      </div>
+      <div class="app-header-title-box">
+        <span class="app-header-title">Buchisapa Delivery</span>
+        <span class="app-header-status">
+          <span class="pulse-dot"></span>
+          <span id="header-gps-label">GPS en Vivo</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Espacio decorativo balanceado a la derecha -->
+    <div style="width: 50px;"></div>
+  </header>
+
+  <!-- CUERPO PRINCIPAL -->
+  <main class="loc-main-layout">
+
+    <!-- SECCIÓN MAPA -->
+    <div class="loc-map-wrapper" id="loc-map-wrapper">
+      
+      <!-- Buscador Elegante con Borde Rojo sobre el Mapa (Screenshot 2) -->
+      <div class="loc-search-container-wrap">
+        <form class="loc-map-search-bar" onsubmit="searchAddressOnMap(event)">
+          <div class="loc-map-search-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <input 
+            type="text" 
+            id="map-query-input" 
+            class="loc-map-search-input" 
+            placeholder="Buscar calle, avenida o referencia..."
+            autocomplete="off"
+            oninput="handleMapSearchInput(event)"
+          >
+          <button type="button" class="loc-map-clear-btn" id="map-clear-btn" onclick="clearMapSearch()" title="Borrar texto">
+            ✕
+          </button>
+          <button type="submit" class="loc-map-search-btn" title="Buscar en mapa">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+
+        <!-- Caja de Sugerencias de Autocompletado en Vivo -->
+        <div class="loc-suggestions-box" id="loc-suggestions-dropdown"></div>
+      </div>
+
+      <!-- Contenedor Leaflet -->
+      <div id="live-delivery-map"></div>
+
+      <!-- Botones flotantes de herramientas del mapa (Image 1) -->
+      <div class="loc-map-floating-controls">
+        <button type="button" class="map-pill-tool-btn" id="btn-toggle-satellite" onclick="toggleSatelliteLayer()">
+          <span>🛰️</span>
+          <span>Satélite</span>
+        </button>
+        <button type="button" class="map-pill-tool-btn" id="btn-draw-route" onclick="toggleRouteToStore()">
+          <span>🗺️</span>
+          <span>Ver Ruta</span>
+        </button>
+        <button type="button" class="map-pill-tool-btn" id="btn-simulate-moto" onclick="simulateMotoDelivery()">
+          <span>🛵</span>
+          <span>Simular Moto</span>
+        </button>
+        <button type="button" class="map-pill-tool-btn active-blue" id="btn-center-gps" onclick="requestUserGps(true)">
+          <span class="pulse-dot" style="background: #ffffff; box-shadow: none;"></span>
+          <span id="btn-gps-text">GPS en Vivo</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- TARJETA INFERIOR DE DIRECCIÓN / RECOJO -->
+    <div class="loc-bottom-sheet">
+      <div class="loc-sheet-drag-handle"></div>
+
+      <!-- PESTAÑAS SEGMENTADAS (Image 1) -->
+      <div class="loc-tabs-pill-row">
+        <button type="button" class="loc-tab-pill-btn active" id="tab-btn-delivery" onclick="switchMode('delivery')">
+          <span>🛵</span>
+          <span>Delivery</span>
+        </button>
+        <button type="button" class="loc-tab-pill-btn" id="tab-btn-pickup" onclick="switchMode('pickup')">
+          <span>🏪</span>
+          <span>Recojo en Tienda</span>
+        </button>
+      </div>
+
+      <!-- VISTA MODO DELIVERY -->
+      <div id="view-delivery-container">
+        
+        <!-- Línea de Cobertura y Costo -->
+        <div class="loc-coverage-badge-row">
+          <div class="coverage-status-tag">
+            <span class="dot"></span>
+            <span id="coverage-status-text">Cobertura Directa (0 km • S/ 3.50)</span>
+          </div>
+          <button type="button" class="edit-address-text-btn" onclick="focusAddressInput()">
+            <span>✏️</span>
+            <span>Editar texto</span>
+          </button>
+        </div>
+
+        <!-- Dirección Principal -->
+        <h2 class="loc-address-main-title" id="display-address-title">Av. La Estrella con Calle 28 de Julio (Santa Clara)</h2>
+        <p class="loc-address-subtitle" id="display-address-sub">Ate, Lima</p>
+
+        <!-- Barra de Telemetría GPS -->
+        <div class="loc-gps-telemetry-row">
+          <div class="loc-gps-coords">
+            <span class="blue-dot"></span>
+            <span id="display-gps-coords">GPS: -12.01635, -76.88455</span>
+          </div>
+          <div style="color: #0284c7; display: flex; align-items: center; gap: 4px; cursor: pointer;" onclick="openGpsPermissionModal()">
+            <span>🛡️</span>
+            <span id="display-gps-status">Precisión Satelital</span>
+          </div>
+        </div>
+
+        <!-- Formulario: Etiqueta y Teléfono (Image 2) -->
+        <form id="delivery-location-form" onsubmit="saveDeliveryAndGoMenu(event)">
+          
+          <div class="loc-form-group">
+            <label class="loc-form-label" for="input-address-tag">Etiqueta tu dirección*</label>
+            <input 
+              type="text" 
+              id="input-address-tag" 
+              class="loc-form-input" 
+              placeholder="Etiqueta (ej: Mi casa, Casa de mamá)"
+              value="Mi casa"
+              required
+            >
+            <!-- Chips rápidos -->
+            <div class="loc-tag-chips">
+              <button type="button" class="loc-chip-btn active" onclick="setChipTag('Mi casa')">🏠 Mi casa</button>
+              <button type="button" class="loc-chip-btn" onclick="setChipTag('Casa de mamá')">❤️ Casa de mamá</button>
+              <button type="button" class="loc-chip-btn" onclick="setChipTag('Trabajo')">💼 Trabajo</button>
+              <button type="button" class="loc-chip-btn" onclick="setChipTag('Otro')">📍 Otro</button>
+            </div>
+          </div>
+
+          <div class="loc-form-group">
+            <label class="loc-form-label" for="input-phone-number">Número teléfono*</label>
+            <input 
+              type="tel" 
+              id="input-phone-number" 
+              class="loc-form-input" 
+              placeholder="Requerido para guardar la dirección"
+              maxlength="15"
+              required
+            >
+          </div>
+
+          <button type="submit" class="loc-submit-btn">
+            <span>🛵</span>
+            <span>CONFIRMAR DIRECCIÓN Y PEDIR</span>
+          </button>
+        </form>
+
+      </div>
+
+      <!-- VISTA MODO RECOJO EN TIENDA -->
+      <div id="view-pickup-container" style="display: none;">
+        <div class="loc-store-card">
+          <div class="loc-store-header">
+            <span style="font-size: 24px;">🍗</span>
+            <div>
+              <div class="loc-store-name">Sede Principal Santa Clara</div>
+              <span class="loc-store-badge">Atención Nocturna Abierta</span>
+            </div>
+          </div>
+          <p class="loc-store-desc">
+            <strong>Av. La Estrella con Calle 28 de Julio</strong><br>
+            Esquina de la posta médica (a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪
+          </p>
+          <div class="loc-store-hours">
+            <span>🕕</span>
+            <span>Horario continuo: <strong>6:00 PM a 5:00 AM (Lunes a Domingo)</strong></span>
+          </div>
+        </div>
+
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px; margin-bottom: 16px; font-size: 13px; color: #166534;">
+          ⚡ <strong>Listo en 15-20 minutos:</strong> Empacado al vacío térmico para que disfrutes de tu comida caliente al recoger.
+        </div>
+
+        <button type="button" class="loc-submit-btn" style="background: #0f172a;" onclick="savePickupAndGoMenu()">
+          <span>🏪</span>
+          <span>CONFIRMAR RECOJO EN SALÓN</span>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL DE VERIFICACIÓN / ACTIVACIÓN GPS (Image 4) -->
+  <div class="gps-perm-backdrop" id="gps-permission-modal" style="display: none;" onclick="if(event.target === this) closeGpsPermissionModal()">
+    <div class="gps-perm-card" onclick="event.stopPropagation()">
+      
+      <div class="gps-perm-header">
+        <div class="gps-perm-icon-circle">
+          📍
+        </div>
+        <div class="gps-perm-title-box">
+          <div class="gps-perm-domain">buchisapaweb.vercel.app</div>
+          <div class="gps-perm-subtitle">quiere usar la ubicación de tu dispositivo para entregas en vivo.</div>
+        </div>
+        <button type="button" class="gps-perm-close-btn" onclick="closeGpsPermissionModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="gps-perm-options-box">
+        
+        <!-- Opción 1: Precisa (Seleccionada) -->
+        <div class="gps-perm-option selected" id="opt-precise" onclick="selectGpsOption('precise')">
+          <div class="gps-option-graphic" style="background: #0284c7;">
+            🎯
+          </div>
+          <div class="gps-option-texts">
+            <div class="gps-option-title">Precisa</div>
+            <div class="gps-option-desc">Ubicación exacta por satélite</div>
+          </div>
+          <div class="gps-option-check" id="check-precise">✓</div>
+        </div>
+
+        <!-- Opción 2: Aproximado -->
+        <div class="gps-perm-option" id="opt-approx" onclick="selectGpsOption('approx')">
+          <div class="gps-option-graphic" style="background: #059669;">
+            🏙️
+          </div>
+          <div class="gps-option-texts">
+            <div class="gps-option-title">Aproximado</div>
+            <div class="gps-option-desc">Barrio o distrito</div>
+          </div>
+          <div class="gps-option-uncheck" id="check-approx"></div>
+        </div>
+
+      </div>
+
+      <div class="gps-perm-actions">
+        <button type="button" class="gps-btn-allow-site" onclick="executeGrantGps('site')">
+          Permitir al visitar el sitio
+        </button>
+        <button type="button" class="gps-btn-allow-hour" onclick="executeGrantGps('hour')">
+          Permitir esta hora
+        </button>
+        <button type="button" class="gps-btn-deny" onclick="denyGpsAndManual()">
+          No permitir nunca
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    // Variables globales
+    const STORE_LAT = -12.01635;
+    const STORE_LNG = -76.88455;
+    let currentLat = STORE_LAT;
+    let currentLng = STORE_LNG;
+    let currentMode = 'delivery';
+    let leafletMap = null;
+    let deliveryMarker = null;
+    let storeMarker = null;
+    let routePolyline = null;
+    let motoMarker = null;
+    let motoAnimationTimer = null;
+    let isSatellite = false;
+    let watchId = null;
+    let selectedAccuracy = 'precise';
+    let searchDebounceTimer = null;
+
+    // Base de datos de referencias locales de Ate / Santa Clara para autocompletado instantáneo
+    const LOCAL_PLACES = [
+      { name: 'Av. La Estrella (Santa Clara)', sub: 'Santa Clara, Ate, Lima', lat: -12.01635, lng: -76.88455 },
+      { name: 'Real Plaza Santa Clara', sub: 'Av. Nicolás Ayllón 8694, Ate', lat: -12.01780, lng: -76.88390 },
+      { name: 'Calle 28 de Julio (Santa Clara)', sub: 'Esquina posta médica, Ate, Lima', lat: -12.01610, lng: -76.88500 },
+      { name: 'Av. 15 de Julio (Huaycán)', sub: 'Huaycán Zona A, Ate, Lima', lat: -12.01190, lng: -76.82390 },
+      { name: 'Plaza Principal Huaycán', sub: 'Av. 15 de Julio, Ate', lat: -12.01350, lng: -76.82100 },
+      { name: 'Plaza Vitarte', sub: 'Av. Nicolás Ayllón, Vitarte, Ate', lat: -12.02890, lng: -76.91850 },
+      { name: 'Pariachi (Carretera Central)', sub: 'Km 12.5 Carretera Central, Ate', lat: -12.00950, lng: -76.84500 },
+      { name: 'Horacio Zeballos', sub: 'Ate, Lima', lat: -12.00400, lng: -76.83700 },
+      { name: 'Los Laureles', sub: 'Santa Clara, Ate', lat: -12.01950, lng: -76.88900 },
+      { name: 'Av. Sinchi Roca', sub: 'Santa Clara, Ate', lat: -12.01480, lng: -76.88220 },
+      { name: 'Carretera Central Km 10', sub: 'Santa Clara, Ate', lat: -12.01820, lng: -76.88100 }
+    ];
+
+    // Capas de mapas
+    let osmLayer = null;
+    let satelliteLayer = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      loadStoredSettings();
+      verifyAndRequestLiveGps();
+
+      // Cerrar sugerencias si se hace clic fuera del contenedor
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.loc-search-container-wrap')) {
+          closeSuggestionsDropdown();
+        }
+      });
+    });
+
+    function initMap() {
+      leafletMap = L.map('live-delivery-map', {
+        center: [currentLat, currentLng],
+        zoom: 16,
+        zoomControl: false,
+        attributionControl: false
+      });
+
+      osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      }).addTo(leafletMap);
+
+      satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19
+      });
+
+      // Marcador de tienda Buchisapa Santa Clara
+      const storeIcon = L.divIcon({
+        className: 'store-leaflet-pin',
+        html: `
+          <div style="background: #1e293b; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); border: 2px solid #fff; font-size: 18px;">
+            🍗
+          </div>
+        `,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+
+      storeMarker = L.marker([STORE_LAT, STORE_LNG], { icon: storeIcon }).addTo(leafletMap);
+      storeMarker.bindPopup('<strong style="color: #dc2626;">Buchisapa Santa Clara</strong><br>Av. La Estrella con Calle 28 de Julio');
+
+      // Marcador interactivo y arrastrable de entrega (Image 1)
+      const pinIcon = L.divIcon({
+        className: 'delivery-leaflet-pin',
+        html: `
+          <div class="pin-label-tag">📍 Punto de Entrega</div>
+          <div class="pin-pulse-circle">
+            <div style="width: 12px; height: 12px; background: #ffffff; border-radius: 50%;"></div>
+          </div>
+        `,
+        iconSize: [44, 44],
+        iconAnchor: [22, 22]
+      });
+
+      deliveryMarker = L.marker([currentLat, currentLng], {
+        icon: pinIcon,
+        draggable: true
+      }).addTo(leafletMap);
+
+      // Evento de arrastre de marcador
+      deliveryMarker.on('dragend', function (e) {
+        const pos = e.target.getLatLng();
+        updatePosition(pos.lat, pos.lng, true);
+      });
+
+      // Clic en mapa para reposicionar fluidamente
+      leafletMap.on('click', function (e) {
+        if (currentMode === 'delivery') {
+          updatePosition(e.latlng.lat, e.latlng.lng, true);
+          leafletMap.panTo([e.latlng.lat, e.latlng.lng], { animate: true, duration: 0.8 });
+        }
+      });
+    }
+
+    function updatePosition(lat, lng, doReverseGeocode = true) {
+      currentLat = lat;
+      currentLng = lng;
+      
+      if (deliveryMarker) {
+        deliveryMarker.setLatLng([lat, lng]);
+      }
+
+      // Actualizar telemetría GPS en UI
+      document.getElementById('display-gps-coords').textContent = `GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      
+      // Calcular distancia y cobertura
+      calculateDistanceAndRate(lat, lng);
+
+      if (doReverseGeocode) {
+        reverseGeocode(lat, lng);
+      }
+    }
+
+    function calculateDistanceAndRate(lat, lng) {
+      // Fórmula Haversine precisa
+      const R = 6371; // Radio de la Tierra en km
+      const dLat = (lat - STORE_LAT) * Math.PI / 180;
+      const dLon = (lng - STORE_LNG) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(STORE_LAT * Math.PI / 180) * Math.cos(lat * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+
+      let fee = 3.50;
+      if (distance > 3) {
+        fee = 3.50 + Math.ceil(distance - 3) * 1.50;
+      }
+
+      const coverageEl = document.getElementById('coverage-status-text');
+      if (distance <= 12) {
+        coverageEl.textContent = `Cobertura Directa (${distance.toFixed(1)} km • S/ ${fee.toFixed(2)})`;
+        coverageEl.parentElement.style.color = '#16a34a';
+      } else {
+        coverageEl.textContent = `Fuera de zona estándar (${distance.toFixed(1)} km • Envío especial)`;
+        coverageEl.parentElement.style.color = '#ea580c';
+      }
+    }
+
+    async function reverseGeocode(lat, lng) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.display_name) {
+            const road = data.address.road || data.address.pedestrian || data.address.suburb || 'Ubicación seleccionada';
+            const city = (data.address.city || data.address.town || data.address.county || 'Ate') + ', Lima';
+            
+            document.getElementById('display-address-title').textContent = road;
+            document.getElementById('display-address-sub').textContent = city;
+          }
+        }
+      } catch (err) {
+        console.warn('Geocoding no disponible, usando coordenadas:', err);
+      }
+    }
+
+    function switchMode(mode) {
+      currentMode = mode;
+      const tabDelivery = document.getElementById('tab-btn-delivery');
+      const tabPickup = document.getElementById('tab-btn-pickup');
+      const viewDelivery = document.getElementById('view-delivery-container');
+      const viewPickup = document.getElementById('view-pickup-container');
+
+      if (mode === 'delivery') {
+        tabDelivery.classList.add('active');
+        tabPickup.classList.remove('active');
+        viewDelivery.style.display = 'block';
+        viewPickup.style.display = 'none';
+        if (deliveryMarker && leafletMap) {
+          deliveryMarker.setOpacity(1);
+          leafletMap.flyTo([currentLat, currentLng], 16, { animate: true, duration: 1.2 });
+        }
+      } else {
+        tabDelivery.classList.remove('active');
+        tabPickup.classList.add('active');
+        viewDelivery.style.display = 'none';
+        viewPickup.style.display = 'block';
+        if (leafletMap) {
+          leafletMap.flyTo([STORE_LAT, STORE_LNG], 17, { animate: true, duration: 1.2 });
+        }
+      }
+    }
+
+    // GESTIÓN DE PERMISOS GPS EN VIVO (Image 4)
+    function verifyAndRequestLiveGps() {
+      if (!navigator.geolocation) {
+        console.warn('Geolocalización no soportada');
+        return;
+      }
+
+      if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'geolocation' }).then(result => {
+          if (result.state === 'granted') {
+            startLiveWatch();
+          } else if (result.state === 'prompt') {
+            setTimeout(() => {
+              openGpsPermissionModal();
+            }, 500);
+          } else if (result.state === 'denied') {
+            document.getElementById('display-gps-status').textContent = 'GPS Desactivado (Click para activar)';
+            document.getElementById('header-gps-label').textContent = 'GPS Inactivo';
+          }
+        }).catch(() => {
+          requestUserGps(false);
+        });
+      } else {
+        requestUserGps(false);
+      }
+    }
+
+    function requestUserGps(userInitiated = false) {
+      if (!navigator.geolocation) {
+        alert('Tu navegador no soporta geolocalización.');
+        return;
+      }
+
+      const btnGps = document.getElementById('btn-center-gps');
+      const btnText = document.getElementById('btn-gps-text');
+      if (btnText) btnText.textContent = 'Detectando...';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          updatePosition(lat, lng, true);
+          if (leafletMap) {
+            leafletMap.flyTo([lat, lng], 17, { animate: true, duration: 1.4 });
+          }
+          startLiveWatch();
+          if (btnText) btnText.textContent = 'GPS en Vivo';
+          if (btnGps) btnGps.classList.add('active-blue');
+          document.getElementById('header-gps-label').textContent = 'GPS en Vivo';
+          document.getElementById('display-gps-status').textContent = 'Precisión Satelital (±' + Math.round(position.coords.accuracy) + 'm)';
+        },
+        (error) => {
+          console.warn('Error GPS:', error);
+          if (btnText) btnText.textContent = 'Activar GPS';
+          if (btnGps) btnGps.classList.remove('active-blue');
+          if (userInitiated) {
+            openGpsPermissionModal();
+          }
+        },
+        { enableHighAccuracy: selectedAccuracy === 'precise', timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    function startLiveWatch() {
+      if (watchId !== null) return;
+      if (!navigator.geolocation) return;
+
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          updatePosition(lat, lng, false);
+        },
+        (err) => console.warn('Watch error:', err),
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+      );
+    }
+
+    // MODAL DE PERMISOS GPS
+    function openGpsPermissionModal() {
+      const modal = document.getElementById('gps-permission-modal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeGpsPermissionModal() {
+      const modal = document.getElementById('gps-permission-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function selectGpsOption(opt) {
+      selectedAccuracy = opt;
+      const optP = document.getElementById('opt-precise');
+      const optA = document.getElementById('opt-approx');
+      const chkP = document.getElementById('check-precise');
+      const chkA = document.getElementById('check-approx');
+
+      if (opt === 'precise') {
+        optP.classList.add('selected');
+        optA.classList.remove('selected');
+        chkP.className = 'gps-option-check';
+        chkP.textContent = '✓';
+        chkA.className = 'gps-option-uncheck';
+        chkA.textContent = '';
+      } else {
+        optA.classList.add('selected');
+        optP.classList.remove('selected');
+        chkA.className = 'gps-option-check';
+        chkA.textContent = '✓';
+        chkP.className = 'gps-option-uncheck';
+        chkP.textContent = '';
+      }
+    }
+
+    function executeGrantGps(scope) {
+      closeGpsPermissionModal();
+      requestUserGps(true);
+    }
+
+    function denyGpsAndManual() {
+      closeGpsPermissionModal();
+      document.getElementById('display-gps-status').textContent = 'Modo Manual / Pin en Mapa';
+    }
+
+    // CAPA SATÉLITE
+    function toggleSatelliteLayer() {
+      const btn = document.getElementById('btn-toggle-satellite');
+      if (!isSatellite) {
+        leafletMap.removeLayer(osmLayer);
+        satelliteLayer.addTo(leafletMap);
+        btn.classList.add('active-blue');
+        isSatellite = true;
+      } else {
+        leafletMap.removeLayer(satelliteLayer);
+        osmLayer.addTo(leafletMap);
+        btn.classList.remove('active-blue');
+        isSatellite = false;
+      }
+    }
+
+    // DIBUJAR RUTA
+    function toggleRouteToStore() {
+      const btn = document.getElementById('btn-draw-route');
+      if (routePolyline) {
+        leafletMap.removeLayer(routePolyline);
+        routePolyline = null;
+        btn.classList.remove('active-blue');
+        return;
+      }
+
+      const points = [
+        [STORE_LAT, STORE_LNG],
+        [currentLat, currentLng]
+      ];
+
+      routePolyline = L.polyline(points, {
+        color: '#dc2626',
+        weight: 5,
+        dashArray: '8, 8',
+        opacity: 0.8
+      }).addTo(leafletMap);
+
+      leafletMap.fitBounds(routePolyline.getBounds(), { padding: [40, 40] });
+      btn.classList.add('active-blue');
+    }
+
+    // SIMULAR MOTO DELIVERY
+    function simulateMotoDelivery() {
+      const btn = document.getElementById('btn-simulate-moto');
+      if (motoMarker) {
+        leafletMap.removeLayer(motoMarker);
+        motoMarker = null;
+        if (motoAnimationTimer) clearInterval(motoAnimationTimer);
+        btn.classList.remove('active-blue');
+        return;
+      }
+
+      const motoIcon = L.divIcon({
+        className: 'moto-leaflet-icon',
+        html: `<div style="font-size: 26px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">🛵</div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+
+      motoMarker = L.marker([STORE_LAT, STORE_LNG], { icon: motoIcon }).addTo(leafletMap);
+      btn.classList.add('active-blue');
+
+      let step = 0;
+      const totalSteps = 60;
+      if (motoAnimationTimer) clearInterval(motoAnimationTimer);
+
+      motoAnimationTimer = setInterval(() => {
+        step++;
+        const progress = step / totalSteps;
+        const curLat = STORE_LAT + (currentLat - STORE_LAT) * progress;
+        const curLng = STORE_LNG + (currentLng - STORE_LNG) * progress;
+        
+        motoMarker.setLatLng([curLat, curLng]);
+
+        if (step >= totalSteps) {
+          clearInterval(motoAnimationTimer);
+        }
+      }, 100);
+    }
+
+    // GESTIÓN DEL BUSCADOR MEJORADO CON NAVEGACIÓN FLUIDA
+    function handleMapSearchInput(e) {
+      const val = e.target.value.trim();
+      const clearBtn = document.getElementById('map-clear-btn');
+      if (clearBtn) {
+        clearBtn.style.display = val.length > 0 ? 'inline-flex' : 'none';
+      }
+
+      if (val.length < 2) {
+        closeSuggestionsDropdown();
+        return;
+      }
+
+      // Filtrado instantáneo en referencias locales
+      const localMatches = LOCAL_PLACES.filter(p => 
+        p.name.toLowerCase().includes(val.toLowerCase()) || 
+        p.sub.toLowerCase().includes(val.toLowerCase())
+      );
+
+      renderSuggestions(localMatches);
+
+      // Búsqueda remota complementaria con debounce
+      if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        fetchRemoteSuggestions(val);
+      }, 400);
+    }
+
+    function clearMapSearch() {
+      const input = document.getElementById('map-query-input');
+      const clearBtn = document.getElementById('map-clear-btn');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      if (clearBtn) clearBtn.style.display = 'none';
+      closeSuggestionsDropdown();
+    }
+
+    async function fetchRemoteSuggestions(query) {
+      try {
+        const fullQuery = query.includes('Lima') || query.includes('Ate') ? query : `${query}, Ate, Lima, Perú`;
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=5&addressdetails=1`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const formatted = data.map(item => ({
+              name: item.display_name.split(',')[0],
+              sub: item.display_name.split(',').slice(1, 4).join(', '),
+              lat: parseFloat(item.lat),
+              lng: parseFloat(item.lon)
+            }));
+            renderSuggestions(formatted);
+          }
+        }
+      } catch (e) {
+        console.warn('Error fetching remote suggestions:', e);
+      }
+    }
+
+    function renderSuggestions(items) {
+      const dropdown = document.getElementById('loc-suggestions-dropdown');
+      if (!dropdown) return;
+
+      if (!items || items.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+
+      dropdown.innerHTML = items.map(item => `
+        <div class="loc-suggestion-item" onclick="selectSuggestion('${item.name.replace(/'/g, "\\'")}', '${item.sub.replace(/'/g, "\\'")}', ${item.lat}, ${item.lng})">
+          <div class="loc-sugg-icon">📍</div>
+          <div class="loc-sugg-text-box">
+            <div class="loc-sugg-title">${item.name}</div>
+            <div class="loc-sugg-sub">${item.sub}</div>
+          </div>
+        </div>
+      `).join('');
+
+      dropdown.style.display = 'block';
+    }
+
+    function closeSuggestionsDropdown() {
+      const dropdown = document.getElementById('loc-suggestions-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+    }
+
+    // NAVEGACIÓN FLUIDA: Vuela con animación suave (flyTo), reposiciona el pin y actualiza el costo y dirección
+    function selectSuggestion(name, sub, lat, lng) {
+      const input = document.getElementById('map-query-input');
+      if (input) {
+        input.value = name;
+        input.blur();
+      }
+      closeSuggestionsDropdown();
+
+      // Reposiciona posición, distancia y costos
+      updatePosition(lat, lng, false);
+      document.getElementById('display-address-title').textContent = name;
+      document.getElementById('display-address-sub').textContent = sub || 'Ate, Lima';
+
+      // Vuelo suave con flyTo
+      if (leafletMap) {
+        leafletMap.flyTo([lat, lng], 17, {
+          animate: true,
+          duration: 1.3,
+          easeLinearity: 0.25
+        });
+      }
+    }
+
+    async function searchAddressOnMap(e) {
+      e.preventDefault();
+      const input = document.getElementById('map-query-input');
+      const query = input.value.trim();
+      if (!query) return;
+
+      closeSuggestionsDropdown();
+
+      // Verificar primero en lugares locales
+      const localFound = LOCAL_PLACES.find(p => p.name.toLowerCase().includes(query.toLowerCase()));
+      if (localFound) {
+        selectSuggestion(localFound.name, localFound.sub, localFound.lat, localFound.lng);
+        return;
+      }
+
+      try {
+        const fullQuery = query.includes('Lima') || query.includes('Ate') ? query : `${query}, Ate, Lima, Perú`;
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=1`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            const title = data[0].display_name.split(',')[0];
+            const sub = data[0].display_name.split(',').slice(1, 3).join(', ');
+            selectSuggestion(title, sub, lat, lng);
+          } else {
+            alert('No encontramos esa dirección exacta. Puedes tocar o mover el pin rojo en el mapa para ubicarte.');
+          }
+        }
+      } catch (err) {
+        console.warn('Error buscando:', err);
+      }
+    }
+
+    function setChipTag(tag) {
+      document.getElementById('input-address-tag').value = tag;
+      document.querySelectorAll('.loc-chip-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.includes(tag));
+      });
+    }
+
+    function focusAddressInput() {
+      const input = document.getElementById('map-query-input');
+      if (input) {
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function saveDeliveryAndGoMenu(e) {
+      e.preventDefault();
+      const tag = document.getElementById('input-address-tag').value.trim() || 'Mi casa';
+      const phone = document.getElementById('input-phone-number').value.trim();
+      const address = document.getElementById('display-address-title').textContent;
+
+      if (!phone) {
+        alert('Por favor, ingresa tu número de teléfono para coordinar la entrega.');
+        return;
+      }
+
+      const deliveryData = {
+        type: 'delivery',
+        tag: tag,
+        phone: phone,
+        address: address,
+        lat: currentLat,
+        lng: currentLng,
+        timestamp: Date.now()
+      };
+
+      localStorage.setItem('buchisapa_delivery_address', JSON.stringify(deliveryData));
+      localStorage.setItem('buchisapa_active_fulfillment', 'delivery');
+      localStorage.setItem('buchisapa_user_phone', phone);
+
+      window.location.href = '/?mode=delivery';
+    }
+
+    function savePickupAndGoMenu() {
+      const pickupData = {
+        type: 'pickup',
+        branch: 'Santa Clara',
+        address: 'Av. La Estrella con Calle 28 de Julio, Ate',
+        timestamp: Date.now()
+      };
+
+      localStorage.setItem('buchisapa_pickup_branch', JSON.stringify(pickupData));
+      localStorage.setItem('buchisapa_active_fulfillment', 'pickup');
+
+      window.location.href = '/?mode=pickup';
+    }
+
+    function loadStoredSettings() {
+      const stored = localStorage.getItem('buchisapa_delivery_address');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.phone) document.getElementById('input-phone-number').value = parsed.phone;
+          if (parsed.tag) setChipTag(parsed.tag);
+        } catch (e) {}
+      }
+    }
+  </script>
+</body>
+</html>

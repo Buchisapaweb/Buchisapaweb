@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantalla de Cocina (KDS) - Buchisapa</title>
+  <link rel="stylesheet" href="/css/comun.css">
+  <link rel="stylesheet" href="/css/cocina.css">
+</head>
+<body>
+  <div class="kds-container">
+    <header class="kds-header">
+      <div class="kds-title">
+        <img src="/imagenes/logo/logo-buchisapa.png" alt="BuchiSapa Logo" class="kds-brand-logo">
+        <span class="kds-sub-title">| Sistema KDS de Cocina en Vivo</span>
+      </div>
+      <div class="kds-actions-group">
+        <!-- BOTÓN TOGGLE DE SONIDO KDS -->
+        <button id="kds-sound-toggle-btn" class="kds-btn kds-btn-sound" type="button" onclick="BuchisapaKdsAudio.toggleSound()">
+          🔊 Sonido: ACTIVO
+        </button>
+        <button class="kds-btn kds-btn-test-sound" type="button" onclick="BuchisapaKdsAudio.testSoundWithOrder()">
+          🔔 Probar Alerta
+        </button>
+        <button class="kds-btn kds-btn-stock" type="button" onclick="openKitchenStockModal()">
+          📦 Stock / Agotados
+        </button>
+        <a href="../index.html" class="kds-btn kds-btn-print kds-btn-link">🏠 Ver Menú</a>
+        <button class="kds-btn kds-btn-print" type="button" onclick="fetchOrders()">🔄 Actualizar</button>
+      </div>
+    </header>
+
+    <!-- BARRA DE ESTADO DE ALERTA SONORA AUTOMÁTICA -->
+    <div id="kds-audio-bar" class="kds-audio-status-bar">
+      <div class="kds-audio-status-info">
+        <span id="kds-audio-dot" class="kds-audio-dot"></span>
+        <span id="kds-audio-status-text" class="kds-audio-status-bold">Alerta Sonora en Vivo: Activa (Campana Dual KDS + Sintetizador)</span>
+        <span id="kds-audio-permission-prompt" class="kds-audio-prompt" onclick="BuchisapaKdsAudio.initAudio()">
+          ⚠️ Clic aquí para habilitar reproducción automática en el navegador
+        </span>
+      </div>
+
+      <div class="kds-actions-group">
+        <button id="kds-voice-toggle-btn" class="kds-btn kds-btn-voice" type="button" onclick="BuchisapaKdsAudio.toggleVoice()">
+          🗣️ Voz de Anuncio: ON
+        </button>
+        <button class="kds-btn kds-btn-chime" type="button" onclick="BuchisapaKdsAudio.playChime()">
+          🔔 Tocar Campana
+        </button>
+      </div>
+    </div>
+
+    <!-- BANNER FLOTANTE DE NUEVO PEDIDO ENTRANTE -->
+    <div id="kds-new-order-banner" class="kds-new-order-banner kds-hidden">
+      <div class="kds-new-order-banner-bell">🔔</div>
+      <div>
+        <div class="kds-banner-title" id="kds-banner-title">¡NUEVO PEDIDO ENTRANTE!</div>
+        <div class="kds-banner-subtitle" id="kds-banner-subtitle">Orden #... - Cliente: ...</div>
+      </div>
+      <button type="button" onclick="dismissNewOrderBanner()" class="kds-banner-close-btn">
+        Entendido ✓
+      </button>
+    </div>
+
+    <main class="kds-columns-grid">
+      <!-- Columna 1: Recibidos -->
+      <section class="kds-column">
+        <div class="kds-column-header recibido">
+          <span>🔔 RECIBIDOS / NUEVOS</span>
+        </div>
+        <div class="kds-orders-list" id="kds-recibidos">
+          <div class="kds-empty-msg">Cargando comandas...</div>
+        </div>
+      </section>
+
+      <!-- Columna 2: En Preparación -->
+      <section class="kds-column">
+        <div class="kds-column-header en_preparacion">
+          <span>🧑‍🍳 EN PREPARACIÓN AL CARBÓN</span>
+        </div>
+        <div class="kds-orders-list" id="kds-preparacion"></div>
+      </section>
+
+      <!-- Columna 3: Listos para Despacho -->
+      <section class="kds-column">
+        <div class="kds-column-header listo">
+          <span>🛵 LISTOS PARA DELIVERY / MESA</span>
+        </div>
+        <div class="kds-orders-list" id="kds-listos"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal de Control de Stock y Agotados en Cocina -->
+  <div id="kds-stock-modal" class="kds-modal-overlay">
+    <div class="kds-modal-box">
+      <div class="kds-modal-header">
+        <div class="kds-modal-title-group">
+          <span class="kds-modal-icon">📦</span>
+          <div>
+            <h3 class="kds-modal-title">Disponibilidad de Platos en Cocina</h3>
+            <p class="kds-modal-subtitle">Los cambios se transmiten instantáneamente al carrito de todos los comensales.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeKitchenStockModal()" class="kds-modal-close-btn">&times;</button>
+      </div>
+
+      <div id="kds-stock-list" class="kds-modal-body">
+        <div class="kds-empty-msg">Cargando platos de la carta...</div>
+      </div>
+
+      <div class="kds-modal-footer">
+        <span class="kds-modal-note">🟢 Verde = Disponible | 🔴 Rojo = Agotado</span>
+        <button type="button" onclick="closeKitchenStockModal()" class="kds-btn-modal-close">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IFRAME OCULTO OBLIGATORIO PARA IMPRESIÓN DIRECTA POR WIFI -->
+  <iframe name="print_hidden" id="print_hidden" class="kds-hidden-frame" title="WiFi Print Frame"></iframe>
+
+  <!-- MODAL DE IMPRESIÓN DE COMANDA KDS -->
+  <div id="kds-ticket-modal" class="kds-modal-overlay" onclick="if(event.target===this) closeKdsTicketModal()">
+    <div class="kds-modal-box kds-modal-box-sm">
+      <div class="kds-modal-header">
+        <div class="kds-modal-title-group">
+          <span class="kds-modal-icon">🖨️</span>
+          <h3 id="kds-ticket-modal-title" class="kds-modal-title">Ticket de Comanda</h3>
+        </div>
+        <button type="button" onclick="closeKdsTicketModal()" class="kds-modal-close-btn">&times;</button>
+      </div>
+
+      <div class="kds-modal-body">
+        <div id="kds-ticket-paper" class="kds-ticket-paper">
+          <div id="kds-ticket-content"></div>
+        </div>
+      </div>
+
+      <div class="kds-modal-footer kds-modal-footer-col">
+        <div class="kds-ticket-actions-grid">
+          <button type="button" onclick="printKdsTicketModal('browser')" class="kds-btn-print-native">🖨️ Imprimir (Nativo)</button>
+          <button type="button" onclick="printKdsTicketModal('wifi')" class="kds-btn-print-wifi">📶 WiFi (Impresora)</button>
+        </div>
+        <div class="text-right">
+          <button type="button" onclick="closeKdsTicketModal()" class="kds-modal-close-btn">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/supabase-cliente.js"></script>
+  <script src="/js/impresora.js"></script>
+  <script src="/js/kitchen.js"></script>
+</body>
+</html>

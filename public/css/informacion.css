@@ -1,0 +1,129 @@
+/* =========================================================
+   BUCHISAPA - PÁGINA OFICIAL DE INFORMACIÓN (CSS)
+   ========================================================= */
+
+body.info-page-body {
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.info-navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.info-nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.info-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.info-brand-logo {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+}
+
+.info-brand-title {
+  font-weight: 900;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.info-brand-sub {
+  font-size: 10px;
+  color: #ea580c;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.info-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ea580c;
+  color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.info-single-column {
+  max-width: 800px;
+  margin: 32px auto 60px auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.info-content-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 600px) {
+  .info-content-card {
+    padding: 20px;
+  }
+}
+
+.info-article-header {
+  border-bottom: 2px solid #ffedd5;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.info-article-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #ffedd5;
+  color: #c2410c;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.info-article-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+}
+
+.info-article-body {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #334155;
+}
+
+.info-footer {
+  margin-top: auto;
+  background-color: #0f172a;
+  color: #94a3b8;
+  padding: 24px 0;
+  font-size: 13px;
+  text-align: center;
+}

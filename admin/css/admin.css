@@ -1,0 +1,13 @@
+/* ==========================================================================
+   BUCHISAPA BURGER & BROASTER - PANEL DE ADMINISTRACIÓN OFICIAL
+   Estilos Principales del Administrador: /admin/css/admin.css
+   ========================================================================== */
+
+@import './variables.css';
+@import './estructura.css';
+@import './componentes.css';
+@import './dashboard.css';
+@import './productos.css';
+@import './pedidos.css';
+@import './caja.css';
+@import './portada-inventario.css';

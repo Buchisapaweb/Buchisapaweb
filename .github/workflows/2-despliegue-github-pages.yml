@@ -1,0 +1,50 @@
+name: "2. Despliegue Automático en GitHub Pages"
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  despliegue-publicacion:
+    name: "Publicar Sitio Web en GitHub Pages"
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: "1. Descargar Código Fuente"
+        uses: actions/checkout@v4
+
+      - name: "2. Configurar Entorno Node.js (v20)"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: "3. Instalar Dependencias"
+        run: npm install
+
+      - name: "4. Compilar Aplicación Completa"
+        run: npm run build
+
+      - name: "5. Configurar GitHub Pages"
+        uses: actions/configure-pages@v4
+
+      - name: "6. Empaquetar Artefacto de Publicación"
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: "7. Publicar Sitio Web Oficial"
+        id: deployment
+        uses: actions/deploy-pages@v4

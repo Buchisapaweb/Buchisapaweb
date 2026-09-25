@@ -1,0 +1,173 @@
+        <!-- ====================================================================
+             1. VISTA DASHBOARD OFICIAL BUCHISAPA (NUEVO DISEÑO COMPLETO)
+             ==================================================================== -->
+        <section class="admin-view active" id="view-dashboard">
+
+          <!-- 3. ALERTA DINÁMICA DE STOCK BAJO / CRÍTICO -->
+          <div class="dashboard-stock-alert-bar" id="dashboard-stock-alert-bar" style="display: none;">
+            <div class="stock-alert-inner">
+              <div class="stock-alert-icon">⚠️</div>
+              <div class="stock-alert-info">
+                <h4 id="stock-alert-title">¡Alerta de Inventario Crítico!</h4>
+                <p id="stock-alert-desc">Hay productos con stock agotado o en nivel crítico.</p>
+              </div>
+              <button class="btn btn-warning btn-sm" onclick="window.switchAdminView('productos')">
+                <span>Gestionar Stock ↗</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 1, 2, 6, 7. METRICAS PRINCIPALES (KPI GRID) -->
+          <div class="metrics-grid">
+            
+            <!-- 1. Ventas del Día -->
+            <div class="metric-card blue">
+              <div class="metric-icon-wrap blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div class="metric-details">
+                <span class="metric-label">1. Ventas del Día</span>
+                <span class="metric-value" id="dash-ventas-hoy">S/ 0.00</span>
+                <span class="metric-hint" id="dash-ventas-sub">Actualizado en tiempo real</span>
+              </div>
+            </div>
+
+            <!-- 2. Pedidos del Día -->
+            <div class="metric-card orange">
+              <div class="metric-icon-wrap orange">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </div>
+              <div class="metric-details">
+                <span class="metric-label">2. Cantidad de Pedidos</span>
+                <span class="metric-value" id="dash-pedidos-hoy">0 órdenes</span>
+                <span class="metric-hint" id="dash-pedidos-sub">En el día de hoy</span>
+              </div>
+            </div>
+
+            <!-- 6. Total Ganado (Día y Semana) -->
+            <div class="metric-card green">
+              <div class="metric-icon-wrap green">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div class="metric-details">
+                <span class="metric-label">6. Total Ganancia Neta</span>
+                <span class="metric-value" id="dash-ganancia-hoy">S/ 0.00</span>
+                <span class="metric-hint" id="dash-ganancia-semana">Semanal: S/ 0.00</span>
+              </div>
+            </div>
+
+            <!-- 7. Total Productos Vendidos (Día y Semana) -->
+            <div class="metric-card purple">
+              <div class="metric-icon-wrap purple">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m16.5 9.4 4.5-2.8L12 2 3 6.6l4.5 2.8"/><path d="M3 12.5l9 5.5 9-5.5"/><path d="m3 17.5 9 5.5 9-5.5"/></svg>
+              </div>
+              <div class="metric-details">
+                <span class="metric-label">7. Productos Vendidos</span>
+                <span class="metric-value" id="dash-unidades-hoy">0 un.</span>
+                <span class="metric-hint" id="dash-unidades-semana">Semanal: 0 un.</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 3, 8, 9, 10. BLOQUE DE DESGLOSE RÁPIDO Y CANALES DE VENTA -->
+          <div class="metrics-sub-grid">
+            
+            <!-- 8. Pedidos por Delivery -->
+            <div class="sub-metric-card">
+              <div class="sub-metric-header">
+                <span class="sub-metric-icon">🛵</span>
+                <span class="sub-metric-title">8. Pedidos por Delivery</span>
+              </div>
+              <div class="sub-metric-body">
+                <span class="sub-metric-val" id="dash-delivery-count">0 órdenes</span>
+                <span class="sub-metric-sum" id="dash-delivery-total">S/ 0.00</span>
+              </div>
+            </div>
+
+            <!-- 9. Pedidos en el Local / Recojo -->
+            <div class="sub-metric-card">
+              <div class="sub-metric-header">
+                <span class="sub-metric-icon">🍽️</span>
+                <span class="sub-metric-title">9. Pedidos en el Local</span>
+              </div>
+              <div class="sub-metric-body">
+                <span class="sub-metric-val" id="dash-local-count">0 órdenes</span>
+                <span class="sub-metric-sum" id="dash-local-total">S/ 0.00</span>
+              </div>
+            </div>
+
+            <!-- 10. Clientes (Total y Nuevos) -->
+            <div class="sub-metric-card">
+              <div class="sub-metric-header">
+                <span class="sub-metric-icon">👥</span>
+                <span class="sub-metric-title">10. Clientes Registrados</span>
+              </div>
+              <div class="sub-metric-body">
+                <span class="sub-metric-val" id="dash-clientes-total">0 clientes</span>
+                <span class="sub-metric-sum" id="dash-clientes-nuevos" style="color: #00ff88;">+0 nuevos hoy</span>
+              </div>
+            </div>
+
+            <!-- 3. Stock Dinámico Status -->
+            <div class="sub-metric-card">
+              <div class="sub-metric-header">
+                <span class="sub-metric-icon">📦</span>
+                <span class="sub-metric-title">3. Stock Dinámico Status</span>
+              </div>
+              <div class="sub-metric-body">
+                <span class="sub-metric-val" id="dash-stock-critico" style="color: #ff0055;">0 Alertas</span>
+                <span class="sub-metric-sum" id="dash-stock-normal" style="color: #00f0ff;">0 Normales</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 4 Y 5. GRÁFICOS DE BARRA Y CIRCULAR -->
+          <div class="dashboard-charts-grid">
+            
+            <!-- 4. Gráfico de Barra - Ventas y Ganancia -->
+            <div class="chart-panel">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">📊 4. Gráfico de Barra - Ventas y Ganancia</h3>
+                  <p class="panel-description">Histórico semanal de ingresos brutos vs ganancia neta</p>
+                </div>
+                <div class="chart-legend-pills">
+                  <span class="legend-pill sales"><span class="dot"></span> Ventas</span>
+                  <span class="legend-pill profit"><span class="dot"></span> Ganancia</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="chart-barras-ventas"></canvas>
+              </div>
+            </div>
+
+            <!-- 5. Gráfico Circular - Categorías y Tipo de Pedido -->
+            <div class="chart-panel">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">🍩 5. Gráfico Circular - Categorías y Tipo</h3>
+                  <p class="panel-description">Proporción por tipo de plato y canal de entrega</p>
+                </div>
+                <div class="chart-toggle-buttons">
+                  <button class="btn btn-xs btn-outline active" id="btn-chart-tipo-cat" onclick="window.toggleCircularChart('categorias')">Categorías</button>
+                  <button class="btn btn-xs btn-outline" id="btn-chart-tipo-tipo" onclick="window.toggleCircularChart('tipo')">Tipo Pedido</button>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper chart-donut-container">
+                <div style="flex: 1; height: 210px; position: relative;">
+                  <canvas id="chart-circular-categorias"></canvas>
+                </div>
+                <div class="chart-donut-legend" id="chart-donut-legend">
+                  <!-- Leyendas dinámicas -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          </div>
+
+        </section>
+

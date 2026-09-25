@@ -1,0 +1,190 @@
+/* =========================================================
+   BUCHISAPA - PÁGINA INDEPENDIENTE: NOSOTROS (CSS)
+   ========================================================= */
+
+body.nosotros-page-body {
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* NAVBAR */
+.nosotros-navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.nosotros-nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.nosotros-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.nosotros-brand-logo {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+}
+
+.nosotros-brand-title {
+  font-weight: 900;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.nosotros-brand-sub {
+  font-size: 10px;
+  color: #ea580c;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.nosotros-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ea580c;
+  color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 0.2s;
+}
+
+.nosotros-back-btn:hover {
+  background-color: #c2410c;
+}
+
+/* HERO SECTION */
+.nosotros-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.nosotros-hero-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  background: rgba(234, 88, 12, 0.2);
+  color: #fb923c;
+  border: 1px solid rgba(234, 88, 12, 0.4);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.nosotros-hero-title {
+  font-size: 30px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.nosotros-hero-sub {
+  font-size: 15px;
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* CONTENEDOR DE 1 SOLA COLUMNA LIMPIA */
+.nosotros-single-column {
+  max-width: 800px;
+  margin: 32px auto 60px auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+/* SECCIONES DE CONTENIDO */
+.nosotros-section-block {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+@media (max-width: 600px) {
+  .nosotros-section-block {
+    padding: 20px;
+  }
+}
+
+.nosotros-section-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nosotros-section-p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #334155;
+  margin-bottom: 16px;
+}
+
+.nosotros-values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.nosotros-value-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.nosotros-value-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.nosotros-value-title {
+  font-weight: 800;
+  font-size: 16px;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.nosotros-value-desc {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* FOOTER */
+.nosotros-footer {
+  margin-top: auto;
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 24px 0;
+  font-size: 13px;
+  text-align: center;
+}

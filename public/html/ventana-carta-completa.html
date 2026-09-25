@@ -1,0 +1,77 @@
+<!-- MODAL DE CHECKOUT -->
+<div class="modal-backdrop" id="checkout-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">Completar Datos de Entrega</h3>
+      <button class="modal-close" onclick="closeCheckoutModal()">&times;</button>
+    </div>
+    <form onsubmit="submitOrder(event)">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Tu Nombre Completo *</label>
+          <input type="text" id="cust-name" class="form-input" required placeholder="Ej: Carlos Silva">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Celular / WhatsApp *</label>
+          <input type="tel" id="cust-phone" class="form-input" required placeholder="Ej: 927486448">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dirección de Entrega</label>
+          <input type="text" id="cust-address" class="form-input" placeholder="Jr. San Martín 450, Tarapoto">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Método de Pago</label>
+          <select id="cust-payment" class="form-select">
+            <option value="yape">Yape / Plin (943 312 024)</option>
+            <option value="efectivo">Efectivo contraentrega</option>
+            <option value="tarjeta">Tarjeta POS Visa/Mastercard</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notas para cocina / salsas extras</label>
+          <textarea id="cust-notes" class="form-textarea" rows="2" placeholder="Ej: Enviar ají extra, pollo parte pierna"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeCheckoutModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL BÚSQUEDA RÁPIDA -->
+<div class="search-modal-backdrop" id="search-modal" onclick="toggleSearchModal(event)">
+  <div class="search-modal-box" onclick="event.stopPropagation()">
+    <div class="search-modal-bar">
+      <div class="search-input-wrapper">
+        <svg class="search-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input 
+          type="text" 
+          id="search-input-field" 
+          class="search-input-control" 
+          placeholder="Buscar plato o antojo..." 
+          oninput="handleSearchInput(this.value)"
+          autocomplete="off"
+        >
+      </div>
+      <button class="search-close-btn" type="button" onclick="toggleSearchModal()">Cerrar</button>
+    </div>
+    <div class="search-results-wrapper">
+      <div id="search-results-container" class="search-results-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE PLATOS POR CATEGORÍA -->
+<div class="search-modal-backdrop" id="category-modal" onclick="closeCategoryModal(event)">
+  <div class="search-modal-box" onclick="event.stopPropagation()">
+    <div class="search-modal-bar">
+      <h3 id="category-modal-title" style="font-size: 16px; font-weight: 900; color: #0f172a; text-transform: uppercase;">PLATOS</h3>
+      <button class="search-close-btn" type="button" onclick="closeCategoryModal()">Cerrar</button>
+    </div>
+    <div class="search-results-wrapper">
+      <div id="category-modal-container" class="search-results-list"></div>
+    </div>
+  </div>
+</div>

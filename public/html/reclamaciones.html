@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libro de Reclamaciones Virtual | BuchiSapa</title>
+  <meta name="description" content="Libro de Reclamaciones Virtual de BuchiSapa conforme a lo establecido en el Código de Protección y Defensa del Consumidor (INDECOPI).">
+  <link rel="icon" type="image/png" href="/imagenes/logo/logo-buchisapa.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/comun.css">
+  <link rel="stylesheet" href="/css/reclamaciones.css">
+</head>
+<body class="reclamaciones-page-body">
+
+    <!-- NAVBAR DE PÁGINA SECUNDARIA (VOLVER A LA DERECHA, SIN CUADRADO) -->
+  <header class="subpage-navbar">
+    <div class="subpage-nav-wrap">
+      <a href="/" class="subpage-brand" title="BuchiSapa - Inicio">
+        <img src="/imagenes/logo/logo-buchisapa.png" alt="BuchiSapa Logo" class="subpage-brand-logo">
+        <span class="subpage-brand-title">BUCHISAPA</span>
+      </a>
+      <a href="/" class="clean-back-btn" title="Volver a la página principal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        <span>Volver</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="container reclamaciones-container-sm">
+    <div class="reclamaciones-card">
+      
+      <div class="reclamaciones-header">
+        <img src="/imagenes/logo/logo-buchisapa.png" alt="BuchiSapa Logo" class="reclamaciones-header-logo">
+        <h1 class="reclamaciones-header-title">LIBRO DE RECLAMACIONES VIRTUAL</h1>
+        <p class="reclamaciones-header-sub">Conforme a lo establecido en el Código de Protección y Defensa del Consumidor - Ley N° 29571 (INDECOPI - Perú)</p>
+      </div>
+
+      <form id="claim-form" onsubmit="submitClaimForm(event)">
+        <h2 class="reclamaciones-section-title">1. IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE</h2>
+        
+        <div class="form-group">
+          <label class="form-label" for="claim-name">Nombre Completo *</label>
+          <input type="text" id="claim-name" class="form-input" required placeholder="Ej: Juan Pérez">
+        </div>
+
+        <div class="reclamaciones-grid-doc">
+          <div class="form-group">
+            <label class="form-label" for="claim-doc-type">Tipo Doc. *</label>
+            <select id="claim-doc-type" class="form-select">
+              <option value="DNI">DNI</option>
+              <option value="CE">Carnet Extranjería</option>
+              <option value="PASAPORTE">Pasaporte</option>
+              <option value="RUC">RUC</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="claim-doc-num">N° de Documento *</label>
+            <input type="text" id="claim-doc-num" class="form-input" required placeholder="Ej: 74839201">
+          </div>
+        </div>
+
+        <div class="reclamaciones-grid-2col">
+          <div class="form-group">
+            <label class="form-label" for="claim-phone">Celular / WhatsApp *</label>
+            <input type="tel" id="claim-phone" class="form-input" required placeholder="Ej: 927486448">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="claim-email">Correo Electrónico *</label>
+            <input type="email" id="claim-email" class="form-input" required placeholder="juan@ejemplo.com">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="claim-address">Dirección Domiciliaria</label>
+          <input type="text" id="claim-address" class="form-input" placeholder="Av. La Estrella 123, Santa Clara, Ate">
+        </div>
+
+        <h2 class="reclamaciones-section-title reclamaciones-section-title-mt">2. IDENTIFICACIÓN DEL BIEN CONTRATADO</h2>
+        
+        <div class="reclamaciones-grid-2col">
+          <div class="form-group">
+            <label class="form-label" for="claim-type">Tipo de Reclamación *</label>
+            <select id="claim-type" class="form-select">
+              <option value="Reclamo">Reclamo (Disconformidad con producto/atención)</option>
+              <option value="Queja">Queja (Disconformidad no relacionada directamente al producto)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="claim-amount">Monto Reclamado (S/) *</label>
+            <input type="number" step="0.10" id="claim-amount" class="form-input" required placeholder="Ej: 45.00">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="claim-desc">Descripción del Producto o Servicio Adquirido *</label>
+          <input type="text" id="claim-desc" class="form-input" required placeholder="Ej: Combo Familiar Broaster + Cecina ordenado por Delivery">
+        </div>
+
+        <h2 class="reclamaciones-section-title reclamaciones-section-title-mt">3. DETALLE DE LA RECLAMACIÓN Y PEDIDO DEL CONSUMIDOR</h2>
+
+        <div class="form-group">
+          <label class="form-label" for="claim-detail">Detalle de los Hechos *</label>
+          <textarea id="claim-detail" class="reclamaciones-textarea" required placeholder="Describe de forma clara lo sucedido..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="claim-request">Pedido del Consumidor (Solución solicitada) *</label>
+          <textarea id="claim-request" class="reclamaciones-textarea" required placeholder="Indica qué solución o respuesta esperas del establecimiento..."></textarea>
+        </div>
+
+        <div class="reclamaciones-terms-box">
+          * La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es condición previa para interponer una denuncia ante el INDECOPI.<br>
+          * El proveedor deberá dar respuesta al reclamo en un plazo no mayor a quince (15) días hábiles improrrogables.
+        </div>
+
+        <button type="submit" id="claim-submit-btn" class="btn btn-primary reclamaciones-btn-submit" style="background: #dc2626; border: none; border-radius: 12px; padding: 14px 24px; color: white; font-weight: 800; font-size: 15px; width: 100%; cursor: pointer;">
+          Enviar Hoja de Reclamación Virtual
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <script src="/js/supabase-cliente.js"></script>
+  <script src="/js/reclamaciones.js"></script>
+</body>
+</html>

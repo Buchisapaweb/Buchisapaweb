@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Seguimiento de Pedido en Vivo | Buchisapa Delivery</title>
+  <meta name="description" content="Sigue en tiempo real la ubicación de tu pedido y repartidor en Buchisapa Santa Clara, Ate.">
+  <link rel="icon" type="image/png" href="/imagenes/logo/logo-buchisapa.png">
+  
+  <!-- Tipografía Oficial -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS para Mapas Interactivos -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Estilos del Cliente y Rastreador -->
+  <link rel="stylesheet" href="/css/comun.css">
+  <link rel="stylesheet" href="/css/cliente.css">
+  <link rel="stylesheet" href="/css/rastreo.css">
+  <link rel="stylesheet" href="/css/notificaciones.css">
+</head>
+<body class="order-status-page">
+
+  <!-- NAVBAR PROFESIONAL DE SEGUIMIENTO EN VIVO -->
+  <header class="order-status-navbar">
+    <div class="tracker-nav-left">
+      <a href="/" class="order-status-brand" title="Ir al Menú Principal">
+        <img src="/imagenes/logo/logo-buchisapa.png" alt="Buchisapa Logo" class="order-status-brand-img">
+        <div class="order-status-brand-texts">
+          <span class="tracker-brand-title">BUCHISAPA</span>
+          <span class="tracker-brand-sub">Delivery GPS • Santa Clara</span>
+        </div>
+      </a>
+      <div class="tracker-live-gps-pill" id="nav-live-pill">
+        <span class="tracker-pulse-dot"></span>
+        <span>EN VIVO</span>
+      </div>
+    </div>
+
+    <div class="tracker-nav-right">
+      <button type="button" onclick="shareTrackerLink()" class="tracker-nav-icon-btn tracker-nav-btn-whatsapp" title="Compartir estado por WhatsApp">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <span class="tracker-nav-btn-text">Compartir</span>
+      </button>
+
+      <a href="/" class="tracker-nav-icon-btn" title="Volver a la Carta de Platos">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+        <span class="tracker-nav-btn-text">Volver a la Carta</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL DEL RASTREADOR -->
+  <main class="order-status-main-container">
+
+    <!-- BARRA BUSCADORA COMPACTA Y MODERNA -->
+    <div class="tracker-search-card">
+      <form onsubmit="searchOrderById(event)" class="tracker-search-form">
+        <div class="tracker-search-input-wrap">
+          <svg class="tracker-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="track-search-input" class="tracker-search-input" placeholder="Ingresa tu código (Ej: ORD-1001)" value="ORD-1001" required autocomplete="off">
+        </div>
+        <button type="submit" class="tracker-search-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span>Rastrear</span>
+        </button>
+      </form>
+
+      <div class="tracker-search-pills" id="tracker-search-pills-container">
+        <span class="tracker-search-pills-label">Sugerencias:</span>
+        <button type="button" id="cart-quick-chip" onclick="loadOrderQuick('ORD-CART')" class="tracker-chip-btn tracker-chip-cart">🛒 Mi Carrito</button>
+        <button type="button" onclick="loadOrderQuick('ORD-1001')" class="tracker-chip-btn active">#ORD-1001</button>
+        <button type="button" onclick="loadOrderQuick('ORD-1002')" class="tracker-chip-btn">#ORD-1002</button>
+        <button type="button" onclick="loadOrderQuick('ORD-1003')" class="tracker-chip-btn">#ORD-1003</button>
+      </div>
+    </div>
+
+    <!-- CONTENEDOR DINÁMICO DONDE BUCHISAPA ORDER TRACKER RENDERIZA EL MAPA, TELEMETRÍA Y DETALLE -->
+    <div id="tracker-modal-content" class="tracker-content-wrapper">
+      <div class="tracker-loading-card">
+        <div class="google-spinner tracker-spinner"></div>
+        <h3 class="tracker-loading-title">Cargando rastreador GPS en tiempo real...</h3>
+        <p class="tracker-loading-sub">Conectando con la unidad de despacho en Santa Clara, Ate</p>
+      </div>
+    </div>
+
+    <!-- FOOTER INFORMATIVO OFICIAL Y ELEGANTE -->
+    <footer class="tracker-footer-card">
+      <div class="tracker-footer-brand-row">
+        <span class="tracker-footer-logo-text">BUCHISAPA</span>
+        <span class="tracker-footer-badge">Santa Clara • Ate</span>
+      </div>
+      <p class="tracker-footer-text">
+        Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara)
+      </p>
+      <div class="tracker-footer-meta-row">
+        <span>⏰ Horario: Lunes a Domingo 6:00 PM a 5:00 AM</span>
+        <span>🛵 Central Delivery: +51 942 475 459</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="/js/notificaciones.js"></script>
+  <script src="/js/rastreo.js"></script>
+  <script>
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function searchOrderById(e) {
+      if (e) e.preventDefault();
+      const code = document.getElementById('track-search-input').value.trim();
+      if (code) {
+        window.history.pushState({}, '', '?id=' + encodeURIComponent(code));
+        BuchisapaOrderTracker.init(code);
+      }
+    }
+
+    function loadOrderQuick(id) {
+      const input = document.getElementById('track-search-input');
+      if (input) input.value = id;
+      document.querySelectorAll('.tracker-chip-btn').forEach(btn => {
+        if (btn.textContent.includes(id)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      window.history.pushState({}, '', '?id=' + encodeURIComponent(id));
+      BuchisapaOrderTracker.init(id);
+    }
+
+    function shareTrackerLink() {
+      const orderId = BuchisapaOrderTracker.currentOrderId || 'ORD-1001';
+      const url = window.location.origin + '/order-status.html?id=' + encodeURIComponent(orderId);
+      const text = encodeURIComponent('¡Hola! Sigue en vivo el estado y ubicación de mi pedido Buchisapa aquí: ' + url);
+      window.open('https://wa.me/?text=' + text, '_blank');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Si hay productos reales en el carrito, mostrar y activar el botón Mi Carrito
+      try {
+        const cartRaw = localStorage.getItem('buchisapa_cart_v1');
+        if (cartRaw) {
+          const cartItems = JSON.parse(cartRaw);
+          if (Array.isArray(cartItems) && cartItems.length > 0) {
+            const cartChip = document.getElementById('cart-quick-chip');
+            if (cartChip) {
+              cartChip.classList.remove('is-hidden');
+              cartChip.style.display = 'inline-flex';
+              cartChip.textContent = `🛒 Mi Carrito (${cartItems.length})`;
+            }
+          }
+        }
+      } catch (e) {}
+
+      const orderId = getQueryParam('id') || getQueryParam('pedido') || null;
+      if (orderId) {
+        const input = document.getElementById('track-search-input');
+        if (input) input.value = orderId;
+      }
+      BuchisapaOrderTracker.init(orderId);
+
+      // Mostrar píldora en vivo en nav
+      const pill = document.getElementById('nav-live-pill');
+      if (pill) pill.style.display = 'inline-flex';
+    });
+  </script>
+
+  <!-- IFRAME OCULTO OBLIGATORIO PARA IMPRESIÓN DIRECTA POR WIFI -->
+  <iframe name="print_hidden" id="print_hidden" class="hidden-iframe" title="WiFi Print Frame"></iframe>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!-- HEADER NAVEGACIÓN Y BÚSQUEDA OFICIAL BUCHISAPA -->
+<header class="site-header">
+  <div class="container header-nav">
+    
+    <!-- LADO IZQUIERDO: TOGGLE MÓVIL Y LOGO -->
+    <div class="header-left">
+      <button class="nav-toggle-btn mobile-only" aria-label="Abrir menú" onclick="toggleMobileMenu()" type="button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round">
+          <line x1="3" x2="21" y1="6" y2="6"/>
+          <line x1="3" x2="21" y1="12" y2="12"/>
+          <line x1="3" x2="21" y1="18" y2="18"/>
+        </svg>
+      </button>
+      
+      <a href="/" class="brand-logo" title="BuchiSapa - Pollería & Sabor Amazónico">
+        <img src="/imagenes/logo/logo-buchisapa.png" alt="BuchiSapa Logo" class="brand-logo-img">
+      </a>
+
+      <!-- SELECTOR DE UBICACIÓN ESTILO GOURMET -->
+      <div class="location-picker-inline" onclick="openLocationModal()" title="Cambiar ubicación de entrega">
+        <svg class="location-pin-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+          <circle cx="12" cy="10" r="3.2"/>
+        </svg>
+        <span class="location-text-red" id="selected-location-label">Recojo Santa Clara</span>
+        <svg class="location-arrow-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- NAVEGACIÓN DE ESCRITORIO Y TABLETA -->
+    <nav class="desktop-main-nav">
+      <!-- DROPDOWN CATEGORÍAS -->
+      <div class="desktop-dropdown-wrap">
+        <button class="desktop-nav-link dropdown-trigger" type="button">
+          <span>CATEGORÍAS</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="desktop-dropdown-menu">
+          <button class="dropdown-item" type="button" onclick="openCategoryView('hamburguesas', 'HAMBURGUESAS')">🍔 Hamburguesas</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS')">🌿 Platos Amazónicos</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('broaster', 'BROASTER')">🍗 Broaster Crujiente</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('alitas', 'ALITAS')">🔥 Alitas BBQ & Broaster</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('salchipapas-y-salchibroasters', 'SALCHIPAPAS Y SALCHIBROASTERS')">🍟 Salchipapas</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('bebidas', 'BEBIDAS')">🥤 Bebidas Frías</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('refrescos', 'REFRESCOS')">🍹 Refrescos de la Selva</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('infusiones', 'INFUSIONES')">☕ Infusiones Calientes</button>
+        </div>
+      </div>
+
+      <!-- CARTA SALÓN -->
+      <button class="desktop-nav-link" type="button" onclick="openFullMenuModal()">
+        <span>CARTA SALÓN</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+
+      <!-- RASTREAR PEDIDO -->
+      <button class="desktop-nav-link" type="button" onclick="openOrderTracker()">
+        <span>RASTREO</span>
+      </button>
+
+      <!-- NOSOTROS -->
+      <a href="/nosotros" class="desktop-nav-link" style="text-decoration: none;">
+        <span>NOSOTROS</span>
+      </a>
+    </nav>
+
+    <!-- BARRA DE BÚSQUEDA INTEGRADA EN ESCRITORIO -->
+    <div class="desktop-search-pill-wrap">
+      <div class="desktop-search-input-box">
+        <svg class="search-box-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input 
+          type="text" 
+          id="desktop-search-input" 
+          class="desktop-search-field" 
+          placeholder="Buscar plato, hamburguesa, broaster..." 
+          oninput="onSearchInputChanged(this.value)"
+          autocomplete="off"
+        >
+        <button id="desktop-search-clear-btn" class="search-clear-btn-inline" type="button" onclick="clearSearchInput()" aria-label="Limpiar búsqueda" style="display: none;">✕</button>
+      </div>
+    </div>
+
+    <!-- ACCIONES DE CABECERA (MI PEDIDO) -->
+    <div class="header-actions">
+      <!-- BOTÓN BÚSQUEDA SOLO EN MÓVILES -->
+      <button class="header-icon-btn mobile-only" id="header-search-btn" aria-label="Buscar platos" onclick="toggleSearchBar()" title="Buscar platos" type="button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7.5"/>
+          <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+        </svg>
+      </button>
+
+      <!-- MI PEDIDO (BOTÓN CARRITO DESKTOP / MÓVIL TAKEOUT BAG) -->
+      <button class="desktop-cart-link-btn" aria-label="Mi Pedido" onclick="BuchisapaCart.openDrawer()" type="button">
+        <svg class="cart-bag-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 3h12l3 5v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8l3-5Z"/>
+          <path d="M3 8h18"/>
+          <path d="M16 11.5c0 2.2-1.79 4-4 4s-4-1.8-4-4"/>
+        </svg>
+        <span class="desktop-cart-text">MI PEDIDO</span>
+        <span class="cart-count-badge" id="cart-count-badge">0</span>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<!-- BARRA DE BÚSQUEDA DESPLEGABLE EN DISPOSITIVOS MÓVILES -->
+<div class="buchisapa-search-bar-wrap" id="buchisapa-search-bar-wrap" style="display: none;">
+  <div class="container search-bar-inner">
+    <div class="search-bar-top-row">
+      <div class="search-input-pill-wrapper">
+        <svg class="search-pill-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7.5"/>
+          <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+        </svg>
+        <input 
+          type="text" 
+          id="main-search-input" 
+          class="search-pill-input" 
+          placeholder="¿Qué se te antoja?" 
+          oninput="onSearchInputChanged(this.value)"
+          autocomplete="off"
+        >
+        <button id="search-clear-btn" class="search-clear-btn" type="button" onclick="clearSearchInput()" aria-label="Limpiar búsqueda" style="display: none;">✕</button>
+      </div>
+      <button id="search-close-action-btn" class="search-action-btn" type="button" onclick="toggleSearchBar(false)">Cerrar</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,171 @@
+        <!-- ====================================================================
+             5. VISTA CAJA (GESTIÓN DE CAJA, ARQUEO Y MOVIMIENTOS)
+             ==================================================================== -->
+        <section class="admin-view" id="view-caja">
+          <div class="section-panel">
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                  <h3 class="panel-title" style="margin: 0;">Control de Caja y Arqueo en Vivo</h3>
+                  <span class="caja-status-badge open" id="caja-status-indicator">
+                    <span class="caja-pulse-dot"></span>
+                    <span id="caja-status-text">Caja Abierta</span>
+                  </span>
+                </div>
+                <p class="panel-description" id="caja-header-desc">Turno Tarde/Noche · Apertura hoy 17:00 · Cajero: Admin BuchiSapa</p>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="window.openCajaMovementModal()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  <span>+ Registrar Movimiento</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="window.printArqueoTicket()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  <span>🖨️ Imprimir Arqueo</span>
+                </button>
+                <button class="btn btn-primary btn-sm" id="btn-toggle-caja-turno" onclick="window.toggleCajaTurno()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <span id="btn-toggle-caja-label">Cerrar Turno (Cierre Z)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Métricas Financieras de Caja -->
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-icon-wrap blue">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Fondo de Apertura</span>
+                  <span class="metric-value" id="caja-initial-cash">S/ 250.00</span>
+                  <span class="metric-hint">Sencillo inicial en gaveta</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap green">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Ventas del Turno</span>
+                  <span class="metric-value" id="caja-total-sales">S/ 1,850.50</span>
+                  <span class="metric-hint" id="caja-orders-count-label">38 pedidos cobrados</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap orange">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Efectivo en Gaveta</span>
+                  <span class="metric-value" id="caja-efectivo-teorico">S/ 925.00</span>
+                  <span class="metric-hint">Fondo + Ventas - Egresos</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap amber">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Billeteras &amp; Tarjetas</span>
+                  <span class="metric-value" id="caja-digitales-total">S/ 1,130.50</span>
+                  <span class="metric-hint">Yape, Plin y POS Niubiz</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de Arqueo y Cuadre de Caja -->
+            <div class="caja-arqueo-panel">
+              <div class="caja-cuadre-card">
+                <h4 style="font-size: 0.92rem; font-weight: 800; color: #fff; margin-bottom: 6px;">📐 Cuadre Teórico (Sistema)</h4>
+                <div class="caja-cuadre-row">
+                  <span style="color: var(--text-muted);">Fondo Inicial (Sencillo):</span>
+                  <span style="font-weight: 700;" id="cuadre-initial">S/ 250.00</span>
+                </div>
+                <div class="caja-cuadre-row">
+                  <span style="color: var(--text-muted);">(+) Ventas en Efectivo:</span>
+                  <span style="font-weight: 700; color: #10b981;" id="cuadre-ventas-efectivo">+ S/ 720.00</span>
+                </div>
+                <div class="caja-cuadre-row">
+                  <span style="color: var(--text-muted);">(+) Ingresos Extraordinarios:</span>
+                  <span style="font-weight: 700; color: #10b981;" id="cuadre-ingresos-extra">+ S/ 0.00</span>
+                </div>
+                <div class="caja-cuadre-row">
+                  <span style="color: var(--text-muted);">(-) Egresos / Gastos Menores:</span>
+                  <span style="font-weight: 700; color: #ef4444;" id="cuadre-egresos">- S/ 45.00</span>
+                </div>
+                <div class="caja-cuadre-row" style="padding-top: 8px; font-weight: 800; font-size: 0.95rem; border-top: 1px solid var(--border-card);">
+                  <span>(=) Efectivo Físico Esperado:</span>
+                  <span style="color: var(--accent-orange);" id="cuadre-esperado">S/ 925.00</span>
+                </div>
+              </div>
+
+              <div class="caja-cuadre-card">
+                <h4 style="font-size: 0.92rem; font-weight: 800; color: #fff; margin-bottom: 6px;">💵 Conteo Físico Real en Gaveta</h4>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Ingresa el monto total de billetes y monedas contados:</p>
+                <div style="display: flex; gap: 10px; align-items: center; margin: 6px 0;">
+                  <span style="font-size: 1.1rem; font-weight: 800; color: var(--text-muted);">S/</span>
+                  <input type="number" step="0.5" id="input-caja-contado" class="form-input" style="font-size: 1.15rem; font-weight: 800; color: #fff;" value="925.00" placeholder="0.00" oninput="window.calcCuadreDifference()">
+                </div>
+                <div class="caja-cuadre-diff ok" id="caja-diff-badge">
+                  ✅ Caja Cuadrada (Diferencia: S/ 0.00)
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla de Movimientos de Caja Chica -->
+            <div style="margin-top: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff;">📝 Movimientos de Caja Chica (Entradas y Salidas)</h4>
+                <button class="btn btn-secondary btn-sm" onclick="window.openCajaMovementModal()">+ Agregar Movimiento</button>
+              </div>
+              <div class="table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Hora</th>
+                      <th>Tipo</th>
+                      <th>Categoría</th>
+                      <th>Motivo / Detalle</th>
+                      <th>Responsable</th>
+                      <th>Comprobante</th>
+                      <th>Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody id="caja-movements-table-body">
+                    <!-- Render dinámico vía scripts -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Historial de Cierres de Turno (Reportes Z) -->
+            <div style="margin-top: 24px;">
+              <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 12px;">📊 Historial de Cierres de Turno (Reportes Z)</h4>
+              <div class="table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Turno</th>
+                      <th>Apertura</th>
+                      <th>Ventas Total</th>
+                      <th>Efectivo Esperado</th>
+                      <th>Efectivo Real</th>
+                      <th>Diferencia</th>
+                      <th>Responsable</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="caja-closures-table-body">
+                    <!-- Render dinámico vía scripts -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </section>

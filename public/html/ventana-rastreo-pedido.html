@@ -1,0 +1,26 @@
+<!-- MODAL DE ESTADO Y RASTREADOR DE PEDIDO EN TIEMPO REAL -->
+<div class="modal-backdrop" id="order-status-modal" style="z-index: 1050;" onclick="if(event.target === this) closeOrderTracker()">
+  <div class="tracker-modal-box" onclick="event.stopPropagation()">
+    <div class="tracker-modal-header">
+      <div class="tracker-header-title-wrap">
+        <div class="tracker-header-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+        </div>
+        <div>
+          <h3 class="tracker-header-title">Estado de tu Pedido</h3>
+          <p class="tracker-header-subtitle">Rastreo de repartidor en vivo</p>
+        </div>
+      </div>
+      <div class="tracker-header-actions">
+        <a href="/order-status.html" id="tracker-open-new-window-btn" target="_blank" class="tracker-new-window-btn" title="Abrir rastreador en ventana nueva completa">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          <span class="tracker-new-window-text">Ventana nueva ↗</span>
+        </a>
+        <button class="tracker-modal-close" onclick="closeOrderTracker()" aria-label="Cerrar">&times;</button>
+      </div>
+    </div>
+    <div class="tracker-modal-body" id="tracker-modal-content">
+      <!-- Renderizado dinámicamente por BuchisapaOrderTracker -->
+    </div>
+  </div>
+</div>

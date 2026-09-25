@@ -1,0 +1,148 @@
+/* =========================================================
+   BUCHISAPA - PÁGINA INDEPENDIENTE: POLÍTICAS Y TÉRMINOS (CSS)
+   ========================================================= */
+
+body.politicas-page-body {
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.politicas-navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.politicas-nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.politicas-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.politicas-brand-logo {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+}
+
+.politicas-brand-title {
+  font-weight: 900;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.politicas-brand-sub {
+  font-size: 10px;
+  color: #ea580c;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.politicas-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ea580c;
+  color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.politicas-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  color: #ffffff;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.politicas-hero-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.politicas-hero-title {
+  font-size: 30px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.politicas-hero-sub {
+  font-size: 15px;
+  color: #cbd5e1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.politicas-single-column {
+  max-width: 800px;
+  margin: 32px auto 60px auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.politicas-section-block {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+@media (max-width: 600px) {
+  .politicas-section-block {
+    padding: 20px;
+  }
+}
+
+.politicas-section-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.politicas-section-p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #334155;
+  margin-bottom: 16px;
+}
+
+.politicas-footer {
+  margin-top: auto;
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 24px 0;
+  font-size: 13px;
+  text-align: center;
+}

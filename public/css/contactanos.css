@@ -1,0 +1,182 @@
+/* =========================================================
+   BUCHISAPA - PÁGINA INDEPENDIENTE: CONTÁCTANOS (CSS)
+   ========================================================= */
+
+body.contactanos-page-body {
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.contactanos-navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.contactanos-nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.contactanos-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.contactanos-brand-logo {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+}
+
+.contactanos-brand-title {
+  font-weight: 900;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.contactanos-brand-sub {
+  font-size: 10px;
+  color: #ea580c;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.contactanos-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ea580c;
+  color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.contactanos-hero {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+  color: #ffffff;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.contactanos-hero-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  background: rgba(52, 211, 153, 0.2);
+  color: #6ee7b7;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.contactanos-hero-title {
+  font-size: 30px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.contactanos-hero-sub {
+  font-size: 15px;
+  color: #a7f3d0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.contactanos-single-column {
+  max-width: 800px;
+  margin: 32px auto 60px auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.contactanos-section-block {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+@media (max-width: 600px) {
+  .contactanos-section-block {
+    padding: 20px;
+  }
+}
+
+.contactanos-section-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contactanos-section-p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #334155;
+  margin-bottom: 16px;
+}
+
+.contactanos-card-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  text-decoration: none;
+  color: #0f172a;
+  transition: all 0.2s;
+  margin-top: 14px;
+}
+
+.contactanos-card-link:hover {
+  border-color: #10b981;
+  background: #ecfdf5;
+}
+
+.contactanos-card-icon {
+  font-size: 28px;
+}
+
+.contactanos-card-text {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.contactanos-card-sub {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.contactanos-footer {
+  margin-top: auto;
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 24px 0;
+  font-size: 13px;
+  text-align: center;
+}

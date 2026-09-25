@@ -1,0 +1,44 @@
+name: "1. Verificación Automática y Compilación (BuchiSapa)"
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  verificacion-y-compilacion:
+    name: "Validar Código y Crear Artefactos de Producción"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "1. Descargar Código Fuente"
+        uses: actions/checkout@v4
+
+      - name: "2. Configurar Entorno Node.js (v20)"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: "3. Instalar Dependencias del Proyecto"
+        run: npm install
+
+      - name: "4. Verificar Sintaxis y Tipos (TypeScript Linter)"
+        run: npm run lint
+
+      - name: "5. Compilar Aplicación (Frontend HTML5 + Servidor Node)"
+        run: npm run build
+
+      - name: "6. Validar Archivos Compilados (dist/index.html y dist/server.cjs)"
+        run: |
+          test -f dist/index.html || { echo "ERROR: Falta dist/index.html"; exit 1; }
+          test -f dist/server.cjs || { echo "ERROR: Falta dist/server.cjs"; exit 1; }
+          echo "¡Validación exitosa de archivos compilados!"
+
+      - name: "7. Guardar Copia Compilada como Artefacto de Producción"
+        uses: actions/upload-artifact@v4
+        with:
+          name: buchisapa-sitio-compilado
+          path: dist/
+          retention-days: 7

@@ -1,0 +1,127 @@
+/* =========================================================
+   BUCHISAPA - LIBRO DE RECLAMACIONES VIRTUAL (CSS)
+   ========================================================= */
+
+body.reclamaciones-page-body {
+  background-color: #f1f5f9;
+  padding: 24px 0;
+  color: #0f172a;
+}
+
+.reclamaciones-container-sm {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.reclamaciones-card {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 600px) {
+  .reclamaciones-card {
+    padding: 20px 16px;
+  }
+}
+
+.reclamaciones-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.reclamaciones-header-logo {
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+
+.reclamaciones-header-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 4px;
+}
+
+.reclamaciones-header-sub {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.reclamaciones-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ea580c;
+  border-bottom: 2px solid #ffedd5;
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+}
+
+.reclamaciones-section-title-mt {
+  margin: 24px 0 16px;
+}
+
+.reclamaciones-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.reclamaciones-grid-doc {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+}
+
+@media (max-width: 500px) {
+  .reclamaciones-grid-2col,
+  .reclamaciones-grid-doc {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reclamaciones-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.reclamaciones-terms-box {
+  background-color: #f8fafc;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.reclamaciones-btn-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.reclamaciones-back-wrap {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.reclamaciones-back-link {
+  color: #64748b;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reclamaciones-back-link:hover {
+  color: #ea580c;
+}

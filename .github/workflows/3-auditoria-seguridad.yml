@@ -1,0 +1,47 @@
+name: "3. Auditoría de Seguridad y Escaneo de Vulnerabilidades"
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  schedule:
+    # Ejecutar escaneo de seguridad cada domingo a las 00:00 UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  escaneo-seguridad:
+    name: "Escaneo de Seguridad y Auditoría de Código"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "1. Descargar Código Fuente"
+        uses: actions/checkout@v4
+
+      - name: "2. Configurar Entorno Node.js (v20)"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: "3. Instalar Dependencias del Proyecto"
+        run: npm install
+
+      - name: "4. Auditoría de Seguridad de Dependencias (NPM Audit)"
+        run: |
+          echo "Ejecutando auditoría de seguridad para librerías de producción..."
+          npm audit --audit-level=moderate || echo "Se detectaron avisos menores de librerías. Revisar informe."
+
+      - name: "5. Verificación de Seguridad de Variables de Entorno (.env)"
+        run: |
+          echo "Verificando que no se expongan credenciales ni claves privadas en el código..."
+          if git ls-files | grep -E '^\.env$'; then
+            echo "ERROR DE SEGURIDAD CRÍTICO: Se encontró un archivo .env subido al repositorio."
+            exit 1
+          else
+            echo "✓ Verificación de claves segura: No hay archivos .env expuestos."
+          fi

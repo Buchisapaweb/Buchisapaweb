@@ -1,0 +1,69 @@
+/* Stylesheet para Tickets Térmicos e Impresión BuchiSapa */
+@page {
+  margin: 0;
+  size: 80mm auto;
+}
+
+body.print-ticket-body {
+  margin: 0;
+  padding: 8px 6px;
+  font-family: 'Courier New', Courier, monospace;
+  color: #000000;
+  background: #ffffff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body.preview-ticket-body {
+  margin: 0;
+  padding: 20px 10px;
+  background: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+img.ticket-logo {
+  max-width: 100%;
+  height: auto;
+  width: 125px;
+  display: block;
+  margin: 0 auto;
+  filter: grayscale(100%) contrast(150%);
+}
+
+.ticket-wrapper {
+  background: #ffffff;
+  padding: 20px 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  max-width: 320px;
+  width: 100%;
+}
+
+.ticket-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+.btn-ticket-print {
+  padding: 10px 18px;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-ticket-close {
+  padding: 10px 18px;
+  background: #e2e8f0;
+  color: #0f172a;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}

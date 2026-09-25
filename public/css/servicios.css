@@ -1,0 +1,173 @@
+/* =========================================================
+   BUCHISAPA - PÁGINA INDEPENDIENTE: SERVICIOS (CSS)
+   ========================================================= */
+
+body.servicios-page-body {
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.servicios-navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.servicios-nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.servicios-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.servicios-brand-logo {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+}
+
+.servicios-brand-title {
+  font-weight: 900;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.servicios-brand-sub {
+  font-size: 10px;
+  color: #ea580c;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.servicios-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ea580c;
+  color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.servicios-hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  color: #ffffff;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.servicios-hero-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  background: rgba(129, 140, 248, 0.2);
+  color: #a5b4fc;
+  border: 1px solid rgba(129, 140, 248, 0.4);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.servicios-hero-title {
+  font-size: 30px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.servicios-hero-sub {
+  font-size: 15px;
+  color: #c7d2fe;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.servicios-single-column {
+  max-width: 800px;
+  margin: 32px auto 60px auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.servicios-section-block {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+@media (max-width: 600px) {
+  .servicios-section-block {
+    padding: 20px;
+  }
+}
+
+.servicios-section-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.servicios-section-p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #334155;
+  margin-bottom: 16px;
+}
+
+.servicios-cta-box {
+  background: #f5f3ff;
+  border-left: 4px solid #6366f1;
+  padding: 18px 22px;
+  border-radius: 0 12px 12px 0;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #3730a3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.servicios-cta-btn {
+  padding: 8px 18px;
+  background: #4338ca;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.servicios-footer {
+  margin-top: auto;
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 24px 0;
+  font-size: 13px;
+  text-align: center;
+}

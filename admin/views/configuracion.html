@@ -1,0 +1,35 @@
+        <!-- ====================================================================
+             14. VISTA CONFIGURACIÓN (HORARIOS LIMA UTC-5, WHATSAPP, PARÁMETROS)
+             ==================================================================== -->
+        <section class="admin-view" id="view-configuracion">
+          <div class="section-panel">
+            <div class="panel-header">
+              <div>
+                <h3 class="panel-title">Parámetros del Sistema BuchiSapa</h3>
+                <p class="panel-description">Configuración de horarios de atención (Oficial Lima UTC-5: 6:00 PM a 5:00 AM), costo de delivery y WhatsApp de despacho.</p>
+              </div>
+              <button class="btn btn-primary" onclick="showToast('Configuraciones guardadas con éxito', 'success')">
+                Guardar Cambios
+              </button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 16px; max-width: 600px;">
+              <div class="form-group">
+                <label class="form-label">Nombre Comercial</label>
+                <input type="text" class="form-input" value="BuchiSapa Burger &amp; Broaster" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tarifa de Delivery Base (S/)</label>
+                <input type="number" class="form-input" value="5.00" step="0.5">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Horario Oficial de Atención (Lima UTC-5)</label>
+                <input type="text" class="form-input" value="Lunes a Domingo de 6:00 PM a 5:00 AM">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Número de WhatsApp de Pedidos</label>
+                <input type="text" class="form-input" value="+51 984 123 456">
+              </div>
+            </div>
+          </div>
+        </section>

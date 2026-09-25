@@ -1,0 +1,853 @@
+<!-- VENTANA COMPLETA DE INGRESO, REGISTRO Y PERFIL DEL CLIENTE -->
+<div class="modal-backdrop" id="login-modal" onclick="closeLoginModal(event)">
+  <div class="buchisapa-auth-modal-box" onclick="event.stopPropagation()">
+    
+    <!-- BARRA SUPERIOR DE LA VENTANA DE INGRESO / REGISTRO -->
+    <div class="auth-window-topbar">
+      <button class="auth-window-back-btn" id="auth-global-back-btn" type="button" onclick="handleAuthBackNav()" aria-label="Volver">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+        <span id="auth-back-btn-text">Volver</span>
+      </button>
+
+      <span class="auth-topbar-title" id="auth-topbar-title" style="display: none;">Mi perfil</span>
+
+      <button class="auth-close-btn-top" type="button" onclick="closeLoginModal()" aria-label="Cerrar ventana">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- VISTA 1: INICIAR SESIÓN -->
+    <div id="auth-view-login">
+      <div class="auth-logo-center-wrap">
+        <img src="/imagenes/logo/logo-buchisapa.png" alt="BuchiSapa Logo" class="auth-logo-img">
+      </div>
+
+      <h2 class="auth-welcome-title">¡Bienvenido a Buchisapa!</h2>
+
+      <div id="auth-login-alert" class="auth-status-alert"></div>
+
+      <form id="auth-login-form" onsubmit="handleAuthLoginSubmit(event)">
+        
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="auth-login-email">Correo electrónico</label>
+          <input 
+            type="email" 
+            id="auth-login-email" 
+            class="auth-text-input" 
+            placeholder="tu@email.com" 
+            required
+            oninput="checkAuthFormReady('login')"
+          >
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="auth-login-password">Contraseña</label>
+          <div class="auth-password-wrapper">
+            <input 
+              type="password" 
+              id="auth-login-password" 
+              class="auth-text-input" 
+              placeholder="••••••••" 
+              required
+              oninput="checkAuthFormReady('login')"
+            >
+            <button type="button" class="auth-eye-toggle-btn" onclick="togglePasswordVisibility('auth-login-password', this)" aria-label="Mostrar contraseña">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-forgot-row">
+          <button type="button" class="auth-forgot-link" onclick="switchAuthView('recovery')">Recuperar contraseña</button>
+        </div>
+
+        <button type="submit" id="auth-submit-btn-login" class="auth-submit-btn">
+          Ingresar
+        </button>
+
+        <div class="auth-guest-row">
+          <button type="button" class="auth-guest-link" onclick="continueAsGuest()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Continuar como invitado</span>
+          </button>
+        </div>
+
+        <div class="auth-divider">
+          <span class="auth-divider-line"></span>
+          <span class="auth-divider-text">ó</span>
+          <span class="auth-divider-line"></span>
+        </div>
+
+        <button type="button" class="auth-google-btn" onclick="handleGoogleSignIn()">
+          <svg width="19" height="19" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Ingresar con Google</span>
+        </button>
+
+        <p class="auth-legal-text">
+          Al ingresar con Google, aceptas nuestros <a href="javascript:void(0)" onclick="openFooterInfoModal('terminos')">términos y condiciones</a> y <a href="javascript:void(0)" onclick="openFooterInfoModal('privacidad')">políticas de privacidad</a>.
+        </p>
+
+        <div class="auth-switch-footer">
+          ¿No tienes una cuenta? <button type="button" class="auth-switch-btn" onclick="switchAuthView('register')">Regístrate aquí</button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- VISTA 2: CREA TU CUENTA -->
+    <div id="auth-view-register" style="display: none;">
+      <h1 class="auth-register-heading">Crea tu cuenta</h1>
+
+      <div id="auth-register-alert" class="auth-status-alert"></div>
+
+      <form id="auth-register-form" onsubmit="handleAuthRegisterSubmit(event)">
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="reg-doc-number">Tipo y número de documento<span class="auth-required-star">*</span></label>
+          <div class="auth-doc-combined-row">
+            <div class="auth-doc-select-box">
+              <select id="reg-doc-type" class="auth-doc-select" onchange="onRegisterDocTypeChange()">
+                <option value="DNI" selected>DNI</option>
+                <option value="CE">CE</option>
+                <option value="Pasaporte">Pasaporte</option>
+                <option value="RUC">RUC</option>
+              </select>
+              <div class="auth-select-arrow">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+            <div class="auth-doc-input-wrapper">
+              <input 
+                type="text" 
+                id="reg-doc-number" 
+                class="auth-text-input auth-doc-input" 
+                placeholder="8 dígitos" 
+                maxlength="8"
+                required 
+                oninput="handleFieldValidation('reg-doc-number')"
+                onblur="handleFieldValidation('reg-doc-number', true)"
+              >
+              <span class="auth-field-status-icon" id="status-icon-reg-doc-number" aria-hidden="true">
+                <svg class="icon-valid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                  <path d="m8 12 3 3 5-5" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <svg class="icon-invalid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                  <line x1="12" y1="8" x2="12" y2="12" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="auth-field-feedback" id="feedback-reg-doc-number"></div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="reg-firstname">Nombres<span class="auth-required-star">*</span></label>
+          <div class="auth-input-wrapper">
+            <input 
+              type="text" 
+              id="reg-firstname" 
+              class="auth-text-input" 
+              placeholder="Ingresa tus nombres"
+              required 
+              oninput="handleFieldValidation('reg-firstname')"
+              onblur="handleFieldValidation('reg-firstname', true)"
+            >
+            <span class="auth-field-status-icon" id="status-icon-reg-firstname" aria-hidden="true">
+              <svg class="icon-valid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                <path d="m8 12 3 3 5-5" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="icon-invalid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                <line x1="12" y1="8" x2="12" y2="12" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="12" y1="16" x2="12.01" y2="16" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="auth-field-feedback" id="feedback-reg-firstname"></div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="reg-lastname">Apellidos<span class="auth-required-star">*</span></label>
+          <div class="auth-input-wrapper">
+            <input 
+              type="text" 
+              id="reg-lastname" 
+              class="auth-text-input" 
+              placeholder="Ingresa tus apellidos"
+              required 
+              oninput="handleFieldValidation('reg-lastname')"
+              onblur="handleFieldValidation('reg-lastname', true)"
+            >
+            <span class="auth-field-status-icon" id="status-icon-reg-lastname" aria-hidden="true">
+              <svg class="icon-valid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                <path d="m8 12 3 3 5-5" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="icon-invalid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                <line x1="12" y1="8" x2="12" y2="12" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="12" y1="16" x2="12.01" y2="16" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="auth-field-feedback" id="feedback-reg-lastname"></div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="reg-email">Correo electrónico<span class="auth-required-star">*</span></label>
+          <div class="auth-input-wrapper">
+            <input 
+              type="email" 
+              id="reg-email" 
+              class="auth-text-input" 
+              placeholder="ejemplo@correo.com"
+              required 
+              oninput="handleFieldValidation('reg-email')"
+              onblur="handleFieldValidation('reg-email', true)"
+            >
+            <span class="auth-field-status-icon" id="status-icon-reg-email" aria-hidden="true">
+              <svg class="icon-valid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                <path d="m8 12 3 3 5-5" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="icon-invalid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                <line x1="12" y1="8" x2="12" y2="12" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="12" y1="16" x2="12.01" y2="16" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="auth-field-feedback" id="feedback-reg-email"></div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="reg-phone">Teléfono celular<span class="auth-required-star">*</span></label>
+          <div class="auth-input-wrapper">
+            <input 
+              type="tel" 
+              id="reg-phone" 
+              class="auth-text-input" 
+              placeholder="Ej. 942 475 459" 
+              maxlength="9"
+              required 
+              oninput="handleFieldValidation('reg-phone')"
+              onblur="handleFieldValidation('reg-phone', true)"
+            >
+            <span class="auth-field-status-icon" id="status-icon-reg-phone" aria-hidden="true">
+              <svg class="icon-valid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                <path d="m8 12 3 3 5-5" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="icon-invalid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                <line x1="12" y1="8" x2="12" y2="12" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="12" y1="16" x2="12.01" y2="16" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="auth-field-feedback" id="feedback-reg-phone"></div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="reg-birthdate">Fecha de nacimiento</label>
+          <div class="auth-input-wrapper">
+            <input 
+              type="date" 
+              id="reg-birthdate" 
+              class="auth-text-input" 
+              oninput="checkRegisterFormReady()"
+            >
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="reg-password">Contraseña<span class="auth-required-star">*</span></label>
+          <div class="auth-password-wrapper">
+            <input 
+              type="password" 
+              id="reg-password" 
+              class="auth-text-input" 
+              placeholder="Mínimo 6 caracteres"
+              required 
+              minlength="6" 
+              oninput="handleFieldValidation('reg-password')"
+              onblur="handleFieldValidation('reg-password', true)"
+            >
+            <span class="auth-field-status-icon" id="status-icon-reg-password" aria-hidden="true">
+              <svg class="icon-valid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                <path d="m8 12 3 3 5-5" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="icon-invalid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                <line x1="12" y1="8" x2="12" y2="12" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="12" y1="16" x2="12.01" y2="16" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <button type="button" class="auth-eye-toggle-btn" onclick="togglePasswordVisibility('reg-password', this)" aria-label="Mostrar contraseña">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="auth-field-feedback" id="feedback-reg-password"></div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-input-label" for="reg-password-confirm">Repetir contraseña<span class="auth-required-star">*</span></label>
+          <div class="auth-password-wrapper">
+            <input 
+              type="password" 
+              id="reg-password-confirm" 
+              class="auth-text-input" 
+              placeholder="Repite tu contraseña"
+              required 
+              minlength="6" 
+              oninput="handleFieldValidation('reg-password-confirm')"
+              onblur="handleFieldValidation('reg-password-confirm', true)"
+            >
+            <span class="auth-field-status-icon" id="status-icon-reg-password-confirm" aria-hidden="true">
+              <svg class="icon-valid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                <path d="m8 12 3 3 5-5" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="icon-invalid" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                <line x1="12" y1="8" x2="12" y2="12" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="12" y1="16" x2="12.01" y2="16" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <button type="button" class="auth-eye-toggle-btn" onclick="togglePasswordVisibility('reg-password-confirm', this)" aria-label="Mostrar contraseña">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="auth-field-feedback" id="feedback-reg-password-confirm"></div>
+        </div>
+
+        <div class="auth-checkbox-group">
+          <label class="auth-custom-checkbox-row">
+            <input type="checkbox" id="reg-terms" class="auth-native-checkbox" required onchange="checkRegisterFormReady()">
+            <span class="auth-checkbox-label-text">
+              He leído y acepto los <a href="javascript:void(0)" onclick="openFooterInfoModal('terminos')" class="auth-red-accent-link">Términos y Condiciones</a> y <a href="javascript:void(0)" onclick="openFooterInfoModal('privacidad')" class="auth-red-accent-link">Políticas de Privacidad</a><span class="auth-required-star">*</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="auth-checkbox-group">
+          <label class="auth-custom-checkbox-row">
+            <input type="checkbox" id="reg-marketing" class="auth-native-checkbox" onchange="checkRegisterFormReady()">
+            <span class="auth-checkbox-label-text">
+              Acepto el envío de cortesías, ofertas, promociones y otros <a href="javascript:void(0)" class="auth-red-accent-link">fines adicionales</a>
+            </span>
+          </label>
+        </div>
+
+        <button type="submit" id="reg-submit-btn" class="auth-submit-btn auth-register-submit-btn" disabled>
+          Crear cuenta
+        </button>
+
+        <div class="auth-switch-footer" style="margin-top: 18px;">
+          ¿Ya tienes una cuenta? <button type="button" class="auth-switch-btn" onclick="switchAuthView('login')">Inicia sesión</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- VISTA 3: RECUPERAR CONTRASEÑA -->
+    <div id="auth-view-recovery" style="display: none;">
+      <h2 class="auth-welcome-title" style="font-size: 21px; margin-bottom: 12px;">Recuperar Contraseña</h2>
+      <p style="font-size: 13.5px; color: #64748b; text-align: center; margin-bottom: 18px; line-height: 1.5;">Ingresa tu correo registrado y te enviaremos las instrucciones de restablecimiento.</p>
+
+      <div id="auth-recovery-alert" class="auth-status-alert"></div>
+
+      <form id="auth-recovery-form" onsubmit="handleAuthRecoverySubmit(event)">
+        <div class="auth-form-group" style="margin-bottom: 20px;">
+          <label class="auth-input-label" for="auth-rec-email">Correo electrónico</label>
+          <input type="email" id="auth-rec-email" class="auth-text-input" placeholder="tu@email.com" required>
+        </div>
+
+        <button type="submit" class="auth-submit-btn ready">
+          Enviar Instrucciones
+        </button>
+
+        <div class="auth-switch-footer">
+          <button type="button" class="auth-switch-btn" onclick="switchAuthView('login')">← Volver a Iniciar Sesión</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- VISTA 4: PERFIL DEL CLIENTE -->
+    <div id="auth-view-profile" style="display: none;">
+      <div id="profile-screen-main">
+        <div class="profile-header-card">
+          <div class="profile-avatar-circle" id="profile-avatar-initial">U</div>
+          <h2 class="profile-user-name" id="profile-user-fullname">Cliente Buchisapa</h2>
+          <p class="profile-user-email" id="profile-user-email">cliente@email.com</p>
+        </div>
+
+        <hr class="profile-divider">
+
+        <div class="profile-menu-list">
+          <button type="button" class="profile-menu-item" onclick="switchProfileScreen('orders')">
+            <div class="profile-menu-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+            </div>
+            <div class="profile-menu-text">
+              <span class="profile-menu-title">Historial de pedidos</span>
+              <span class="profile-menu-sub">Revisa todos los pedidos que has hecho</span>
+            </div>
+            <svg class="profile-menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item" onclick="switchProfileScreen('addresses')">
+            <div class="profile-menu-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="profile-menu-text">
+              <span class="profile-menu-title">Mis direcciones</span>
+              <span class="profile-menu-sub">Revisa todas tus direcciones preferidas</span>
+            </div>
+            <svg class="profile-menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item" onclick="switchProfileScreen('cards')">
+            <div class="profile-menu-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2">
+                <rect width="20" height="14" x="2" y="5" rx="2"/>
+                <line x1="2" x2="22" y1="10" y2="10"/>
+              </svg>
+            </div>
+            <div class="profile-menu-text">
+              <span class="profile-menu-title">Mis tarjetas</span>
+              <span class="profile-menu-sub">Administra las tarjetas que tienes guardadas</span>
+            </div>
+            <svg class="profile-menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item" onclick="switchProfileScreen('edit_data')">
+            <div class="profile-menu-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="profile-menu-text">
+              <span class="profile-menu-title">Editar mis datos</span>
+              <span class="profile-menu-sub">Mantén tu información siempre actualizada</span>
+            </div>
+            <svg class="profile-menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item" onclick="switchProfileScreen('settings')">
+            <div class="profile-menu-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <div class="profile-menu-text">
+              <span class="profile-menu-title">Configuraciones</span>
+              <span class="profile-menu-sub">Encuentra aquí todas tus configuraciones</span>
+            </div>
+            <svg class="profile-menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="profile-logout-wrap">
+          <button type="button" class="profile-logout-link" onclick="handleLogoutCustomer()">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+
+      <!-- HISTORIAL DE PEDIDOS -->
+      <div id="profile-screen-orders" style="display: none;">
+        <div class="profile-orders-header">
+          <div>
+            <h3 class="profile-orders-title">Historial de Compras</h3>
+            <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">
+              Filtrado por: <strong id="profile-orders-user-email-tag" style="color: #0f172a;">-</strong>
+            </div>
+          </div>
+          <button type="button" class="profile-orders-refresh-btn" onclick="fetchAndRenderCustomerOrders(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <span>Actualizar</span>
+          </button>
+        </div>
+
+        <div id="profile-orders-loading" style="text-align: center; padding: 30px 16px; color: #64748b;">
+          <div style="display: inline-block; width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: #dc2626; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 8px;"></div>
+          <div style="font-size: 13.5px; font-weight: 600;">Consultando pedidos...</div>
+        </div>
+
+        <div id="profile-orders-empty" class="profile-subview-empty-box" style="display: none;">
+          <div class="profile-subview-empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </div>
+          <h3 class="profile-subview-empty-title">Aún no has realizado tu primer pedido</h3>
+          <p class="profile-subview-empty-desc">
+            Revisa nuestras promociones y comienza a disfrutar del sabor de Buchisapa.
+          </p>
+          <button type="button" class="btn-profile-red" onclick="goToPromociones()">
+            VER PROMOCIONES
+          </button>
+        </div>
+
+        <div id="profile-orders-list" style="display: none; max-height: 480px; overflow-y: auto; padding-right: 2px;"></div>
+      </div>
+
+      <!-- MIS DIRECCIONES -->
+      <div id="profile-screen-addresses" style="display: none;">
+        <div class="address-tabs-row">
+          <button type="button" class="address-tab-btn active" id="addr-tab-favorites" onclick="switchAddressTab('favorites')">
+            FAVORITAS
+          </button>
+          <button type="button" class="address-tab-btn" id="addr-tab-all" onclick="switchAddressTab('all')">
+            TODAS MIS DIRECCIONES
+          </button>
+        </div>
+
+        <div id="addr-empty-favorites" class="profile-subview-empty-box">
+          <div class="profile-subview-empty-icon">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <h3 class="profile-subview-empty-title">Aun no cuentas con direcciones guardadas cómo favoritas</h3>
+          <p class="profile-subview-empty-desc">
+            Realiza una compra y guarda tus direcciones para futuras compras
+          </p>
+          <button type="button" class="btn-profile-red" onclick="goToPromociones()">
+            VER PROMOCIONES
+          </button>
+          <button type="button" class="btn-profile-dark" onclick="toggleAddAddressForm(true)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <span>+ Agregar dirección</span>
+          </button>
+        </div>
+
+        <div id="addr-empty-all" class="profile-subview-empty-box" style="display: none;">
+          <div class="profile-subview-empty-icon">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <h3 class="profile-subview-empty-title">Aun no has utilizado ninguna dirección</h3>
+          <p class="profile-subview-empty-desc">
+            Realiza una compra y guarda tus direcciones para futuras compras
+          </p>
+          <button type="button" class="btn-profile-red" onclick="goToPromociones()">
+            VER PROMOCIONES
+          </button>
+          <button type="button" class="btn-profile-dark" onclick="toggleAddAddressForm(true)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <span>+ Agregar dirección</span>
+          </button>
+        </div>
+
+        <div id="add-address-form-box" class="add-address-form-box" style="display: none;">
+          <h4 class="add-address-form-title">Nueva Dirección de Entrega</h4>
+          <div class="auth-form-group">
+            <label class="auth-input-label">Dirección (Calle, Av, Jr y Número)*</label>
+            <div class="auth-input-wrapper">
+              <input type="text" id="new-addr-street" class="auth-text-input" placeholder="Ej: Jr. Central 123">
+            </div>
+          </div>
+          <div class="auth-form-group">
+            <label class="auth-input-label">Distrito / Zona (Lima Este)*</label>
+            <div class="auth-input-wrapper">
+              <input type="text" id="new-addr-district" class="auth-text-input" placeholder="Ej: Huaycán / Ate">
+            </div>
+          </div>
+          <div class="auth-form-group">
+            <label class="auth-input-label">Referencia</label>
+            <div class="auth-input-wrapper">
+              <input type="text" id="new-addr-reference" class="auth-text-input" placeholder="Ej: Frente al parque, rejas negras">
+            </div>
+          </div>
+          <div class="auth-checkbox-group">
+            <label class="auth-custom-checkbox-row">
+              <input type="checkbox" id="new-addr-is-fav" class="auth-native-checkbox" checked>
+              <span class="auth-checkbox-label-text">Marcar como dirección favorita</span>
+            </label>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button type="button" class="drawer-btn-white-outline" onclick="toggleAddAddressForm(false)" style="flex: 1;">
+              Cancelar
+            </button>
+            <button type="button" class="btn-profile-red" onclick="saveNewCustomerAddress()" style="flex: 1.5; margin-bottom: 0;">
+              Guardar Dirección
+            </button>
+          </div>
+        </div>
+
+        <div id="addr-list-container" style="display: none; max-height: 440px; overflow-y: auto;"></div>
+
+        <div id="addr-bottom-add-btn-wrap" style="display: none; margin-top: 14px;">
+          <button type="button" class="btn-profile-dark" onclick="toggleAddAddressForm(true)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <span>+ Agregar otra dirección</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MIS TARJETAS -->
+      <div id="profile-screen-cards" style="display: none;">
+        <div class="profile-subview-empty-box">
+          <div class="profile-subview-empty-icon" style="width: 70px; height: 70px; background: #fff1f2; border-color: #fecdd3; color: #dc2626;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="20" height="14" x="2" y="5" rx="2"/>
+              <line x1="2" x2="22" y1="10" y2="10"/>
+            </svg>
+          </div>
+          <h3 class="profile-subview-empty-title">Aún no tienes tarjetas guardadas</h3>
+          <p class="profile-subview-empty-desc">
+            Al pagar en línea marca "Guardar tarjeta para futuras compras" y la verás aquí.
+          </p>
+          <button type="button" class="btn-profile-red" onclick="goToPromociones()">
+            HACER UN PEDIDO
+          </button>
+        </div>
+      </div>
+
+      <!-- EDITAR MIS DATOS -->
+      <div id="profile-screen-edit_data" style="display: none;">
+        <form id="profile-edit-form" onsubmit="handleSaveProfileData(event)">
+          <div id="profile-edit-alert" class="auth-status-alert"></div>
+
+          <div class="auth-form-group">
+            <label class="auth-input-label">Tipo y número de documento<span class="auth-required-star">*</span></label>
+            <div class="auth-doc-combined-row">
+              <div class="auth-doc-select-box">
+                <select id="edit-doc-type" class="auth-doc-select">
+                  <option value="DNI">DNI</option>
+                  <option value="CE">C.E.</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="RUC">RUC</option>
+                </select>
+                <div class="auth-select-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+              </div>
+              <div class="auth-doc-input-wrapper">
+                <input type="text" id="edit-doc-number" class="auth-text-input auth-doc-input" placeholder="8 dígitos" maxlength="12" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-input-label">Fecha de nacimiento</label>
+            <div class="auth-input-wrapper">
+              <input type="date" id="edit-birthdate" class="auth-text-input">
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-input-label">Nombres<span class="auth-required-star">*</span></label>
+            <div class="auth-input-wrapper">
+              <input type="text" id="edit-firstname" class="auth-text-input" placeholder="Tus nombres" required>
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-input-label">Apellidos<span class="auth-required-star">*</span></label>
+            <div class="auth-input-wrapper">
+              <input type="text" id="edit-lastname" class="auth-text-input" placeholder="Tus apellidos" required>
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-input-label">Teléfono<span class="auth-required-star">*</span></label>
+            <div class="auth-input-wrapper">
+              <input type="tel" id="edit-phone" class="auth-text-input" placeholder="9 dígitos" maxlength="9" required>
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-input-label">Correo electrónico</label>
+            <div class="auth-input-wrapper">
+              <input type="email" id="edit-email" class="auth-text-input" readonly style="background: #f8fafc; color: #64748b;">
+            </div>
+          </div>
+
+          <div class="auth-checkbox-group">
+            <label class="auth-custom-checkbox-row">
+              <input type="checkbox" id="edit-marketing-consent" class="auth-native-checkbox" checked>
+              <span class="auth-checkbox-label-text">
+                Acepto el envío de Cortesías, Ofertas, Promociones y otros <a href="javascript:void(0)" onclick="openFooterInfoModal('privacidad')" class="auth-red-accent-link">fines adicionales</a>.
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-profile-red" style="margin-top: 16px;">
+            Actualizar
+          </button>
+        </form>
+      </div>
+
+      <!-- CONFIGURACIONES -->
+      <div id="profile-screen-settings" style="display: none;">
+        <div class="settings-section-card settings-danger-card">
+          <div class="settings-danger-header">
+            <h3 class="settings-danger-title">Eliminar cuenta</h3>
+            <p class="settings-danger-desc">
+              Esta acción eliminará tu cuenta de forma permanente. No podrás recuperar tus datos ni tu historial de pedidos.
+            </p>
+          </div>
+          <button type="button" class="btn-profile-red" onclick="handleDeleteCustomerAccount()">
+            Eliminar cuenta
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AUTENTICACIÓN GOOGLE REAL -->
+<div class="modal-backdrop google-dark-backdrop" id="google-auth-modal" onclick="closeGoogleAuthModal(event)">
+  <div class="google-dark-sheet-box" onclick="event.stopPropagation()">
+    <div class="google-dark-topbar">
+      <div class="google-top-brand">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span class="google-dialog-header-text">Acceder con Google</span>
+      </div>
+      <button type="button" class="google-dark-close-btn" onclick="closeGoogleAuthModal()" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="google-dark-body">
+      <div class="google-app-avatar-wrap">
+        <div class="google-app-avatar-bg">
+          <img src="/imagenes/logo/logo-buchisapa.png" alt="Buchisapa Logo" class="google-app-avatar-img">
+        </div>
+      </div>
+
+      <h3 class="google-choose-title">Acceder con Google</h3>
+      <div class="google-service-subtitle">
+        <a href="javascript:void(0)" class="google-link-blue">Ir a Buchisapa Delivery</a>
+      </div>
+
+      <div id="g_id_signin_wrapper" style="display: flex; justify-content: center; margin-bottom: 14px; min-height: 44px;"></div>
+
+      <div id="google-device-accounts-section" style="display: none;">
+        <p class="google-section-label">Tus cuentas usadas en este dispositivo:</p>
+        <div id="google-accounts-list" class="google-accounts-list"></div>
+      </div>
+
+      <div id="google-direct-input-box" class="google-direct-input-box" style="margin-top: 10px;">
+        <form onsubmit="handleCustomGoogleAccountSubmit(event)" style="display: flex; flex-direction: column; gap: 8px;">
+          <label for="google-custom-email-input" style="font-size: 12px; color: #9aa0a6; font-weight: 600;">Ingresa tu correo de Google (Gmail):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="email" id="google-custom-email-input" class="google-dark-input" placeholder="tu-correo@gmail.com" required autocomplete="email">
+            <button type="submit" class="google-verify-btn" id="google-verify-submit-btn">Ingresar</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="google-verifying-status" class="google-verifying-status" style="display: none;">
+        <div class="google-spinner"></div>
+        <span id="google-verifying-text">Verificando cuenta con Google...</span>
+      </div>
+
+      <p class="google-terms-notice">
+        Antes de usar Buchisapa Delivery, revisa su <a href="javascript:void(0)" onclick="openFooterInfoModal('privacidad')" class="google-link-blue">Política de Privacidad</a> y <a href="javascript:void(0)" onclick="openFooterInfoModal('terminos')" class="google-link-blue">Condiciones del Servicio</a>.
+      </p>
+    </div>
+
+    <div class="google-dark-footer">
+      <div class="google-lang-selector">
+        <span>Español (Latinoamérica)</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="google-footer-links">
+        <a href="javascript:void(0)" onclick="openFooterInfoModal('terminos')">Ayuda</a>
+        <a href="javascript:void(0)" onclick="openFooterInfoModal('privacidad')">Privacidad</a>
+        <a href="javascript:void(0)" onclick="openFooterInfoModal('terminos')">Condiciones</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CÓDIGO OTP -->
+<div class="modal-backdrop" id="email-verification-modal" style="z-index: 1060; display: none;" onclick="if(event.target === this) closeEmailVerificationModal()">
+  <div class="otp-modal-box" onclick="event.stopPropagation()">
+    <div class="otp-modal-header">
+      <div class="otp-icon-bubble">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="20" height="16" x="2" y="4" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          <circle cx="18" cy="18" r="3" fill="#22c55e" stroke="#0f172a" stroke-width="1.5"/>
+          <path d="m16.8 18 0.9 0.9 1.5-1.5" stroke="#ffffff" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <button type="button" class="otp-close-btn" onclick="closeEmailVerificationModal()" aria-label="Cerrar modal">&times;</button>
+    </div>
+
+    <div class="otp-modal-body">
+      <h3 class="otp-title">Verifica tu Correo</h3>
+      <p class="otp-subtitle">
+        Ingresa el código de <strong>6 dígitos</strong> enviado a:
+      </p>
+      
+      <div class="otp-email-badge">
+        <span id="otp-target-email-display">tu-correo@gmail.com</span>
+        <button type="button" class="otp-change-email-btn" onclick="handleChangeEmailFromOtp()" title="Cambiar correo">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          Editar
+        </button>
+      </div>
+
+      <div id="otp-alert-message" class="otp-alert" style="display: none;"></div>
+
+      <div class="otp-digits-container" id="otp-digits-group">
+        <input type="text" class="otp-digit-box" id="otp-digit-1" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" autofocus>
+        <input type="text" class="otp-digit-box" id="otp-digit-2" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+        <input type="text" class="otp-digit-box" id="otp-digit-3" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+        <span class="otp-separator">-</span>
+        <input type="text" class="otp-digit-box" id="otp-digit-4" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+        <input type="text" class="otp-digit-box" id="otp-digit-5" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+        <input type="text" class="otp-digit-box" id="otp-digit-6" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+      </div>
+
+      <div class="otp-resend-row">
+        <span id="otp-timer-label">Reenviar código en <strong id="otp-countdown-timer">00:45</strong></span>
+        <button type="button" id="otp-resend-btn" class="otp-resend-action-btn" onclick="handleResendOtpCode()" style="display: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+          Reenviar código ahora
+        </button>
+      </div>
+
+      <button type="button" id="otp-verify-submit-btn" class="otp-main-submit-btn" onclick="submitOtpVerification()">
+        <span id="otp-btn-text">Verificar y Continuar</span>
+        <div id="otp-btn-spinner" class="otp-spinner" style="display: none;"></div>
+      </button>
+
+      <p class="otp-security-footnote">
+        🔒 Verificación segura de identidad respaldada por el sistema de seguridad BuchiSapa. Válida en cualquier dispositivo.
+      </p>
+    </div>
+  </div>
+</div>
