@@ -120,20 +120,9 @@ export function compileHtml() {
   }
   console.log('✅ Rutas estáticas limpias creadas (/kitchen, /ubicacion, /rastreo, /reclamaciones).');
 
-  // 5. Garantizar alias /imagenes y /imagen en dist/ para Vercel
-  const imagenDist = path.join(DIST_DIR, 'imagen');
-  const imagenesDist = path.join(DIST_DIR, 'imagenes');
-
-  if (fs.existsSync(imagenDist) && !fs.existsSync(imagenesDist)) {
-    copyDirRecursive(imagenDist, imagenesDist);
-  } else if (fs.existsSync(imagenesDist) && !fs.existsSync(imagenDist)) {
-    copyDirRecursive(imagenesDist, imagenDist);
-  }
-
-  // Verificar logo oficial en dist
-  const logoDist1 = path.join(DIST_DIR, 'imagenes', 'logo', 'logo-buchisapa.png');
-  const logoDist2 = path.join(DIST_DIR, 'imagen', 'logo', 'logo-buchisapa.png');
-  console.log(`✅ Archivos de imágenes verificados en dist/imagen y dist/imagenes.`);
+  // 5. Verificar carpeta de imágenes en dist/ para Vercel
+  const logoDist = path.join(DIST_DIR, 'imagenes', 'logo', 'logo-buchisapa.png');
+  console.log(`✅ Archivos de imágenes verificados en dist/imagenes.`);
 }
 
 compileHtml();

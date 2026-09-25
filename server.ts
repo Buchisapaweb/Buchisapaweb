@@ -2270,8 +2270,7 @@ app.use((req, res, next) => {
   // 1. Archivos estáticos de css, js, html, imágenes y raíz pública (todos dentro de public/)
   app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
   app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
-  app.use('/imagenes', express.static(path.join(process.cwd(), 'public/imagen'), staticOptions));
-  app.use('/imagen', express.static(path.join(process.cwd(), 'public/imagen'), staticOptions));
+  app.use('/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
 
   // 2. Panel de Administración Oficial BuchiSapa (Ubicado en carpeta aislada /admin fuera de public/)
   app.get(['/admin', '/admin/', '/admin/index.html', '/admin.html', '/admin/html/admin.html'], (_req: Request, res: Response) => {
