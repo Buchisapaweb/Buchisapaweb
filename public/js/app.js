@@ -2527,7 +2527,7 @@ function updateSelectedLocationHeader() {
         const parsed = JSON.parse(storedDelivery);
         const tag = parsed.tag || 'Delivery';
         const shortAddr = (parsed.address || '').split(',')[0].trim();
-        label.textContent = shortAddr ? `🛵 ${shortAddr.slice(0, 18)}` : `🛵 ${tag}`;
+        label.textContent = shortAddr ? `🛵 ${shortAddr}` : `🛵 ${tag}`;
         return;
       }
       label.textContent = '🛵 Delivery a Domicilio';
@@ -2535,7 +2535,7 @@ function updateSelectedLocationHeader() {
     }
   } catch (e) {}
 
-  label.textContent = 'Recojo Santa Clara';
+  label.textContent = 'Recojo en Santa Clara';
 }
 
 // Escuchar cambios de ubicación si fue abierta en una nueva pestaña/ventana
