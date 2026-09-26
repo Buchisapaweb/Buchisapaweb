@@ -1078,6 +1078,18 @@ img.lazy-img.loaded {
   display: block;
   user-select: none;
   -webkit-user-select: none;
+  overflow: hidden;
+}
+
+.carousel-slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Flechas de control del carousel (eliminadas) */

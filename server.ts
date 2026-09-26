@@ -2279,6 +2279,12 @@ app.use((req, res, next) => {
   app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
   app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
   app.use('/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
+  app.use('/images', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
+  app.use('/img', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
+  app.use('/public/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
+  app.use('/publico/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
+  app.use(encodeURI('/público/imágenes'), express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
+  app.use('/portada', express.static(path.join(process.cwd(), 'public/imagenes/portada'), staticOptions));
 
   // 2. Panel de Administración Oficial BuchiSapa (Ubicado en carpeta aislada /admin fuera de public/)
   app.get(['/admin', '/admin/', '/admin/index.html', '/admin.html', '/admin/html/admin.html'], (_req: Request, res: Response) => {

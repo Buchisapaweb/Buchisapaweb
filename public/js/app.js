@@ -161,7 +161,9 @@ function renderDynamicHeroCarousel(portadas) {
     const bgStyle = `style="background-image: url('${bg}');"`;
 
     return `
-      <div class="carousel-slide ${activeClass}" ${bgStyle}></div>
+      <div class="carousel-slide ${activeClass}" ${bgStyle}>
+        <img src="${safeStr(bg)}" alt="Portada BuchiSapa" class="carousel-slide-img" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async">
+      </div>
     `;
   }).join('');
 
