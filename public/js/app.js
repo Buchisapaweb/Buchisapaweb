@@ -938,39 +938,8 @@ async function handleAuthLoginSubmit(event) {
     }
 
     const emailLower = (email || '').toLowerCase().trim();
-    const passTrim = (password || '').trim();
-
-    // Fallback de contingencia si el endpoint de API de Vercel/Servidor no responde
-    const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
-    const isAdminEmail = ADMIN_EMAILS.includes(emailLower);
 
     if (!res.ok || !result || !result.success) {
-      if (isAdminEmail) {
-        // Autenticación de rescate para el Administrador
-        const adminUser = {
-          id: 'admin-buchisapaweb-id',
-          uid: 'admin-buchisapaweb-id',
-          email: emailLower,
-          name: 'Admin BuchiSapa Web',
-          firstName: 'Admin',
-          lastName: 'BuchiSapa',
-          phone: '942 475 459',
-          role: 'admin',
-          isAdmin: true,
-          emailVerified: true
-        };
-        const token = `admin-token-${Date.now()}`;
-        localStorage.setItem('buchisapa_admin_token', token);
-        sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(adminUser));
-        localStorage.setItem('buchisapa_customer', JSON.stringify(adminUser));
-
-        showCustomSuccess('¡Acceso de Administrador verificado! Redirigiendo al panel...');
-        setTimeout(() => {
-          window.location.href = '/admin';
-        }, 300);
-        return;
-      }
-
       const cleanMsg = result?.error || result?.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
       throw new Error(cleanMsg);
     }
@@ -978,13 +947,13 @@ async function handleAuthLoginSubmit(event) {
     const user = result.user || result.data;
     const token = result.token || `token-${Date.now()}`;
 
-    // Si el usuario es administrador (role === 'admin' o isAdmin === true o email en lista)
-    if (user.role === 'admin' || user.isAdmin || result.isAdmin || isAdminEmail) {
+    // Si el usuario es administrador validado por el servidor
+    if (user.role === 'admin' || user.isAdmin === true || result.isAdmin === true) {
       localStorage.setItem('buchisapa_admin_token', token);
       sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(user));
       localStorage.setItem('buchisapa_customer', JSON.stringify(user));
 
-      showCustomSuccess('¡Acceso de Administrador confirmado! Redirigiendo al panel...');
+      showCustomSuccess('¡Acceso de Administrador verificado! Redirigiendo al panel...');
 
       setTimeout(() => {
         window.location.href = '/admin';
@@ -1004,36 +973,9 @@ async function handleAuthLoginSubmit(event) {
 
   } catch (err) {
     console.error('Error en login:', err);
-    const emailLower = (email || '').toLowerCase().trim();
-    const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
-    
-    if (ADMIN_EMAILS.includes(emailLower)) {
-      const adminUser = {
-        id: 'admin-buchisapaweb-id',
-        uid: 'admin-buchisapaweb-id',
-        email: emailLower,
-        name: 'Admin BuchiSapa Web',
-        firstName: 'Admin',
-        lastName: 'BuchiSapa',
-        phone: '942 475 459',
-        role: 'admin',
-        isAdmin: true,
-        emailVerified: true
-      };
-      localStorage.setItem('buchisapa_admin_token', `admin-token-${Date.now()}`);
-      sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(adminUser));
-      localStorage.setItem('buchisapa_customer', JSON.stringify(adminUser));
-
-      showCustomSuccess('¡Acceso de Administrador confirmado! Redirigiendo al panel...');
-      setTimeout(() => {
-        window.location.href = '/admin';
-      }, 300);
-      return;
-    }
-
-    let userFriendlyMsg = err.message || 'El correo electrónico o la contraseña no son válidos.';
+    let userFriendlyMsg = err.message || 'El correo electrónico o la contraseña ingresados no son válidos.';
     if (userFriendlyMsg.includes('Unexpected') || userFriendlyMsg.includes('JSON') || userFriendlyMsg.includes('doctype') || userFriendlyMsg.includes('SyntaxError') || userFriendlyMsg.includes('Fetch')) {
-      userFriendlyMsg = 'El correo electrónico o la contraseña ingresados no son válidos. Por favor, verifica e inténtalo nuevamente.';
+      userFriendlyMsg = 'El correo electrónico o la contraseña ingresados no son correctos. Por favor, verifica e inténtalo nuevamente.';
     }
     showCustomError(userFriendlyMsg);
   } finally {
@@ -1651,12 +1593,7 @@ async function submitOtpVerification() {
 
     // Autenticación confirmada y verificada
     const user = result.user || result.data || {};
-    const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
-    const isAdminUser = Boolean(
-      user.role === 'admin' ||
-      user.isAdmin ||
-      ADMIN_EMAILS.includes((user.email || pendingOtpState.email || '').toLowerCase())
-    );
+    const isAdminUser = Boolean(user.role === 'admin' || user.isAdmin === true || result.isAdmin === true);
 
     const customer = {
       id: user.id || `USR-${Date.now()}`,
@@ -2370,11 +2307,7 @@ function updateNavbarUserAuth() {
     const fullName = customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Cliente';
     const shortName = customer.firstName || fullName.split(' ')[0] || 'Cliente';
     const initial = fullName.charAt(0).toUpperCase() || 'B';
-    const isAdminUser = Boolean(
-      customer.role === 'admin' ||
-      customer.isAdmin ||
-      ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'].includes((customer.email || '').toLowerCase())
-    );
+    const isAdminUser = Boolean(customer.role === 'admin' || customer.isAdmin === true);
 
     // En menú lateral: Mostrar card de usuario y ocultar botón INGRESAR
     if (drawerLoginBtn) {

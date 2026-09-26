@@ -137,8 +137,6 @@
     const email = emailInput ? emailInput.value.trim() : '';
     const password = passInput ? passInput.value.trim() : '';
     const emailLower = email.toLowerCase();
-    const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
-    const isAdminEmail = ADMIN_EMAILS.includes(emailLower);
 
     const showError = (msg) => {
       if (!alertEl) return;
@@ -194,10 +192,10 @@
 
       if (isFetchOk && data && data.success) {
         const user = data.user || data.data;
-        const isAdmin = Boolean(data.isAdmin || user.role === 'admin' || user.isAdmin || isAdminEmail);
+        const isAdmin = Boolean(data.isAdmin || user.role === 'admin' || user.isAdmin === true);
 
         if (!isAdmin) {
-          throw new Error('Esta cuenta no cuenta con privilegios de Administrador para acceder al panel.');
+          throw new Error('Esta cuenta no cuenta con privilegios de Administrador.');
         }
 
         const token = data.token || `admin-token-${Date.now()}`;
@@ -210,36 +208,6 @@
         setTimeout(async () => {
           hideAdminLoginModal();
           updateAdminUserDisplay(user);
-          window.showToast?.(`¡Bienvenido al Panel de Control!`, 'success');
-          await loadAllAdminData();
-          window.switchAdminView('dashboard');
-        }, 300);
-        return;
-      }
-
-      // Respaldo directo si el servidor no responde pero el usuario es administrador registrado
-      if (isAdminEmail) {
-        const fallbackUser = {
-          id: 'admin-buchisapaweb-id',
-          uid: 'admin-buchisapaweb-id',
-          email: emailLower,
-          name: emailLower.includes('buchisapaweb') ? 'Admin BuchiSapa Web' : 'Administrador BuchiSapa',
-          firstName: 'Admin',
-          lastName: 'BuchiSapa',
-          role: 'admin',
-          isAdmin: true,
-          emailVerified: true
-        };
-        const token = `admin-token-${Date.now()}`;
-        localStorage.setItem('buchisapa_admin_token', token);
-        sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(fallbackUser));
-        localStorage.setItem('buchisapa_customer', JSON.stringify(fallbackUser));
-
-        showSuccess('¡Identidad confirmada! Cargando panel de control...');
-
-        setTimeout(async () => {
-          hideAdminLoginModal();
-          updateAdminUserDisplay(fallbackUser);
           window.showToast?.(`¡Bienvenido al Panel de Control!`, 'success');
           await loadAllAdminData();
           window.switchAdminView('dashboard');
