@@ -347,6 +347,11 @@ function closeMobileMenu() {
   const drawer = document.getElementById('mobile-menu-backdrop');
   if (drawer) {
     drawer.classList.remove('active', 'open');
+    setTimeout(() => {
+      if (!drawer.classList.contains('active') && !drawer.classList.contains('open')) {
+        drawer.style.display = 'none';
+      }
+    }, 280);
     document.body.style.overflow = '';
   }
 }
@@ -355,17 +360,23 @@ function closeMobileDrawer() {
   closeMobileMenu();
 }
 
-function toggleMobileMenu() {
+function toggleMobileMenu(forceState) {
   const drawer = document.getElementById('mobile-menu-backdrop');
-  if (drawer) {
-    const isOpen = drawer.classList.contains('active') || drawer.classList.contains('open');
-    if (isOpen) {
-      drawer.classList.remove('active', 'open');
-      document.body.style.overflow = '';
-    } else {
-      drawer.classList.add('active', 'open');
-      document.body.style.overflow = 'hidden';
+  if (!drawer) return;
+  const isOpen = drawer.classList.contains('active') || drawer.classList.contains('open');
+  const shouldOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
+
+  if (shouldOpen) {
+    drawer.style.display = 'flex';
+    void drawer.offsetWidth;
+    drawer.classList.add('active', 'open');
+    document.body.style.overflow = 'hidden';
+    if (window.BuchisapaCart && typeof window.BuchisapaCart.getItemsCount === 'function') {
+      const countEl = document.getElementById('drawer-cart-count');
+      if (countEl) countEl.textContent = String(window.BuchisapaCart.getItemsCount());
     }
+  } else {
+    closeMobileMenu();
   }
 }
 
