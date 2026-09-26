@@ -174,3 +174,21 @@
   padding-top: 10px;
   margin-top: 14px;
 }
+
+/* RESPONSIVE DESIGN PARA CAJA Y TICKETS */
+@media (max-width: 768px) {
+  .caja-arqueo-panel {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .caja-cuadre-card {
+    padding: 14px 12px;
+  }
+
+  .thermal-ticket-container {
+    padding: 18px 14px;
+    max-width: 100%;
+    font-size: 12px;
+  }
+}

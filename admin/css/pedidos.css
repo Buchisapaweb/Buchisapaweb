@@ -122,13 +122,80 @@
 }
 
 .order-total-amount {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 900;
-  color: #10b981;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .order-stage-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* RESPONSIVE DESIGN PARA PEDIDOS */
+@media (max-width: 640px) {
+  .order-card {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  .order-header-row {
+    gap: 8px;
+  }
+
+  .order-id-group {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .order-number {
+    font-size: 0.95rem;
+  }
+
+  .order-customer-info {
+    gap: 8px;
+    font-size: 0.8rem;
+  }
+
+  .order-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .order-total-amount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-size: 1.15rem;
+  }
+
+  .order-total-amount::before {
+    content: 'Total a Pagar:';
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .order-stage-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .order-stage-actions .btn {
+    width: 100%;
+    padding: 8px 6px;
+    font-size: 0.78rem;
+    justify-content: center;
+  }
+
+  .order-stage-actions .btn:only-child {
+    grid-column: span 2;
+  }
 }

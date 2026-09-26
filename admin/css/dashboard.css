@@ -284,48 +284,130 @@
 /* RESPONSIVE DESIGN PARA MÓVIL */
 @media (max-width: 768px) {
   .metrics-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+    margin-bottom: 16px;
   }
 
   .metric-card {
-    padding: 14px;
+    padding: 12px 10px;
     gap: 10px;
+    border-radius: var(--radius-lg);
   }
 
   .metric-icon-wrap {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+  }
+
+  .metric-icon-wrap svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .metric-label {
+    font-size: 0.68rem;
   }
 
   .metric-value {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    margin: 1px 0;
+  }
+
+  .metric-hint {
+    font-size: 0.7rem;
   }
 
   .metrics-sub-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .sub-metric-card {
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+  }
+
+  .sub-metric-title {
+    font-size: 0.68rem;
+  }
+
+  .sub-metric-val {
+    font-size: 1rem;
+  }
+
+  .sub-metric-sum {
+    font-size: 0.78rem;
   }
 
   .dashboard-charts-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .chart-panel {
+    padding: 14px 12px;
+    border-radius: var(--radius-lg);
+  }
+
+  .chart-canvas-wrapper {
+    height: 200px;
   }
 
   .chart-donut-container {
     flex-direction: column;
+    gap: 12px;
   }
 
   .chart-donut-legend {
     width: 100%;
+    max-height: 160px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 420px) {
   .metrics-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .metric-card {
+    padding: 10px 8px;
+    gap: 8px;
+  }
+
+  .metric-icon-wrap {
+    width: 32px;
+    height: 32px;
+  }
+
+  .metric-icon-wrap svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .metric-value {
+    font-size: 1.05rem;
   }
 
   .metrics-sub-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .sub-metric-card {
+    padding: 8px 10px;
+  }
+
+  .sub-metric-header {
+    margin-bottom: 4px;
+    gap: 4px;
+  }
+
+  .sub-metric-val {
+    font-size: 0.95rem;
   }
 }
