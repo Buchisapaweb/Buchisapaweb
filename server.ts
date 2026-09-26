@@ -2414,10 +2414,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.send(getCompiledIndexHtml());
   });
 
-  if (!process.env.VERCEL) {
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server running on http://0.0.0.0:${PORT}`);
-    });
+  const isServerless = Boolean(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME);
+  const isDirectRun = Boolean(process.argv[1] && (process.argv[1].endsWith('server.ts') || process.argv[1].endsWith('server.cjs') || process.argv[1].endsWith('server.js')));
+
+  if (!isServerless && isDirectRun) {
+    try {
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on http://0.0.0.0:${PORT}`);
+      });
+    } catch (e) {
+      console.warn('Could not bind to port:', e);
+    }
   }
 
 export default app;
