@@ -3789,6 +3789,9 @@ function openCategoryView(catId, catTitle) {
     return;
   }
 
+  // Ordenar los platos de la categoría en orden alfabético (A - Z)
+  filtered.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' }));
+
   renderCardsInContainer(filtered, container);
 }
 

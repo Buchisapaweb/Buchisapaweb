@@ -755,14 +755,15 @@ const claimsStore: Claim[] = [];
 
 // QUERIES
 export async function getCategories(): Promise<Category[]> {
-  return categoriesStore;
+  return [...categoriesStore].sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 }
 
 export async function getProducts(categoryId?: string): Promise<Product[]> {
+  let list = productsStore;
   if (categoryId) {
-    return productsStore.filter(p => p.category_id === categoryId);
+    list = list.filter(p => p.category_id === categoryId);
   }
-  return productsStore;
+  return [...list].sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
