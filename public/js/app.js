@@ -2996,7 +2996,7 @@ function startLiveGeolocationWatch() {
     // 4. Mantener fija la etiqueta superior oficial #selected-location-label
     const label = document.getElementById('selected-location-label');
     if (label) {
-      label.textContent = 'Recojo Santa Clara';
+      label.textContent = 'Recojo en Santa Clara';
     }
 
     // 5. Actualizar inputs de dirección
@@ -3191,7 +3191,7 @@ function updateLocationFromCoords(lat, lng, shouldReverseGeocode = false, forced
   if (forcedAddress) {
     const label = document.getElementById('selected-location-label');
     if (label) {
-      label.textContent = 'Recojo Santa Clara';
+      label.textContent = 'Recojo en Santa Clara';
     }
   }
 
@@ -3209,7 +3209,7 @@ function updateLocationFromCoords(lat, lng, shouldReverseGeocode = false, forced
       if (addrInput) addrInput.value = cachedAddr;
       const label = document.getElementById('selected-location-label');
       if (label) {
-        label.textContent = 'Recojo Santa Clara';
+        label.textContent = 'Recojo en Santa Clara';
       }
       updateLocStatus('✓ Pin de entrega ajustado en el mapa', 'success');
       return;
@@ -3262,7 +3262,7 @@ function updateLocationFromCoords(lat, lng, shouldReverseGeocode = false, forced
             clientAppGeocodeCache.set(cacheKey, formatted);
             const label = document.getElementById('selected-location-label');
             if (label) {
-              label.textContent = 'Recojo Santa Clara';
+              label.textContent = 'Recojo en Santa Clara';
             }
           }
         }
@@ -3357,7 +3357,7 @@ function confirmDeliveryAddress() {
   // Mantener fija la etiqueta superior oficial #selected-location-label
   const label = document.getElementById('selected-location-label');
   if (label) {
-    label.textContent = 'Recojo Santa Clara';
+    label.textContent = 'Recojo en Santa Clara';
   }
 
   // Pre-llenar checkout si el formulario está abierto o se abre luego
@@ -3389,7 +3389,7 @@ function confirmPickupStore() {
 
   const label = document.getElementById('selected-location-label');
   if (label) {
-    label.textContent = 'Recojo Santa Clara';
+    label.textContent = 'Recojo en Santa Clara';
   }
 
   const custAddr = document.getElementById('cust-address');

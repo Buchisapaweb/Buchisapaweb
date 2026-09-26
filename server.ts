@@ -2261,8 +2261,12 @@ app.use((req, res, next) => {
 
   // --- SERVIR ARCHIVOS ESTÁTICOS HTML5, CSS, JS Y RUTAS ---
   const staticOptions = {
-    maxAge: '7d',
+    maxAge: 0,
+    etag: false,
     setHeaders: (res: Response) => {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     }
@@ -2378,12 +2382,18 @@ app.use((req, res, next) => {
   // 3. Página de Inicio (HTML5 con parciales compilados)
   app.get(['/', '/index.html'], (_req: Request, res: Response) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.send(getCompiledIndexHtml());
   });
 
   // Fallback a index.html para SPA/rutas directas
   app.get('*all', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.send(getCompiledIndexHtml());
   });
 
