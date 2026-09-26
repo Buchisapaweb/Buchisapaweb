@@ -226,7 +226,7 @@ const BuchisapaAPI = {
       meta.isAdmin === true ||
       meta.role === 'admin' ||
       appMeta.role === 'admin' ||
-      ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'].includes(cleanEmail)
+      sbUser.role === 'admin'
     );
 
     const userProfile = {

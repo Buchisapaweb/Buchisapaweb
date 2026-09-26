@@ -1061,7 +1061,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
           meta.isAdmin === true ||
           meta.role === 'admin' ||
           appMeta.role === 'admin' ||
-          ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'].includes(emailLower)
+          supabaseUser.role === 'admin'
         );
 
         const verifiedUser = {
