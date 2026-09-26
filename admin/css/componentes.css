@@ -19,22 +19,35 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #ff007f 0%, #e024c3 100%);
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 55%, #9f1239 100%);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 18px rgba(255, 0, 127, 0.42);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 18px rgba(225, 29, 72, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #ff2aa8 0%, #f032d6 100%);
-  box-shadow: 0 6px 24px rgba(255, 0, 127, 0.6);
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 55%, #be123c 100%);
+  box-shadow: 0 6px 24px rgba(225, 29, 72, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.38);
   transform: translateY(-1px);
 }
 
 .btn-primary:active {
-  background: linear-gradient(135deg, #d6006b 0%, #c418aa 100%);
+  background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
   transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(225, 29, 72, 0.4);
+}
+
+.btn-open-new-product {
+  padding: 8px 16px;
+  height: 38px;
+  border-radius: 12px;
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
 .btn-secondary {

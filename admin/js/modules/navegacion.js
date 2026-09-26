@@ -79,8 +79,16 @@
     }
   };
 
-  function switchAdminView(viewId) {
+  async function switchAdminView(viewId) {
     if (!viewId) return;
+
+    // Verificar permisos de Administrador en Supabase antes de cargar cualquier vista
+    if (window.AdminApi && typeof window.AdminApi.verifyAdminRole === 'function') {
+      const hasPermission = await window.AdminApi.verifyAdminRole();
+      if (!hasPermission) {
+        return; // Detiene la carga y redirige al index si no tiene permisos
+      }
+    }
 
     // Actualizar enlaces del sidebar
     document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
@@ -112,8 +120,21 @@
     if (mainActionBtn) {
       if (meta.button) {
         mainActionBtn.style.display = 'inline-flex';
-        mainActionBtn.querySelector('.btn-text-full').textContent = meta.button.text;
-        mainActionBtn.querySelector('.btn-text-mobile').textContent = meta.button.text.split(' ')[0] || '+';
+        const cleanText = (meta.button.text || '').replace(/^\+\s*/, '').trim();
+        const fullTextEl = mainActionBtn.querySelector('.btn-text-full');
+        const mobileTextEl = mainActionBtn.querySelector('.btn-text-mobile');
+        if (fullTextEl) fullTextEl.textContent = cleanText || meta.button.text;
+        if (mobileTextEl) {
+          if (cleanText.toLowerCase().includes('producto')) {
+            mobileTextEl.textContent = 'Agregar';
+          } else if (cleanText.toLowerCase().includes('ticket')) {
+            mobileTextEl.textContent = 'Ticket';
+          } else if (cleanText.toLowerCase().includes('movimiento')) {
+            mobileTextEl.textContent = 'Movimiento';
+          } else {
+            mobileTextEl.textContent = cleanText.split(' ')[0] || 'Nuevo';
+          }
+        }
         mainActionBtn.onclick = meta.button.action;
       } else {
         mainActionBtn.style.display = 'none';

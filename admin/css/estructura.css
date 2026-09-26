@@ -394,6 +394,10 @@ img {
   display: none;
 }
 
+.btn-topbar-search-toggle {
+  display: none;
+}
+
 /* CONTENT VIEWPORT */
 .admin-content {
   padding: 24px;
@@ -488,6 +492,19 @@ img {
 
   .btn-text-mobile {
     display: inline;
+    font-weight: 700;
+  }
+
+  .btn-topbar-search-toggle {
+    display: inline-flex;
+  }
+
+  .btn-primary.btn-open-new-product {
+    padding: 6px 12px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    gap: 5px;
   }
 
   .admin-topbar .search-box {

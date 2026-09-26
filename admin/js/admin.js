@@ -109,6 +109,14 @@
     setupEventListeners();
     setupSSEPushNotifications();
 
+    // Verificar si el usuario autenticado tiene el rol de administrador en Supabase antes de cargar cualquier vista
+    if (window.AdminApi && typeof window.AdminApi.verifyAdminRole === 'function') {
+      const isAllowed = await window.AdminApi.verifyAdminRole();
+      if (!isAllowed) {
+        return; // Detiene la inicialización y redirige al index si no tiene permisos
+      }
+    }
+
     // Verificar sesión activa de Administrador
     const { isAuthorized, user } = getAdminAuthStatus();
 
@@ -335,14 +343,55 @@
       });
     });
 
-    // 4. Búsqueda en Topbar & Input de Productos
+    // 4. Búsqueda en Topbar & Input de Catálogo de Productos
     const searchInputs = document.querySelectorAll('.admin-search-input');
+    const clearCatalogSearchBtn = document.getElementById('btn-clear-catalog-search');
+
     searchInputs.forEach(input => {
       input.addEventListener('input', (e) => {
-        window.AdminState.searchQuery = e.target.value;
+        const val = e.target.value || '';
+        window.AdminState.searchQuery = val;
+        
+        // Sincronizar todos los inputs de búsqueda
+        searchInputs.forEach(otherInput => {
+          if (otherInput !== input && otherInput.value !== val) {
+            otherInput.value = val;
+          }
+        });
+
+        // Mostrar u ocultar botón de limpiar
+        if (clearCatalogSearchBtn) {
+          clearCatalogSearchBtn.style.display = val.trim().length > 0 ? 'flex' : 'none';
+        }
+
         window.applyProductFilters();
       });
     });
+
+    if (clearCatalogSearchBtn) {
+      clearCatalogSearchBtn.addEventListener('click', () => {
+        searchInputs.forEach(input => { input.value = ''; });
+        clearCatalogSearchBtn.style.display = 'none';
+        window.AdminState.searchQuery = '';
+        window.applyProductFilters();
+        const catalogSearchInput = document.getElementById('catalog-search-input');
+        if (catalogSearchInput) catalogSearchInput.focus();
+      });
+    }
+
+    // Función global para enfocar buscador de productos desde botón móvil o atajo
+    window.focusProductSearch = function () {
+      if (typeof window.switchAdminView === 'function') {
+        window.switchAdminView('productos');
+      }
+      setTimeout(() => {
+        const catalogSearchInput = document.getElementById('catalog-search-input');
+        if (catalogSearchInput) {
+          catalogSearchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          catalogSearchInput.focus();
+        }
+      }, 150);
+    };
 
     // 5. Select Ordenamiento Productos
     const sortSelect = document.getElementById('product-sort-select');

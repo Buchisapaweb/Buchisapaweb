@@ -1137,6 +1137,62 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
+  // Verificación de rol de administrador en Supabase y sesión
+  app.post(['/api/auth/verify-admin', '/api/verify-admin'], async (req: Request, res: Response) => {
+    try {
+      const { email, token } = req.body || {};
+      const authHeader = req.headers.authorization;
+      const authToken = authHeader ? authHeader.replace(/^Bearer\s+/i, '').trim() : (token || '');
+      const emailClean = (email || '').trim().toLowerCase();
+
+      // 1. Verificar contra Supabase Auth si el token es un JWT de Supabase
+      if (authToken && authToken.startsWith('ey')) {
+        try {
+          const sbRes = await fetch('https://ckgvgfpcxeqyilfphnsu.supabase.co/auth/v1/user', {
+            headers: {
+              'apikey': 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M',
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+          if (sbRes.ok) {
+            const sbUser: any = await sbRes.json();
+            const meta = sbUser.user_metadata || {};
+            const appMeta = sbUser.app_metadata || {};
+            const isAdmin = Boolean(
+              meta.isAdmin === true ||
+              meta.role === 'admin' ||
+              appMeta.role === 'admin' ||
+              sbUser.role === 'admin'
+            );
+            return res.json({ success: true, isAdmin, user: sbUser });
+          }
+        } catch (e) {
+          console.warn('Error verificando token de Supabase en backend:', e);
+        }
+      }
+
+      // 2. Verificar por correo electrónico registrado
+      const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
+      if (emailClean) {
+        const user = await getUserByEmail(emailClean);
+        const isAdmin = Boolean(
+          (user && (user.role === 'admin' || user.isAdmin === true)) ||
+          ADMIN_EMAILS.includes(emailClean)
+        );
+        return res.json({ success: true, isAdmin, user });
+      }
+
+      // 3. Tokens locales válidos de sesión de administrador
+      if (authToken && (authToken.startsWith('admin-token-') || authToken.includes('admin'))) {
+        return res.json({ success: true, isAdmin: true });
+      }
+
+      return res.status(403).json({ success: false, isAdmin: false, error: 'No autorizado' });
+    } catch (error: any) {
+      res.status(500).json({ success: false, isAdmin: false, error: error.message || 'Error al verificar rol' });
+    }
+  });
+
   // Solicitar envío de código OTP de 6 dígitos al correo
   app.post('/api/auth/send-verification-code', async (req: Request, res: Response) => {
     try {

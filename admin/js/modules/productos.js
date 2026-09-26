@@ -31,7 +31,10 @@
       const q = window.AdminState.searchQuery.toLowerCase().trim();
       prods = prods.filter(p =>
         (p.name && p.name.toLowerCase().includes(q)) ||
-        (p.description && p.description.toLowerCase().includes(q))
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.category_id && p.category_id.toLowerCase().includes(q)) ||
+        (p.badge && p.badge.toLowerCase().includes(q)) ||
+        (p.code && p.code.toLowerCase().includes(q))
       );
     }
 

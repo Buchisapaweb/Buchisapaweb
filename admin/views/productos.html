@@ -3,8 +3,9 @@
              ==================================================================== -->
         <section class="admin-view" id="view-productos">
 
-          <!-- BARRA DE FILTROS POR CATEGORÍA Y ORDENAMIENTO -->
+          <!-- BARRA DE FILTROS POR CATEGORÍA, BÚSQUEDA Y ACCIONES -->
           <div class="catalog-toolbar">
+            <!-- 1. CHIPS DE CATEGORÍAS -->
             <div class="category-filter-chips">
               <button class="category-chip active" data-category="todos">Todos (45)</button>
               <button class="category-chip" data-category="platos-amazonicos">🌿 Amazónicos</button>
@@ -19,14 +20,39 @@
               <button class="category-chip" data-category="extras">🔥 Extras</button>
             </div>
 
+            <!-- 2. FILA DE BÚSQUEDA Y ACCIÓN AGREGAR PRODUCTO ELEGANTE -->
+            <div class="catalog-action-row">
+              <div class="product-search-wrapper">
+                <svg class="product-search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.3-4.3"/>
+                </svg>
+                <input type="text" id="catalog-search-input" class="admin-search-input catalog-search-field" placeholder="Buscar por nombre, código o categoría..." autocomplete="off">
+                <button type="button" class="btn-clear-catalog-search" id="btn-clear-catalog-search" title="Limpiar búsqueda" style="display: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+
+              <!-- BOTÓN AGREGAR ELEGANTE -->
+              <button type="button" class="btn-add-product-elegant" onclick="window.openProductModal()" title="Agregar nuevo producto al catálogo">
+                <div class="btn-add-icon-glow">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                </div>
+                <span class="btn-add-label">Agregar Producto</span>
+              </button>
+            </div>
+
+            <!-- 3. CONTROLES DE ORDENAMIENTO Y MODO DE VISTA -->
             <div class="toolbar-controls">
-              <select class="sort-select" id="product-sort-select">
-                <option value="recent">Más recientes</option>
-                <option value="price-asc">Precio: menor a mayor</option>
-                <option value="price-desc">Precio: mayor a menor</option>
-                <option value="stock-desc">Mayor stock disponible</option>
-                <option value="name-asc">Nombre (A - Z)</option>
-              </select>
+              <div class="sort-select-wrapper">
+                <select class="sort-select" id="product-sort-select">
+                  <option value="recent">Más recientes</option>
+                  <option value="price-asc">Precio: menor a mayor</option>
+                  <option value="price-desc">Precio: mayor a menor</option>
+                  <option value="stock-desc">Mayor stock disponible</option>
+                  <option value="name-asc">Nombre (A - Z)</option>
+                </select>
+              </div>
 
               <div class="view-mode-toggle">
                 <button class="view-btn active" id="btn-view-grid" title="Vista en tarjetas cuadrícula">
