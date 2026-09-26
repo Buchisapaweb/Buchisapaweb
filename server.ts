@@ -310,7 +310,7 @@ app.use((req, res, next) => {
   });
 
   // Admin supplies (Insumos)
-  app.get('/api/admin/supplies', async (_req: Request, res: Response) => {
+  app.get(['/api/admin/supplies', '/api/supplies'], async (_req: Request, res: Response) => {
     try {
       const supplies = await getSupplies();
       res.json({ success: true, data: supplies });
@@ -319,7 +319,7 @@ app.use((req, res, next) => {
     }
   });
 
-  app.post('/api/admin/supplies/:id/stock', async (req: Request, res: Response) => {
+  app.post(['/api/admin/supplies/:id/stock', '/api/supplies/:id/stock'], async (req: Request, res: Response) => {
     try {
       const supplyId = req.params.id as string;
       const newStock = Number(req.body.stock);
@@ -331,7 +331,7 @@ app.use((req, res, next) => {
   });
 
   // Admin utensils (Utensilios)
-  app.get('/api/admin/utensils', async (_req: Request, res: Response) => {
+  app.get(['/api/admin/utensils', '/api/utensils'], async (_req: Request, res: Response) => {
     try {
       const utensils = await getUtensils();
       res.json({ success: true, data: utensils });
@@ -341,7 +341,7 @@ app.use((req, res, next) => {
   });
 
   // Admin caja metrics
-  app.get('/api/admin/caja', async (_req: Request, res: Response) => {
+  app.get(['/api/admin/caja', '/api/caja'], async (_req: Request, res: Response) => {
     try {
       const caja = await getCajaSummary();
       res.json({ success: true, data: caja });
@@ -351,7 +351,7 @@ app.use((req, res, next) => {
   });
 
   // Admin caja: Registrar movimiento (Ingreso / Egreso)
-  app.post('/api/admin/caja/movimiento', async (req: Request, res: Response) => {
+  app.post(['/api/admin/caja/movimiento', '/api/caja/movements'], async (req: Request, res: Response) => {
     try {
       const { tipo, categoria, monto, motivo, responsable, comprobante } = req.body;
       if (!tipo || !monto) {
@@ -366,10 +366,12 @@ app.use((req, res, next) => {
   });
 
   // Admin caja: Apertura de turno
-  app.post('/api/admin/caja/apertura', async (req: Request, res: Response) => {
+  app.post(['/api/admin/caja/apertura', '/api/caja/abrir'], async (req: Request, res: Response) => {
     try {
-      const { montoInicial, responsable } = req.body;
-      const caja = await abrirCaja({ montoInicial: Number(montoInicial) || 250, responsable });
+      const { montoInicial, initial_cash, responsable, cajero } = req.body;
+      const initial = Number(montoInicial || initial_cash) || 250;
+      const resp = responsable || cajero || 'Admin BuchiSapa';
+      const caja = await abrirCaja({ montoInicial: initial, responsable: resp });
       res.json({ success: true, data: caja });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
@@ -377,10 +379,12 @@ app.use((req, res, next) => {
   });
 
   // Admin caja: Cierre de turno / Arqueo Z
-  app.post('/api/admin/caja/cierre', async (req: Request, res: Response) => {
+  app.post(['/api/admin/caja/cierre', '/api/caja/cerrar'], async (req: Request, res: Response) => {
     try {
-      const { efectivoReal, notas, responsable } = req.body;
-      const result = await cerrarCaja({ efectivoReal: Number(efectivoReal), notas, responsable });
+      const { efectivoReal, real_cash, notes, notas, responsable } = req.body;
+      const cash = Number(efectivoReal !== undefined ? efectivoReal : real_cash);
+      const note = notes || notas;
+      const result = await cerrarCaja({ efectivoReal: cash, notas: note, responsable });
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
@@ -388,7 +392,7 @@ app.use((req, res, next) => {
   });
 
   // Admin tickets: Listar tickets de venta / boletas
-  app.get('/api/admin/tickets', async (_req: Request, res: Response) => {
+  app.get(['/api/admin/tickets', '/api/tickets'], async (_req: Request, res: Response) => {
     try {
       const tickets = await getTickets();
       res.json({ success: true, data: tickets });
@@ -398,7 +402,7 @@ app.use((req, res, next) => {
   });
 
   // Admin tickets: Emitir nuevo ticket rápido
-  app.post('/api/admin/tickets', async (req: Request, res: Response) => {
+  app.post(['/api/admin/tickets', '/api/tickets'], async (req: Request, res: Response) => {
     try {
       const ticket = await createQuickTicket(req.body);
       res.json({ success: true, data: ticket });

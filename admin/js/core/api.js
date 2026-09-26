@@ -7,6 +7,20 @@
   'use strict';
 
   const AdminApi = {
+    // AUTHENTICATION
+    async login(email, password) {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || data.message || 'Error al autenticar');
+      }
+      return data;
+    },
+
     // PRODUCTS
     async getProducts() {
       const res = await fetch('/api/products');

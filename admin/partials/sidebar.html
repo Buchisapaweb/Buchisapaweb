@@ -101,13 +101,13 @@
       <!-- PIE CON USUARIO ADMINISTRADOR Y BOTÓN DE CERRAR SESIÓN -->
       <div class="sidebar-footer">
         <div class="user-profile">
-          <div class="avatar-badge">AD</div>
+          <div class="avatar-badge" id="admin-sidebar-avatar">AD</div>
           <div class="user-info">
-            <p class="user-name">Admin BuchiSapa</p>
-            <p class="user-role">Super Administrador</p>
+            <p class="user-name" id="admin-sidebar-name">Admin BuchiSapa</p>
+            <p class="user-role" id="admin-sidebar-email">Super Administrador</p>
           </div>
         </div>
-        <button type="button" class="btn-logout-full" id="btn-admin-logout" onclick="window.handleLogout ? window.handleLogout() : (location.href='/index.html')" title="Cerrar sesión de administrador">
+        <button type="button" class="btn-logout-full" id="btn-admin-logout" onclick="window.handleAdminLogout ? window.handleAdminLogout() : (localStorage.removeItem('buchisapa_admin_token'), localStorage.removeItem('buchisapa_admin_session'), location.reload())" title="Cerrar sesión de administrador">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
             <polyline points="16 17 21 12 16 7"/>

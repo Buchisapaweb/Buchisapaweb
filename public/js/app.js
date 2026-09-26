@@ -160,10 +160,20 @@ function renderDynamicHeroCarousel(portadas) {
     const activeClass = isFirst ? 'active' : '';
     const bgStyle = `style="background-image: url('${bg}');"`;
     const ctaCategory = p.buttonCategory || p.category || 'broaster';
-    const slideTitle = p.title || 'BuchiSapa';
+    const slideTitle = p.title || 'Pollo Broaster con Sabor Amazónico';
+    const highlight = p.highlight ? ` ${p.highlight}` : '';
+    const fullTitle = `${slideTitle}${highlight}`;
+    const badge = p.badge || (idx === 0 ? '🍗 ESPECIAL CRUJIENTE' : '✨ DESTACADO BUCHISAPA');
+    const subtitle = p.subtitle || '';
 
     return `
-      <div class="carousel-slide ${activeClass}" ${bgStyle} onclick="openCategoryView('${safeStr(ctaCategory)}', '${safeStr(slideTitle)}')" role="button" tabindex="0" title="${safeStr(slideTitle)}"></div>
+      <div class="carousel-slide ${activeClass}" ${bgStyle} title="${safeStr(fullTitle)}">
+        <div class="carousel-slide-scrim">
+          <span class="carousel-slide-tag">${safeStr(badge)}</span>
+          <h3 class="carousel-slide-title">${safeStr(fullTitle)}</h3>
+          ${subtitle ? `<p class="carousel-slide-sub">${safeStr(subtitle)}</p>` : ''}
+        </div>
+      </div>
     `;
   }).join('');
 
@@ -1590,23 +1600,37 @@ async function submitOtpVerification() {
     }
 
     // Autenticación confirmada y verificada
+    const user = result.user || result.data || {};
+    const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
+    const isAdminUser = Boolean(
+      user.role === 'admin' ||
+      user.isAdmin ||
+      ADMIN_EMAILS.includes((user.email || pendingOtpState.email || '').toLowerCase())
+    );
+
     const customer = {
       id: user.id || `USR-${Date.now()}`,
-      name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email.split('@')[0],
-      firstName: user.firstName || user.name?.split(' ')[0] || user.email.split('@')[0],
+      name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email?.split('@')[0] || pendingOtpState.email.split('@')[0],
+      firstName: user.firstName || user.name?.split(' ')[0] || user.email?.split('@')[0] || 'Cliente',
       lastName: user.lastName || '',
-      email: user.email,
+      email: user.email || pendingOtpState.email,
       phone: user.phone || '942475459',
       docType: user.docType || 'DNI',
       docNumber: user.docNumber || '',
       authProvider: user.authProvider || payload.authProvider || 'local',
-      role: 'customer',
+      role: isAdminUser ? 'admin' : (user.role || 'customer'),
+      isAdmin: isAdminUser,
       emailVerified: true,
       updatedAt: new Date().toISOString()
     };
 
     // Guardar sesión
     localStorage.setItem('buchisapa_customer', JSON.stringify(customer));
+    if (isAdminUser) {
+      const token = result.token || `admin-token-${Date.now()}`;
+      localStorage.setItem('buchisapa_admin_token', token);
+      sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(customer));
+    }
     
     // Si fue login por Google, registrarlo en la lista de cuentas frecuentes de este dispositivo
     if (customer.authProvider === 'google') {
@@ -2289,10 +2313,18 @@ function updateNavbarUserAuth() {
     } catch (e) {}
   }
 
+  const drawerAdminBtn = document.getElementById('drawer-admin-panel-btn');
+  const profileAdminBtn = document.getElementById('profile-menu-admin-btn');
+
   if (customer) {
     const fullName = customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Cliente';
     const shortName = customer.firstName || fullName.split(' ')[0] || 'Cliente';
     const initial = fullName.charAt(0).toUpperCase() || 'B';
+    const isAdminUser = Boolean(
+      customer.role === 'admin' ||
+      customer.isAdmin ||
+      ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'].includes((customer.email || '').toLowerCase())
+    );
 
     // En menú lateral: Mostrar card de usuario y ocultar botón INGRESAR
     if (drawerLoginBtn) {
@@ -2316,6 +2348,13 @@ function updateNavbarUserAuth() {
     }
     if (drawerRegisterBtn) {
       drawerRegisterBtn.style.display = 'none';
+    }
+
+    if (drawerAdminBtn) {
+      drawerAdminBtn.style.display = isAdminUser ? 'flex' : 'none';
+    }
+    if (profileAdminBtn) {
+      profileAdminBtn.style.display = isAdminUser ? 'flex' : 'none';
     }
 
     // Elementos en header
@@ -2344,6 +2383,12 @@ function updateNavbarUserAuth() {
     }
     if (drawerRegisterBtn) {
       drawerRegisterBtn.style.display = 'flex';
+    }
+    if (drawerAdminBtn) {
+      drawerAdminBtn.style.display = 'none';
+    }
+    if (profileAdminBtn) {
+      profileAdminBtn.style.display = 'none';
     }
 
     if (userBtn) {

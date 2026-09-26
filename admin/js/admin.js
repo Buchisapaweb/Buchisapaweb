@@ -11,8 +11,7 @@
     initApp();
   });
 
-  async function initApp() {
-    // Verificar sesión activa de Administrador
+  function getAdminAuthStatus() {
     const adminToken = localStorage.getItem('buchisapa_admin_token');
     const adminSession = sessionStorage.getItem('buchisapa_admin_session');
     let customerSession = null;
@@ -26,15 +25,61 @@
       (customerSession && (customerSession.role === 'admin' || customerSession.isAdmin))
     );
 
-    if (!isAdminAuthorized) {
-      window.location.href = '/index.html';
-      return;
+    let user = null;
+    if (adminSession) {
+      try { user = JSON.parse(adminSession); } catch (e) {}
+    }
+    if (!user && customerSession && (customerSession.role === 'admin' || customerSession.isAdmin)) {
+      user = customerSession;
+    }
+    if (!user && adminToken) {
+      user = {
+        name: 'Administrador BuchiSapa',
+        email: 'admin@buchisapa.pe',
+        role: 'admin',
+        isAdmin: true
+      };
     }
 
-    setupEventListeners();
-    setupSSEPushNotifications();
+    return { isAuthorized: isAdminAuthorized, user };
+  }
 
-    // Cargar datos en paralelo para máxima velocidad y fluidez
+  function showAdminLoginModal() {
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) {
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+      const emailInput = document.getElementById('admin-login-email');
+      if (emailInput) {
+        setTimeout(() => emailInput.focus(), 150);
+      }
+    }
+  }
+
+  function hideAdminLoginModal() {
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+  }
+
+  function updateAdminUserDisplay(user) {
+    if (!user) return;
+    const nameEl = document.getElementById('admin-sidebar-name');
+    const emailEl = document.getElementById('admin-sidebar-email');
+    const avatarEl = document.getElementById('admin-sidebar-avatar');
+
+    const name = user.name || user.firstName || 'Admin BuchiSapa';
+    const email = user.email || 'admin@buchisapa.pe';
+    const initial = (name.charAt(0) || 'A').toUpperCase();
+
+    if (nameEl) nameEl.textContent = name;
+    if (emailEl) emailEl.textContent = email;
+    if (avatarEl) avatarEl.textContent = initial;
+  }
+
+  async function loadAllAdminData() {
     try {
       await Promise.allSettled([
         window.fetchProducts?.(),
@@ -46,11 +91,152 @@
         window.fetchUtensils?.()
       ]);
     } catch (e) {
-      console.warn('Carga inicial completada con fallbacks:', e);
+      console.warn('Carga de datos del panel completada:', e);
     }
+  }
+
+  async function initApp() {
+    setupEventListeners();
+    setupSSEPushNotifications();
+
+    // Verificar sesión activa de Administrador
+    const { isAuthorized, user } = getAdminAuthStatus();
+
+    if (!isAuthorized) {
+      showAdminLoginModal();
+      return;
+    }
+
+    hideAdminLoginModal();
+    updateAdminUserDisplay(user);
+
+    // Cargar datos en paralelo para máxima velocidad y fluidez
+    await loadAllAdminData();
 
     // Inicializar vista por defecto
     window.switchAdminView('dashboard');
+  }
+
+  async function handleAdminLoginFormSubmit(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const emailInput = document.getElementById('admin-login-email');
+    const passInput = document.getElementById('admin-login-password');
+    const alertEl = document.getElementById('admin-login-alert');
+    const submitBtn = document.getElementById('btn-admin-login-submit');
+
+    const email = emailInput ? emailInput.value.trim() : '';
+    const password = passInput ? passInput.value.trim() : '';
+
+    const showError = (msg) => {
+      if (!alertEl) return;
+      alertEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; color: #ff4d79;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>${msg}</span>
+        </div>
+      `;
+      alertEl.style.display = 'block';
+      alertEl.style.background = 'rgba(255, 51, 102, 0.15)';
+      alertEl.style.border = '1px solid rgba(255, 51, 102, 0.35)';
+    };
+
+    const showSuccess = (msg) => {
+      if (!alertEl) return;
+      alertEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; color: #00ff88;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>${msg}</span>
+        </div>
+      `;
+      alertEl.style.display = 'block';
+      alertEl.style.background = 'rgba(0, 255, 136, 0.15)';
+      alertEl.style.border = '1px solid rgba(0, 255, 136, 0.35)';
+    };
+
+    if (!email) {
+      showError('Por favor ingresa tu correo de administrador.');
+      if (emailInput) emailInput.focus();
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Verificando acceso...</span>';
+    }
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Credenciales no válidas.');
+      }
+
+      const user = data.user || data.data;
+      const isAdmin = Boolean(data.isAdmin || user.role === 'admin' || user.isAdmin);
+
+      if (!isAdmin) {
+        throw new Error('Esta cuenta no cuenta con privilegios de Administrador para acceder al panel.');
+      }
+
+      const token = data.token || `admin-token-${Date.now()}`;
+      localStorage.setItem('buchisapa_admin_token', token);
+      sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(user));
+      localStorage.setItem('buchisapa_customer', JSON.stringify(user));
+
+      showSuccess('¡Identidad confirmada! Cargando panel de control...');
+
+      setTimeout(async () => {
+        hideAdminLoginModal();
+        updateAdminUserDisplay(user);
+        window.showToast?.(`¡Bienvenido al Panel de Control!`, 'success');
+        await loadAllAdminData();
+        window.switchAdminView('dashboard');
+      }, 400);
+
+    } catch (err) {
+      console.error('Error in admin login:', err);
+      showError(err.message || 'Error al iniciar sesión en el panel.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Ingresar al Panel</span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
+      }
+    }
+  }
+
+  function fillAdminCredentials(email, pass) {
+    const emailInput = document.getElementById('admin-login-email');
+    const passInput = document.getElementById('admin-login-password');
+    if (emailInput) emailInput.value = email;
+    if (passInput) passInput.value = pass;
+    const alertEl = document.getElementById('admin-login-alert');
+    if (alertEl) alertEl.style.display = 'none';
+  }
+
+  function toggleAdminPasswordVisibility() {
+    const passInput = document.getElementById('admin-login-password');
+    if (!passInput) return;
+    passInput.type = passInput.type === 'password' ? 'text' : 'password';
+  }
+
+  function handleAdminLogout() {
+    localStorage.removeItem('buchisapa_admin_token');
+    sessionStorage.removeItem('buchisapa_admin_session');
+    
+    try {
+      const cust = JSON.parse(localStorage.getItem('buchisapa_customer') || 'null');
+      if (cust && (cust.role === 'admin' || cust.isAdmin)) {
+        localStorage.removeItem('buchisapa_customer');
+      }
+    } catch (e) {}
+
+    window.showToast?.('Sesión de administrador cerrada', 'info');
+    showAdminLoginModal();
   }
 
   function setupEventListeners() {
@@ -300,5 +486,14 @@
       console.warn('SSE no disponible:', e);
     }
   }
+
+  // Exponer utilidades globales para eventos de formulario y botones
+  window.handleAdminLoginFormSubmit = handleAdminLoginFormSubmit;
+  window.fillAdminCredentials = fillAdminCredentials;
+  window.toggleAdminPasswordVisibility = toggleAdminPasswordVisibility;
+  window.handleAdminLogout = handleAdminLogout;
+  window.handleLogout = handleAdminLogout;
+  window.showAdminLoginModal = showAdminLoginModal;
+  window.hideAdminLoginModal = hideAdminLoginModal;
 
 })();
