@@ -123,13 +123,13 @@
 
           </div>
 
-          <!-- GRÁFICOS VISUALES -->
+          <!-- GRÁFICOS VISUALES MODERNOS -->
           <div class="dashboard-charts-grid">
             
             <!-- Gráfico de Ventas y Ganancias -->
             <div class="chart-panel">
               <div class="panel-header">
-                <div>
+                <div class="panel-header-title-box">
                   <h3 class="panel-title">📊 Ventas y Ganancias</h3>
                   <p class="panel-description">Histórico semanal de ingresos brutos vs ganancia neta</p>
                 </div>
@@ -138,7 +138,7 @@
                   <span class="legend-pill profit"><span class="dot"></span> Ganancias</span>
                 </div>
               </div>
-              <div class="chart-canvas-wrapper">
+              <div class="chart-canvas-wrapper" id="bar-chart-container">
                 <canvas id="chart-barras-ventas"></canvas>
               </div>
             </div>
@@ -146,17 +146,17 @@
             <!-- Gráfico de Distribución -->
             <div class="chart-panel">
               <div class="panel-header">
-                <div>
+                <div class="panel-header-title-box">
                   <h3 class="panel-title">🍩 Distribución de Ventas</h3>
                   <p class="panel-description">Proporción por categoría y canal de entrega</p>
                 </div>
                 <div class="chart-toggle-buttons">
-                  <button class="btn btn-xs btn-outline active" id="btn-chart-tipo-cat" onclick="window.toggleCircularChart('categorias')">Categorías</button>
-                  <button class="btn btn-xs btn-outline" id="btn-chart-tipo-tipo" onclick="window.toggleCircularChart('tipo')">Canal</button>
+                  <button class="btn btn-xs btn-outline active" id="btn-chart-tipo-cat" onclick="window.toggleCircularChart('categorias')" type="button">Categorías</button>
+                  <button class="btn btn-xs btn-outline" id="btn-chart-tipo-tipo" onclick="window.toggleCircularChart('tipo')" type="button">Canal</button>
                 </div>
               </div>
               <div class="chart-canvas-wrapper chart-donut-container">
-                <div style="flex: 1; height: 210px; position: relative;">
+                <div class="chart-donut-canvas-box" id="donut-chart-container">
                   <canvas id="chart-circular-categorias"></canvas>
                 </div>
                 <div class="chart-donut-legend" id="chart-donut-legend">

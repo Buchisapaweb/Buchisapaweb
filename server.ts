@@ -2343,16 +2343,29 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     }
   };
-  // 1. Archivos estáticos de css, js, html, imágenes y raíz pública (todos dentro de public/)
+
+  const imageStaticOptions = {
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días en caché de navegador
+    etag: true,
+    setHeaders: (res: Response) => {
+      res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    }
+  };
+
+  // 1. Archivos de imágenes con caché optimizada para velocidad instantánea
+  app.use('/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
+  app.use('/images', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
+  app.use('/img', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
+  app.use('/public/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
+  app.use('/publico/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
+  app.use(encodeURI('/público/imágenes'), express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
+  app.use('/portada', express.static(path.join(process.cwd(), 'public/imagenes/portada'), imageStaticOptions));
+
+  // 2. Archivos estáticos de css, js, html y raíz pública (todos dentro de public/)
   app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
   app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
-  app.use('/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
-  app.use('/images', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
-  app.use('/img', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
-  app.use('/public/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
-  app.use('/publico/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
-  app.use(encodeURI('/público/imágenes'), express.static(path.join(process.cwd(), 'public/imagenes'), staticOptions));
-  app.use('/portada', express.static(path.join(process.cwd(), 'public/imagenes/portada'), staticOptions));
 
   // 2. Panel de Administración Oficial BuchiSapa (Ubicado en carpeta aislada /admin fuera de public/)
   app.get(['/admin', '/admin/', '/admin/index.html', '/admin.html', '/admin/html/admin.html'], (_req: Request, res: Response) => {

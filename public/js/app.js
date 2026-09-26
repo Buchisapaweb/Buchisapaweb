@@ -2299,6 +2299,8 @@ function updateNavbarUserAuth() {
   const drawerUserAvatar = document.getElementById('drawer-user-avatar');
   const drawerUserGreeting = document.getElementById('drawer-user-greeting');
   const drawerRegisterBtn = document.getElementById('drawer-register-btn');
+  const drawerAdminBtn = document.getElementById('drawer-admin-btn');
+  const profileAdminBtn = document.getElementById('profile-admin-btn');
   const userBtn = document.getElementById('header-user-btn');
   const userDot = document.getElementById('user-active-indicator');
   const authBtn = document.getElementById('header-auth-btn');
