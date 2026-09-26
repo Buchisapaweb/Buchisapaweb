@@ -106,10 +106,17 @@ const PORT = 3000;
 
 app.use((req, res, next) => {
   res.setHeader('Permissions-Policy', 'geolocation=(self "*")');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, x-admin-token');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
   next();
 });
 
-  app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // --- SSE REAL-TIME PUSH NOTIFICATIONS EVENT BUS ---
   interface SSESubscriber {
@@ -1016,7 +1023,7 @@ app.use((req, res, next) => {
   });
 
   // User Login endpoint
-  app.post('/api/auth/login', async (req: Request, res: Response) => {
+  app.post(['/api/auth/login', '/auth/login', '/api/login', '/login'], async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
       if (!email) {
