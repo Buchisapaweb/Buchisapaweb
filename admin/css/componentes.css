@@ -59,6 +59,14 @@
   box-shadow: 0 4px 14px rgba(255, 51, 102, 0.35);
 }
 
+.soles-badge-icon {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1;
+}
+
 .btn-danger:hover {
   background-color: #ff1a53;
   box-shadow: 0 6px 18px rgba(255, 51, 102, 0.5);

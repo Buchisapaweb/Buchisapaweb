@@ -349,6 +349,37 @@
   background: #f1f5f9;
 }
 
+/* BOTÓN INGRESAR / MI CUENTA EN DESKTOP */
+.desktop-user-auth-btn {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  .desktop-user-auth-btn {
+    display: inline-flex;
+  }
+}
+
+.desktop-user-auth-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+}
+
 /* BOTÓN MI PEDIDO DESKTOP / MÓVIL */
 .desktop-cart-link-btn {
   background: transparent;

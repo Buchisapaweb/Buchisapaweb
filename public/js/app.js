@@ -924,35 +924,40 @@ async function handleAuthLoginSubmit(event) {
   }
 
   try {
-    let result = null;
-
-    // 1. Intento primario: Autenticación directa contra Supabase Auth API
-    if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
-      try {
-        result = await window.BuchisapaAPI.loginAuth(email, password);
-      } catch (sbErr) {
-        console.warn('Supabase Auth fallo o esperando fallback backend:', sbErr);
+    // Autenticación ultra rápida en paralelo (el que responda primero con éxito)
+    const sbAuthPromise = (async () => {
+      if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
+        const res = await window.BuchisapaAPI.loginAuth(email, password);
+        if (res && res.success) return res;
       }
-    }
+      throw new Error('Supabase direct unavailable');
+    })();
 
-    // 2. Si Supabase no autenticó o no estaba disponible, consultar el endpoint backend /api/auth/login
-    if (!result || !result.success) {
+    const backendAuthPromise = (async () => {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data && data.success) return data;
+      const errMsg = data?.error || data?.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
+      throw new Error(errMsg);
+    })();
 
+    try {
+      result = await Promise.any([sbAuthPromise, backendAuthPromise]);
+    } catch (aggregateErr) {
+      // Si ambos fallaron, capturar error real
       try {
-        result = await res.json();
-      } catch (e) {
-        result = null;
+        result = await backendAuthPromise;
+      } catch (err) {
+        throw err;
       }
+    }
 
-      if (!res.ok || !result || !result.success) {
-        const cleanMsg = result?.error || result?.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
-        throw new Error(cleanMsg);
-      }
+    if (!result || !result.success) {
+      throw new Error('El correo electrónico o la contraseña ingresados no son correctos.');
     }
 
     const user = result.user || result.data;
@@ -964,11 +969,9 @@ async function handleAuthLoginSubmit(event) {
       sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(user));
       localStorage.setItem('buchisapa_customer', JSON.stringify(user));
 
-      showCustomSuccess('¡Acceso de Administrador verificado! Redirigiendo al panel...');
-
-      setTimeout(() => {
-        window.location.href = '/admin';
-      }, 300);
+      showCustomSuccess('¡Acceso verificado! Ingresando...');
+      // Redirección instantánea sin demoras artificiales
+      window.location.href = '/admin';
       return;
     }
 
@@ -979,7 +982,7 @@ async function handleAuthLoginSubmit(event) {
       updateNavbarUserAuth();
     }
     if (typeof showToast === 'function') {
-      showToast(`¡Bienvenido de nuevo, ${user.firstName || user.name || 'Cliente'}!`);
+      showToast(`¡Bienvenido, ${user.firstName || user.name || 'Cliente'}!`);
     }
 
   } catch (err) {
@@ -2311,16 +2314,12 @@ function updateNavbarUserAuth() {
     } catch (e) {}
   }
 
-  const drawerAdminBtn = document.getElementById('drawer-admin-panel-btn');
-  const profileAdminBtn = document.getElementById('profile-menu-admin-btn');
-
-  if (customer) {
+  if (customer && !customer.isAdmin && customer.role !== 'admin') {
     const fullName = customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Cliente';
     const shortName = customer.firstName || fullName.split(' ')[0] || 'Cliente';
-    const initial = fullName.charAt(0).toUpperCase() || 'B';
-    const isAdminUser = Boolean(customer.role === 'admin' || customer.isAdmin === true);
+    const initial = fullName.charAt(0).toUpperCase() || 'C';
 
-    // En menú lateral: Mostrar card de usuario y ocultar botón INGRESAR
+    // En menú lateral: Mostrar card de cliente y ocultar botón INGRESAR
     if (drawerLoginBtn) {
       drawerLoginBtn.style.display = 'none';
     }
@@ -2344,13 +2343,6 @@ function updateNavbarUserAuth() {
       drawerRegisterBtn.style.display = 'none';
     }
 
-    if (drawerAdminBtn) {
-      drawerAdminBtn.style.display = isAdminUser ? 'flex' : 'none';
-    }
-    if (profileAdminBtn) {
-      profileAdminBtn.style.display = isAdminUser ? 'flex' : 'none';
-    }
-
     // Elementos en header
     if (userBtn) {
       userBtn.classList.add('logged-in');
@@ -2365,7 +2357,7 @@ function updateNavbarUserAuth() {
       authBtn.classList.add('logged-in');
     }
   } else {
-    // Estado desconectado
+    // Estado desconectado o sesión administrativa (la tienda pública se mantiene limpia)
     if (drawerLoginBtn) {
       drawerLoginBtn.style.display = 'flex';
     }

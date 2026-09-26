@@ -59,75 +59,110 @@
 }
 
 .metric-card {
-  background: rgba(18, 11, 36, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(224, 36, 195, 0.2);
+  background: rgba(18, 11, 36, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);
-  padding: 18px;
+  padding: 22px 16px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
 }
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0.8;
+}
+
+.metric-card.blue::before { background: linear-gradient(90deg, #00f0ff, transparent); }
+.metric-card.orange::before { background: linear-gradient(90deg, #ff7800, transparent); }
+.metric-card.green::before { background: linear-gradient(90deg, #00ff88, transparent); }
+.metric-card.purple::before { background: linear-gradient(90deg, #c084fc, transparent); }
 
 .metric-card:hover {
-  background: rgba(28, 17, 54, 0.92);
-  border-color: rgba(0, 240, 255, 0.5);
+  background: rgba(28, 17, 54, 0.95);
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.2);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.15);
 }
 
-.metric-card.blue { border-color: rgba(0, 240, 255, 0.3); }
-.metric-card.orange { border-color: rgba(255, 120, 0, 0.3); }
-.metric-card.green { border-color: rgba(0, 255, 136, 0.3); }
-.metric-card.purple { border-color: rgba(180, 70, 255, 0.3); }
+.metric-card.blue { border-color: rgba(0, 240, 255, 0.35); }
+.metric-card.orange { border-color: rgba(255, 120, 0, 0.35); }
+.metric-card.green { border-color: rgba(0, 255, 136, 0.35); }
+.metric-card.purple { border-color: rgba(192, 132, 252, 0.35); }
 
 .metric-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-lg);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-bottom: 2px;
 }
 
 .metric-icon-wrap.blue { background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.35); }
 .metric-icon-wrap.orange { background: rgba(255, 120, 0, 0.15); color: #ff7800; border: 1px solid rgba(255, 120, 0, 0.35); }
 .metric-icon-wrap.green { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.35); }
-.metric-icon-wrap.purple { background: rgba(180, 70, 255, 0.15); color: #c084fc; border: 1px solid rgba(180, 70, 255, 0.35); }
+.metric-icon-wrap.purple { background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.35); }
+
+.soles-badge-icon {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1;
+}
 
 .metric-details {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
   min-width: 0;
 }
 
 .metric-label {
-  font-size: 0.74rem;
-  color: var(--text-muted);
-  font-weight: 800;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  text-align: center;
 }
 
 .metric-value {
-  font-size: 1.45rem;
+  font-size: 1.55rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.25;
-  margin: 2px 0;
+  margin: 4px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 
 .metric-hint {
-  font-size: 0.76rem;
-  color: #94a3b8;
+  font-size: 0.75rem;
+  color: #64748b;
   font-weight: 600;
+  text-align: center;
 }
 
 /* 3. SUB METRICS GRID (DELIVERY, LOCAL, CLIENTES, STOCK) */
@@ -139,53 +174,67 @@
 }
 
 .sub-metric-card {
-  background: rgba(15, 10, 30, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 10, 30, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
-  padding: 14px 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   transition: all 0.2s ease;
 }
 
 .sub-metric-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(22, 14, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(24, 16, 46, 0.9);
 }
 
 .sub-metric-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 100%;
 }
 
 .sub-metric-icon {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
 .sub-metric-title {
-  font-size: 0.74rem;
-  font-weight: 800;
-  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 
 .sub-metric-body {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  width: 100%;
 }
 
 .sub-metric-val {
   font-size: 1.15rem;
   font-weight: 800;
   color: #ffffff;
+  text-align: center;
 }
 
 .sub-metric-sum {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 800;
   color: #10b981;
+  text-align: center;
 }
 
 /* 4. CHARTS GRID */
@@ -197,9 +246,9 @@
 }
 
 .chart-panel {
-  background: rgba(18, 11, 36, 0.82);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(224, 36, 195, 0.18);
+  background: rgba(18, 11, 36, 0.88);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xl);
   padding: 20px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -216,7 +265,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--text-muted);
+  color: #94a3b8;
 }
 
 .legend-pill.sales .dot { width: 8px; height: 8px; border-radius: 50%; background: #00f0ff; box-shadow: 0 0 6px #00f0ff; }
@@ -256,9 +305,9 @@
   justify-content: space-between;
   font-size: 0.78rem;
   padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .donut-item-label {

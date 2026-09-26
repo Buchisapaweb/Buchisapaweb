@@ -178,31 +178,34 @@
     try {
       let data = null;
 
-      // 1. Intentar validar directamente con Supabase Auth si está disponible en el cliente
-      if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
-        try {
-          const sbAuth = await window.BuchisapaAPI.loginAuth(emailLower, password);
-          if (sbAuth && sbAuth.success) {
-            data = sbAuth;
-          }
-        } catch (sbErr) {
-          console.warn('Supabase Auth fallo directo en admin:', sbErr);
+      // Autenticación ultra rápida en paralelo para el panel de administración
+      const sbAuthPromise = (async () => {
+        if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
+          const res = await window.BuchisapaAPI.loginAuth(emailLower, password);
+          if (res && res.success) return res;
         }
-      }
+        throw new Error('Supabase direct unavailable');
+      })();
 
-      // 2. Si no se autenticó por Supabase directo, consultar endpoint /api/auth/login
-      if (!data || !data.success) {
+      const backendAuthPromise = (async () => {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailLower, password })
+        });
+        const resJson = await res.json().catch(() => null);
+        if (res.ok && resJson && resJson.success) return resJson;
+        const errMsg = resJson?.error || resJson?.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
+        throw new Error(errMsg);
+      })();
+
+      try {
+        data = await Promise.any([sbAuthPromise, backendAuthPromise]);
+      } catch (aggregateErr) {
         try {
-          const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: emailLower, password })
-          });
-          if (res.ok) {
-            data = await res.json();
-          }
-        } catch (networkErr) {
-          console.warn('Fallo de red en login admin:', networkErr);
+          data = await backendAuthPromise;
+        } catch (err) {
+          throw err;
         }
       }
 
@@ -219,15 +222,14 @@
         sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(user));
         localStorage.setItem('buchisapa_customer', JSON.stringify(user));
 
-        showSuccess('¡Identidad confirmada! Cargando panel de control...');
+        showSuccess('¡Identidad confirmada! Ingresando...');
 
-        setTimeout(async () => {
-          hideAdminLoginModal();
-          updateAdminUserDisplay(user);
-          window.showToast?.(`¡Bienvenido al Panel de Control!`, 'success');
-          await loadAllAdminData();
-          window.switchAdminView('dashboard');
-        }, 300);
+        // Desbloqueo y renderizado instantáneo
+        hideAdminLoginModal();
+        updateAdminUserDisplay(user);
+        window.switchAdminView('dashboard');
+        // Carga asíncrona de datos en segundo plano sin bloquear UI
+        loadAllAdminData();
         return;
       }
 
