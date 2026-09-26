@@ -159,21 +159,9 @@ function renderDynamicHeroCarousel(portadas) {
     const isFirst = idx === 0;
     const activeClass = isFirst ? 'active' : '';
     const bgStyle = `style="background-image: url('${bg}');"`;
-    const ctaCategory = p.buttonCategory || p.category || 'broaster';
-    const slideTitle = p.title || 'Pollo Broaster con Sabor Amazónico';
-    const highlight = p.highlight ? ` ${p.highlight}` : '';
-    const fullTitle = `${slideTitle}${highlight}`;
-    const badge = p.badge || (idx === 0 ? '🍗 ESPECIAL CRUJIENTE' : '✨ DESTACADO BUCHISAPA');
-    const subtitle = p.subtitle || '';
 
     return `
-      <div class="carousel-slide ${activeClass}" ${bgStyle} title="${safeStr(fullTitle)}">
-        <div class="carousel-slide-scrim">
-          <span class="carousel-slide-tag">${safeStr(badge)}</span>
-          <h3 class="carousel-slide-title">${safeStr(fullTitle)}</h3>
-          ${subtitle ? `<p class="carousel-slide-sub">${safeStr(subtitle)}</p>` : ''}
-        </div>
-      </div>
+      <div class="carousel-slide ${activeClass}" ${bgStyle}></div>
     `;
   }).join('');
 
