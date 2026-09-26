@@ -36,11 +36,11 @@
   <link rel="stylesheet" href="/css/rastreo.css?v=20260925_5">
   <link rel="stylesheet" href="/css/notificaciones.css?v=20260925_5">
   
-  <!-- Preload de Imágenes de Portada para Carga Ultrarrápida -->
-  <link rel="preload" as="image" href="/imagenes/portada/portada-1.jpg" fetchpriority="high">
-  <link rel="prefetch" as="image" href="/imagenes/portada/portada-2.jpg">
-  <link rel="prefetch" as="image" href="/imagenes/portada/portada-3.jpg">
-  <link rel="prefetch" as="image" href="/imagenes/portada/portada-4.jpg">
+  <!-- Preload de Imágenes de Portada en WebP para Carga Ultrarrápida -->
+  <link rel="preload" as="image" href="/imagenes/portada/portada-1.webp" type="image/webp" fetchpriority="high">
+  <link rel="prefetch" as="image" href="/imagenes/portada/portada-2.webp" type="image/webp">
+  <link rel="prefetch" as="image" href="/imagenes/portada/portada-3.webp" type="image/webp">
+  <link rel="prefetch" as="image" href="/imagenes/portada/portada-4.webp" type="image/webp">
 
   <!-- Tipografía -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -75,60 +75,60 @@
       <p class="section-subtitle">Selecciona una categoría para ver los platos, combos y promociones disponibles.</p>
     </div>
 
-    <!-- SECCIÓN DE BANNERS DE TODAS LAS CATEGORÍAS (GRID RESPONSIVO ESCRITORIO, TABLET Y MÓVIL) -->
+    <!-- SECCIÓN DE BANNERS DE TODAS LAS CATEGORÍAS (GRID RESPONSIVO ESCRITORIO, TABLET Y MÓVIL CON LAZY LOADING Y WEBP) -->
     <div id="category-banners-section" class="mobile-category-cards-grid desktop-category-cards-grid">
       
       <!-- 1. PLATOS AMAZÓNICOS -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/platos-amazonicos/banner.jpg');" onclick="openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS')" title="Platos Amazónicos BuchiSapa">
+      <div class="category-banner-card lazy-bg" data-bg="url('/imagenes/categorias/platos-amazonicos/banner.webp')" onclick="openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS')" title="Platos Amazónicos BuchiSapa">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">PLATOS AMAZÓNICOS</h2>
         </div>
       </div>
 
       <!-- 2. HAMBURGUESAS -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/hamburguesas/banner.jpg');" onclick="openCategoryView('hamburguesas', 'HAMBURGUESAS')" title="Hamburguesas BuchiSapa">
+      <div class="category-banner-card lazy-bg" data-bg="url('/imagenes/categorias/hamburguesas/banner.webp')" onclick="openCategoryView('hamburguesas', 'HAMBURGUESAS')" title="Hamburguesas BuchiSapa">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">HAMBURGUESAS</h2>
         </div>
       </div>
 
       <!-- 3. BROASTER -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/broaster/banner.jpg');" onclick="openCategoryView('broaster', 'BROASTER')" title="Pollo Broaster Crujiente">
+      <div class="category-banner-card lazy-bg" data-bg="url('/imagenes/categorias/broaster/banner.webp')" onclick="openCategoryView('broaster', 'BROASTER')" title="Pollo Broaster Crujiente">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">BROASTER</h2>
         </div>
       </div>
 
       <!-- 4. ALITAS -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/alitas/banner.jpg');" onclick="openCategoryView('alitas', 'ALITAS')" title="Alitas Broaster & BBQ">
+      <div class="category-banner-card lazy-bg" data-bg="url('/imagenes/categorias/alitas/banner.webp')" onclick="openCategoryView('alitas', 'ALITAS')" title="Alitas Broaster & BBQ">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">ALITAS</h2>
         </div>
       </div>
 
       <!-- 5. SALCHIPAPAS Y SALCHIBROASTERS -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/salchipapas-y-salchibroasters/banner.jpg');" onclick="openCategoryView('salchipapas', 'SALCHIPAPAS Y SALCHIBROASTERS')" title="Salchipapas y Salchibroasters">
+      <div class="category-banner-card lazy-bg" data-bg="url('/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp')" onclick="openCategoryView('salchipapas', 'SALCHIPAPAS Y SALCHIBROASTERS')" title="Salchipapas y Salchibroasters">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">SALCHIPAPAS Y SALCHIBROASTERS</h2>
         </div>
       </div>
 
       <!-- 6. BEBIDAS -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/bebidas/banner.jpg');" onclick="openCategoryView('bebidas', 'BEBIDAS')" title="Bebidas Frías">
+      <div class="category-banner-card lazy-bg" data-bg="url('/imagenes/categorias/bebidas/banner.webp')" onclick="openCategoryView('bebidas', 'BEBIDAS')" title="Bebidas Frías">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">BEBIDAS</h2>
         </div>
       </div>
 
       <!-- 7. REFRESCOS -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/refrescos/banner.jpg');" onclick="openCategoryView('refrescos', 'REFRESCOS')" title="Refrescos Naturales Amazónicos">
+      <div class="category-banner-card lazy-bg" data-bg="url('/imagenes/categorias/refrescos/banner.webp')" onclick="openCategoryView('refrescos', 'REFRESCOS')" title="Refrescos Naturales Amazónicos">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">REFRESCOS</h2>
         </div>
       </div>
 
       <!-- 8. INFUSIONES -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/infusiones/banner.jpg');" onclick="openCategoryView('infusiones', 'INFUSIONES')" title="Infusiones y Calientes">
+      <div class="category-banner-card lazy-bg" data-bg="url('/imagenes/categorias/infusiones/banner.webp')" onclick="openCategoryView('infusiones', 'INFUSIONES')" title="Infusiones y Calientes">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">INFUSIONES</h2>
         </div>

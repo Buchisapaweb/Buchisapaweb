@@ -1,25 +1,25 @@
-<!-- HERO SLIDER / CAROUSEL BANNERS (CARGA DIRECTA E INSTANTÁNEA) -->
+<!-- HERO SLIDER / CAROUSEL BANNERS (CARGA WEBP Y LAZY LOADING INTELIGENTE) -->
 <section class="hero-carousel-container" aria-label="Banners de Portada BuchiSapa">
   <div class="carousel-track" id="hero-carousel-track">
     
-    <!-- SLIDE 1: BROASTER -->
-    <div class="carousel-slide active" style="background-image: url('/imagenes/portada/portada-1.jpg');">
-      <img src="/imagenes/portada/portada-1.jpg" alt="Portada Pollo Broaster BuchiSapa" class="carousel-slide-img" loading="eager" decoding="async">
+    <!-- SLIDE 1: BROASTER (EAGER LOAD WEBP) -->
+    <div class="carousel-slide active" style="background-image: url('/imagenes/portada/portada-1.webp');">
+      <img src="/imagenes/portada/portada-1.webp" alt="Portada Pollo Broaster BuchiSapa" class="carousel-slide-img" loading="eager" fetchpriority="high" decoding="async" onerror="this.onerror=null; this.src='/imagenes/portada/portada-1.jpg';">
     </div>
 
-    <!-- SLIDE 2: PLATOS AMAZÓNICOS -->
-    <div class="carousel-slide" style="background-image: url('/imagenes/portada/portada-2.jpg');">
-      <img src="/imagenes/portada/portada-2.jpg" alt="Portada Platos Amazónicos BuchiSapa" class="carousel-slide-img" loading="lazy" decoding="async">
+    <!-- SLIDE 2: PLATOS AMAZÓNICOS (LAZY LOAD WEBP) -->
+    <div class="carousel-slide lazy-bg" data-bg="url('/imagenes/portada/portada-2.webp')">
+      <img src="/imagenes/portada/portada-2.webp" alt="Portada Platos Amazónicos BuchiSapa" class="carousel-slide-img lazy-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/imagenes/portada/portada-2.jpg';">
     </div>
 
-    <!-- SLIDE 3: HAMBURGUESAS -->
-    <div class="carousel-slide" style="background-image: url('/imagenes/portada/portada-3.jpg');">
-      <img src="/imagenes/portada/portada-3.jpg" alt="Portada Hamburguesas BuchiSapa" class="carousel-slide-img" loading="lazy" decoding="async">
+    <!-- SLIDE 3: HAMBURGUESAS (LAZY LOAD WEBP) -->
+    <div class="carousel-slide lazy-bg" data-bg="url('/imagenes/portada/portada-3.webp')">
+      <img src="/imagenes/portada/portada-3.webp" alt="Portada Hamburguesas BuchiSapa" class="carousel-slide-img lazy-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/imagenes/portada/portada-3.jpg';">
     </div>
 
-    <!-- SLIDE 4: HAMBURGUESA AMAZÓNICA -->
-    <div class="carousel-slide" style="background-image: url('/imagenes/portada/portada-4.jpg');">
-      <img src="/imagenes/portada/portada-4.jpg" alt="Portada Hamburguesa Amazónica BuchiSapa" class="carousel-slide-img" loading="lazy" decoding="async">
+    <!-- SLIDE 4: HAMBURGUESA AMAZÓNICA (LAZY LOAD WEBP) -->
+    <div class="carousel-slide lazy-bg" data-bg="url('/imagenes/portada/portada-4.webp')">
+      <img src="/imagenes/portada/portada-4.webp" alt="Portada Hamburguesa Amazónica BuchiSapa" class="carousel-slide-img lazy-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='/imagenes/portada/portada-4.jpg';">
     </div>
 
   </div>

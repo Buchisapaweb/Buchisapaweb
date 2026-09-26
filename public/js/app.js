@@ -91,8 +91,15 @@ function initLazyLoadingObserver() {
           }
           
           if (el.dataset.src) {
-            el.src = el.dataset.src;
+            const realSrc = el.dataset.src;
             el.removeAttribute('data-src');
+            el.src = realSrc;
+            if (el.complete) {
+              el.classList.add('loaded');
+            } else {
+              el.onload = () => el.classList.add('loaded');
+              el.onerror = () => el.classList.add('loaded');
+            }
           }
 
           observer.unobserve(el);
@@ -117,11 +124,16 @@ function initLazyLoadingObserver() {
     });
     mutationObs.observe(document.body, { childList: true, subtree: true });
   } else {
-    // Fallback directo
+    // Fallback directo para navegadores sin IntersectionObserver
     document.querySelectorAll('.lazy-bg[data-bg]').forEach(el => {
       el.style.backgroundImage = el.dataset.bg;
       el.removeAttribute('data-bg');
       el.classList.add('bg-loaded');
+    });
+    document.querySelectorAll('img.lazy-img[data-src]').forEach(el => {
+      el.src = el.dataset.src;
+      el.removeAttribute('data-src');
+      el.classList.add('loaded');
     });
   }
 }
@@ -155,14 +167,25 @@ function renderDynamicHeroCarousel(portadas) {
   }
 
   track.innerHTML = portadas.map((p, idx) => {
-    const bg = p.image || `/imagenes/portada/portada-${(idx % 4) + 1}.jpg`;
+    let bg = p.image || `/imagenes/portada/portada-${(idx % 4) + 1}.webp`;
+    if (bg.includes('/imagenes/portada/portada-') && bg.endsWith('.jpg')) {
+      bg = bg.replace('.jpg', '.webp');
+    }
     const isFirst = idx === 0;
     const activeClass = isFirst ? 'active' : '';
-    const bgStyle = `style="background-image: url('${bg}');"`;
+    const jpgFallback = bg.replace('.webp', '.jpg');
 
     return `
-      <div class="carousel-slide ${activeClass}" ${bgStyle}>
-        <img src="${safeStr(bg)}" alt="Portada BuchiSapa" class="carousel-slide-img" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async">
+      <div class="carousel-slide ${activeClass} ${!isFirst ? 'lazy-bg' : ''}" ${isFirst ? `style="background-image: url('${bg}');"` : `data-bg="url('${bg}')"`}>
+        <img 
+          ${isFirst ? `src="${safeStr(bg)}"` : `src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1350'%3E%3C/svg%3E" data-src="${safeStr(bg)}"`} 
+          alt="Portada BuchiSapa" 
+          class="carousel-slide-img ${isFirst ? 'loaded' : 'lazy-img'}" 
+          loading="${isFirst ? 'eager' : 'lazy'}" 
+          ${isFirst ? 'fetchpriority="high"' : ''} 
+          decoding="async" 
+          onerror="this.onerror=null; this.src='${safeStr(jpgFallback)}';"
+        >
       </div>
     `;
   }).join('');
@@ -3924,15 +3947,15 @@ function goToFavorites() {
 
 function getCategoryBannerFallback(catId) {
   const c = String(catId || '').toLowerCase().trim();
-  if (c.includes('hamburguesa') || c.includes('burger')) return '/imagenes/categorias/hamburguesas/banner.jpg';
-  if (c.includes('amazon') || c.includes('selva') || c.includes('juane') || c.includes('tacacho') || c.includes('patacon')) return '/imagenes/categorias/platos-amazonicos/banner.jpg';
-  if (c.includes('broaster') || c.includes('pollo')) return '/imagenes/categorias/broaster/banner.jpg';
-  if (c.includes('alita')) return '/imagenes/categorias/alitas/banner.jpg';
-  if (c.includes('salchipapa') || c.includes('salchibroaster')) return '/imagenes/categorias/salchipapas-y-salchibroasters/banner.jpg';
-  if (c.includes('bebida') || c.includes('gaseosa')) return '/imagenes/categorias/bebidas/banner.jpg';
-  if (c.includes('refresco') || c.includes('jugo') || c.includes('chicha') || c.includes('cocona') || c.includes('aguajina')) return '/imagenes/categorias/refrescos/banner.jpg';
-  if (c.includes('infusion') || c.includes('cafe') || c.includes('te')) return '/imagenes/categorias/infusiones/banner.jpg';
-  return '/imagenes/portada/portada-1.jpg';
+  if (c.includes('hamburguesa') || c.includes('burger')) return '/imagenes/categorias/hamburguesas/banner.webp';
+  if (c.includes('amazon') || c.includes('selva') || c.includes('juane') || c.includes('tacacho') || c.includes('patacon')) return '/imagenes/categorias/platos-amazonicos/banner.webp';
+  if (c.includes('broaster') || c.includes('pollo')) return '/imagenes/categorias/broaster/banner.webp';
+  if (c.includes('alita')) return '/imagenes/categorias/alitas/banner.webp';
+  if (c.includes('salchipapa') || c.includes('salchibroaster')) return '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp';
+  if (c.includes('bebida') || c.includes('gaseosa')) return '/imagenes/categorias/bebidas/banner.webp';
+  if (c.includes('refresco') || c.includes('jugo') || c.includes('chicha') || c.includes('cocona') || c.includes('aguajina')) return '/imagenes/categorias/refrescos/banner.webp';
+  if (c.includes('infusion') || c.includes('cafe') || c.includes('te')) return '/imagenes/categorias/infusiones/banner.webp';
+  return '/imagenes/portada/portada-1.webp';
 }
 window.getCategoryBannerFallback = getCategoryBannerFallback;
 
@@ -3950,19 +3973,27 @@ function renderCardsInContainer(items, container) {
     return;
   }
 
-  container.innerHTML = list.map(p => {
+  container.innerHTML = list.map((p, idx) => {
     const isFav = isFavorite(p.id);
     const catId = p.category_id || p.category || '';
     const fallbackImg = getCategoryBannerFallback(catId);
-    const initialImg = p.image || fallbackImg;
+    let initialImg = p.image || fallbackImg;
+    if (initialImg.startsWith('/imagenes/categorias/') && initialImg.endsWith('.jpg')) {
+      initialImg = initialImg.replace('.jpg', '.webp');
+    } else if (initialImg.startsWith('/imagenes/portada/') && initialImg.endsWith('.jpg')) {
+      initialImg = initialImg.replace('.jpg', '.webp');
+    }
+
+    const isTopThree = idx < 3;
+    const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect width='100%25' height='100%25' fill='%23f1f5f9'/%3E%3C/svg%3E";
 
     return `
       <div class="buchisapa-dish-card" onclick="openProductDetailModal('${p.id}')" style="cursor: pointer;" title="${p.name || 'Plato'}">
         <div class="dish-card-img-wrap">
           <img 
-            src="${initialImg}" 
+            ${isTopThree ? `src="${initialImg}"` : `src="${placeholderSvg}" data-src="${initialImg}"`}
             alt="${p.name || 'Plato'}" 
-            class="dish-card-img lazy-img loaded" 
+            class="dish-card-img ${isTopThree ? 'loaded' : 'lazy-img'}" 
             loading="lazy" 
             decoding="async" 
             onerror="this.onerror=null; this.src='${fallbackImg}';"

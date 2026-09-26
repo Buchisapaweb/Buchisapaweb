@@ -25,7 +25,7 @@
         highlight: 'ULTRA CROCANTE',
         badge: '✨ ESPECIALIDAD DE LA CASA',
         subtitle: 'Empanizado artesanal dorado a la perfección, jugoso por dentro con papas crocantes...',
-        image: '/imagenes/portada/portada-1.jpg',
+        image: '/imagenes/portada/portada-1.webp',
         category: 'broaster',
         buttonText: 'PIDE TU BROASTER AQUÍ',
         active: true
@@ -36,7 +36,7 @@
         highlight: 'DE GALLINA',
         badge: '🌿 SAZÓN SELVÁTICA',
         subtitle: 'Arroz aromatizado envuelto en hoja de bijao con presa tierna y el auténtico sabor...',
-        image: '/imagenes/portada/portada-2.jpg',
+        image: '/imagenes/portada/portada-2.webp',
         category: 'platos-amazonicos',
         buttonText: 'DESCUBRE LA SELVA',
         active: true
@@ -47,7 +47,7 @@
         highlight: '100% CARNE ARTESANAL',
         badge: '🍔 TOP VENTAS',
         subtitle: 'Carne jugosa a la parrilla, queso cheddar derretido, lechuga fresca y papas crocantes...',
-        image: '/imagenes/portada/portada-3.jpg',
+        image: '/imagenes/portada/portada-3.webp',
         category: 'hamburguesas',
         buttonText: 'PIDE TU BURGER AHORA',
         active: true
@@ -58,7 +58,7 @@
         highlight: 'PATACONES CON CECINA',
         badge: '🔥 EXCLUSIVO BUCHISAPA',
         subtitle: 'Plátanos verdes machacados y fritos con deliciosa cecina ahumada regional...',
-        image: '/imagenes/portada/portada-4.jpg',
+        image: '/imagenes/portada/portada-4.webp',
         category: 'platos-amazonicos',
         buttonText: 'PROBAR AHORA',
         active: true
@@ -232,10 +232,10 @@
 
   async function quickAddPortadaPreset(presetKey) {
     const presets = {
-      broaster: { title: 'POLLO BROASTER', highlight: 'MEGA CRUNCH', badge: '🍗 ULTRA CRUJIENTE', image: '/imagenes/portada/portada-1.jpg', category: 'broaster', subtitle: 'Papas nativas y cremas de la selva' },
-      juane: { title: 'JUANE TRADICIONAL', highlight: 'REGIONAL', badge: '🌿 TRADICIÓN SELVÁTICA', image: '/imagenes/portada/portada-2.jpg', category: 'platos-amazonicos', subtitle: 'Aromatizado en hoja de bijao' },
-      burger: { title: 'HAMBURGUESA BUCHISAPA', highlight: 'DOBLE CARNE', badge: '🍔 GOURMET', image: '/imagenes/portada/portada-3.jpg', category: 'hamburguesas', subtitle: 'Con queso cheddar y cecina crocante' },
-      amazonica: { title: 'FUSIÓN AMAZÓNICA', highlight: 'PATACONES CON CECINA', badge: '🔥 SABOR AUTÉNTICO', image: '/imagenes/portada/portada-4.jpg', category: 'platos-amazonicos', subtitle: 'Sabor 100% regional' },
+      broaster: { title: 'POLLO BROASTER', highlight: 'MEGA CRUNCH', badge: '🍗 ULTRA CRUJIENTE', image: '/imagenes/portada/portada-1.webp', category: 'broaster', subtitle: 'Papas nativas y cremas de la selva' },
+      juane: { title: 'JUANE TRADICIONAL', highlight: 'REGIONAL', badge: '🌿 TRADICIÓN SELVÁTICA', image: '/imagenes/portada/portada-2.webp', category: 'platos-amazonicos', subtitle: 'Aromatizado en hoja de bijao' },
+      burger: { title: 'HAMBURGUESA BUCHISAPA', highlight: 'DOBLE CARNE', badge: '🍔 GOURMET', image: '/imagenes/portada/portada-3.webp', category: 'hamburguesas', subtitle: 'Con queso cheddar y cecina crocante' },
+      amazonica: { title: 'FUSIÓN AMAZÓNICA', highlight: 'PATACONES CON CECINA', badge: '🔥 SABOR AUTÉNTICO', image: '/imagenes/portada/portada-4.webp', category: 'platos-amazonicos', subtitle: 'Sabor 100% regional' },
       alitas: { title: 'ALITAS BBQ Y COCONA', highlight: 'PICANTES Y CRUJIENTES', badge: '🍗 SNACK FAVORITO', image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=1200&auto=format&fit=crop&q=80', category: 'alitas', subtitle: 'Glaseadas al fuego con mayonesa de la casa' },
       salchipapa: { title: 'SALCHIBROASTER REAL', highlight: 'CON TODAS LAS CREMAS', badge: '🍟 FUENTE GRANDE', image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=1200&auto=format&fit=crop&q=80', category: 'salchipapas', subtitle: 'Papas fritas con salchicha ahumada y trozos broaster' }
     };

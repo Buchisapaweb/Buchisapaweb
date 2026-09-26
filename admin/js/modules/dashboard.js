@@ -367,41 +367,96 @@
 
     if (currentCircularMode === 'categorias') {
       centerSubtitle = 'Categorías';
+
+      // 8 Categorías Oficiales BuchiSapa
+      const CATEGORIES_DEF = [
+        { key: 'broaster', label: 'Broaster', color: '#ff6b00', defaultPct: 24 },
+        { key: 'hamburguesas', label: 'Hamburguesas', color: '#00e5ff', defaultPct: 20 },
+        { key: 'platos-amazonicos', label: 'Amazónicos', color: '#00ff88', defaultPct: 16 },
+        { key: 'alitas', label: 'Alitas', color: '#ff3366', defaultPct: 12 },
+        { key: 'salchipapas', label: 'Salchipapas', color: '#ffcc00', defaultPct: 10 },
+        { key: 'bebidas', label: 'Bebidas', color: '#38bdf8', defaultPct: 8 },
+        { key: 'refrescos', label: 'Refrescos', color: '#e040fb', defaultPct: 6 },
+        { key: 'infusiones', label: 'Infusiones', color: '#a855f7', defaultPct: 4 }
+      ];
+
       const catCount = {
-        'Broaster': 0,
-        'Hamburguesas': 0,
-        'Platos Amazónicos': 0,
-        'Bebidas & Otros': 0
+        'broaster': 0,
+        'hamburguesas': 0,
+        'platos-amazonicos': 0,
+        'alitas': 0,
+        'salchipapas': 0,
+        'bebidas': 0,
+        'refrescos': 0,
+        'infusiones': 0
       };
+
+      const allProds = (products && products.length > 0) ? products : (window.AdminState?.products || []);
+      const prodLookup = {};
+      allProds.forEach(p => {
+        if (p.id) prodLookup[String(p.id).toLowerCase()] = p;
+        if (p.name) prodLookup[String(p.name).toLowerCase()] = p;
+      });
 
       (allOrders || []).forEach(o => {
         (o.items || []).forEach(item => {
-          const name = (item.name || '').toLowerCase();
           const qty = parseInt(item.quantity || item.qty) || 1;
-          if (name.includes('broaster') || name.includes('pollo')) catCount['Broaster'] += qty;
-          else if (name.includes('burger') || name.includes('hamburguesa') || name.includes('royal')) catCount['Hamburguesas'] += qty;
-          else if (name.includes('juane') || name.includes('tacacho') || name.includes('cecina') || name.includes('amaz')) catCount['Platos Amazónicos'] += qty;
-          else catCount['Bebidas & Otros'] += qty;
+          const itemId = String(item.id || item.product_id || '').toLowerCase();
+          const itemName = String(item.name || '').toLowerCase();
+          const itemCat = String(item.category_id || item.category || '').toLowerCase();
+          const matchedProd = prodLookup[itemId] || prodLookup[itemName] || {};
+          const fullCat = itemCat || String(matchedProd.category_id || matchedProd.category || '').toLowerCase();
+
+          if (fullCat === 'broaster' || itemName.includes('broaster') || itemName.includes('pollo')) {
+            catCount['broaster'] += qty;
+          } else if (fullCat === 'hamburguesas' || itemName.includes('burger') || itemName.includes('hamburguesa') || itemName.includes('royal')) {
+            catCount['hamburguesas'] += qty;
+          } else if (fullCat === 'platos-amazonicos' || fullCat.includes('amazon') || itemName.includes('juane') || itemName.includes('tacacho') || itemName.includes('cecina') || itemName.includes('chorizo') || itemName.includes('patacon') || itemName.includes('chaufa regional')) {
+            catCount['platos-amazonicos'] += qty;
+          } else if (fullCat === 'alitas' || itemName.includes('alita') || itemName.includes('wings') || itemName.includes('bbq') || itemName.includes('acevichada')) {
+            catCount['alitas'] += qty;
+          } else if (fullCat.includes('salchipapa') || itemName.includes('salchipapa') || itemName.includes('salchibroaster') || itemName.includes('salchiqueso')) {
+            catCount['salchipapas'] += qty;
+          } else if (fullCat === 'bebidas' || itemName.includes('gaseosa') || itemName.includes('inca kola') || itemName.includes('coca cola') || itemName.includes('agua') || itemName.includes('san mateo')) {
+            catCount['bebidas'] += qty;
+          } else if (fullCat === 'refrescos' || itemName.includes('refresco') || itemName.includes('cocona') || itemName.includes('aguajina') || itemName.includes('camu camu') || itemName.includes('maracuy') || itemName.includes('chicha') || itemName.includes('jugo')) {
+            catCount['refrescos'] += qty;
+          } else if (fullCat === 'infusiones' || itemName.includes('infusion') || itemName.includes('infusión') || itemName.includes('cafe') || itemName.includes('café') || itemName.includes('te') || itemName.includes('té') || itemName.includes('manzanilla') || itemName.includes('anis') || itemName.includes('anís')) {
+            catCount['infusiones'] += qty;
+          } else {
+            catCount['broaster'] += qty;
+          }
         });
       });
 
       const totalItems = Object.values(catCount).reduce((a, b) => a + b, 0);
 
       if (totalItems > 0) {
-        chartData = [
-          { label: 'Broaster', value: Math.round((catCount['Broaster'] / totalItems) * 100), color: '#ff7800', count: catCount['Broaster'] },
-          { label: 'Hamburguesas', value: Math.round((catCount['Hamburguesas'] / totalItems) * 100), color: '#00f0ff', count: catCount['Hamburguesas'] },
-          { label: 'Amazónicos', value: Math.round((catCount['Platos Amazónicos'] / totalItems) * 100), color: '#00ff88', count: catCount['Platos Amazónicos'] },
-          { label: 'Bebidas & Otros', value: Math.round((catCount['Bebidas & Otros'] / totalItems) * 100), color: '#c084fc', count: catCount['Bebidas & Otros'] }
-        ].filter(i => i.value > 0);
+        chartData = CATEGORIES_DEF.map(cat => {
+          const count = catCount[cat.key] || 0;
+          const pct = Math.round((count / totalItems) * 100);
+          return {
+            label: cat.label,
+            value: pct,
+            color: cat.color,
+            count: count
+          };
+        });
+
+        // Asegurar que sumen exactamente 100%
+        const sumPct = chartData.reduce((s, i) => s + i.value, 0);
+        if (sumPct > 0 && sumPct !== 100) {
+          const maxItem = chartData.reduce((prev, current) => (prev.value > current.value) ? prev : current);
+          maxItem.value += (100 - sumPct);
+        }
       } else {
-        // Distribución por defecto basada en la carta
-        chartData = [
-          { label: 'Broaster', value: 40, color: '#ff7800', count: 0 },
-          { label: 'Hamburguesas', value: 30, color: '#00f0ff', count: 0 },
-          { label: 'Amazónicos', value: 20, color: '#00ff88', count: 0 },
-          { label: 'Bebidas & Otros', value: 10, color: '#c084fc', count: 0 }
-        ];
+        // Distribución inicial realista con las 8 categorías oficiales
+        chartData = CATEGORIES_DEF.map(cat => ({
+          label: cat.label,
+          value: cat.defaultPct,
+          color: cat.color,
+          count: 0
+        }));
       }
     } else {
       centerSubtitle = 'Canal';

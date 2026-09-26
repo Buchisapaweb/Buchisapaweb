@@ -847,7 +847,7 @@ const BuchisapaCart = {
                 const badge = item.badge || 'RECOMENDADO';
                 const catFallback = (typeof window.getCategoryBannerFallback === 'function') 
                   ? window.getCategoryBannerFallback(item.category_id || item.category) 
-                  : '/imagenes/portada/portada-1.jpg';
+                  : '/imagenes/portada/portada-1.webp';
                 const imgUrl = item.image || catFallback;
 
                 return `
@@ -888,7 +888,7 @@ const BuchisapaCart = {
               const accompanimentsText = item.accompaniments || 'Con todos sus acompañamientos (1/4 Pollo Broaster (Pecho o Pierna), Papas Fritas artesanales, Ensalada del día, Refresco Chicha Morada 500ml)';
               const itemFallback = (typeof window.getCategoryBannerFallback === 'function') 
                 ? window.getCategoryBannerFallback(item.category_id || item.category || categoryBadge) 
-                : '/imagenes/portada/portada-1.jpg';
+                : '/imagenes/portada/portada-1.webp';
               const itemImg = item.image || itemFallback;
 
               // Chequeo de stock en tiempo real por ID o Nombre

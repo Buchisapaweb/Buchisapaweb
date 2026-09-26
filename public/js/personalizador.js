@@ -453,7 +453,7 @@
     const totalPrice = (priceNum * currentQty).toFixed(2);
     const catFallback = (typeof window.getCategoryBannerFallback === 'function') 
       ? window.getCategoryBannerFallback(p.category_id || p.category) 
-      : '/imagenes/portada/portada-1.jpg';
+      : '/imagenes/portada/portada-1.webp';
     const imgSrc = p.image || catFallback;
 
     const isDrink = catLabel === 'BEBIDAS' || catLabel === 'REFRESCOS' || catLabel === 'INFUSIONES' || (p.category_id || '').includes('bebida') || (p.category_id || '').includes('refresco') || (p.category_id || '').includes('infusion');
