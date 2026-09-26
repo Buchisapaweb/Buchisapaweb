@@ -362,6 +362,8 @@
       if (!res.ok) throw new Error('Error al eliminar portada');
       return await res.json();
     }
+  };
+
   window.AdminApi = AdminApi;
   window.verifyAdminRole = AdminApi.verifyAdminRole.bind(AdminApi);
   window.checkAdminRole = AdminApi.checkAdminRole.bind(AdminApi);
