@@ -340,7 +340,7 @@
 
     // PORTADAS
     async getPortadas() {
-      const res = await fetch('/api/portadas');
+      const res = await fetch('/api/portadas?all=true');
       if (!res.ok) throw new Error('Error al cargar portadas');
       return await res.json();
     },

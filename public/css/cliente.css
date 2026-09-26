@@ -1043,7 +1043,7 @@ img.lazy-img.loaded {
   padding: 0 4px;
 }
 
-/* Hero Carousel Slider (Adaptado a formato 1080x1350 / 4:5 en Móvil y Panorámico en PC) */
+/* Hero Carousel Slider (Adaptado para Móvil, Tableta y Escritorio / Smart TVs) */
 .hero-carousel-container {
   position: relative;
   width: calc(100% - 16px);
@@ -1056,6 +1056,7 @@ img.lazy-img.loaded {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
   /* Relación 4:5 / 1080x1350 para encuadre vertical óptimo en móviles */
   aspect-ratio: 4 / 5;
+  min-height: 380px;
   max-height: 540px;
   transition: all 0.3s ease;
 }
@@ -1064,7 +1065,8 @@ img.lazy-img.loaded {
   .hero-carousel-container {
     width: calc(100% - 24px);
     aspect-ratio: 1 / 1;
-    max-height: 480px;
+    min-height: 400px;
+    max-height: 500px;
     border-radius: 18px;
   }
 }
@@ -1074,8 +1076,9 @@ img.lazy-img.loaded {
     width: calc(100% - 32px);
     margin: 16px auto 26px;
     border-radius: 20px;
-    aspect-ratio: 16 / 10;
-    max-height: 420px;
+    aspect-ratio: 16 / 9;
+    min-height: 380px;
+    max-height: 520px;
   }
 }
 
@@ -1083,9 +1086,11 @@ img.lazy-img.loaded {
   .hero-carousel-container {
     width: 100%;
     margin: 20px auto 32px;
-    border-radius: 22px;
-    aspect-ratio: 16 / 8;
-    max-height: 460px;
+    border-radius: 24px;
+    /* Aspect ratio generoso 16:9 y altura suficiente para evitar recortes agresivos */
+    aspect-ratio: 16 / 9;
+    min-height: 440px;
+    max-height: 560px;
   }
 }
 
@@ -1102,25 +1107,59 @@ img.lazy-img.loaded {
   height: 100%;
   box-sizing: border-box;
   background-size: cover;
-  background-position: center 35%;
+  background-position: center center;
   background-repeat: no-repeat;
   position: relative;
   cursor: default;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
+  background-color: #0b0f19;
+}
+
+/* Fondo ambiental difuminado para evitar espacios negros y cortes abruptos en pantallas grandes */
+.carousel-slide::before {
+  content: '';
+  position: absolute;
+  inset: -15px;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center center;
+  filter: blur(24px) brightness(0.65);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.85;
+  transform: scale(1.08);
+}
+
+.carousel-slide-picture {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .carousel-slide-img {
+  position: relative;
+  z-index: 2;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 35%;
+  object-position: center center;
   display: block;
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
+}
+
+@media (min-width: 1024px) {
+  .carousel-slide-img {
+    object-position: center 30%;
+  }
 }
 
 /* Flechas de control del carousel (eliminadas) */
@@ -1131,18 +1170,18 @@ img.lazy-img.loaded {
 /* Indicadores de puntos */
 .carousel-dots {
   position: absolute;
-  bottom: 12px;
+  bottom: 14px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 6px;
   z-index: 10;
-  padding: 4px 10px;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 5px 12px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .carousel-dot {
@@ -1166,6 +1205,7 @@ img.lazy-img.loaded {
 .desktop-category-cards-grid {
   display: grid;
   grid-template-columns: 1fr;
+  grid-auto-rows: minmax(260px, auto);
   gap: 18px;
   margin: 0 auto 36px;
   width: 100%;
@@ -1177,27 +1217,30 @@ img.lazy-img.loaded {
 @media (min-width: 480px) {
   .mobile-category-cards-grid,
   .desktop-category-cards-grid {
+    grid-auto-rows: minmax(280px, auto);
     gap: 20px;
     padding: 0 6px;
   }
 }
 
-/* TABLETA (640px a 1023px): 2 Columnas */
+/* TABLETA (640px a 1023px): 2 Columnas con altura garantizada */
 @media (min-width: 640px) {
   .mobile-category-cards-grid,
   .desktop-category-cards-grid {
     grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: minmax(300px, auto);
     gap: 20px;
     max-width: 960px;
     padding: 0 16px;
   }
 }
 
-/* ESCRITORIO (>= 1024px): 4 Columnas */
+/* ESCRITORIO (>= 1024px): 4 Columnas con altura garantizada en Smart TVs y PC */
 @media (min-width: 1024px) {
   .mobile-category-cards-grid,
   .desktop-category-cards-grid {
     grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(300px, auto);
     gap: 24px;
     max-width: 1360px;
     padding: 0;
@@ -1208,8 +1251,9 @@ img.lazy-img.loaded {
 .category-banner-card {
   position: relative;
   width: 100%;
+  min-height: 260px;
+  height: 100%;
   aspect-ratio: 1 / 1;
-  min-height: unset;
   border-radius: 28px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
@@ -1224,10 +1268,22 @@ img.lazy-img.loaded {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   transform: translateZ(0);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
   .category-banner-card {
+    min-height: 300px;
+    border-radius: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .category-banner-card {
+    min-height: 300px;
     border-radius: 24px;
   }
 }
@@ -1245,29 +1301,33 @@ img.lazy-img.loaded {
 .category-banner-overlay {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(
     to top,
-    rgba(11, 15, 25, 0.92) 0%,
-    rgba(11, 15, 25, 0.55) 32%,
-    rgba(11, 15, 25, 0.08) 60%,
+    rgba(11, 15, 25, 0.94) 0%,
+    rgba(11, 15, 25, 0.65) 35%,
+    rgba(11, 15, 25, 0.12) 65%,
     rgba(11, 15, 25, 0) 100%
   );
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  padding: 22px 20px;
+  padding: 24px 20px;
   pointer-events: none;
+  box-sizing: border-box;
+  z-index: 2;
 }
 
 @media (min-width: 640px) {
   .category-banner-overlay {
-    padding: 20px 18px;
+    padding: 22px 20px;
   }
 }
 
 @media (min-width: 1024px) {
   .category-banner-overlay {
-    padding: 22px 20px;
+    padding: 24px 20px;
   }
 }
 

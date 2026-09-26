@@ -407,31 +407,37 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="portada-form-image">URL de la Imagen de Portada *</label>
+            <label class="form-label" for="portada-form-image">URL de la Imagen (Escritorio / Panorámica) *</label>
             <input type="text" class="form-input" id="portada-form-image" required placeholder="https://... o /imagenes/portada/portada-1.jpg" oninput="window.updatePortadaFormPreview()">
-            <span class="text-muted-xs">Puedes colocar una ruta local del restaurante o cualquier enlace de imagen web.</span>
+            <span class="text-muted-xs">Recomendado para PC, Smart TV y Tablets: formato horizontal panorámico (1920x800 o 16:9).</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="portada-form-image-mobile">URL de la Imagen para Móviles (Opcional - Formato Vertical)</label>
+            <input type="text" class="form-input" id="portada-form-image-mobile" placeholder="Ej. /imagenes/portada/portada-1.webp o formato 4:5 (1080x1350)">
+            <span class="text-muted-xs">Para teléfonos: si se ingresa, los móviles mostrarán esta imagen vertical y las pantallas grandes la panorámica.</span>
           </div>
 
           <!-- Selector rápido de imágenes locales disponibles -->
           <div class="form-group" class="form-group mt-neg6">
             <label class="form-label" class="text-muted-sm">Sugerencias de la galería local BuchiSapa:</label>
             <div class="portada-preset-thumbs">
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/portada-1.jpg')">
-                <img src="/imagenes/portada/portada-1.jpg" alt="Broaster">
+              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/Portada1E.webp', '/imagenes/portada/Portada1M.webp')" title="Broaster (Portada1E / Portada1M)">
+                <img src="/imagenes/portada/Portada1E.webp" alt="Broaster">
               </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/portada-2.jpg')">
-                <img src="/imagenes/portada/portada-2.jpg" alt="Juane">
+              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/Portada2E.webp', '/imagenes/portada/Portada2M.webp')" title="Juane (Portada2E / Portada2M)">
+                <img src="/imagenes/portada/Portada2E.webp" alt="Juane">
               </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/portada-3.jpg')">
-                <img src="/imagenes/portada/portada-3.jpg" alt="Burger">
+              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/Portada3E.webp', '/imagenes/portada/Portada3M.webp')" title="Burger (Portada3E / Portada3M)">
+                <img src="/imagenes/portada/Portada3E.webp" alt="Burger">
               </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/portada-4.jpg')">
-                <img src="/imagenes/portada/portada-4.jpg" alt="Amazónica">
+              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/Portada4E.webp', '/imagenes/portada/Portada4M.webp')" title="Amazónica (Portada4E / Portada4M)">
+                <img src="/imagenes/portada/Portada4E.webp" alt="Amazónica">
               </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&amp;auto=format&amp;fit=crop&amp;q=80')">
+              <div class="portada-preset-item" onclick="window.selectPortadaPreset('https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&amp;auto=format&amp;fit=crop&amp;q=80', 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&amp;auto=format&amp;fit=crop&amp;q=80')">
                 <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=200&amp;auto=format&amp;fit=crop&amp;q=80" alt="Burger Gourmet">
               </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=1200&amp;auto=format&amp;fit=crop&amp;q=80')">
+              <div class="portada-preset-item" onclick="window.selectPortadaPreset('https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=1200&amp;auto=format&amp;fit=crop&amp;q=80', 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&amp;auto=format&amp;fit=crop&amp;q=80')">
                 <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=200&amp;auto=format&amp;fit=crop&amp;q=80" alt="Pollo Frito">
               </div>
             </div>

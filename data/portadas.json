@@ -1,0 +1,90 @@
+[
+  {
+    "id": "portada-1",
+    "title": "POLLO BROASTER",
+    "highlight": "ULTRA CROCANTE",
+    "subtitle": "Empanizado artesanal dorado a la perfección, jugoso por dentro con papas crocantes y nuestras mejores cremas caseras.",
+    "badge": "✨ ESPECIALIDAD DE LA CASA",
+    "badgeType": "red-pill",
+    "image": "/imagenes/portada/Portada1E.webp",
+    "imageMobile": "/imagenes/portada/Portada1M.webp",
+    "secretPillIcon": "💡",
+    "secretPillText": "RECETA SECRETA BUCHISAPA | Pecho, Pierna, Encuentro y Alitas desde S/ 12.00",
+    "buttonText": "PIDE TU BROASTER AQUÍ",
+    "buttonCategory": "broaster",
+    "features": [
+      "✦ 100% POLLO FRESCO",
+      "👤 EMPANIZADO CRUJIENTE",
+      "🤍 CREMAS CASERAS"
+    ],
+    "active": true,
+    "order": 1,
+    "createdAt": "2026-09-26T18:42:48.366Z"
+  },
+  {
+    "id": "portada-2",
+    "title": "AUTÉNTICO JUANE",
+    "highlight": "& SABORES AMAZÓNICOS",
+    "subtitle": "Elaborado con aromática hoja de bijao, arroz sazonado con mishkina, gallina tierna, huevo y aceitunas. Acompañado de tacacho con cecina y patacones crocantes.",
+    "badge": "🌿 ESPECIALIDAD DE LA SELVA",
+    "badgeType": "red-pill",
+    "image": "/imagenes/portada/Portada2E.webp",
+    "imageMobile": "/imagenes/portada/Portada2M.webp",
+    "secretPillIcon": "🌴",
+    "secretPillText": "100% SAZÓN REGIONAL | Juanes, Tacacho con Cecina y Patacones desde S/ 12.00",
+    "buttonText": "PEDIR PLATOS AMAZÓNICOS",
+    "buttonCategory": "platos-amazonicos",
+    "features": [
+      "✦ HOJA DE BIJAO FRESCA",
+      "🔥 CECINA AHUMADA",
+      "🌶️ AJÍ DE COCONA"
+    ],
+    "active": true,
+    "order": 2,
+    "createdAt": "2026-09-26T18:42:48.366Z"
+  },
+  {
+    "id": "portada-3",
+    "title": "HAMBURGUESAS ARTESANALES",
+    "highlight": "AL CARBÓN",
+    "subtitle": "Carne jugosa, queso cheddar, huevo, tocino, plátano y papas fritas doradas.",
+    "badge": "BURGUERS & ROYALS",
+    "badgeType": "text",
+    "image": "/imagenes/portada/Portada3E.webp",
+    "imageMobile": "/imagenes/portada/Portada3M.webp",
+    "secretPillIcon": "🍔",
+    "secretPillText": "SABOR AUTÉNTICO | 100% Carne de res seleccionada con papas artesanales",
+    "buttonText": "VER HAMBURGUESAS",
+    "buttonCategory": "hamburguesas",
+    "features": [
+      "✦ CARNE PREMIUM",
+      "🔥 PAN ARTESANAL",
+      "🧀 CHEDDAR FUNDIDO"
+    ],
+    "active": true,
+    "order": 3,
+    "createdAt": "2026-09-26T18:42:48.366Z"
+  },
+  {
+    "id": "portada-4",
+    "title": "HAMBURGUESA",
+    "highlight": "AMAZÓNICA BUCHISAPA",
+    "subtitle": "Carne jugosa artesanal de res con fina cecina ahumada de Tarapoto, queso cheddar derretido, plátano bellaco crujiente y cremosa salsa de cocona con ají charapita.",
+    "badge": "🔥 EDICIÓN ESPECIAL AMAZÓNICA",
+    "badgeType": "red-pill",
+    "image": "/imagenes/portada/Portada4E.webp",
+    "imageMobile": "/imagenes/portada/Portada4M.webp",
+    "secretPillIcon": "🌴",
+    "secretPillText": "NUEVO DE TEMPORADA | Incluye Papas Nativas Crocantes + Refresco desde S/ 18.00",
+    "buttonText": "PROBAR HAMBURGUESA AMAZÓNICA",
+    "buttonCategory": "hamburguesas",
+    "features": [
+      "✦ CECINA DE TARAPOTO",
+      "🌴 PLÁTANO BELLACO CRISPY",
+      "🔥 SALSA CHARAPITA & COCONA"
+    ],
+    "active": true,
+    "order": 4,
+    "createdAt": "2026-09-26T18:42:48.366Z"
+  }
+]

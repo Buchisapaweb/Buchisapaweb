@@ -167,25 +167,28 @@ function renderDynamicHeroCarousel(portadas) {
   }
 
   track.innerHTML = portadas.map((p, idx) => {
-    let bg = p.image || `/imagenes/portada/portada-${(idx % 4) + 1}.webp`;
-    if (bg.includes('/imagenes/portada/portada-') && bg.endsWith('.jpg')) {
-      bg = bg.replace('.jpg', '.webp');
-    }
+    let desktopImg = p.image || p.imageDesktop || `/imagenes/portada/Portada${(idx % 4) + 1}E.webp`;
+    let mobileImg = p.imageMobile || p.image_mobile || `/imagenes/portada/Portada${(idx % 4) + 1}M.webp` || desktopImg;
+
     const isFirst = idx === 0;
     const activeClass = isFirst ? 'active' : '';
-    const jpgFallback = bg.replace('.webp', '.jpg');
+    const jpgFallback = desktopImg.replace('.webp', '.jpg');
 
     return `
-      <div class="carousel-slide ${activeClass} ${!isFirst ? 'lazy-bg' : ''}" ${isFirst ? `style="background-image: url('${bg}');"` : `data-bg="url('${bg}')"`}>
-        <img 
-          ${isFirst ? `src="${safeStr(bg)}"` : `src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1350'%3E%3C/svg%3E" data-src="${safeStr(bg)}"`} 
-          alt="Portada BuchiSapa" 
-          class="carousel-slide-img ${isFirst ? 'loaded' : 'lazy-img'}" 
-          loading="${isFirst ? 'eager' : 'lazy'}" 
-          ${isFirst ? 'fetchpriority="high"' : ''} 
-          decoding="async" 
-          onerror="this.onerror=null; this.src='${safeStr(jpgFallback)}';"
-        >
+      <div class="carousel-slide ${activeClass} ${!isFirst ? 'lazy-bg' : ''}" ${isFirst ? `style="background-image: url('${desktopImg}');"` : `data-bg="url('${desktopImg}')"`}>
+        <picture class="carousel-slide-picture">
+          <source media="(max-width: 640px)" srcset="${safeStr(mobileImg)}">
+          <source media="(min-width: 641px)" srcset="${safeStr(desktopImg)}">
+          <img 
+            ${isFirst ? `src="${safeStr(desktopImg)}"` : `src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3C/svg%3E" data-src="${safeStr(desktopImg)}"`} 
+            alt="Portada BuchiSapa" 
+            class="carousel-slide-img ${isFirst ? 'loaded' : 'lazy-img'}" 
+            loading="${isFirst ? 'eager' : 'lazy'}" 
+            ${isFirst ? 'fetchpriority="high"' : ''} 
+            decoding="async" 
+            onerror="this.onerror=null; this.src='${safeStr(jpgFallback)}';"
+          >
+        </picture>
       </div>
     `;
   }).join('');

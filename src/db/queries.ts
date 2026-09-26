@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 export interface Category {
   id: string;
   name: string;
@@ -1358,6 +1361,7 @@ export interface PortadaBanner {
   badge?: string;
   badgeType?: string;
   image: string;
+  imageMobile?: string;
   secretPillIcon?: string;
   secretPillText?: string;
   buttonText: string;
@@ -1368,7 +1372,9 @@ export interface PortadaBanner {
   createdAt: string;
 }
 
-let portadasStore: PortadaBanner[] = [
+const PORTADAS_FILE = path.join(process.cwd(), 'data', 'portadas.json');
+
+const initialPortadas: PortadaBanner[] = [
   {
     id: 'portada-1',
     title: 'POLLO BROASTER',
@@ -1376,7 +1382,8 @@ let portadasStore: PortadaBanner[] = [
     subtitle: 'Empanizado artesanal dorado a la perfección, jugoso por dentro con papas crocantes y nuestras mejores cremas caseras.',
     badge: '✨ ESPECIALIDAD DE LA CASA',
     badgeType: 'red-pill',
-    image: '/imagenes/portada/portada-1.jpg',
+    image: '/imagenes/portada/Portada1E.webp',
+    imageMobile: '/imagenes/portada/Portada1M.webp',
     secretPillIcon: '💡',
     secretPillText: 'RECETA SECRETA BUCHISAPA | Pecho, Pierna, Encuentro y Alitas desde S/ 12.00',
     buttonText: 'PIDE TU BROASTER AQUÍ',
@@ -1393,7 +1400,8 @@ let portadasStore: PortadaBanner[] = [
     subtitle: 'Elaborado con aromática hoja de bijao, arroz sazonado con mishkina, gallina tierna, huevo y aceitunas. Acompañado de tacacho con cecina y patacones crocantes.',
     badge: '🌿 ESPECIALIDAD DE LA SELVA',
     badgeType: 'red-pill',
-    image: '/imagenes/portada/portada-2.jpg',
+    image: '/imagenes/portada/Portada2E.webp',
+    imageMobile: '/imagenes/portada/Portada2M.webp',
     secretPillIcon: '🌴',
     secretPillText: '100% SAZÓN REGIONAL | Juanes, Tacacho con Cecina y Patacones desde S/ 12.00',
     buttonText: 'PEDIR PLATOS AMAZÓNICOS',
@@ -1410,7 +1418,8 @@ let portadasStore: PortadaBanner[] = [
     subtitle: 'Carne jugosa, queso cheddar, huevo, tocino, plátano y papas fritas doradas.',
     badge: 'BURGUERS & ROYALS',
     badgeType: 'text',
-    image: '/imagenes/portada/portada-3.jpg',
+    image: '/imagenes/portada/Portada3E.webp',
+    imageMobile: '/imagenes/portada/Portada3M.webp',
     secretPillIcon: '🍔',
     secretPillText: 'SABOR AUTÉNTICO | 100% Carne de res seleccionada con papas artesanales',
     buttonText: 'VER HAMBURGUESAS',
@@ -1427,7 +1436,8 @@ let portadasStore: PortadaBanner[] = [
     subtitle: 'Carne jugosa artesanal de res con fina cecina ahumada de Tarapoto, queso cheddar derretido, plátano bellaco crujiente y cremosa salsa de cocona con ají charapita.',
     badge: '🔥 EDICIÓN ESPECIAL AMAZÓNICA',
     badgeType: 'red-pill',
-    image: '/imagenes/portada/portada-4.jpg',
+    image: '/imagenes/portada/Portada4E.webp',
+    imageMobile: '/imagenes/portada/Portada4M.webp',
     secretPillIcon: '🌴',
     secretPillText: 'NUEVO DE TEMPORADA | Incluye Papas Nativas Crocantes + Refresco desde S/ 18.00',
     buttonText: 'PROBAR HAMBURGUESA AMAZÓNICA',
@@ -1438,6 +1448,35 @@ let portadasStore: PortadaBanner[] = [
     createdAt: new Date().toISOString()
   }
 ];
+
+function loadPortadasFromDisk(): PortadaBanner[] {
+  try {
+    if (fs.existsSync(PORTADAS_FILE)) {
+      const raw = fs.readFileSync(PORTADAS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn('No se pudo cargar portadas de disco, usando iniciales:', err);
+  }
+  return [...initialPortadas];
+}
+
+function savePortadasToDisk() {
+  try {
+    const dir = path.dirname(PORTADAS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(PORTADAS_FILE, JSON.stringify(portadasStore, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error al guardar portadas en disco:', err);
+  }
+}
+
+let portadasStore: PortadaBanner[] = loadPortadasFromDisk();
 
 export async function getPortadas(includeInactive = false): Promise<PortadaBanner[]> {
   let list = [...portadasStore];
@@ -1460,7 +1499,8 @@ export async function createPortada(data: Partial<PortadaBanner>): Promise<Porta
     subtitle: data.subtitle || 'Promoción especial BuchiSapa Burger & Broaster',
     badge: data.badge || '✨ DESTACADO',
     badgeType: data.badgeType || 'red-pill',
-    image: data.image || '/imagenes/portada/portada-1.jpg',
+    image: data.image || '/imagenes/portada/Portada1E.webp',
+    imageMobile: data.imageMobile || data.image || '/imagenes/portada/Portada1M.webp',
     secretPillIcon: data.secretPillIcon || '💡',
     secretPillText: data.secretPillText || '',
     buttonText: data.buttonText || 'VER CARTA',
@@ -1472,6 +1512,7 @@ export async function createPortada(data: Partial<PortadaBanner>): Promise<Porta
   };
 
   portadasStore.push(newPortada);
+  savePortadasToDisk();
   return newPortada;
 }
 
@@ -1484,12 +1525,14 @@ export async function updatePortada(id: string, data: Partial<PortadaBanner>): P
     ...data,
     id // preserve id
   };
+  savePortadasToDisk();
   return portadasStore[index];
 }
 
 export async function deletePortada(id: string): Promise<boolean> {
   const initialLength = portadasStore.length;
   portadasStore = portadasStore.filter(item => item.id !== id);
+  savePortadasToDisk();
   return portadasStore.length < initialLength;
 }
 
@@ -1498,6 +1541,7 @@ export async function reorderPortadas(orderedIds: string[]): Promise<PortadaBann
     const p = portadasStore.find(item => item.id === id);
     if (p) p.order = index + 1;
   });
+  savePortadasToDisk();
   return portadasStore.sort((a, b) => a.order - b.order);
 }
 

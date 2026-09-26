@@ -431,7 +431,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  app.post('/api/admin/portadas', async (req: Request, res: Response) => {
+  app.post(['/api/portadas', '/api/admin/portadas'], async (req: Request, res: Response) => {
     try {
       const portada = await createPortada(req.body);
       res.json({ success: true, data: portada });
@@ -440,7 +440,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  app.put('/api/admin/portadas/:id', async (req: Request, res: Response) => {
+  app.put(['/api/portadas/:id', '/api/admin/portadas/:id'], async (req: Request, res: Response) => {
     try {
       const portadaId = req.params.id as string;
       const portada = await updatePortada(portadaId, req.body);
@@ -453,7 +453,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  app.delete('/api/admin/portadas/:id', async (req: Request, res: Response) => {
+  app.delete(['/api/portadas/:id', '/api/admin/portadas/:id'], async (req: Request, res: Response) => {
     try {
       const portadaId = req.params.id as string;
       const success = await deletePortada(portadaId);
@@ -463,7 +463,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  app.post('/api/admin/portadas/reorder', async (req: Request, res: Response) => {
+  app.post(['/api/portadas/reorder', '/api/admin/portadas/reorder'], async (req: Request, res: Response) => {
     try {
       const { ids } = req.body;
       if (!Array.isArray(ids)) {

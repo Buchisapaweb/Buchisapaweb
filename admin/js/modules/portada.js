@@ -154,7 +154,10 @@
     if (titleEl) titleEl.textContent = 'Nueva Imagen de Portada';
     form.reset();
     document.getElementById('portada-form-id').value = '';
-    document.getElementById('portada-form-image').value = '/imagenes/portada/portada-1.jpg';
+    document.getElementById('portada-form-image').value = '/imagenes/portada/Portada1E.webp';
+    if (document.getElementById('portada-form-image-mobile')) {
+      document.getElementById('portada-form-image-mobile').value = '/imagenes/portada/Portada1M.webp';
+    }
     updatePortadaFormPreview();
     modal.classList.add('active');
   }
@@ -170,6 +173,9 @@
     if (titleEl) titleEl.textContent = 'Editar Portada';
     document.getElementById('portada-form-id').value = p.id;
     document.getElementById('portada-form-image').value = p.image || '';
+    if (document.getElementById('portada-form-image-mobile')) {
+      document.getElementById('portada-form-image-mobile').value = p.imageMobile || p.image_mobile || '';
+    }
     document.getElementById('portada-form-title').value = p.title || '';
     document.getElementById('portada-form-highlight').value = p.highlight || '';
     document.getElementById('portada-form-badge').value = p.badge || '';
@@ -182,18 +188,22 @@
     modal.classList.add('active');
   }
 
-  function selectPortadaPreset(url) {
+  function selectPortadaPreset(url, mobileUrl) {
     const input = document.getElementById('portada-form-image');
     if (input) {
       input.value = url;
       updatePortadaFormPreview();
+    }
+    const mobileInput = document.getElementById('portada-form-image-mobile');
+    if (mobileInput && mobileUrl) {
+      mobileInput.value = mobileUrl;
     }
   }
 
   function updatePortadaFormPreview() {
     const imgEl = document.getElementById('portada-form-preview-img');
     const textEl = document.getElementById('portada-form-preview-text');
-    const inputUrl = document.getElementById('portada-form-image')?.value || '/imagenes/portada/portada-1.jpg';
+    const inputUrl = document.getElementById('portada-form-image')?.value || '/imagenes/portada/Portada1E.webp';
     const title = document.getElementById('portada-form-title')?.value || 'POLLO BROASTER';
     const highlight = document.getElementById('portada-form-highlight')?.value || '';
 
@@ -232,12 +242,12 @@
 
   async function quickAddPortadaPreset(presetKey) {
     const presets = {
-      broaster: { title: 'POLLO BROASTER', highlight: 'MEGA CRUNCH', badge: '🍗 ULTRA CRUJIENTE', image: '/imagenes/portada/portada-1.webp', category: 'broaster', subtitle: 'Papas nativas y cremas de la selva' },
-      juane: { title: 'JUANE TRADICIONAL', highlight: 'REGIONAL', badge: '🌿 TRADICIÓN SELVÁTICA', image: '/imagenes/portada/portada-2.webp', category: 'platos-amazonicos', subtitle: 'Aromatizado en hoja de bijao' },
-      burger: { title: 'HAMBURGUESA BUCHISAPA', highlight: 'DOBLE CARNE', badge: '🍔 GOURMET', image: '/imagenes/portada/portada-3.webp', category: 'hamburguesas', subtitle: 'Con queso cheddar y cecina crocante' },
-      amazonica: { title: 'FUSIÓN AMAZÓNICA', highlight: 'PATACONES CON CECINA', badge: '🔥 SABOR AUTÉNTICO', image: '/imagenes/portada/portada-4.webp', category: 'platos-amazonicos', subtitle: 'Sabor 100% regional' },
-      alitas: { title: 'ALITAS BBQ Y COCONA', highlight: 'PICANTES Y CRUJIENTES', badge: '🍗 SNACK FAVORITO', image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=1200&auto=format&fit=crop&q=80', category: 'alitas', subtitle: 'Glaseadas al fuego con mayonesa de la casa' },
-      salchipapa: { title: 'SALCHIBROASTER REAL', highlight: 'CON TODAS LAS CREMAS', badge: '🍟 FUENTE GRANDE', image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=1200&auto=format&fit=crop&q=80', category: 'salchipapas', subtitle: 'Papas fritas con salchicha ahumada y trozos broaster' }
+      broaster: { title: 'POLLO BROASTER', highlight: 'MEGA CRUNCH', badge: '🍗 ULTRA CRUJIENTE', image: '/imagenes/portada/Portada1E.webp', imageMobile: '/imagenes/portada/Portada1M.webp', category: 'broaster', subtitle: 'Papas nativas y cremas de la selva' },
+      juane: { title: 'JUANE TRADICIONAL', highlight: 'REGIONAL', badge: '🌿 TRADICIÓN SELVÁTICA', image: '/imagenes/portada/Portada2E.webp', imageMobile: '/imagenes/portada/Portada2M.webp', category: 'platos-amazonicos', subtitle: 'Aromatizado en hoja de bijao' },
+      burger: { title: 'HAMBURGUESA BUCHISAPA', highlight: 'DOBLE CARNE', badge: '🍔 GOURMET', image: '/imagenes/portada/Portada3E.webp', imageMobile: '/imagenes/portada/Portada3M.webp', category: 'hamburguesas', subtitle: 'Con queso cheddar y cecina crocante' },
+      amazonica: { title: 'FUSIÓN AMAZÓNICA', highlight: 'PATACONES CON CECINA', badge: '🔥 SABOR AUTÉNTICO', image: '/imagenes/portada/Portada4E.webp', imageMobile: '/imagenes/portada/Portada4M.webp', category: 'platos-amazonicos', subtitle: 'Sabor 100% regional' },
+      alitas: { title: 'ALITAS BBQ Y COCONA', highlight: 'PICANTES Y CRUJIENTES', badge: '🍗 SNACK FAVORITO', image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=1200&auto=format&fit=crop&q=80', imageMobile: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=600&auto=format&fit=crop&q=80', category: 'alitas', subtitle: 'Glaseadas al fuego con mayonesa de la casa' },
+      salchipapa: { title: 'SALCHIBROASTER REAL', highlight: 'CON TODAS LAS CREMAS', badge: '🍟 FUENTE GRANDE', image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=1200&auto=format&fit=crop&q=80', imageMobile: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80', category: 'salchipapas', subtitle: 'Papas fritas con salchicha ahumada y trozos broaster' }
     };
 
     const data = presets[presetKey];
