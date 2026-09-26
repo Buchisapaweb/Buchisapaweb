@@ -924,30 +924,41 @@ async function handleAuthLoginSubmit(event) {
   }
 
   try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-
     let result = null;
-    try {
-      result = await res.json();
-    } catch (e) {
-      result = null;
+
+    // 1. Intento primario: Autenticación directa contra Supabase Auth API
+    if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
+      try {
+        result = await window.BuchisapaAPI.loginAuth(email, password);
+      } catch (sbErr) {
+        console.warn('Supabase Auth fallo o esperando fallback backend:', sbErr);
+      }
     }
 
-    const emailLower = (email || '').toLowerCase().trim();
+    // 2. Si Supabase no autenticó o no estaba disponible, consultar el endpoint backend /api/auth/login
+    if (!result || !result.success) {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
 
-    if (!res.ok || !result || !result.success) {
-      const cleanMsg = result?.error || result?.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
-      throw new Error(cleanMsg);
+      try {
+        result = await res.json();
+      } catch (e) {
+        result = null;
+      }
+
+      if (!res.ok || !result || !result.success) {
+        const cleanMsg = result?.error || result?.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
+        throw new Error(cleanMsg);
+      }
     }
 
     const user = result.user || result.data;
     const token = result.token || `token-${Date.now()}`;
 
-    // Si el usuario es administrador validado por el servidor
+    // Si el usuario es administrador validado por Supabase o por el servidor
     if (user.role === 'admin' || user.isAdmin === true || result.isAdmin === true) {
       localStorage.setItem('buchisapa_admin_token', token);
       sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(user));

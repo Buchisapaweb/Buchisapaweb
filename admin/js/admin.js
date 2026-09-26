@@ -177,20 +177,36 @@
 
     try {
       let data = null;
-      let isFetchOk = false;
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: emailLower, password })
-        });
-        isFetchOk = res.ok;
-        data = await res.json();
-      } catch (networkErr) {
-        data = null;
+
+      // 1. Intentar validar directamente con Supabase Auth si está disponible en el cliente
+      if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
+        try {
+          const sbAuth = await window.BuchisapaAPI.loginAuth(emailLower, password);
+          if (sbAuth && sbAuth.success) {
+            data = sbAuth;
+          }
+        } catch (sbErr) {
+          console.warn('Supabase Auth fallo directo en admin:', sbErr);
+        }
       }
 
-      if (isFetchOk && data && data.success) {
+      // 2. Si no se autenticó por Supabase directo, consultar endpoint /api/auth/login
+      if (!data || !data.success) {
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: emailLower, password })
+          });
+          if (res.ok) {
+            data = await res.json();
+          }
+        } catch (networkErr) {
+          console.warn('Fallo de red en login admin:', networkErr);
+        }
+      }
+
+      if (data && data.success) {
         const user = data.user || data.data;
         const isAdmin = Boolean(data.isAdmin || user.role === 'admin' || user.isAdmin === true);
 

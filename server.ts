@@ -1022,7 +1022,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  // User Login endpoint
+  // User Login endpoint (Autenticación integrada con Supabase Auth + Fallback Local)
   app.post(['/api/auth/login', '/auth/login', '/api/login', '/login'], async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
@@ -1033,14 +1033,75 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       const emailLower = (email || '').toLowerCase().trim();
       const passClean = (password || '').trim();
 
+      // 1. Intentar autenticar primero contra el servicio oficial de Supabase Auth
+      let supabaseUser: any = null;
+      let supabaseToken: string | null = null;
+      try {
+        const sbRes = await fetch('https://ckgvgfpcxeqyilfphnsu.supabase.co/auth/v1/token?grant_type=password', {
+          method: 'POST',
+          headers: {
+            'apikey': 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: emailLower, password: passClean })
+        });
+        if (sbRes.ok) {
+          const sbData = await sbRes.json();
+          supabaseUser = sbData.user;
+          supabaseToken = sbData.access_token;
+        }
+      } catch (sbErr) {
+        console.warn('Advertencia al consultar Supabase Auth:', sbErr);
+      }
+
+      if (supabaseUser) {
+        const meta = supabaseUser.user_metadata || {};
+        const appMeta = supabaseUser.app_metadata || {};
+        const isAdminUser = Boolean(
+          meta.isAdmin === true ||
+          meta.role === 'admin' ||
+          appMeta.role === 'admin' ||
+          ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'].includes(emailLower)
+        );
+
+        const verifiedUser = {
+          id: supabaseUser.id,
+          uid: supabaseUser.id,
+          email: supabaseUser.email || emailLower,
+          name: meta.name || meta.full_name || 'Administrador BuchiSapa',
+          firstName: meta.firstName || (meta.name ? meta.name.split(' ')[0] : 'Admin'),
+          lastName: meta.lastName || (meta.name ? meta.name.split(' ').slice(1).join(' ') : 'BuchiSapa'),
+          phone: meta.phone || supabaseUser.phone || '',
+          docType: meta.docType || 'DNI',
+          docNumber: meta.docNumber || '',
+          role: isAdminUser ? 'admin' : (meta.role || 'customer'),
+          isAdmin: isAdminUser,
+          emailVerified: true,
+          createdAt: supabaseUser.created_at || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        // Guardar/sincronizar en el almacén en memoria
+        await registerCustomer(verifiedUser);
+
+        return res.json({
+          success: true,
+          user: verifiedUser,
+          data: verifiedUser,
+          isAdmin: isAdminUser,
+          token: supabaseToken || `user-token-${Date.now()}`,
+          message: isAdminUser ? 'Bienvenido al Panel de Administración' : 'Inicio de sesión exitoso'
+        });
+      }
+
+      // 2. Fallback de usuarios locales si Supabase Auth está offline
       let user = await getUserByEmail(emailLower);
       if (!user) {
-        // Auto-create or allow customer record
         user = await registerCustomer({
           email: emailLower,
           firstName: emailLower.split('@')[0],
           lastName: '',
-          password: password || '',
+          password: passClean,
         });
       }
 

@@ -9,6 +9,14 @@
   const AdminApi = {
     // AUTHENTICATION
     async login(email, password) {
+      if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
+        try {
+          const sbAuth = await window.BuchisapaAPI.loginAuth(email, password);
+          if (sbAuth && sbAuth.success) return sbAuth;
+        } catch (e) {
+          console.warn('Supabase auth fallback to /api/auth/login:', e);
+        }
+      }
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
