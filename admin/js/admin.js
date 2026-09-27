@@ -542,7 +542,7 @@
           category: document.getElementById('portada-form-category').value,
           subtitle: document.getElementById('portada-form-subtitle').value.trim(),
           buttonText: document.getElementById('portada-form-btn-text').value.trim(),
-          image: document.getElementById('portada-form-image').value.trim() || '/imagenes/portada/portada-1.jpg',
+          image: document.getElementById('portada-form-image').value.trim() || '/imagenes/portada/Portada1E.webp',
           imageMobile: document.getElementById('portada-form-image-mobile')?.value.trim() || undefined,
           active: document.getElementById('portada-form-active').checked
         };

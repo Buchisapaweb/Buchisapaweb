@@ -70,7 +70,7 @@
       } else {
         gridContainer.innerHTML = prods.map(prod => {
           const isAvail = prod.available !== false;
-          const imgUrl = prod.image || '/imagenes/portada/portada-1.jpg';
+          const imgUrl = prod.image || '/imagenes/portada/Portada1E.webp';
           return `
             <div class="product-card ${!isAvail ? 'unavailable' : ''}">
               <div class="product-card-img-wrap">
@@ -109,7 +109,7 @@
           <tr>
             <td>
               <div style="display: flex; align-items: center; gap: 12px;">
-                <img src="${prod.image || '/imagenes/portada/portada-1.jpg'}" alt="" style="width: 36px; height: 36px; border-radius: var(--radius-sm); object-fit: cover;">
+                <img src="${prod.image || '/imagenes/portada/Portada1E.webp'}" alt="" style="width: 36px; height: 36px; border-radius: var(--radius-sm); object-fit: cover;">
                 <span style="font-weight: 700; color: #fff;">${window.AdminUtils.escapeHtml(prod.name)}</span>
               </div>
             </td>
@@ -203,7 +203,7 @@
       stock: parseInt(document.getElementById('form-product-stock').value, 10) || 0,
       badge: document.getElementById('form-product-badge').value.trim() || undefined,
       description: document.getElementById('form-product-description').value.trim(),
-      image: document.getElementById('form-product-image').value.trim() || '/imagenes/portada/portada-1.jpg',
+      image: document.getElementById('form-product-image').value.trim() || '/imagenes/portada/Portada1E.webp',
       available: document.getElementById('form-product-available').checked,
       includes_sauces: true
     };

@@ -16,7 +16,7 @@ body {
     radial-gradient(ellipse at top right, rgba(224, 36, 195, 0.16), transparent 50%),
     radial-gradient(ellipse at bottom left, rgba(0, 240, 255, 0.14), transparent 50%),
     linear-gradient(rgba(11, 7, 22, 0.72), rgba(11, 7, 22, 0.85)),
-    url('/imagenes/admin-bg-neon.jpg');
+    url('/imagenes/admin-bg-neon.webp');
   background-size: cover;
   background-position: center center;
   background-attachment: fixed;

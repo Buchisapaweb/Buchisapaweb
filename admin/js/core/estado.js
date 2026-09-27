@@ -57,7 +57,7 @@
       popular: true,
       available: true,
       stock: 15,
-      image: '/imagenes/portada/portada-2.webp',
+      image: '/imagenes/portada/Portada2E.webp',
       includes_sauces: true
     },
     {
@@ -70,7 +70,7 @@
       popular: true,
       available: true,
       stock: 20,
-      image: '/imagenes/portada/portada-1.webp',
+      image: '/imagenes/portada/Portada1E.webp',
       includes_sauces: true
     },
     {
@@ -83,7 +83,7 @@
       popular: true,
       available: true,
       stock: 30,
-      image: '/imagenes/portada/portada-3.webp',
+      image: '/imagenes/portada/Portada3E.webp',
       includes_sauces: true
     },
     {

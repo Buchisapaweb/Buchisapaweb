@@ -25,7 +25,7 @@
         highlight: 'ULTRA CROCANTE',
         badge: '✨ ESPECIALIDAD DE LA CASA',
         subtitle: 'Empanizado artesanal dorado a la perfección, jugoso por dentro con papas crocantes...',
-        image: '/imagenes/portada/portada-1.webp',
+        image: '/imagenes/portada/Portada1E.webp',
         category: 'broaster',
         buttonText: 'PIDE TU BROASTER AQUÍ',
         active: true
@@ -36,7 +36,7 @@
         highlight: 'DE GALLINA',
         badge: '🌿 SAZÓN SELVÁTICA',
         subtitle: 'Arroz aromatizado envuelto en hoja de bijao con presa tierna y el auténtico sabor...',
-        image: '/imagenes/portada/portada-2.webp',
+        image: '/imagenes/portada/Portada2E.webp',
         category: 'platos-amazonicos',
         buttonText: 'DESCUBRE LA SELVA',
         active: true
@@ -47,7 +47,7 @@
         highlight: '100% CARNE ARTESANAL',
         badge: '🍔 TOP VENTAS',
         subtitle: 'Carne jugosa a la parrilla, queso cheddar derretido, lechuga fresca y papas crocantes...',
-        image: '/imagenes/portada/portada-3.webp',
+        image: '/imagenes/portada/Portada3E.webp',
         category: 'hamburguesas',
         buttonText: 'PIDE TU BURGER AHORA',
         active: true
@@ -58,7 +58,7 @@
         highlight: 'PATACONES CON CECINA',
         badge: '🔥 EXCLUSIVO BUCHISAPA',
         subtitle: 'Plátanos verdes machacados y fritos con deliciosa cecina ahumada regional...',
-        image: '/imagenes/portada/portada-4.webp',
+        image: '/imagenes/portada/Portada4E.webp',
         category: 'platos-amazonicos',
         buttonText: 'PROBAR AHORA',
         active: true

@@ -145,7 +145,7 @@ const initialProducts: Product[] = [
     popular: true,
     available: true,
     stock: 25,
-    image: '/imagenes/categorias/platos-amazonicos/banner.jpg',
+    image: '/imagenes/categorias/platos-amazonicos/banner.webp',
     includes_sauces: true
   },
   {

@@ -172,7 +172,6 @@ function renderDynamicHeroCarousel(portadas) {
 
     const isFirst = idx === 0;
     const activeClass = isFirst ? 'active' : '';
-    const jpgFallback = desktopImg.replace('.webp', '.jpg');
 
     return `
       <div class="carousel-slide ${activeClass} ${!isFirst ? 'lazy-bg' : ''}" ${isFirst ? `style="background-image: url('${desktopImg}');"` : `data-bg="url('${desktopImg}')"`}>
@@ -185,8 +184,7 @@ function renderDynamicHeroCarousel(portadas) {
             class="carousel-slide-img ${isFirst ? 'loaded' : 'lazy-img'}" 
             loading="${isFirst ? 'eager' : 'lazy'}" 
             ${isFirst ? 'fetchpriority="high"' : ''} 
-            decoding="async" 
-            onerror="this.onerror=null; this.src='${safeStr(jpgFallback)}';"
+            decoding="async"
           >
         </picture>
       </div>
@@ -3972,7 +3970,7 @@ function getCategoryBannerFallback(catId) {
   if (c.includes('bebida') || c.includes('gaseosa')) return '/imagenes/categorias/bebidas/banner.webp';
   if (c.includes('refresco') || c.includes('jugo') || c.includes('chicha') || c.includes('cocona') || c.includes('aguajina')) return '/imagenes/categorias/refrescos/banner.webp';
   if (c.includes('infusion') || c.includes('cafe') || c.includes('te')) return '/imagenes/categorias/infusiones/banner.webp';
-  return '/imagenes/portada/portada-1.webp';
+  return '/imagenes/portada/Portada1E.webp';
 }
 window.getCategoryBannerFallback = getCategoryBannerFallback;
 
@@ -4362,7 +4360,7 @@ function getFallbackProducts() {
       price: 15.00,
       description: "Juane tradicional jugoso con arroz selvático gallina tierna huevo y maduro frito",
       popular: true,
-      image: "/imagenes/categorias/platos-amazonicos/banner.jpg"
+      image: "/imagenes/categorias/platos-amazonicos/banner.webp"
     },
     {
       id: "ama-4",

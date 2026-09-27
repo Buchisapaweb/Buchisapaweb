@@ -151,7 +151,7 @@
           
           <!-- Imagen de la Promoción -->
           <div style="position: relative; width: 100%; height: 160px; background: #000; overflow: hidden;">
-            <img src="${escapeHtml(p.image || '/imagenes/portada/Portada1E.webp')}" alt="${escapeHtml(p.title)}" style="width: 100%; height: 100%; object-fit: cover; opacity: ${isActive ? '1' : '0.4'}; transition: transform 0.3s ease;" onerror="this.onerror=null; this.src='/imagenes/portada/Portada1E.jpg';">
+            <img src="${escapeHtml(p.image || '/imagenes/portada/Portada1E.webp')}" alt="${escapeHtml(p.title)}" style="width: 100%; height: 100%; object-fit: cover; opacity: ${isActive ? '1' : '0.4'}; transition: transform 0.3s ease;">
             
             <!-- Badge Superior -->
             <div style="position: absolute; top: 10px; left: 10px; background: rgba(220, 38, 38, 0.92); color: #fff; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
