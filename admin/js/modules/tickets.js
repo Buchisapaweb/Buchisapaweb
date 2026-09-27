@@ -7,13 +7,14 @@
   'use strict';
 
   async function fetchTickets() {
+    const state = window.AdminState = window.AdminState || {};
     try {
       const data = await window.AdminApi.getTickets();
-      window.AdminState.allTickets = Array.isArray(data) ? data : [];
+      state.allTickets = Array.isArray(data) ? data : [];
     } catch (e) {
       console.warn('Fallback tickets locales:', e);
-      if (!window.AdminState.allTickets || window.AdminState.allTickets.length === 0) {
-        window.AdminState.allTickets = [
+      if (!state.allTickets || state.allTickets.length === 0) {
+        state.allTickets = [
           {
             id: 'tk-1',
             number: 'TK-0038',
@@ -47,7 +48,8 @@
   }
 
   function filterTickets() {
-    let tickets = [...(window.AdminState.allTickets || [])];
+    const state = window.AdminState = window.AdminState || {};
+    let tickets = [...(state.allTickets || [])];
 
     const searchInput = document.getElementById('ticket-search-input');
     const typeSelect = document.getElementById('ticket-filter-type');
@@ -72,7 +74,7 @@
       tickets = tickets.filter(t => (t.payment || '').toLowerCase().includes(payFilter.toLowerCase()));
     }
 
-    window.AdminState.filteredTickets = tickets;
+    state.filteredTickets = tickets;
     renderTicketsTable();
   }
 
@@ -80,7 +82,8 @@
     const tbody = document.getElementById('tickets-table-body');
     if (!tbody) return;
 
-    const tickets = window.AdminState.filteredTickets || [];
+    const state = window.AdminState = window.AdminState || {};
+    const tickets = state.filteredTickets || [];
     if (tickets.length === 0) {
       tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px;">No se encontraron tickets con los filtros aplicados.</td></tr>`;
       return;

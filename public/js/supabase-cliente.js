@@ -202,57 +202,65 @@ const BuchisapaAPI = {
     const cleanEmail = (email || '').trim().toLowerCase();
     const cleanPass = (password || '').trim();
 
-    const authUrl = `${SUPABASE_CONFIG.url}/auth/v1/token?grant_type=password`;
-    const res = await fetch(authUrl, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_CONFIG.anonKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email: cleanEmail, password: cleanPass })
-    });
+    try {
+      const authUrl = `${SUPABASE_CONFIG.url}/auth/v1/token?grant_type=password`;
+      const res = await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_CONFIG.anonKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: cleanEmail, password: cleanPass })
+      });
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.access_token) {
-      const errDetail = data.error_description || data.msg || data.message || 'Credenciales inválidas en Supabase';
-      throw new Error(errDetail);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.access_token) {
+        const errDetail = data.error_description || data.msg || data.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
+        throw new Error(errDetail);
+      }
+
+      const sbUser = data.user || {};
+      const meta = sbUser.user_metadata || {};
+      const appMeta = sbUser.app_metadata || {};
+
+      const isAdmin = Boolean(
+        meta.isAdmin === true ||
+        meta.role === 'admin' ||
+        appMeta.role === 'admin' ||
+        sbUser.role === 'admin'
+      );
+
+      const userProfile = {
+        id: sbUser.id,
+        uid: sbUser.id,
+        email: sbUser.email || cleanEmail,
+        name: meta.name || meta.full_name || 'Usuario BuchiSapa',
+        firstName: meta.firstName || meta.given_name || (meta.name ? meta.name.split(' ')[0] : 'Admin'),
+        lastName: meta.lastName || meta.family_name || (meta.name ? meta.name.split(' ').slice(1).join(' ') : ''),
+        phone: meta.phone || sbUser.phone || '',
+        docType: meta.docType || 'DNI',
+        docNumber: meta.docNumber || '',
+        role: isAdmin ? 'admin' : (meta.role || 'customer'),
+        isAdmin: isAdmin,
+        emailVerified: Boolean(sbUser.email_confirmed_at || sbUser.confirmed_at || meta.email_verified),
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token
+      };
+
+      return {
+        success: true,
+        user: userProfile,
+        data: userProfile,
+        token: data.access_token,
+        isAdmin
+      };
+    } catch (err) {
+      const msg = (err.message || '').toLowerCase();
+      if (msg.includes('failed') || msg.includes('fetch') || msg.includes('network') || msg.includes('typeerror')) {
+        throw new Error('El correo electrónico o la contraseña ingresados no son correctos.');
+      }
+      throw err;
     }
-
-    const sbUser = data.user || {};
-    const meta = sbUser.user_metadata || {};
-    const appMeta = sbUser.app_metadata || {};
-
-    const isAdmin = Boolean(
-      meta.isAdmin === true ||
-      meta.role === 'admin' ||
-      appMeta.role === 'admin' ||
-      sbUser.role === 'admin'
-    );
-
-    const userProfile = {
-      id: sbUser.id,
-      uid: sbUser.id,
-      email: sbUser.email || cleanEmail,
-      name: meta.name || meta.full_name || 'Usuario BuchiSapa',
-      firstName: meta.firstName || meta.given_name || (meta.name ? meta.name.split(' ')[0] : 'Admin'),
-      lastName: meta.lastName || meta.family_name || (meta.name ? meta.name.split(' ').slice(1).join(' ') : ''),
-      phone: meta.phone || sbUser.phone || '',
-      docType: meta.docType || 'DNI',
-      docNumber: meta.docNumber || '',
-      role: isAdmin ? 'admin' : (meta.role || 'customer'),
-      isAdmin: isAdmin,
-      emailVerified: Boolean(sbUser.email_confirmed_at || sbUser.confirmed_at || meta.email_verified),
-      accessToken: data.access_token,
-      refreshToken: data.refresh_token
-    };
-
-    return {
-      success: true,
-      user: userProfile,
-      data: userProfile,
-      token: data.access_token,
-      isAdmin
-    };
   }
 };
 

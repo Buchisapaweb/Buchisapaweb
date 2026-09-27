@@ -7,13 +7,14 @@
   'use strict';
 
   async function fetchCaja() {
+    const state = window.AdminState = window.AdminState || {};
     try {
       const data = await window.AdminApi.getCaja();
-      window.AdminState.cajaData = data;
+      state.cajaData = data;
     } catch (e) {
       console.warn('Fallback datos caja local:', e);
-      if (!window.AdminState.cajaData) {
-        window.AdminState.cajaData = {
+      if (!state.cajaData) {
+        state.cajaData = {
           isOpen: true,
           initial_cash: 250,
           total_sales: 1850.5,
@@ -40,7 +41,8 @@
   }
 
   function renderCajaView() {
-    const data = window.AdminState.cajaData;
+    const state = window.AdminState = window.AdminState || {};
+    const data = state.cajaData;
     if (!data) return;
 
     // Status Indicator

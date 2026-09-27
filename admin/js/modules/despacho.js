@@ -10,7 +10,8 @@
     const container = document.getElementById('delivery-orders-list');
     if (!container) return;
 
-    const orders = (window.AdminState.allOrders || []).filter(o => o.type === 'delivery');
+    const state = window.AdminState = window.AdminState || {};
+    const orders = (state.allOrders || []).filter(o => o.type === 'delivery');
 
     if (orders.length === 0) {
       container.innerHTML = `
@@ -40,7 +41,8 @@
     const container = document.getElementById('recojo-orders-list');
     if (!container) return;
 
-    const orders = (window.AdminState.allOrders || []).filter(o => o.type === 'pickup');
+    const state = window.AdminState = window.AdminState || {};
+    const orders = (state.allOrders || []).filter(o => o.type === 'pickup');
 
     if (orders.length === 0) {
       container.innerHTML = `

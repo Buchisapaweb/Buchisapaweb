@@ -9,9 +9,10 @@
   let currentCircularMode = 'categorias'; // 'categorias' | 'tipo'
 
   function updateDashboardMetrics() {
-    const products = window.AdminState.allProducts || [];
-    const orders = window.AdminState.allOrders || [];
-    const users = window.AdminState.allUsers || [];
+    const state = window.AdminState = window.AdminState || {};
+    const products = state.allProducts || [];
+    const orders = state.allOrders || [];
+    const users = state.allUsers || [];
 
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
@@ -567,7 +568,7 @@
     const container = document.getElementById('dashboard-recent-orders-list');
     if (!container) return;
 
-    const orders = (window.AdminState.allOrders || []).slice(0, 5);
+    const orders = ((window.AdminState && window.AdminState.allOrders) || []).slice(0, 5);
 
     if (orders.length === 0) {
       container.innerHTML = `

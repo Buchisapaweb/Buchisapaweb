@@ -9,7 +9,7 @@
             <div class="catalog-toolbar">
               <!-- 1. CHIPS DE CATEGORÍAS -->
               <div class="category-filter-chips">
-                <button class="category-chip active" data-category="todos">Todos (45)</button>
+                <button class="category-chip active" data-category="todos">Todos los Platos</button>
                 <button class="category-chip" data-category="platos-amazonicos">🌿 Amazónicos</button>
                 <button class="category-chip" data-category="hamburguesas">🍔 Burgers</button>
                 <button class="category-chip" data-category="broaster">🍗 Broaster</button>
@@ -40,7 +40,7 @@
                   <div class="btn-add-icon-glow">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                   </div>
-                  <span class="btn-add-label">Agregar Producto</span>
+                  <span class="btn-add-label">Nuevo Producto</span>
                 </button>
               </div>
 
@@ -104,6 +104,10 @@
                 <span>Volver al Catálogo</span>
               </button>
               <div class="form-page-title-group">
+                <div class="form-page-badge">
+                  <span class="pulse-dot"></span>
+                  <span>GESTOR DE CARTA</span>
+                </div>
                 <h3 id="product-form-page-title" class="form-page-title">Nuevo Producto</h3>
                 <p class="form-page-subtitle">Completa la información del plato para publicarlo inmediatamente en la carta digital.</p>
               </div>
@@ -116,7 +120,7 @@
               <div class="form-page-grid">
                 <!-- Panel Principal de Campos -->
                 <div class="form-card-panel">
-                  <h4 class="form-card-section-title">📄 Datos del Producto</h4>
+                  <h4 class="form-card-section-title">📄 Información del Producto</h4>
 
                   <div class="form-group">
                     <label class="form-label" for="form-product-name">Nombre del Producto *</label>
@@ -171,7 +175,7 @@
                   <div class="modal-switch-box">
                     <div>
                       <p class="modal-title-white">Disponible en la Carta</p>
-                      <p class="modal-subtitle-text">Los clientes podrán ordenarlo inmediatamente</p>
+                      <p class="modal-subtitle-text">Los clientes podrán ordenarlo inmediatamente en la web</p>
                     </div>
                     <label class="switch">
                       <input type="checkbox" id="form-product-available" checked>
@@ -181,29 +185,35 @@
 
                   <div class="form-page-actions">
                     <button type="button" class="btn btn-secondary" onclick="window.closeProductFormView()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary btn-lg-bold">Guardar Producto</button>
+                    <button type="submit" class="btn btn-primary btn-lg-bold btn-glow-submit">Guardar Producto</button>
                   </div>
                 </div>
 
-                <!-- Módulo de Vista Previa en Vivo -->
+                <!-- Módulo de Vista Previa en Vivo con Imagen 100% Cuadrada -->
                 <div class="form-card-preview-col">
                   <h4 class="form-card-section-title">👀 Vista Previa en Vivo</h4>
-                  <div class="product-card" style="margin: 0; width: 100%;">
-                    <div class="product-card-img-wrap">
-                      <img id="product-preview-img" src="/imagenes/portada/Portada1E.webp" alt="Preview" class="product-card-img">
+                  
+                  <div class="product-preview-card">
+                    <div class="product-preview-img-wrap">
+                      <img id="product-preview-img" src="/imagenes/portada/Portada1E.webp" alt="Preview" class="product-preview-img">
                       <span id="product-preview-badge" class="product-badge-pill" style="display: none;">NUEVO</span>
                     </div>
-                    <div class="product-card-body">
+
+                    <div class="product-preview-body">
                       <span id="product-preview-category" class="product-card-category">Platos Amazónicos</span>
                       <h4 id="product-preview-name" class="product-card-title">Ej. BuchiBurger Super Especial</h4>
                       <p id="product-preview-desc" class="product-card-desc">Ingredientes, preparación y detalles para el cliente...</p>
+                      
                       <div class="product-card-footer">
                         <div>
                           <span id="product-preview-price" class="product-price-tag">S/ 18.00</span>
                         </div>
+                        <span class="preview-avail-tag">🟢 Disponible</span>
                       </div>
                     </div>
                   </div>
+
+                  <p class="preview-note-text">✨ La imagen se ajustará en formato <strong>cuadrado 1:1 perfecto</strong> sin franjas laterales.</p>
                 </div>
 
               </div>
@@ -211,4 +221,3 @@
           </div>
 
         </section>
-

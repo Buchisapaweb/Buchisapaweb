@@ -38,17 +38,18 @@
   }
 
   async function fetchPromociones() {
+    const state = window.AdminState = window.AdminState || {};
     try {
       const res = await window.AdminApi.getPromotions(true);
       if (res && res.success && Array.isArray(res.data)) {
-        window.AdminState.allPromociones = res.data;
+        state.allPromociones = res.data;
       } else if (Array.isArray(res)) {
-        window.AdminState.allPromociones = res;
+        state.allPromociones = res;
       }
     } catch (err) {
       console.warn('Usando datos de promociones en caché o respaldo:', err);
-      if (!window.AdminState.allPromociones || window.AdminState.allPromociones.length === 0) {
-        window.AdminState.allPromociones = [
+      if (!state.allPromociones || state.allPromociones.length === 0) {
+        state.allPromociones = [
           {
             id: 'promo-1',
             title: 'Combo Familiar Amazónico',

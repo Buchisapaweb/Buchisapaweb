@@ -38,6 +38,7 @@ function getCompiledAdminHtml(): string {
     'VIEW_CAJA': 'admin/views/caja.html',
     'VIEW_TICKET': 'admin/views/ticket.html',
     'VIEW_PORTADA': 'admin/views/portada.html',
+    'VIEW_PROMOCIONES': 'admin/views/promociones.html',
     'VIEW_INSUMOS': 'admin/views/insumos.html',
     'VIEW_UTENSILIOS': 'admin/views/utensilios.html',
     'VIEW_DELIVERY': 'admin/views/delivery.html',
@@ -2473,12 +2474,21 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
   app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
 
-  // 2. Panel de Administración Oficial BuchiSapa (Ubicado en carpeta aislada /admin fuera de public/)
-  app.get(['/admin', '/admin/', '/admin/index.html', '/admin.html', '/admin/html/admin.html'], (_req: Request, res: Response) => {
+  // 3. Panel de Administración Oficial BuchiSapa (Archivos estáticos CSS, JS, etc.)
+  app.use('/admin', express.static(path.join(process.cwd(), 'admin'), staticOptions));
+
+  // 4. Servir HTML Compilado del Panel de Administración para /admin y cualquier subruta (/admin/dashboard, /admin/productos, etc.)
+  app.get(['/admin', '/admin/*', '/admin.html'], (req: Request, res: Response, next) => {
+    // Si la petición solicita un archivo específico con extensión (.css, .js, .png, etc.) que no existe, pasar al siguiente handler
+    if (path.extname(req.path)) {
+      return next();
+    }
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.send(getCompiledAdminHtml());
   });
-  app.use('/admin', express.static(path.join(process.cwd(), 'admin')));
 
   app.get(['/kitchen', '/cocina', '/cocina.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'public/html/cocina.html'));
@@ -2595,9 +2605,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   });
 
   const isServerless = Boolean(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME);
-  const isDirectRun = Boolean(process.argv[1] && (process.argv[1].endsWith('server.ts') || process.argv[1].endsWith('server.cjs') || process.argv[1].endsWith('server.js')));
 
-  if (!isServerless && isDirectRun) {
+  if (!isServerless) {
     try {
       app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running on http://0.0.0.0:${PORT}`);

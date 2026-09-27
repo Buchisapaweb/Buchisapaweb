@@ -7,28 +7,31 @@
   'use strict';
 
   async function fetchProducts() {
+    const state = window.AdminState = window.AdminState || {};
     try {
-      const data = await window.AdminApi.getProducts();
-      window.AdminState.allProducts = (data && data.length > 0) ? data : window.AdminState.defaultSignatureProducts;
+      const rawData = await window.AdminApi.getProducts();
+      const list = Array.isArray(rawData) ? rawData : (rawData && Array.isArray(rawData.data) ? rawData.data : []);
+      state.allProducts = (list && list.length > 0) ? list : (state.defaultSignatureProducts || []);
     } catch (e) {
       console.warn('Usando catálogo local de contingencia:', e);
-      window.AdminState.allProducts = window.AdminState.defaultSignatureProducts;
+      state.allProducts = state.defaultSignatureProducts || [];
     }
     applyProductFilters();
     window.updateDashboardMetrics?.();
   }
 
   function applyProductFilters() {
-    let prods = [...(window.AdminState.allProducts || [])];
+    const state = window.AdminState = window.AdminState || {};
+    let prods = [...(state.allProducts || [])];
 
     // Filtro Categoría
-    if (window.AdminState.currentCategory && window.AdminState.currentCategory !== 'todos') {
-      prods = prods.filter(p => p.category_id === window.AdminState.currentCategory);
+    if (state.currentCategory && state.currentCategory !== 'todos') {
+      prods = prods.filter(p => p.category_id === state.currentCategory);
     }
 
     // Filtro Búsqueda
-    if (window.AdminState.searchQuery && window.AdminState.searchQuery.trim() !== '') {
-      const q = window.AdminState.searchQuery.toLowerCase().trim();
+    if (state.searchQuery && state.searchQuery.trim() !== '') {
+      const q = state.searchQuery.toLowerCase().trim();
       prods = prods.filter(p =>
         (p.name && p.name.toLowerCase().includes(q)) ||
         (p.description && p.description.toLowerCase().includes(q)) ||
@@ -39,7 +42,7 @@
     }
 
     // Ordenamiento
-    const sort = window.AdminState.currentSort;
+    const sort = state.currentSort;
     if (sort === 'price-asc') {
       prods.sort((a, b) => a.price - b.price);
     } else if (sort === 'price-desc') {
@@ -50,14 +53,15 @@
       prods.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     }
 
-    window.AdminState.filteredProducts = prods;
+    state.filteredProducts = prods;
     renderProducts();
   }
 
   function renderProducts() {
     const gridContainer = document.getElementById('products-grid-container');
     const tableBody = document.getElementById('products-table-body');
-    const prods = window.AdminState.filteredProducts || [];
+    const state = window.AdminState = window.AdminState || {};
+    const prods = state.filteredProducts || [];
 
     if (gridContainer) {
       if (prods.length === 0) {

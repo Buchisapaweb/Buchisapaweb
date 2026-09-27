@@ -959,35 +959,36 @@ async function handleAuthLoginSubmit(event) {
   }
 
   try {
-    // Autenticación ultra rápida en paralelo (el que responda primero con éxito)
-    const sbAuthPromise = (async () => {
-      if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
-        const res = await window.BuchisapaAPI.loginAuth(email, password);
-        if (res && res.success) return res;
-      }
-      throw new Error('Supabase direct unavailable');
-    })();
+    let result = null;
 
-    const backendAuthPromise = (async () => {
+    // Intento 1: Servidor principal Express (/api/auth/login)
+    try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       const data = await res.json().catch(() => null);
-      if (res.ok && data && data.success) return data;
-      const errMsg = data?.error || data?.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
-      throw new Error(errMsg);
-    })();
-
-    try {
-      result = await Promise.any([sbAuthPromise, backendAuthPromise]);
-    } catch (aggregateErr) {
-      // Si ambos fallaron, capturar error real
-      try {
-        result = await backendAuthPromise;
-      } catch (err) {
-        throw err;
+      if (res.ok && data && data.success) {
+        result = data;
+      } else {
+        const errMsg = data?.error || data?.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
+        throw new Error(errMsg);
+      }
+    } catch (backendErr) {
+      // Intento 2: Consulta directa a Supabase Auth en cliente si Express falló por red
+      if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
+        try {
+          const sbRes = await window.BuchisapaAPI.loginAuth(email, password);
+          if (sbRes && sbRes.success) {
+            result = sbRes;
+          }
+        } catch (sbErr) {
+          // Ignorar fallo de cliente Supabase
+        }
+      }
+      if (!result) {
+        throw backendErr;
       }
     }
 
@@ -1005,7 +1006,7 @@ async function handleAuthLoginSubmit(event) {
       localStorage.setItem('buchisapa_customer', JSON.stringify(user));
 
       showCustomSuccess('¡Acceso verificado! Ingresando...');
-      // Redirección instantánea sin demoras artificiales
+      // Redirección instantánea
       window.location.href = '/admin';
       return;
     }
@@ -1021,9 +1022,10 @@ async function handleAuthLoginSubmit(event) {
     }
 
   } catch (err) {
-    console.error('Error en login:', err);
+    console.warn('Resultado de login:', err?.message || err);
     let userFriendlyMsg = err.message || 'El correo electrónico o la contraseña ingresados no son válidos.';
-    if (userFriendlyMsg.includes('Unexpected') || userFriendlyMsg.includes('JSON') || userFriendlyMsg.includes('doctype') || userFriendlyMsg.includes('SyntaxError') || userFriendlyMsg.includes('Fetch')) {
+    const lower = userFriendlyMsg.toLowerCase();
+    if (lower.includes('failed') || lower.includes('fetch') || lower.includes('unexpected') || lower.includes('json') || lower.includes('doctype') || lower.includes('syntaxerror') || lower.includes('typeerror') || lower.includes('network')) {
       userFriendlyMsg = 'El correo electrónico o la contraseña ingresados no son correctos. Por favor, verifica e inténtalo nuevamente.';
     }
     showCustomError(userFriendlyMsg);
@@ -4781,6 +4783,76 @@ function getFallbackProducts() {
       description: "Flores de manzanilla seleccionadas. Calma, descanso y aroma herbal que reconforta el alma.",
       popular: false,
       image: "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "com-1",
+      name: "Combo Familiar Broaster",
+      category_id: "combos",
+      category: "combos",
+      price: 45.00,
+      description: "1 Pollo broaster entero crocante + porción familiar de papas fritas + ensalada + chicha morada 1.5L.",
+      popular: true,
+      image: "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "com-2",
+      name: "Combo Selvático Dúo",
+      category_id: "combos",
+      category: "combos",
+      price: 32.00,
+      description: "1 Tacacho con cecina + 1 Arroz chaufa amazónico + 2 refrescos de cocona helados.",
+      popular: true,
+      image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "com-3",
+      name: "Combo Burger Lover",
+      category_id: "combos",
+      category: "combos",
+      price: 28.00,
+      description: "2 Hamburguesas a lo Pobre + 2 porciones de papas crujientes + 2 Inca Cola 500ml.",
+      popular: true,
+      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "ext-1",
+      name: "Porción de Papas Fritas",
+      category_id: "extras",
+      category: "extras",
+      price: 6.00,
+      description: "Papas amarillas crocantes saladas al punto, doradas al momento.",
+      popular: false,
+      image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "ext-2",
+      name: "Porción Extra de Cecina",
+      category_id: "extras",
+      category: "extras",
+      price: 8.00,
+      description: "Láminas jugosas de cecina ahumada artesanal de la selva.",
+      popular: false,
+      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "ext-3",
+      name: "Porción de Tacacho",
+      category_id: "extras",
+      category: "extras",
+      price: 6.00,
+      description: "Bolas de plátano majado con chicharrón y sazón amazónica.",
+      popular: false,
+      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "ext-4",
+      name: "Porción de Cremas de la Casa",
+      category_id: "extras",
+      category: "extras",
+      price: 3.00,
+      description: "Variedad de salsas caseras: ají pollero, tártara, mayonesa y rocoto.",
+      popular: false,
+      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80"
     }
   ];
 }

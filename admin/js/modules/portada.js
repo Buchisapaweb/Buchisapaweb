@@ -7,12 +7,13 @@
   'use strict';
 
   async function fetchPortadas() {
+    const state = window.AdminState = window.AdminState || {};
     try {
       const data = await window.AdminApi.getPortadas();
-      window.AdminState.allPortadas = Array.isArray(data) && data.length > 0 ? data : defaultPortadas();
+      state.allPortadas = Array.isArray(data) && data.length > 0 ? data : defaultPortadas();
     } catch (e) {
       console.warn('Fallback portadas locales:', e);
-      window.AdminState.allPortadas = defaultPortadas();
+      state.allPortadas = defaultPortadas();
     }
     renderPortadas();
   }

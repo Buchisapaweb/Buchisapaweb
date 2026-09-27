@@ -135,6 +135,7 @@
   // FETCH & MANAGEMENT OF ORDERS
   // ============================================================================
   async function fetchOrders() {
+    const state = window.AdminState = window.AdminState || {};
     try {
       const data = await window.AdminApi.getOrders();
       const orders = Array.isArray(data) ? data : [];
@@ -152,11 +153,11 @@
       }
       previousOrderIds = currentIds;
 
-      window.AdminState.allOrders = orders;
+      state.allOrders = orders;
     } catch (e) {
       console.warn('Error al cargar órdenes del servidor, usando órdenes locales:', e);
-      if (!window.AdminState.allOrders || window.AdminState.allOrders.length === 0) {
-        window.AdminState.allOrders = [
+      if (!state.allOrders || state.allOrders.length === 0) {
+        state.allOrders = [
           {
             id: 'ord-101',
             orderNumber: 'TK-0038',
@@ -193,7 +194,8 @@
   }
 
   function updateMetricsAndViews() {
-    const orders = window.AdminState.allOrders || [];
+    const state = window.AdminState = window.AdminState || {};
+    const orders = state.allOrders || [];
 
     let totalOrders = orders.length;
     let recibidos = 0;
@@ -269,7 +271,7 @@
     const container = document.getElementById('all-orders-master-list');
     if (!container) return;
 
-    let orders = window.AdminState.allOrders || [];
+    let orders = (window.AdminState && window.AdminState.allOrders) || [];
 
     const searchInput = document.getElementById('pedidos-search-input');
     const searchVal = (searchInput?.value || '').toLowerCase().trim();

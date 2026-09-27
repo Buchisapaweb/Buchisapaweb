@@ -7,12 +7,13 @@
   'use strict';
 
   async function fetchSupplies() {
+    const state = window.AdminState = window.AdminState || {};
     try {
       const data = await window.AdminApi.getSupplies();
-      window.AdminState.allSupplies = Array.isArray(data) && data.length > 0 ? data : defaultSupplies();
+      state.allSupplies = Array.isArray(data) && data.length > 0 ? data : defaultSupplies();
     } catch (e) {
       console.warn('Fallback insumos locales:', e);
-      window.AdminState.allSupplies = defaultSupplies();
+      state.allSupplies = defaultSupplies();
     }
     renderSuppliesTable();
   }
@@ -33,7 +34,8 @@
     const tbody = document.getElementById('supplies-table-body');
     if (!tbody) return;
 
-    const supplies = window.AdminState.allSupplies || [];
+    const state = window.AdminState = window.AdminState || {};
+    const supplies = state.allSupplies || [];
     tbody.innerHTML = supplies.map(s => {
       const isLow = s.stock <= s.min;
       return `
@@ -58,12 +60,13 @@
   }
 
   async function restockSupply(id, qty) {
+    const state = window.AdminState = window.AdminState || {};
     try {
       await window.AdminApi.updateSupplyStock(id, qty);
       window.showToast(`Insumo reabastecido con +${qty}`, 'success');
       await fetchSupplies();
     } catch (e) {
-      const s = (window.AdminState.allSupplies || []).find(item => item.id === id);
+      const s = (state.allSupplies || []).find(item => item.id === id);
       if (s) s.stock = (s.stock || 0) + qty;
       renderSuppliesTable();
       window.showToast(`Insumo reabastecido (+${qty})`, 'info');
@@ -71,11 +74,12 @@
   }
 
   async function fetchUtensils() {
+    const state = window.AdminState = window.AdminState || {};
     try {
       const data = await window.AdminApi.getUtensils();
-      window.AdminState.allUtensils = Array.isArray(data) && data.length > 0 ? data : defaultUtensils();
+      state.allUtensils = Array.isArray(data) && data.length > 0 ? data : defaultUtensils();
     } catch (e) {
-      window.AdminState.allUtensils = defaultUtensils();
+      state.allUtensils = defaultUtensils();
     }
     renderUtensilsGrid();
   }
@@ -93,7 +97,8 @@
     const grid = document.getElementById('utensils-grid');
     if (!grid) return;
 
-    const utensils = window.AdminState.allUtensils || [];
+    const state = window.AdminState = window.AdminState || {};
+    const utensils = state.allUtensils || [];
     grid.innerHTML = utensils.map(u => `
       <div class="utensil-card">
         <h4 class="utensil-name">${window.AdminUtils.escapeHtml(u.name)}</h4>
