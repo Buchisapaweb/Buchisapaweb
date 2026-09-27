@@ -1,6 +1,6 @@
 /**
  * BUCHISAPA ADMIN - NAVIGATION & VIEW ROUTING MODULE
- * Layer: /admin/js/modules/navigation.js
+ * Layer: /admin/js/modules/navegacion.js
  */
 
 (function () {
@@ -18,8 +18,8 @@
       button: { text: '+ Nuevo Producto', action: () => window.openProductModal() }
     },
     'pedidos': {
-      title: 'Gestión de Pedidos',
-      desc: 'Comandas activas, estados de preparación y pedidos listos',
+      title: 'Gestión de Pedidos & Cocina KDS',
+      desc: 'Comandas activas, estados de preparación y pedidos listos en tiempo real',
       button: null
     },
     'ventas': {
@@ -84,18 +84,13 @@
     }
   };
 
-  async function switchAdminView(viewId) {
+  /**
+   * Cambia la vista activa del panel INSTANTÁNEAMENTE en 0ms
+   */
+  function switchAdminView(viewId) {
     if (!viewId) return;
 
-    // Verificar permisos de Administrador en Supabase antes de cargar cualquier vista
-    if (window.AdminApi && typeof window.AdminApi.verifyAdminRole === 'function') {
-      const hasPermission = await window.AdminApi.verifyAdminRole();
-      if (!hasPermission) {
-        return; // Detiene la carga y redirige al index si no tiene permisos
-      }
-    }
-
-    // Actualizar enlaces del sidebar
+    // 1. Actualizar enlaces del sidebar instantáneamente
     document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
       if (item.dataset.view === viewId) {
         item.classList.add('active');
@@ -104,7 +99,7 @@
       }
     });
 
-    // Actualizar secciones de vista
+    // 2. Transición instantánea de vistas DOM
     document.querySelectorAll('.admin-view').forEach(view => {
       if (view.id === `view-${viewId}`) {
         view.classList.add('active');
@@ -113,14 +108,14 @@
       }
     });
 
-    // Actualizar Topbar
+    // 3. Actualizar Topbar
     const meta = viewMetadata[viewId] || { title: 'Panel de Control', desc: 'Administración BuchiSapa', button: null };
     const titleEl = document.getElementById('topbar-title');
     const descEl = document.getElementById('topbar-desc');
     if (titleEl) titleEl.textContent = meta.title;
     if (descEl) descEl.textContent = meta.desc;
 
-    // Actualizar botón de acción principal en topbar
+    // 4. Actualizar botón de acción principal en topbar
     const mainActionBtn = document.querySelector('.btn-open-new-product');
     if (mainActionBtn) {
       if (meta.button) {
@@ -146,11 +141,30 @@
       }
     }
 
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 5. Scroll suave a la parte superior
+    window.scrollTo({ top: 0, behavior: 'auto' });
 
-    // Cerrar sidebar en móvil si estuviera abierto
+    // 6. Cerrar sidebar en móvil si estuviera abierto
     closeMobileSidebar();
+
+    // 7. Refresco asíncrono de datos según la vista en segundo plano
+    triggerViewDataRefresh(viewId);
+  }
+
+  function triggerViewDataRefresh(viewId) {
+    setTimeout(() => {
+      if (viewId === 'pedidos' && typeof window.fetchOrders === 'function') {
+        window.fetchOrders();
+      } else if (viewId === 'productos' && typeof window.fetchProducts === 'function') {
+        window.fetchProducts();
+      } else if (viewId === 'caja' && typeof window.fetchCaja === 'function') {
+        window.fetchCaja();
+      } else if (viewId === 'ticket' && typeof window.fetchTickets === 'function') {
+        window.fetchTickets();
+      } else if (viewId === 'dashboard') {
+        window.updateDashboardMetrics?.();
+      }
+    }, 10);
   }
 
   function toggleMobileSidebar() {

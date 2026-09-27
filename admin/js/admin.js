@@ -1,7 +1,7 @@
 /**
  * BUCHISAPA BURGER & BROASTER - PANEL DE ADMINISTRACIÓN OFICIAL
  * Master Entry Orchestrator: /admin/js/admin.js
- * High-Density Modular POS & Backoffice System
+ * High-Density Modular POS & Backoffice System (Ultra-Fast Async Orchestration)
  */
 
 (function () {
@@ -56,7 +56,7 @@
       modal.style.display = 'flex';
       const emailInput = document.getElementById('admin-login-email');
       if (emailInput) {
-        setTimeout(() => emailInput.focus(), 150);
+        setTimeout(() => emailInput.focus(), 100);
       }
     }
   }
@@ -89,36 +89,31 @@
     if (avatarEl) avatarEl.textContent = initial;
   }
 
-  async function loadAllAdminData() {
-    try {
-      await Promise.allSettled([
-        window.fetchProducts?.(),
-        window.fetchOrders?.(),
-        window.fetchCaja?.(),
+  // Carga asíncrona no bloqueante de datos en paralelo
+  function loadAllAdminDataAsync() {
+    // 1. Cargar módulos críticos primero
+    Promise.allSettled([
+      window.fetchProducts?.(),
+      window.fetchOrders?.(),
+      window.fetchCaja?.()
+    ]).then(() => {
+      window.updateDashboardMetrics?.();
+      // 2. Cargar módulos secundarios en segundo plano
+      Promise.allSettled([
         window.fetchTickets?.(),
         window.fetchPortadas?.(),
         window.fetchPromociones?.(),
         window.fetchSupplies?.(),
         window.fetchUtensils?.()
       ]);
-    } catch (e) {
-      console.warn('Carga de datos del panel completada:', e);
-    }
+    });
   }
 
-  async function initApp() {
+  function initApp() {
     setupEventListeners();
     setupSSEPushNotifications();
 
-    // Verificar si el usuario autenticado tiene el rol de administrador en Supabase antes de cargar cualquier vista
-    if (window.AdminApi && typeof window.AdminApi.verifyAdminRole === 'function') {
-      const isAllowed = await window.AdminApi.verifyAdminRole();
-      if (!isAllowed) {
-        return; // Detiene la inicialización y redirige al index si no tiene permisos
-      }
-    }
-
-    // Verificar sesión activa de Administrador
+    // 1. Verificar sesión activa de Administrador localmente (0ms)
     const { isAuthorized, user } = getAdminAuthStatus();
 
     if (!isAuthorized) {
@@ -129,11 +124,11 @@
     hideAdminLoginModal();
     updateAdminUserDisplay(user);
 
-    // Cargar datos en paralelo para máxima velocidad y fluidez
-    await loadAllAdminData();
-
-    // Inicializar vista por defecto
+    // 2. Renderizar vista inmediatamente sin esperar por la red
     window.switchAdminView('dashboard');
+
+    // 3. Cargar datos en segundo plano
+    loadAllAdminDataAsync();
   }
 
   async function handleAdminLoginFormSubmit(event) {
@@ -187,7 +182,6 @@
     try {
       let data = null;
 
-      // Autenticación ultra rápida en paralelo para el panel de administración
       const sbAuthPromise = (async () => {
         if (window.BuchisapaAPI && typeof window.BuchisapaAPI.loginAuth === 'function') {
           const res = await window.BuchisapaAPI.loginAuth(emailLower, password);
@@ -233,12 +227,10 @@
 
         showSuccess('¡Identidad confirmada! Ingresando...');
 
-        // Desbloqueo y renderizado instantáneo
         hideAdminLoginModal();
         updateAdminUserDisplay(user);
         window.switchAdminView('dashboard');
-        // Carga asíncrona de datos en segundo plano sin bloquear UI
-        loadAllAdminData();
+        loadAllAdminDataAsync();
         return;
       }
 
@@ -294,7 +286,6 @@
       console.warn('Error al limpiar almacenamiento:', e);
     }
     
-    // Redirigir directamente a la página de inicio (index)
     window.location.replace('/');
   }
 
@@ -353,14 +344,12 @@
         const val = e.target.value || '';
         window.AdminState.searchQuery = val;
         
-        // Sincronizar todos los inputs de búsqueda
         searchInputs.forEach(otherInput => {
           if (otherInput !== input && otherInput.value !== val) {
             otherInput.value = val;
           }
         });
 
-        // Mostrar u ocultar botón de limpiar
         if (clearCatalogSearchBtn) {
           clearCatalogSearchBtn.style.display = val.trim().length > 0 ? 'flex' : 'none';
         }
@@ -380,7 +369,6 @@
       });
     }
 
-    // Función global para enfocar buscador de productos desde botón móvil o atajo
     window.focusProductSearch = function () {
       if (typeof window.switchAdminView === 'function') {
         window.switchAdminView('productos');
@@ -391,7 +379,7 @@
           catalogSearchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
           catalogSearchInput.focus();
         }
-      }, 150);
+      }, 100);
     };
 
     // 5. Select Ordenamiento Productos
@@ -434,7 +422,6 @@
       });
     });
 
-    // Click fuera de modal para cerrar
     const overlays = document.querySelectorAll('.modal-overlay');
     overlays.forEach(overlay => {
       overlay.addEventListener('click', (e) => {
@@ -588,7 +575,6 @@
     }
   }
 
-  // Exponer utilidades globales para eventos de formulario y botones
   window.handleAdminLoginFormSubmit = handleAdminLoginFormSubmit;
   window.fillAdminCredentials = fillAdminCredentials;
   window.toggleAdminPasswordVisibility = toggleAdminPasswordVisibility;

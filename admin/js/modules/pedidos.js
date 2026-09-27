@@ -6,10 +6,13 @@
 (function () {
   'use strict';
 
-  let activeTab = 'kds';
+  let activeTab = 'list';
   let previousOrderIds = new Set();
   let kdsAudioCtx = null;
   let kitchenProducts = [];
+
+  let currentStatusFilter = 'todos';
+  let currentTypeFilter = 'todos';
 
   // ============================================================================
   // AUDIO & ALERT SYSTEM (SIRENA KDS + SÍNTESIS DE VOZ)
@@ -196,164 +199,67 @@
     let recibidos = 0;
     let preparacion = 0;
     let listos = 0;
+    let entregados = 0;
+    let cancelados = 0;
     let totalMonto = 0;
 
     orders.forEach(o => {
       const st = (o.status || 'pendiente').toLowerCase();
       if (st === 'pendiente' || st === 'recibido') recibidos++;
       else if (st === 'en_preparacion' || st === 'preparando') preparacion++;
-      else if (st === 'listo' || st === 'en_camino' || st === 'entregado') listos++;
+      else if (st === 'listo' || st === 'en_camino') listos++;
+      else if (st === 'entregado') entregados++;
+      else if (st === 'cancelado') cancelados++;
 
       if (st !== 'cancelado') {
         totalMonto += Number(o.total || 0);
       }
     });
 
-    // Actualizar KPIs
-    const elTotal = document.getElementById('kpi-orders-total');
-    const elRecibidos = document.getElementById('kpi-orders-recibidos');
-    const elPrep = document.getElementById('kpi-orders-preparacion');
-    const elListos = document.getElementById('kpi-orders-listos');
-    const elMonto = document.getElementById('kpi-orders-monto');
+    // Actualizar contadores en los Chips
+    const elChipTodos = document.getElementById('count-chip-todos');
+    const elChipRecibido = document.getElementById('count-chip-recibido');
+    const elChipPrep = document.getElementById('count-chip-preparacion');
+    const elChipListo = document.getElementById('count-chip-listo');
+    const elChipEntregado = document.getElementById('count-chip-entregado');
+    const elChipCancelado = document.getElementById('count-chip-cancelado');
 
-    if (elTotal) elTotal.textContent = totalOrders;
-    if (elRecibidos) elRecibidos.textContent = recibidos;
-    if (elPrep) elPrep.textContent = preparacion;
-    if (elListos) elListos.textContent = listos;
-    if (elMonto) elMonto.textContent = window.AdminUtils.formatSoles(totalMonto);
+    if (elChipTodos) elChipTodos.textContent = totalOrders;
+    if (elChipRecibido) elChipRecibido.textContent = recibidos;
+    if (elChipPrep) elChipPrep.textContent = preparacion;
+    if (elChipListo) elChipListo.textContent = listos;
+    if (elChipEntregado) elChipEntregado.textContent = entregados;
+    if (elChipCancelado) elChipCancelado.textContent = cancelados;
 
-    renderKdsView();
     renderAllOrders();
-    renderDeliveryMonitoring();
     window.updateDashboardMetrics?.();
   }
 
   // ============================================================================
-  // RENDER KDS KANBAN VIEW (3 COLUMNAS)
+  // FILTER CHIP SELECTION
   // ============================================================================
-  function renderKdsView() {
-    const colRecibidos = document.getElementById('kds-recibidos-list');
-    const colPrep = document.getElementById('kds-preparacion-list');
-    const colListos = document.getElementById('kds-listos-list');
+  function selectStatusFilter(val, btn) {
+    currentStatusFilter = val || 'todos';
 
-    const countRec = document.getElementById('count-recibidos');
-    const countPrep = document.getElementById('count-preparacion');
-    const countListos = document.getElementById('count-listos');
+    const container = document.getElementById('status-chips-container');
+    if (container) {
+      container.querySelectorAll('.status-chip').forEach(chip => chip.classList.remove('active'));
+    }
+    if (btn) btn.classList.add('active');
 
-    if (!colRecibidos || !colPrep || !colListos) return;
-
-    const orders = window.AdminState.allOrders || [];
-
-    const listRecibidos = [];
-    const listPrep = [];
-    const listListos = [];
-
-    orders.forEach(order => {
-      const st = (order.status || 'pendiente').toLowerCase();
-      if (st === 'pendiente' || st === 'recibido') listRecibidos.push(order);
-      else if (st === 'en_preparacion' || st === 'preparando') listPrep.push(order);
-      else if (st === 'listo' || st === 'en_camino') listListos.push(order);
-    });
-
-    if (countRec) countRec.textContent = listRecibidos.length;
-    if (countPrep) countPrep.textContent = listPrep.length;
-    if (countListos) countListos.textContent = listListos.length;
-
-    // Render Columna 1: Recibidos
-    colRecibidos.innerHTML = listRecibidos.length === 0
-      ? '<div class="kds-empty-state"><span class="empty-icon">✨</span><p>Sin comandas pendientes</p></div>'
-      : listRecibidos.map(o => renderKdsCard(o, 'recibido')).join('');
-
-    // Render Columna 2: En Preparación
-    colPrep.innerHTML = listPrep.length === 0
-      ? '<div class="kds-empty-state"><span class="empty-icon">🔥</span><p>Cocina libre en este momento</p></div>'
-      : listPrep.map(o => renderKdsCard(o, 'preparacion')).join('');
-
-    // Render Columna 3: Listos
-    colListos.innerHTML = listListos.length === 0
-      ? '<div class="kds-empty-state"><span class="empty-icon">✅</span><p>No hay pedidos pendientes de entrega</p></div>'
-      : listListos.map(o => renderKdsCard(o, 'listo')).join('');
+    renderAllOrders();
   }
 
-  function renderKdsCard(order, stage) {
-    const orderNum = order.orderNumber || order.id;
-    const isDelivery = order.type === 'delivery' || order.orderType === 'delivery';
-    const isPickup = order.type === 'pickup' || order.orderType === 'pickup';
-    const typeLabel = isDelivery ? '🛵 Delivery' : (isPickup ? '🛍️ Recojo' : '🍽️ Mesa');
+  function selectTypeFilter(val, btn) {
+    currentTypeFilter = val || 'todos';
 
-    const createdTime = new Date(order.created_at || order.createdAt || Date.now());
-    const minsElapsed = Math.floor((Date.now() - createdTime.getTime()) / 60000);
-    const isLate = minsElapsed >= 15;
-
-    const custName = window.AdminUtils.escapeHtml(order.customerName || order.customer?.name || 'Cliente');
-    const custPhone = order.customerPhone || order.customer?.phone || '';
-    const custAddress = window.AdminUtils.escapeHtml(order.deliveryAddress || order.customer?.address || '');
-
-    let parsedItems = order.items || [];
-    if (typeof parsedItems === 'string') {
-      try { parsedItems = JSON.parse(parsedItems); } catch (e) { parsedItems = []; }
+    const container = document.getElementById('type-chips-container');
+    if (container) {
+      container.querySelectorAll('.type-chip').forEach(chip => chip.classList.remove('active'));
     }
+    if (btn) btn.classList.add('active');
 
-    return `
-      <div class="kds-card kds-card-${stage}">
-        <div class="kds-card-header">
-          <div>
-            <span class="kds-order-num">#${orderNum}</span>
-            <span class="order-type-badge">${typeLabel}</span>
-          </div>
-          <span class="kds-timer-badge ${isLate ? 'timer-warning' : ''}">
-            ⏱️ ${minsElapsed} min
-          </span>
-        </div>
-
-        <div class="kds-customer-detail">
-          <span class="kds-cust-name">👤 ${custName}</span>
-          ${custPhone ? `<a href="https://wa.me/51${custPhone.replace(/\D/g,'')}" target="_blank" class="kds-cust-phone">📞 ${custPhone} (WhatsApp)</a>` : ''}
-          ${custAddress ? `<span>📍 ${custAddress}</span>` : ''}
-          <span>💳 ${order.payment_method || order.paymentMethod || 'Efectivo'}</span>
-        </div>
-
-        <div class="kds-items-list">
-          ${parsedItems.map(item => `
-            <div class="kds-item-row">
-              <span class="kds-item-qty">${item.quantity || 1}x</span>
-              <div class="kds-item-name">
-                ${window.AdminUtils.escapeHtml(item.name || item.title || 'Plato')}
-                ${item.notes ? `<div class="kds-item-notes">📝 ${window.AdminUtils.escapeHtml(item.notes)}</div>` : ''}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-
-        <div class="kds-card-footer">
-          <span class="kds-total-price">${window.AdminUtils.formatSoles(order.total || 0)}</span>
-
-          <div class="kds-action-btns">
-            ${stage === 'recibido' ? `
-              <button class="btn btn-primary btn-sm" onclick="window.changeOrderStatus('${order.id}', 'en_preparacion')">
-                🧑‍🍳 A Cocina
-              </button>
-            ` : ''}
-
-            ${stage === 'preparacion' ? `
-              <button class="btn btn-secondary btn-sm" style="border-color: #10b981; color: #10b981;" onclick="window.changeOrderStatus('${order.id}', 'listo')">
-                ✅ Marcar Listo
-              </button>
-            ` : ''}
-
-            ${stage === 'listo' ? `
-              <button class="btn btn-primary btn-sm" onclick="window.changeOrderStatus('${order.id}', 'entregado')">
-                🚀 Entregar
-              </button>
-            ` : ''}
-
-            <button class="btn btn-secondary btn-sm" onclick="window.previewThermalTicketFromOrder('${order.id}')" title="Imprimir Ticket">
-              🖨️
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
+    renderAllOrders();
   }
 
   // ============================================================================
@@ -366,12 +272,10 @@
     let orders = window.AdminState.allOrders || [];
 
     const searchInput = document.getElementById('pedidos-search-input');
-    const statusFilter = document.getElementById('pedidos-status-filter');
-    const typeFilter = document.getElementById('pedidos-type-filter');
-
     const searchVal = (searchInput?.value || '').toLowerCase().trim();
-    const statusVal = statusFilter?.value || 'todos';
-    const typeVal = typeFilter?.value || 'todos';
+
+    const statusVal = currentStatusFilter || 'todos';
+    const typeVal = currentTypeFilter || 'todos';
 
     if (searchVal) {
       orders = orders.filter(o => {
@@ -400,8 +304,8 @@
     if (orders.length === 0) {
       container.innerHTML = `
         <div style="text-align: center; padding: 48px; color: var(--text-muted, #94a3b8);">
-          <p style="font-size: 1.1rem; font-weight: 700;">No hay pedidos registrados con estos filtros</p>
-          <p style="font-size: 0.8rem; margin-top: 4px;">Ajusta el buscador o el filtro para ver más ordenes.</p>
+          <p style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">No hay pedidos registrados con estos filtros</p>
+          <p style="font-size: 0.85rem; margin-top: 4px;">Toca otra pestaña de estado arriba o ajusta la búsqueda.</p>
         </div>
       `;
       return;
@@ -481,42 +385,6 @@
     }).join('');
   }
 
-  function renderDeliveryMonitoring() {
-    const grid = document.getElementById('delivery-active-orders-grid');
-    if (!grid) return;
-
-    const orders = (window.AdminState.allOrders || []).filter(o => (o.type === 'delivery' || o.orderType === 'delivery') && o.status !== 'entregado' && o.status !== 'cancelado');
-
-    if (orders.length === 0) {
-      grid.innerHTML = `
-        <div style="text-align: center; padding: 48px; color: #94a3b8; grid-column: 1 / -1;">
-          <p style="font-size: 1.1rem; font-weight: 700;">No hay envíos activos en ruta</p>
-          <p style="font-size: 0.8rem; margin-top: 4px;">Los motorizados asignados y entregas en proceso aparecerán aquí.</p>
-        </div>
-      `;
-      return;
-    }
-
-    grid.innerHTML = orders.map(o => `
-      <div style="background: rgba(22, 14, 46, 0.9); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 12px; padding: 16px;">
-        <div style="display: flex; justify-content: space-between; font-weight: 800; color: #fff; margin-bottom: 8px;">
-          <span>🛵 Orden #${o.orderNumber || o.id}</span>
-          <span style="color: #00f0ff;">S/ ${Number(o.total || 0).toFixed(2)}</span>
-        </div>
-        <div style="font-size: 0.82rem; color: #cbd5e1;">
-          <p style="margin: 2px 0;"><strong>Cliente:</strong> ${window.AdminUtils.escapeHtml(o.customerName || o.customer?.name || '')}</p>
-          <p style="margin: 2px 0;"><strong>Dirección:</strong> ${window.AdminUtils.escapeHtml(o.deliveryAddress || o.customer?.address || 'Tarapoto')}</p>
-          <p style="margin: 2px 0;"><strong>Teléfono:</strong> ${o.customerPhone || o.customer?.phone || ''}</p>
-        </div>
-        <div style="margin-top: 12px;">
-          <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="window.changeOrderStatus('${o.id}', 'entregado')">
-            ✅ Marcar Entregado
-          </button>
-        </div>
-      </div>
-    `).join('');
-  }
-
   function getStatusBadgeClass(status) {
     if (status === 'en_preparacion' || status === 'preparando') return 'badge-blue';
     if (status === 'listo' || status === 'en_camino' || status === 'entregado') return 'badge-green';
@@ -546,40 +414,10 @@
   }
 
   // ============================================================================
-  // TAB NAVIGATION & FULLSCREEN CONTROLS
+  // FULL-PAGE KITCHEN STOCK & CARTA AVAILABILITY MANAGEMENT
   // ============================================================================
-  function switchPedidosTab(tabName) {
-    activeTab = tabName;
+  let activeStockCategory = 'todos';
 
-    const btnKds = document.getElementById('tab-btn-kds');
-    const btnList = document.getElementById('tab-btn-list');
-    const btnDelivery = document.getElementById('tab-btn-delivery');
-
-    const paneKds = document.getElementById('pedidos-tab-content-kds');
-    const paneList = document.getElementById('pedidos-tab-content-list');
-    const paneDelivery = document.getElementById('pedidos-tab-content-delivery');
-
-    if (btnKds) btnKds.classList.toggle('active', tabName === 'kds');
-    if (btnList) btnList.classList.toggle('active', tabName === 'list');
-    if (btnDelivery) btnDelivery.classList.toggle('active', tabName === 'delivery');
-
-    if (paneKds) paneKds.classList.toggle('active', tabName === 'kds');
-    if (paneList) paneList.classList.toggle('active', tabName === 'list');
-    if (paneDelivery) paneDelivery.classList.toggle('active', tabName === 'delivery');
-  }
-
-  function toggleKdsFullScreen() {
-    const sec = document.getElementById('view-pedidos');
-    if (sec) {
-      sec.classList.toggle('kds-fullscreen-active');
-      const isActive = sec.classList.contains('kds-fullscreen-active');
-      window.showToast?.(isActive ? '🖥️ Modo Pantalla Completa Activado' : 'Pantalla Normal', 'info');
-    }
-  }
-
-  // ============================================================================
-  // KITCHEN STOCK MODAL MANAGEMENT
-  // ============================================================================
   async function openKitchenStockModal() {
     const modal = document.getElementById('admin-kds-stock-modal');
     if (!modal) return;
@@ -587,9 +425,18 @@
     modal.classList.add('active');
 
     try {
-      const data = await window.AdminApi.getProducts();
-      kitchenProducts = Array.isArray(data) ? data : [];
+      const res = await window.AdminApi.getProducts(true);
+      if (Array.isArray(res)) {
+        kitchenProducts = res;
+      } else if (res && Array.isArray(res.data)) {
+        kitchenProducts = res.data;
+      } else if (res && res.products && Array.isArray(res.products)) {
+        kitchenProducts = res.products;
+      } else {
+        kitchenProducts = window.AdminState.products || [];
+      }
     } catch (e) {
+      console.warn('Error al obtener platos para control de stock:', e);
       kitchenProducts = window.AdminState.products || [];
     }
 
@@ -601,55 +448,114 @@
     if (modal) modal.classList.remove('active');
   }
 
+  function filterStockByCategory(cat, btn) {
+    activeStockCategory = cat || 'todos';
+
+    const container = document.getElementById('stock-category-pills');
+    if (container) {
+      const pills = container.querySelectorAll('.category-pill');
+      pills.forEach(p => p.classList.remove('active'));
+    }
+    if (btn) btn.classList.add('active');
+
+    renderKitchenStockList();
+  }
+
   function renderKitchenStockList() {
     const container = document.getElementById('admin-kds-stock-list');
-    const searchVal = (document.getElementById('stock-modal-search')?.value || '').toLowerCase();
+    const searchVal = (document.getElementById('stock-modal-search')?.value || '').toLowerCase().trim();
 
     if (!container) return;
 
-    let items = kitchenProducts;
+    let items = kitchenProducts || [];
+
     if (searchVal) {
-      items = items.filter(p => (p.name || '').toLowerCase().includes(searchVal) || (p.category || '').toLowerCase().includes(searchVal));
+      items = items.filter(p => 
+        (p.name || '').toLowerCase().includes(searchVal) ||
+        (p.category || '').toLowerCase().includes(searchVal) ||
+        (p.description || '').toLowerCase().includes(searchVal)
+      );
     }
 
+    if (activeStockCategory !== 'todos') {
+      items = items.filter(p => {
+        const cat = (p.category || '').toLowerCase();
+        if (activeStockCategory === 'pollos') return cat.includes('pollo') || cat.includes('broaster') || cat.includes('brasa');
+        if (activeStockCategory === 'tipicos') return cat.includes('tipico') || cat.includes('tacacho') || cat.includes('amazonic');
+        if (activeStockCategory === 'bebidas') return cat.includes('bebida') || cat.includes('refresco') || cat.includes('jugo');
+        if (activeStockCategory === 'combos') return cat.includes('combo') || cat.includes('promo') || cat.includes('familiar');
+        return true;
+      });
+    }
+
+    const elAvailable = document.getElementById('stock-count-available');
+    const elSoldout = document.getElementById('stock-count-soldout');
+
+    const totalAvailable = kitchenProducts.filter(p => p.available !== false).length;
+    const totalSoldout = kitchenProducts.filter(p => p.available === false).length;
+
+    if (elAvailable) elAvailable.textContent = totalAvailable;
+    if (elSoldout) elSoldout.textContent = totalSoldout;
+
     if (items.length === 0) {
-      container.innerHTML = '<div style="text-align: center; padding: 24px; color: #94a3b8;">No se encontraron platos.</div>';
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: #94a3b8;">
+          <p style="font-size: 1.1rem; font-weight: 800; color: #ffffff;">No se encontraron platos con este filtro</p>
+          <p style="font-size: 0.85rem; margin-top: 4px;">Intenta buscar por otro término o selecciona "Todos".</p>
+        </div>
+      `;
       return;
     }
 
-    container.innerHTML = items.map(p => `
-      <div class="stock-item-card">
-        <div class="stock-item-info">
-          <img src="${p.image || '/imagenes/portada/Portada1E.webp'}" alt="${p.name}" class="stock-item-img">
-          <div>
-            <div class="stock-item-name">${window.AdminUtils.escapeHtml(p.name)}</div>
-            <div class="stock-item-category">S/ ${Number(p.price || 0).toFixed(2)}</div>
-          </div>
-        </div>
+    container.innerHTML = items.map(p => {
+      const isAvailable = p.available !== false;
+      const priceFormatted = window.AdminUtils ? window.AdminUtils.formatSoles(p.price || 0) : `S/ ${Number(p.price || 0).toFixed(2)}`;
+      const fallbackImg = '/imagenes/portada/Portada1E.webp';
 
-        <button type="button" class="stock-toggle-btn ${p.available ? 'available' : 'soldout'}" onclick="window.toggleProductStockInKitchen('${p.id}', ${Boolean(p.available)})">
-          ${p.available ? '🟢 Disponible' : '🔴 AGOTADO'}
-        </button>
-      </div>
-    `).join('');
+      return `
+        <div class="stock-card-item ${!isAvailable ? 'is-soldout' : ''}">
+          <div class="stock-card-media">
+            <img src="${p.image || fallbackImg}" alt="${window.AdminUtils.escapeHtml(p.name)}" class="stock-card-img" onerror="this.src='${fallbackImg}'">
+            <div class="stock-card-details">
+              <div class="stock-card-name" title="${window.AdminUtils.escapeHtml(p.name)}">${window.AdminUtils.escapeHtml(p.name)}</div>
+              <div class="stock-card-price">${priceFormatted}</div>
+              <div class="stock-card-cat">${window.AdminUtils.escapeHtml(p.category || 'Carta Buchisapa')}</div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-toggle-stock ${isAvailable ? 'available' : 'soldout'}" onclick="window.toggleProductStockInKitchen('${p.id}', ${Boolean(isAvailable)})">
+            ${isAvailable ? '🟢 DISPONIBLE' : '🔴 AGOTADO'}
+          </button>
+        </div>
+      `;
+    }).join('');
   }
 
   async function toggleProductStockInKitchen(id, currentAvailable) {
     const newAvailable = !currentAvailable;
+
+    const prod = kitchenProducts.find(p => p.id === id || String(p.id) === String(id));
+    if (prod) prod.available = newAvailable;
+    renderKitchenStockList();
+
     try {
       const res = await fetch(`/api/products/${id}/stock`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ available: newAvailable })
       });
+
       if (res.ok) {
-        const prod = kitchenProducts.find(p => p.id === id);
-        if (prod) prod.available = newAvailable;
+        window.showToast?.(newAvailable ? '🟢 Plato habilitado en carta' : '🔴 Plato marcado como agotado', 'success');
+      } else {
+        if (prod) prod.available = currentAvailable;
         renderKitchenStockList();
-        window.showToast?.(`Estado de plato actualizado`, 'success');
+        window.showToast?.('Error al cambiar estado en servidor', 'error');
       }
     } catch (e) {
-      console.error('Error toggling stock:', e);
+      console.error('Error al cambiar estado de stock:', e);
+      if (prod) prod.available = currentAvailable;
+      renderKitchenStockList();
     }
   }
 
@@ -664,12 +570,16 @@
         evtSource.addEventListener('order_update', (e) => {
           fetchOrders();
         });
+        evtSource.addEventListener('stock_update', (e) => {
+          if (document.getElementById('admin-kds-stock-modal')?.classList.contains('active')) {
+            openKitchenStockModal();
+          }
+        });
       } catch (err) {
         console.warn('EventSource warning:', err);
       }
     }
 
-    // Polling fallback every 15s
     setInterval(fetchOrders, 15000);
   }
 
@@ -677,9 +587,9 @@
   window.fetchOrders = fetchOrders;
   window.renderAllOrders = renderAllOrders;
   window.filterAllOrdersList = renderAllOrders;
+  window.selectStatusFilter = selectStatusFilter;
+  window.selectTypeFilter = selectTypeFilter;
   window.changeOrderStatus = changeOrderStatus;
-  window.switchPedidosTab = switchPedidosTab;
-  window.toggleKdsFullScreen = toggleKdsFullScreen;
   window.toggleKdsSound = () => BuchisapaKdsAudio.toggleSound();
   window.toggleKdsVoice = () => BuchisapaKdsAudio.toggleVoice();
   window.testKdsSoundAlert = () => BuchisapaKdsAudio.triggerAlert({ orderNumber: 'PRUEBA-101', customerName: 'Carlos Mendoza' });
@@ -687,6 +597,7 @@
   window.openKitchenStockModal = openKitchenStockModal;
   window.closeKitchenStockModal = closeKitchenStockModal;
   window.filterKitchenStockList = renderKitchenStockList;
+  window.filterStockByCategory = filterStockByCategory;
   window.toggleProductStockInKitchen = toggleProductStockInKitchen;
 
   // Inicialización

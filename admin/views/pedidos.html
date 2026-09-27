@@ -1,250 +1,162 @@
 <!-- ====================================================================
-     3. VISTA PEDIDOS (GESTIÓN Y MONITOREO DE COCINA KDS EN TIEMPO REAL)
+     VISTA GESTIÓN DE PEDIDOS Y CONTROL DE CARTA / AGOTADOS EN COCINA
      ==================================================================== -->
 <section class="admin-view" id="view-pedidos">
   <div class="pedidos-dashboard-container">
 
-    <!-- CABECERA SUPERIOR Y CONTROLES KDS -->
-    <div class="pedidos-header-card">
-      <div class="pedidos-header-main">
-        <div class="pedidos-title-group">
-          <div class="pedidos-brand-badge">
-            <span class="pulse-dot"></span>
-            <span>MONITOR EN VIVO</span>
-          </div>
-          <h2 class="pedidos-main-title">Gestión de Pedidos &amp; Cocina KDS</h2>
-          <p class="pedidos-main-subtitle">Control de comandas al carbón, preparación en tiempo real y despacho de delivery</p>
-        </div>
+    <!-- BARRA SUPERIOR DE BÚSQUEDA Y ACCIONES RÁPIDAS -->
+    <div class="pedidos-filter-bar">
+      <div class="search-box-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="pedidos-search-input" placeholder="Buscar cliente, N° orden, teléfono o dirección..." oninput="window.filterAllOrdersList()">
+      </div>
 
-        <div class="pedidos-toolbar">
-          <button type="button" id="btn-kds-sound-toggle" class="btn btn-kds-sound" onclick="window.toggleKdsSound()">
-            <span id="kds-sound-icon">🔊</span>
-            <span id="kds-sound-text">Sonido: ACTIVO</span>
+      <div class="top-action-buttons">
+        <button type="button" class="btn btn-primary btn-sm btn-highlight-glow" onclick="window.openKitchenStockModal()" title="Abrir Pantalla Completa de Control de Carta">
+          📦 Agotados / Carta
+        </button>
+
+        <button type="button" class="btn btn-secondary btn-sm" onclick="window.fetchOrders()" title="Refrescar Pedidos">
+          🔄 Refrescar
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTOR DE FILTROS INTERACTIVOS POR ESTADO Y CANAL (CHIPS / PILLS) -->
+    <div class="pedidos-chips-section">
+      <!-- FILTRO DE ESTADOS -->
+      <div class="filter-chips-group">
+        <span class="chips-group-label">Estado:</span>
+        <div class="chips-scroll-container" id="status-chips-container">
+          <button type="button" class="status-chip active" data-status="todos" onclick="window.selectStatusFilter('todos', this)">
+            <span class="chip-icon">✨</span>
+            <span class="chip-label">Todos los Estados</span>
+            <span class="chip-count" id="count-chip-todos">0</span>
           </button>
 
-          <button type="button" class="btn btn-secondary" onclick="window.testKdsSoundAlert()">
-            <span>🔔 Probar Alerta</span>
+          <button type="button" class="status-chip chip-amber" data-status="recibido" onclick="window.selectStatusFilter('recibido', this)">
+            <span class="chip-icon">🔔</span>
+            <span class="chip-label">Recibido</span>
+            <span class="chip-count" id="count-chip-recibido">0</span>
           </button>
 
-          <button type="button" class="btn btn-secondary" onclick="window.openKitchenStockModal()">
-            <span>📦 Agotados / Carta</span>
+          <button type="button" class="status-chip chip-cyan" data-status="en_preparacion" onclick="window.selectStatusFilter('en_preparacion', this)">
+            <span class="chip-icon">🧑‍🍳</span>
+            <span class="chip-label">En Preparación</span>
+            <span class="chip-count" id="count-chip-preparacion">0</span>
           </button>
 
-          <button type="button" class="btn btn-secondary" onclick="window.toggleKdsFullScreen()">
-            <span>🖥️ Pantalla Completa</span>
+          <button type="button" class="status-chip chip-emerald" data-status="listo" onclick="window.selectStatusFilter('listo', this)">
+            <span class="chip-icon">🛵 Listo</span>
+            <span class="chip-count" id="count-chip-listo">0</span>
           </button>
 
-          <button type="button" class="btn btn-primary" onclick="window.fetchOrders()">
-            <span>🔄 Actualizar</span>
+          <button type="button" class="status-chip chip-purple" data-status="entregado" onclick="window.selectStatusFilter('entregado', this)">
+            <span class="chip-icon">✅ Entregado</span>
+            <span class="chip-count" id="count-chip-entregado">0</span>
+          </button>
+
+          <button type="button" class="status-chip chip-red" data-status="cancelado" onclick="window.selectStatusFilter('cancelado', this)">
+            <span class="chip-icon">❌ Cancelado</span>
+            <span class="chip-count" id="count-chip-cancelado">0</span>
           </button>
         </div>
       </div>
 
-      <!-- BANNER DE ALERTA SONORA AUTOMÁTICA -->
-      <div id="admin-kds-audio-bar" class="kds-audio-status-bar">
-        <div class="kds-audio-status-info">
-          <span id="admin-kds-audio-dot" class="kds-audio-dot"></span>
-          <span id="admin-kds-audio-status-text" class="kds-audio-status-bold">Alerta de Comandas: Reproducción automática lista</span>
-          <span id="admin-kds-audio-prompt" class="kds-audio-prompt" onclick="window.enableKdsAudioContext()" style="display: none;">
-            ⚠️ Haz clic aquí para habilitar sonido en este navegador
-          </span>
-        </div>
-        <div class="kds-audio-subactions">
-          <button type="button" class="btn-text-action" onclick="window.toggleKdsVoice()">
-            <span id="kds-voice-icon">🗣️</span> <span id="kds-voice-text">Voz: ACTIVA</span>
+      <!-- FILTRO DE CANALES -->
+      <div class="filter-chips-group">
+        <span class="chips-group-label">Canal:</span>
+        <div class="chips-scroll-container" id="type-chips-container">
+          <button type="button" class="type-chip active" data-type="todos" onclick="window.selectTypeFilter('todos', this)">
+            <span class="chip-label">🌐 Todos Canales</span>
           </button>
-        </div>
-      </div>
 
-      <!-- TARJETAS METRICAS KPI -->
-      <div class="pedidos-kpi-grid">
-        <div class="kpi-mini-card kpi-total">
-          <div class="kpi-icon-box">📊</div>
-          <div>
-            <span class="kpi-label">Total Pedidos Hoy</span>
-            <h4 class="kpi-val" id="kpi-orders-total">0</h4>
-          </div>
-        </div>
+          <button type="button" class="type-chip" data-type="delivery" onclick="window.selectTypeFilter('delivery', this)">
+            <span class="chip-label">🛵 Delivery</span>
+          </button>
 
-        <div class="kpi-mini-card kpi-recibidos">
-          <div class="kpi-icon-box">🔔</div>
-          <div>
-            <span class="kpi-label">Recibidos / Pendientes</span>
-            <h4 class="kpi-val text-amber" id="kpi-orders-recibidos">0</h4>
-          </div>
-        </div>
+          <button type="button" class="type-chip" data-type="pickup" onclick="window.selectTypeFilter('pickup', this)">
+            <span class="chip-label">🛍️ Recojo</span>
+          </button>
 
-        <div class="kpi-mini-card kpi-preparacion">
-          <div class="kpi-icon-box">🧑‍🍳</div>
-          <div>
-            <span class="kpi-label">En Cocina</span>
-            <h4 class="kpi-val text-cyan" id="kpi-orders-preparacion">0</h4>
-          </div>
-        </div>
-
-        <div class="kpi-mini-card kpi-listos">
-          <div class="kpi-icon-box">🛵</div>
-          <div>
-            <span class="kpi-label">Listos / En Ruta</span>
-            <h4 class="kpi-val text-emerald" id="kpi-orders-listos">0</h4>
-          </div>
-        </div>
-
-        <div class="kpi-mini-card kpi-monto">
-          <div class="kpi-icon-box">💰</div>
-          <div>
-            <span class="kpi-label">Venta Acumulada</span>
-            <h4 class="kpi-val text-neon-green" id="kpi-orders-monto">S/ 0.00</h4>
-          </div>
+          <button type="button" class="type-chip" data-type="salon" onclick="window.selectTypeFilter('salon', this)">
+            <span class="chip-label">🍽️ Salón</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- PESTAÑAS NAVEGADORAS INTERNAS -->
-    <div class="pedidos-tabs-nav">
-      <button type="button" class="tab-btn active" id="tab-btn-kds" onclick="window.switchPedidosTab('kds')">
-        <span>🧑‍🍳 Pantalla de Cocina KDS (Kanban)</span>
-      </button>
-
-      <button type="button" class="tab-btn" id="tab-btn-list" onclick="window.switchPedidosTab('list')">
-        <span>📋 Todos los Pedidos &amp; Filtros</span>
-      </button>
-
-      <button type="button" class="tab-btn" id="tab-btn-delivery" onclick="window.switchPedidosTab('delivery')">
-        <span>🛵 Monitoreo de Envíos</span>
-      </button>
-    </div>
-
-    <!-- SECCIÓN TAB 1: PANTALLA DE COCINA KDS (KANBAN) -->
-    <div id="pedidos-tab-content-kds" class="pedidos-tab-pane active">
-      <div class="kds-kanban-grid">
-        <!-- COLUMNA 1: RECIBIDOS / NUEVOS -->
-        <div class="kds-kanban-col col-recibidos">
-          <div class="kds-col-header header-recibidos">
-            <div class="kds-col-title">
-              <span class="status-indicator-dot dot-amber"></span>
-              <span>🔔 RECIBIDOS / COMANDAS NUEVAS</span>
-            </div>
-            <span class="kds-col-count" id="count-recibidos">0</span>
-          </div>
-          <div class="kds-cards-container" id="kds-recibidos-list">
-            <div class="kds-empty-state">
-              <span class="empty-icon">✨</span>
-              <p>Sin comandas pendientes</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- COLUMNA 2: EN PREPARACIÓN AL CARBÓN -->
-        <div class="kds-kanban-col col-preparacion">
-          <div class="kds-col-header header-preparacion">
-            <div class="kds-col-title">
-              <span class="status-indicator-dot dot-cyan"></span>
-              <span>🧑‍🍳 EN PREPARACIÓN AL CARBÓN</span>
-            </div>
-            <span class="kds-col-count" id="count-preparacion">0</span>
-          </div>
-          <div class="kds-cards-container" id="kds-preparacion-list">
-            <div class="kds-empty-state">
-              <span class="empty-icon">🔥</span>
-              <p>Cocina libre en este momento</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- COLUMNA 3: LISTOS / DESPACHO -->
-        <div class="kds-kanban-col col-listos">
-          <div class="kds-col-header header-listos">
-            <div class="kds-col-title">
-              <span class="status-indicator-dot dot-emerald"></span>
-              <span>🛵 LISTOS PARA DESPACHO / MESA</span>
-            </div>
-            <span class="kds-col-count" id="count-listos">0</span>
-          </div>
-          <div class="kds-cards-container" id="kds-listos-list">
-            <div class="kds-empty-state">
-              <span class="empty-icon">✅</span>
-              <p>No hay pedidos pendientes de entrega</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECCIÓN TAB 2: TODOS LOS PEDIDOS (LISTA CON FILTROS Y BUSCADOR) -->
-    <div id="pedidos-tab-content-list" class="pedidos-tab-pane">
-      <div class="pedidos-filter-bar">
-        <div class="search-box-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input type="text" id="pedidos-search-input" placeholder="Buscar por cliente, N° orden, teléfono o dirección..." oninput="window.filterAllOrdersList()">
-        </div>
-
-        <div class="filter-select-group">
-          <select id="pedidos-status-filter" onchange="window.filterAllOrdersList()" class="form-select-sm">
-            <option value="todos">Todos los Estados</option>
-            <option value="recibido">🔔 Recibido / Pendiente</option>
-            <option value="en_preparacion">🧑‍🍳 En Preparación</option>
-            <option value="listo">🛵 Listo en Cocina</option>
-            <option value="entregado">✅ Entregado</option>
-            <option value="cancelado">❌ Cancelado</option>
-          </select>
-
-          <select id="pedidos-type-filter" onchange="window.filterAllOrdersList()" class="form-select-sm">
-            <option value="todos">Todos los Canales</option>
-            <option value="delivery">🛵 Delivery a Domicilio</option>
-            <option value="pickup">🛍️ Recojo en Tienda</option>
-            <option value="salon">🍽️ Consumo en Salón</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="orders-list" id="all-orders-master-list">
-        <!-- Render dinámico de lista completa -->
-      </div>
-    </div>
-
-    <!-- SECCIÓN TAB 3: MONITOREO DE ENVÍOS -->
-    <div id="pedidos-tab-content-delivery" class="pedidos-tab-pane">
-      <div class="delivery-monitoring-panel">
-        <div class="delivery-panel-header">
-          <h3>🛵 Estado de Repartos &amp; Cobertura en Vivo</h3>
-          <p>Supervisión de pedidos en camino con datos de ubicación del cliente</p>
-        </div>
-        <div class="delivery-active-grid" id="delivery-active-orders-grid">
-          <!-- Carga dinámica de motorizados y envíos en ruta -->
-        </div>
-      </div>
+    <!-- LISTADO COMPLETO DE PEDIDOS EN VIVO -->
+    <div class="orders-list" id="all-orders-master-list">
+      <!-- Carga dinámica de tarjetas de pedido -->
     </div>
 
   </div>
 </section>
 
-<!-- MODAL INTEGRADO DE CONTROL DE AGOTADOS Y DISPONIBILIDAD DE COCINA -->
-<div id="admin-kds-stock-modal" class="modal-overlay">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-header">
-      <div class="modal-title-group">
-        <span class="modal-icon-lg">📦</span>
-        <div>
-          <h3 class="modal-title-white">Disponibilidad de Platos en Cocina</h3>
-          <p class="modal-subtitle-text">Los platos marcados como agotados se desactivan en el carrito de los clientes al instante</p>
+<!-- ====================================================================
+     PÁGINA COMPLETA: CONTROL DE DISPONIBILIDAD Y AGOTADOS DE COCINA
+     ==================================================================== -->
+<div id="admin-kds-stock-modal" class="stock-fullscreen-overlay">
+  <div class="stock-fullscreen-container">
+    
+    <!-- CABECERA SUPERIOR DE PÁGINA COMPLETA -->
+    <div class="stock-header">
+      <div class="stock-header-branding">
+        <div class="stock-brand-badge">
+          <span class="pulse-dot"></span>
+          <span>COCINA BUCHISAPA</span>
+        </div>
+        <h2 class="stock-title">Disponibilidad de Platos en Carta</h2>
+        <p class="stock-subtitle">Los cambios realizados desactivan o activan el plato en la carta web al instante</p>
+      </div>
+
+      <div class="stock-header-stats">
+        <div class="stock-stat-pill stat-green">
+          <span>🟢 Disponibles:</span>
+          <strong id="stock-count-available">0</strong>
+        </div>
+        <div class="stock-stat-pill stat-red">
+          <span>🔴 Agotados:</span>
+          <strong id="stock-count-soldout">0</strong>
+        </div>
+        <button type="button" class="btn-close-fullscreen" onclick="window.closeKitchenStockModal()">
+          ✕ Cerrar Pantalla
+        </button>
+      </div>
+    </div>
+
+    <!-- BARRA DE FILTROS Y BÚSQUEDA RÁPIDA -->
+    <div class="stock-toolbar">
+      <div class="stock-search-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="stock-modal-search" placeholder="Buscar plato por nombre o descripción..." oninput="window.filterKitchenStockList()">
+      </div>
+
+      <div class="stock-category-pills" id="stock-category-pills">
+        <button type="button" class="category-pill active" onclick="window.filterStockByCategory('todos', this)">Todos</button>
+        <button type="button" class="category-pill" onclick="window.filterStockByCategory('pollos', this)">🔥 Pollos al Carbón</button>
+        <button type="button" class="category-pill" onclick="window.filterStockByCategory('tipicos', this)">🌴 Platos Típicos</button>
+        <button type="button" class="category-pill" onclick="window.filterStockByCategory('bebidas', this)">🍹 Refrescos &amp; Bebidas</button>
+        <button type="button" class="category-pill" onclick="window.filterStockByCategory('combos', this)">🎁 Combos &amp; Promos</button>
+      </div>
+    </div>
+
+    <!-- REJILLA PRINCIPAL DE PLATOS (FULL PAGE GRID) -->
+    <div class="stock-body">
+      <div id="admin-kds-stock-list" class="stock-cards-fullgrid">
+        <div class="stock-loading-state">
+          <span class="spinner-icon">🔄</span>
+          <p>Cargando lista completa de platos...</p>
         </div>
       </div>
-      <button type="button" class="modal-close-btn" onclick="window.closeKitchenStockModal()">&times;</button>
     </div>
 
-    <div class="modal-body">
-      <div class="stock-search-bar">
-        <input type="text" id="stock-modal-search" placeholder="Filtrar plato por nombre..." oninput="window.filterKitchenStockList()" class="form-input">
-      </div>
-      <div id="admin-kds-stock-list" class="stock-items-grid">
-        <div class="text-center p-24 text-muted">Cargando platos de la carta...</div>
-      </div>
+    <!-- PIE DE PÁGINA NOTA Y ACCIÓN -->
+    <div class="stock-footer">
+      <span>💡 Tip: Toca el botón <strong>"🟢 Disponible"</strong> para marcar un plato como <strong>"🔴 AGOTADO"</strong> de inmediato.</span>
+      <button type="button" class="btn btn-secondary" onclick="window.closeKitchenStockModal()">Volver a Pedidos</button>
     </div>
 
-    <div class="modal-footer">
-      <span class="text-muted-xs">🟢 Verde = Disponible | 🔴 Rojo = Agotado en Cocina</span>
-      <button type="button" class="btn btn-secondary" onclick="window.closeKitchenStockModal()">Cerrar</button>
-    </div>
   </div>
 </div>
