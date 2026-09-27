@@ -133,11 +133,47 @@
     }
   }
 
+  function updateProductFormLivePreview() {
+    const name = document.getElementById('form-product-name')?.value.trim() || 'Nombre del producto';
+    const cat = document.getElementById('form-product-category')?.value || 'platos-amazonicos';
+    const price = document.getElementById('form-product-price')?.value || '0.00';
+    const desc = document.getElementById('form-product-description')?.value.trim() || 'Descripción e ingredientes del plato...';
+    const image = document.getElementById('form-product-image')?.value.trim() || '/imagenes/portada/Portada1E.webp';
+    const badge = document.getElementById('form-product-badge')?.value.trim();
+
+    const pImg = document.getElementById('product-preview-img');
+    const pCat = document.getElementById('product-preview-category');
+    const pName = document.getElementById('product-preview-name');
+    const pDesc = document.getElementById('product-preview-desc');
+    const pPrice = document.getElementById('product-preview-price');
+    const pBadge = document.getElementById('product-preview-badge');
+
+    if (pImg) pImg.src = image;
+    if (pCat) pCat.textContent = window.AdminUtils?.formatCategoryName?.(cat) || cat;
+    if (pName) pName.textContent = name;
+    if (pDesc) pDesc.textContent = desc;
+    if (pPrice) pPrice.textContent = `S/ ${parseFloat(price || 0).toFixed(2)}`;
+    if (pBadge) {
+      if (badge) {
+        pBadge.textContent = badge;
+        pBadge.style.display = 'inline-block';
+      } else {
+        pBadge.style.display = 'none';
+      }
+    }
+  }
+
   function openProductModal(isEdit = false, prod = null) {
-    const modal = document.getElementById('product-modal');
-    const titleEl = document.getElementById('product-modal-title');
+    const listSec = document.getElementById('products-list-section');
+    const formSec = document.getElementById('product-form-page-section');
+    const titleEl = document.getElementById('product-form-page-title');
     const form = document.getElementById('product-form');
-    if (!modal || !form) return;
+
+    // También ocultar modal por si existiera
+    const modal = document.getElementById('product-modal');
+    if (modal) modal.classList.remove('active');
+
+    if (!formSec || !listSec) return;
 
     if (isEdit && prod) {
       if (titleEl) titleEl.textContent = 'Editar Producto';
@@ -152,12 +188,23 @@
       document.getElementById('form-product-available').checked = prod.available !== false;
     } else {
       if (titleEl) titleEl.textContent = 'Nuevo Producto';
-      form.reset();
+      if (form) form.reset();
       document.getElementById('form-product-id').value = '';
       document.getElementById('form-product-available').checked = true;
     }
 
-    modal.classList.add('active');
+    updateProductFormLivePreview();
+    listSec.style.display = 'none';
+    formSec.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeProductFormView() {
+    const listSec = document.getElementById('products-list-section');
+    const formSec = document.getElementById('product-form-page-section');
+    if (formSec) formSec.style.display = 'none';
+    if (listSec) listSec.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function editProduct(id) {
@@ -211,7 +258,7 @@
     try {
       await window.AdminApi.saveProduct(productData, isEdit, id);
       window.showToast(isEdit ? 'Producto actualizado' : 'Producto creado con éxito', 'success');
-      document.getElementById('product-modal').classList.remove('active');
+      closeProductFormView();
       await fetchProducts();
     } catch (err) {
       console.warn('Fallback guardado local:', err);
@@ -222,7 +269,7 @@
         window.AdminState.allProducts.unshift({ id: 'prod-' + Date.now(), ...productData });
       }
       applyProductFilters();
-      document.getElementById('product-modal').classList.remove('active');
+      closeProductFormView();
       window.showToast('Guardado en la sesión activa', 'info');
     }
   }
@@ -232,8 +279,11 @@
   window.applyProductFilters = applyProductFilters;
   window.renderProducts = renderProducts;
   window.openProductModal = openProductModal;
+  window.closeProductFormView = closeProductFormView;
+  window.updateProductFormLivePreview = updateProductFormLivePreview;
   window.editProduct = editProduct;
   window.confirmDeleteProduct = confirmDeleteProduct;
   window.handleProductFormSubmit = handleProductFormSubmit;
 
 })();
+

@@ -50,12 +50,18 @@
   margin: 0;
 }
 
-/* 2. METRICS GRID */
+/* 2. METRICS GRID (8 TARJETAS TOTALMENTE UNIFORMES) */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .metric-card {
@@ -64,17 +70,18 @@
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);
-  padding: 22px 16px;
+  padding: 20px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 10px;
+  gap: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   transition: all var(--transition-fast);
   position: relative;
   overflow: hidden;
+  min-height: 148px;
 }
 
 .metric-card::before {
@@ -84,13 +91,17 @@
   left: 0;
   right: 0;
   height: 2px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .metric-card.blue::before { background: linear-gradient(90deg, #00f0ff, transparent); }
 .metric-card.orange::before { background: linear-gradient(90deg, #ff7800, transparent); }
 .metric-card.green::before { background: linear-gradient(90deg, #00ff88, transparent); }
 .metric-card.purple::before { background: linear-gradient(90deg, #c084fc, transparent); }
+.metric-card.yellow::before { background: linear-gradient(90deg, #ffb700, transparent); }
+.metric-card.teal::before { background: linear-gradient(90deg, #00e5ff, transparent); }
+.metric-card.pink::before { background: linear-gradient(90deg, #ff2a85, transparent); }
+.metric-card.red::before { background: linear-gradient(90deg, #ff3366, transparent); }
 
 .metric-card:hover {
   background: rgba(28, 17, 54, 0.95);
@@ -102,10 +113,14 @@
 .metric-card.orange { border-color: rgba(255, 120, 0, 0.35); }
 .metric-card.green { border-color: rgba(0, 255, 136, 0.35); }
 .metric-card.purple { border-color: rgba(192, 132, 252, 0.35); }
+.metric-card.yellow { border-color: rgba(255, 183, 0, 0.35); }
+.metric-card.teal { border-color: rgba(0, 229, 255, 0.35); }
+.metric-card.pink { border-color: rgba(255, 42, 133, 0.35); }
+.metric-card.red { border-color: rgba(255, 51, 102, 0.35); }
 
 .metric-icon-wrap {
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -118,6 +133,10 @@
 .metric-icon-wrap.orange { background: rgba(255, 120, 0, 0.15); color: #ff7800; border: 1px solid rgba(255, 120, 0, 0.35); }
 .metric-icon-wrap.green { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.35); }
 .metric-icon-wrap.purple { background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.35); }
+.metric-icon-wrap.yellow { background: rgba(255, 183, 0, 0.15); color: #ffb700; border: 1px solid rgba(255, 183, 0, 0.35); }
+.metric-icon-wrap.teal { background: rgba(0, 229, 255, 0.15); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.35); }
+.metric-icon-wrap.pink { background: rgba(255, 42, 133, 0.15); color: #ff2a85; border: 1px solid rgba(255, 42, 133, 0.35); }
+.metric-icon-wrap.red { background: rgba(255, 51, 102, 0.15); color: #ff3366; border: 1px solid rgba(255, 51, 102, 0.35); }
 
 .soles-badge-icon {
   font-size: 1.25rem;
@@ -147,11 +166,11 @@
 }
 
 .metric-value {
-  font-size: 1.55rem;
+  font-size: 1.45rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.25;
-  margin: 4px 0;
+  margin: 3px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -162,78 +181,6 @@
   font-size: 0.75rem;
   color: #64748b;
   font-weight: 600;
-  text-align: center;
-}
-
-/* 3. SUB METRICS GRID (DELIVERY, LOCAL, CLIENTES, STOCK) */
-.metrics-sub-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
-}
-
-.sub-metric-card {
-  background: rgba(15, 10, 30, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.sub-metric-card:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  background: rgba(24, 16, 46, 0.9);
-}
-
-.sub-metric-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  text-align: center;
-  width: 100%;
-}
-
-.sub-metric-icon {
-  font-size: 1.15rem;
-}
-
-.sub-metric-title {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  text-align: center;
-}
-
-.sub-metric-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  text-align: center;
-  width: 100%;
-}
-
-.sub-metric-val {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #ffffff;
-  text-align: center;
-}
-
-.sub-metric-sum {
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #10b981;
   text-align: center;
 }
 
@@ -486,29 +433,6 @@
     font-size: 0.7rem;
   }
 
-  .metrics-sub-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .sub-metric-card {
-    padding: 10px 12px;
-    border-radius: var(--radius-md);
-  }
-
-  .sub-metric-title {
-    font-size: 0.68rem;
-  }
-
-  .sub-metric-val {
-    font-size: 1rem;
-  }
-
-  .sub-metric-sum {
-    font-size: 0.78rem;
-  }
-
   .dashboard-charts-grid {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -570,7 +494,8 @@
 
   .metric-card {
     padding: 10px 8px;
-    gap: 8px;
+    gap: 6px;
+    min-height: 125px;
   }
 
   .metric-icon-wrap {
@@ -585,23 +510,5 @@
 
   .metric-value {
     font-size: 1.05rem;
-  }
-
-  .metrics-sub-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  .sub-metric-card {
-    padding: 8px 10px;
-  }
-
-  .sub-metric-header {
-    margin-bottom: 4px;
-    gap: 4px;
-  }
-
-  .sub-metric-val {
-    font-size: 0.95rem;
   }
 }

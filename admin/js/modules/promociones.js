@@ -26,6 +26,7 @@
     window.fetchPromociones = fetchPromociones;
     window.renderPromociones = renderPromociones;
     window.openCreatePromotionModal = openCreatePromotionModal;
+    window.closePromotionFormView = closePromotionFormView;
     window.editPromotion = editPromotion;
     window.deletePromotion = deletePromotion;
     window.duplicatePromotion = duplicatePromotion;
@@ -223,13 +224,18 @@
   }
 
   function openCreatePromotionModal() {
-    const modal = document.getElementById('promotion-modal');
-    const titleEl = document.getElementById('promotion-modal-title');
+    const listSec = document.getElementById('promotions-list-section');
+    const formSec = document.getElementById('promotion-form-page-section');
+    const titleEl = document.getElementById('promotion-form-page-title');
     const form = document.getElementById('promotion-form');
-    if (!modal || !form) return;
+
+    const modal = document.getElementById('promotion-modal');
+    if (modal) modal.classList.remove('active');
+
+    if (!formSec || !listSec) return;
 
     if (titleEl) titleEl.textContent = 'Nueva Promoción Comercial';
-    form.reset();
+    if (form) form.reset();
     document.getElementById('promotion-form-id').value = '';
     document.getElementById('promotion-form-image').value = '/imagenes/portada/Portada1E.webp';
     document.getElementById('promotion-form-badge').value = '🔥 OFERTA ESPECIAL';
@@ -238,16 +244,31 @@
     document.getElementById('promotion-form-active').checked = true;
 
     updatePromotionFormPreview();
-    modal.classList.add('active');
+    listSec.style.display = 'none';
+    formSec.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closePromotionFormView() {
+    const listSec = document.getElementById('promotions-list-section');
+    const formSec = document.getElementById('promotion-form-page-section');
+    if (formSec) formSec.style.display = 'none';
+    if (listSec) listSec.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function editPromotion(id) {
     const p = (window.AdminState.allPromociones || []).find(item => item.id === id);
     if (!p) return;
 
+    const listSec = document.getElementById('promotions-list-section');
+    const formSec = document.getElementById('promotion-form-page-section');
+    const titleEl = document.getElementById('promotion-form-page-title');
+
     const modal = document.getElementById('promotion-modal');
-    const titleEl = document.getElementById('promotion-modal-title');
-    if (!modal) return;
+    if (modal) modal.classList.remove('active');
+
+    if (!formSec || !listSec) return;
 
     if (titleEl) titleEl.textContent = 'Editar Promoción';
     document.getElementById('promotion-form-id').value = p.id;
@@ -261,7 +282,9 @@
     document.getElementById('promotion-form-active').checked = p.active !== false;
 
     updatePromotionFormPreview();
-    modal.classList.add('active');
+    listSec.style.display = 'none';
+    formSec.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function selectPromotionPreset(url) {
@@ -310,10 +333,7 @@
     try {
       await window.AdminApi.savePromotion(data, isEdit, id);
       window.showToast(`Promoción ${isEdit ? 'actualizada' : 'creada'} con éxito`, 'success');
-      
-      const modal = document.getElementById('promotion-modal');
-      if (modal) modal.classList.remove('active');
-
+      closePromotionFormView();
       await fetchPromociones();
     } catch (err) {
       console.error('Error al guardar promoción:', err);
@@ -326,10 +346,8 @@
       }
       renderPromociones();
       updatePromocionesMetrics();
+      closePromotionFormView();
       window.showToast('Promoción guardada en sesión local', 'info');
-      
-      const modal = document.getElementById('promotion-modal');
-      if (modal) modal.classList.remove('active');
     }
   }
 

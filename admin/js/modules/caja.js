@@ -175,13 +175,33 @@
     }).join('');
   }
 
+  function closeCajaFormViews() {
+    const mainSec = document.getElementById('caja-main-section');
+    const movSec = document.getElementById('caja-movement-form-page-section');
+    const openSec = document.getElementById('caja-open-form-page-section');
+    const closeSec = document.getElementById('caja-close-form-page-section');
+
+    if (movSec) movSec.style.display = 'none';
+    if (openSec) openSec.style.display = 'none';
+    if (closeSec) closeSec.style.display = 'none';
+    if (mainSec) mainSec.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function openCajaMovementModal() {
-    const modal = document.getElementById('caja-movement-modal');
+    const mainSec = document.getElementById('caja-main-section');
+    const movSec = document.getElementById('caja-movement-form-page-section');
     const form = document.getElementById('caja-movement-form');
-    if (modal && form) {
-      form.reset();
-      modal.classList.add('active');
-    }
+
+    const modal = document.getElementById('caja-movement-modal');
+    if (modal) modal.classList.remove('active');
+
+    if (form) form.reset();
+    if (mainSec) mainSec.style.display = 'none';
+    if (movSec) movSec.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function toggleCajaTurno() {
@@ -194,23 +214,38 @@
   }
 
   function openCajaOpenModal() {
+    const mainSec = document.getElementById('caja-main-section');
+    const openSec = document.getElementById('caja-open-form-page-section');
+
     const modal = document.getElementById('caja-open-modal');
-    if (modal) modal.classList.add('active');
+    if (modal) modal.classList.remove('active');
+
+    if (mainSec) mainSec.style.display = 'none';
+    if (openSec) openSec.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function openCajaCloseModal() {
-    const modal = document.getElementById('caja-close-modal');
+    const mainSec = document.getElementById('caja-main-section');
+    const closeSec = document.getElementById('caja-close-form-page-section');
     const expEl = document.getElementById('modal-close-expected');
     const realInput = document.getElementById('modal-close-real-cash');
-    if (modal) {
-      if (expEl) expEl.textContent = document.getElementById('cuadre-esperado')?.textContent || 'S/ 925.00';
-      if (realInput) realInput.value = document.getElementById('input-caja-contado')?.value || '925.00';
-      modal.classList.add('active');
-    }
+
+    const modal = document.getElementById('caja-close-modal');
+    if (modal) modal.classList.remove('active');
+
+    if (expEl) expEl.textContent = document.getElementById('cuadre-esperado')?.textContent || 'S/ 925.00';
+    if (realInput) realInput.value = document.getElementById('input-caja-contado')?.value || '925.00';
+
+    if (mainSec) mainSec.style.display = 'none';
+    if (closeSec) closeSec.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function handleCajaMovementSubmit(e) {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     const data = {
       tipo: document.getElementById('mov-form-tipo').value,
       categoria: document.getElementById('mov-form-categoria').value,
@@ -224,14 +259,14 @@
     try {
       await window.AdminApi.addCajaMovement(data);
       window.showToast('Movimiento registrado con éxito', 'success');
-      document.getElementById('caja-movement-modal').classList.remove('active');
+      closeCajaFormViews();
       await fetchCaja();
     } catch (err) {
       window.AdminState.cajaData = window.AdminState.cajaData || { movements: [] };
       window.AdminState.cajaData.movements = window.AdminState.cajaData.movements || [];
       window.AdminState.cajaData.movements.unshift(data);
       renderCajaView();
-      document.getElementById('caja-movement-modal').classList.remove('active');
+      closeCajaFormViews();
       window.showToast('Movimiento registrado localmente', 'info');
     }
   }
@@ -245,6 +280,7 @@
   window.renderCajaView = renderCajaView;
   window.calcCuadreDifference = calcCuadreDifference;
   window.openCajaMovementModal = openCajaMovementModal;
+  window.closeCajaFormViews = closeCajaFormViews;
   window.toggleCajaTurno = toggleCajaTurno;
   window.openCajaOpenModal = openCajaOpenModal;
   window.openCajaCloseModal = openCajaCloseModal;

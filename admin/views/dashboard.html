@@ -17,10 +17,10 @@
             </div>
           </div>
 
-          <!-- TARJETAS DE MÉTRICAS PRINCIPALES -->
+          <!-- TARJETAS DE MÉTRICAS PRINCIPALES (GRID UNIFICADO DE 8 MÓDULOS UNIFORMES) -->
           <div class="metrics-grid">
             
-            <!-- Ventas del Día -->
+            <!-- 1. Ventas del Día -->
             <div class="metric-card blue">
               <div class="metric-icon-wrap blue">
                 <span class="soles-badge-icon">S/</span>
@@ -32,7 +32,7 @@
               </div>
             </div>
 
-            <!-- Cantidad de Pedidos -->
+            <!-- 2. Cantidad de Pedidos -->
             <div class="metric-card orange">
               <div class="metric-icon-wrap orange">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -44,7 +44,7 @@
               </div>
             </div>
 
-            <!-- Ganancia Neta -->
+            <!-- 3. Ganancia Neta -->
             <div class="metric-card green">
               <div class="metric-icon-wrap green">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -56,7 +56,7 @@
               </div>
             </div>
 
-            <!-- Productos Vendidos -->
+            <!-- 4. Productos Vendidos -->
             <div class="metric-card purple">
               <div class="metric-icon-wrap purple">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m16.5 9.4 4.5-2.8L12 2 3 6.6l4.5 2.8"/><path d="M3 12.5l9 5.5 9-5.5"/><path d="m3 17.5 9 5.5 9-5.5"/></svg>
@@ -68,56 +68,51 @@
               </div>
             </div>
 
-          </div>
-
-          <!-- BLOQUE DE DESGLOSE Y CANALES -->
-          <div class="metrics-sub-grid">
-            
-            <!-- Pedidos por Delivery -->
-            <div class="sub-metric-card">
-              <div class="sub-metric-header">
-                <span class="sub-metric-icon">🛵</span>
-                <span class="sub-metric-title">Pedidos por Delivery</span>
+            <!-- 5. Pedidos por Delivery -->
+            <div class="metric-card yellow">
+              <div class="metric-icon-wrap yellow">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
               </div>
-              <div class="sub-metric-body">
-                <span class="sub-metric-val" id="dash-delivery-count">0 órdenes</span>
-                <span class="sub-metric-sum" id="dash-delivery-total">S/ 0.00</span>
+              <div class="metric-details">
+                <span class="metric-label">Pedidos por Delivery</span>
+                <span class="metric-value" id="dash-delivery-count">0 órdenes</span>
+                <span class="metric-hint" id="dash-delivery-total">Total: S/ 0.00</span>
               </div>
             </div>
 
-            <!-- Pedidos en el Local -->
-            <div class="sub-metric-card">
-              <div class="sub-metric-header">
-                <span class="sub-metric-icon">🍽️</span>
-                <span class="sub-metric-title">Pedidos en el Local</span>
+            <!-- 6. Pedidos en el Local -->
+            <div class="metric-card teal">
+              <div class="metric-icon-wrap teal">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
               </div>
-              <div class="sub-metric-body">
-                <span class="sub-metric-val" id="dash-local-count">0 órdenes</span>
-                <span class="sub-metric-sum" id="dash-local-total">S/ 0.00</span>
-              </div>
-            </div>
-
-            <!-- Clientes Registrados -->
-            <div class="sub-metric-card">
-              <div class="sub-metric-header">
-                <span class="sub-metric-icon">👥</span>
-                <span class="sub-metric-title">Clientes Registrados</span>
-              </div>
-              <div class="sub-metric-body">
-                <span class="sub-metric-val" id="dash-clientes-total">0 clientes</span>
-                <span class="sub-metric-sum" id="dash-clientes-nuevos" style="color: #00ff88;">+0 hoy</span>
+              <div class="metric-details">
+                <span class="metric-label">Pedidos en Local</span>
+                <span class="metric-value" id="dash-local-count">0 órdenes</span>
+                <span class="metric-hint" id="dash-local-total">Total: S/ 0.00</span>
               </div>
             </div>
 
-            <!-- Estado de Stock -->
-            <div class="sub-metric-card">
-              <div class="sub-metric-header">
-                <span class="sub-metric-icon">📦</span>
-                <span class="sub-metric-title">Estado de Stock</span>
+            <!-- 7. Clientes Registrados -->
+            <div class="metric-card pink">
+              <div class="metric-icon-wrap pink">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
-              <div class="sub-metric-body">
-                <span class="sub-metric-val" id="dash-stock-critico" style="color: #ff3366;">0 Agotados</span>
-                <span class="sub-metric-sum" id="dash-stock-normal" style="color: #00f0ff;">0 Normales</span>
+              <div class="metric-details">
+                <span class="metric-label">Clientes Registrados</span>
+                <span class="metric-value" id="dash-clientes-total">0 clientes</span>
+                <span class="metric-hint" id="dash-clientes-nuevos">+0 hoy</span>
+              </div>
+            </div>
+
+            <!-- 8. Estado de Stock -->
+            <div class="metric-card red">
+              <div class="metric-icon-wrap red">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+              </div>
+              <div class="metric-details">
+                <span class="metric-label">Estado de Stock</span>
+                <span class="metric-value" id="dash-stock-critico">0 Agotados</span>
+                <span class="metric-hint" id="dash-stock-normal">20 Normales</span>
               </div>
             </div>
 

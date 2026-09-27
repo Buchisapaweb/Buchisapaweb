@@ -126,9 +126,9 @@
     if (elUnidadesSemana) elUnidadesSemana.textContent = `Semana: ${unitsWeek} un.`;
 
     if (elDeliveryCount) elDeliveryCount.textContent = `${deliveryCount} órdenes`;
-    if (elDeliveryTotal) elDeliveryTotal.textContent = window.AdminUtils.formatSoles(deliveryTotal);
+    if (elDeliveryTotal) elDeliveryTotal.textContent = `Total: ${window.AdminUtils.formatSoles(deliveryTotal)}`;
     if (elLocalCount) elLocalCount.textContent = `${localCount} órdenes`;
-    if (elLocalTotal) elLocalTotal.textContent = window.AdminUtils.formatSoles(localTotal);
+    if (elLocalTotal) elLocalTotal.textContent = `Total: ${window.AdminUtils.formatSoles(localTotal)}`;
     if (elClientesTotal) elClientesTotal.textContent = `${totalCustomersCount} clientes`;
     if (elClientesNuevos) elClientesNuevos.textContent = `+${newCustomersToday} hoy`;
 

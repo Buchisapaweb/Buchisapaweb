@@ -146,29 +146,49 @@
   }
 
   function openCreatePortadaModal() {
-    const modal = document.getElementById('portada-modal');
-    const titleEl = document.getElementById('portada-modal-title');
+    const listSec = document.getElementById('portada-list-section');
+    const formSec = document.getElementById('portada-form-page-section');
+    const titleEl = document.getElementById('portada-form-page-title');
     const form = document.getElementById('portada-form');
-    if (!modal || !form) return;
+
+    const modal = document.getElementById('portada-modal');
+    if (modal) modal.classList.remove('active');
+
+    if (!formSec || !listSec) return;
 
     if (titleEl) titleEl.textContent = 'Nueva Imagen de Portada';
-    form.reset();
+    if (form) form.reset();
     document.getElementById('portada-form-id').value = '';
     document.getElementById('portada-form-image').value = '/imagenes/portada/Portada1E.webp';
     if (document.getElementById('portada-form-image-mobile')) {
       document.getElementById('portada-form-image-mobile').value = '/imagenes/portada/Portada1M.webp';
     }
     updatePortadaFormPreview();
-    modal.classList.add('active');
+    listSec.style.display = 'none';
+    formSec.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closePortadaFormView() {
+    const listSec = document.getElementById('portada-list-section');
+    const formSec = document.getElementById('portada-form-page-section');
+    if (formSec) formSec.style.display = 'none';
+    if (listSec) listSec.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function editPortada(id) {
     const p = (window.AdminState.allPortadas || []).find(item => item.id === id);
     if (!p) return;
 
+    const listSec = document.getElementById('portada-list-section');
+    const formSec = document.getElementById('portada-form-page-section');
+    const titleEl = document.getElementById('portada-form-page-title');
+
     const modal = document.getElementById('portada-modal');
-    const titleEl = document.getElementById('portada-modal-title');
-    if (!modal) return;
+    if (modal) modal.classList.remove('active');
+
+    if (!formSec || !listSec) return;
 
     if (titleEl) titleEl.textContent = 'Editar Portada';
     document.getElementById('portada-form-id').value = p.id;
@@ -185,7 +205,45 @@
     document.getElementById('portada-form-active').checked = p.active !== false;
 
     updatePortadaFormPreview();
-    modal.classList.add('active');
+    listSec.style.display = 'none';
+    formSec.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function handlePortadaFormSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const id = document.getElementById('portada-form-id').value;
+    const isEdit = Boolean(id);
+
+    const data = {
+      title: document.getElementById('portada-form-title').value.trim(),
+      highlight: document.getElementById('portada-form-highlight').value.trim(),
+      badge: document.getElementById('portada-form-badge').value.trim(),
+      image: document.getElementById('portada-form-image').value.trim() || '/imagenes/portada/Portada1E.webp',
+      imageMobile: document.getElementById('portada-form-image-mobile')?.value.trim() || undefined,
+      category: document.getElementById('portada-form-category').value,
+      subtitle: document.getElementById('portada-form-subtitle').value.trim(),
+      buttonText: document.getElementById('portada-form-btn-text').value.trim() || 'PEDIR AHORA',
+      active: document.getElementById('portada-form-active').checked
+    };
+
+    try {
+      await window.AdminApi.savePortada(data, isEdit, id);
+      window.showToast(`Portada ${isEdit ? 'actualizada' : 'creada'} con éxito`, 'success');
+      closePortadaFormView();
+      await fetchPortadas();
+    } catch (err) {
+      console.warn('Fallback guardado local de portada:', err);
+      if (isEdit) {
+        const idx = (window.AdminState.allPortadas || []).findIndex(p => p.id === id);
+        if (idx !== -1) window.AdminState.allPortadas[idx] = { ...window.AdminState.allPortadas[idx], ...data };
+      } else {
+        window.AdminState.allPortadas.push({ id: 'portada-' + Date.now(), ...data });
+      }
+      renderPortadas();
+      closePortadaFormView();
+      window.showToast('Portada guardada en sesión local', 'info');
+    }
   }
 
   function selectPortadaPreset(url, mobileUrl) {
@@ -269,7 +327,9 @@
   window.renderPortadas = renderPortadas;
   window.setPortadaSlide = setPortadaSlide;
   window.openCreatePortadaModal = openCreatePortadaModal;
+  window.closePortadaFormView = closePortadaFormView;
   window.editPortada = editPortada;
+  window.handlePortadaFormSubmit = handlePortadaFormSubmit;
   window.selectPortadaPreset = selectPortadaPreset;
   window.updatePortadaFormPreview = updatePortadaFormPreview;
   window.duplicatePortada = duplicatePortada;

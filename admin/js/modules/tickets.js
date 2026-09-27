@@ -107,6 +107,18 @@
     }).join('');
   }
 
+  function closeTicketViews() {
+    const listSec = document.getElementById('ticket-list-section');
+    const formSec = document.getElementById('ticket-form-page-section');
+    const prevSec = document.getElementById('ticket-preview-page-section');
+
+    if (formSec) formSec.style.display = 'none';
+    if (prevSec) prevSec.style.display = 'none';
+    if (listSec) listSec.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function previewThermalTicket(id) {
     const ticket = (window.AdminState.allTickets || []).find(t => t.id === id);
     if (!ticket) return;
@@ -114,8 +126,18 @@
     window.AdminState.activePreviewTicket = ticket;
     renderThermalReceiptHTML(ticket);
 
-    const modal = document.getElementById('ticket-preview-modal');
-    if (modal) modal.classList.add('active');
+    const listSec = document.getElementById('ticket-list-section');
+    const formSec = document.getElementById('ticket-form-page-section');
+    const prevSec = document.getElementById('ticket-preview-page-section');
+    const titleEl = document.getElementById('ticket-preview-page-title');
+
+    if (titleEl) titleEl.textContent = `Ticket de Venta ${ticket.number || '#TK-0000'}`;
+
+    if (listSec) listSec.style.display = 'none';
+    if (formSec) formSec.style.display = 'none';
+    if (prevSec) prevSec.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function previewThermalTicketFromOrder(orderId) {
@@ -135,8 +157,19 @@
     };
 
     renderThermalReceiptHTML(ticketLike);
-    const modal = document.getElementById('ticket-preview-modal');
-    if (modal) modal.classList.add('active');
+
+    const listSec = document.getElementById('ticket-list-section');
+    const formSec = document.getElementById('ticket-form-page-section');
+    const prevSec = document.getElementById('ticket-preview-page-section');
+    const titleEl = document.getElementById('ticket-preview-page-title');
+
+    if (titleEl) titleEl.textContent = `Ticket de Pedido #${order.orderNumber || order.id}`;
+
+    if (listSec) listSec.style.display = 'none';
+    if (formSec) formSec.style.display = 'none';
+    if (prevSec) prevSec.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function renderThermalReceiptHTML(t) {
@@ -209,9 +242,10 @@
   }
 
   function openNewTicketModal() {
-    const modal = document.getElementById('new-ticket-modal');
+    const listSec = document.getElementById('ticket-list-section');
+    const formSec = document.getElementById('ticket-form-page-section');
+    const prevSec = document.getElementById('ticket-preview-page-section');
     const select = document.getElementById('ticket-form-product-select');
-    if (!modal) return;
 
     if (select) {
       const prods = window.AdminState.allProducts || [];
@@ -222,8 +256,63 @@
       `).join('');
     }
 
-    modal.classList.add('active');
+    if (listSec) listSec.style.display = 'none';
+    if (prevSec) prevSec.style.display = 'none';
+    if (formSec) formSec.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  function handleNewTicketSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const customer = document.getElementById('ticket-form-customer')?.value.trim() || 'Cliente Mostrador';
+    const type = document.getElementById('ticket-form-type')?.value || 'pickup';
+    const payment = document.getElementById('ticket-form-payment')?.value || 'Efectivo';
+    const prodSelect = document.getElementById('ticket-form-product-select');
+    const selectedOption = prodSelect?.options[prodSelect.selectedIndex];
+    const qty = parseInt(document.getElementById('ticket-form-quantity')?.value) || 1;
+    const unitPrice = parseFloat(document.getElementById('ticket-form-unit-price')?.value) || 18.00;
+
+    const prodName = selectedOption ? selectedOption.text.split(' - S/')[0] : 'Plato BuchiSapa';
+
+    const count = (window.AdminState.allTickets || []).length + 1;
+    const newNum = `#TK-${String(count).padStart(4, '0')}`;
+
+    const newTicket = {
+      id: `tk-${Date.now()}`,
+      number: newNum,
+      created_at: new Date().toISOString(),
+      customer: customer,
+      type: type,
+      payment: payment,
+      items: [{ name: prodName, qty: qty, price: unitPrice }],
+      subtotal: qty * unitPrice,
+      deliveryFee: type === 'delivery' ? 5 : 0,
+      total: (qty * unitPrice) + (type === 'delivery' ? 5 : 0),
+      status: 'Emitido'
+    };
+
+    window.AdminState.allTickets = window.AdminState.allTickets || [];
+    window.AdminState.allTickets.unshift(newTicket);
+
+    filterTickets();
+    closeTicketViews();
+    window.showToast(`Ticket ${newNum} emitido con éxito. Imprimiendo...`, 'success');
+  }
+
+  // Event listener para el formulario
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('new-ticket-form');
+    if (form) {
+      form.addEventListener('submit', handleNewTicketSubmit);
+    }
+    const printBtn = document.getElementById('btn-print-active-ticket');
+    if (printBtn) {
+      printBtn.addEventListener('click', () => {
+        window.showToast('Enviando ticket a la impresora térmica 80mm...', 'success');
+      });
+    }
+  });
 
   // Bindings
   window.fetchTickets = fetchTickets;
@@ -233,5 +322,8 @@
   window.previewThermalTicketFromOrder = previewThermalTicketFromOrder;
   window.testThermalPrinter = testThermalPrinter;
   window.openNewTicketModal = openNewTicketModal;
+  window.closeTicketViews = closeTicketViews;
+  window.handleNewTicketSubmit = handleNewTicketSubmit;
 
 })();
+
