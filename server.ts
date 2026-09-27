@@ -73,6 +73,10 @@ import {
   getProductById,
   getSauces,
   getPromotions,
+  createPromotion,
+  updatePromotion,
+  deletePromotion,
+  reorderPromotions,
   getOrders,
   getOrderById,
   createOrder,
@@ -487,14 +491,60 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  // Get promotions
+  // Get promotions (include inactive when ?all=true)
   app.get('/api/promotions', async (req: Request, res: Response) => {
     try {
-      const promotions = await getPromotions();
+      const includeAll = req.query.all === 'true';
+      const promotions = await getPromotions(includeAll);
       res.json({ success: true, data: promotions });
     } catch (error: any) {
       console.error('Error fetching promotions:', error);
       res.status(500).json({ success: false, error: error.message || 'Error fetching promotions' });
+    }
+  });
+
+  app.post(['/api/promotions', '/api/admin/promotions'], async (req: Request, res: Response) => {
+    try {
+      const promo = await createPromotion(req.body);
+      res.json({ success: true, data: promo });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.put(['/api/promotions/:id', '/api/admin/promotions/:id'], async (req: Request, res: Response) => {
+    try {
+      const promoId = req.params.id as string;
+      const promo = await updatePromotion(promoId, req.body);
+      if (!promo) {
+        return res.status(404).json({ success: false, error: 'Promoción no encontrada' });
+      }
+      res.json({ success: true, data: promo });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.delete(['/api/promotions/:id', '/api/admin/promotions/:id'], async (req: Request, res: Response) => {
+    try {
+      const promoId = req.params.id as string;
+      const success = await deletePromotion(promoId);
+      res.json({ success });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.post(['/api/promotions/reorder', '/api/admin/promotions/reorder'], async (req: Request, res: Response) => {
+    try {
+      const { ids } = req.body;
+      if (!Array.isArray(ids)) {
+        return res.status(400).json({ success: false, error: 'Lista de IDs requerida' });
+      }
+      const promos = await reorderPromotions(ids);
+      res.json({ success: true, data: promos });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
   });
 

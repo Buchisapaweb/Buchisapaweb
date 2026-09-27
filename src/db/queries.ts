@@ -37,6 +37,10 @@ export interface Promotion {
   originalPrice: number;
   image: string;
   badge: string;
+  active?: boolean;
+  order?: number;
+  features?: string[];
+  createdAt?: string;
 }
 
 export interface Order {
@@ -703,32 +707,115 @@ const initialProducts: Product[] = [
 ];
 
 // 4. PROMOCIONES
+const PROMOTIONS_FILE = path.join(process.cwd(), 'data', 'promociones.json');
+
 const initialPromotions: Promotion[] = [
   {
     id: 'promo-1',
     title: 'Combo Familiar Amazónico',
-    description: '1 Juane + 1 Tacacho con Cecina + 1/4 Pollo Broaster + 2 Refrescos de Cocona',
+    description: '1 Juane Tradicional + 1 Tacacho con Cecina + 1/4 Pollo Broaster + 2 Refrescos de Cocona helados',
     price: 45.00,
-    originalPrice: 55.00,
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
-    badge: 'POPULAR'
+    originalPrice: 58.00,
+    image: '/imagenes/portada/Portada2E.webp',
+    badge: '🔥 MÁS PEDIDO',
+    active: true,
+    order: 1,
+    features: [
+      '✦ 1 Juane Tradicional en hoja de bijao',
+      '🌴 Tacacho artesanal con cecina ahumada',
+      '🍗 1/4 Pollo Broaster crujiente',
+      '🍹 2 Refrescos de Cocona natural'
+    ],
+    createdAt: new Date().toISOString()
   },
   {
     id: 'promo-2',
-    title: 'Dúo Broaster Crocante',
-    description: '2 Porciones de 1/4 Broaster (Pecho y Pierna) + Papas familiares + 2 Gaseosas',
+    title: 'Dúo Broaster Ultra Crunch',
+    description: '2 Porciones de 1/4 Broaster (Pecho y Pierna) + Gran porción de Papas Nativas + Cremas Caseras + 2 Gaseosas 500ml',
     price: 32.00,
-    originalPrice: 38.00,
-    image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80',
-    badge: 'OFERTA'
+    originalPrice: 40.00,
+    image: '/imagenes/portada/Portada1E.webp',
+    badge: '✨ OFERTA DÚO',
+    active: true,
+    order: 2,
+    features: [
+      '🍗 2 Presas de Pollo Broaster crocante',
+      '🍟 Porción generosa de Papas Nativas',
+      '🤍 Cremas caseras de la casa',
+      '🥤 2 Gaseosas 500ml heladas'
+    ],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'promo-3',
+    title: 'Trío Burger & Alitas Fest',
+    description: '2 Hamburguesas Clásicas Artesanales + 6 Alitas Broaster BBQ + Papas Fritas Familiares + Gaseosa 1.5L',
+    price: 42.00,
+    originalPrice: 52.00,
+    image: '/imagenes/portada/Portada3E.webp',
+    badge: '🍔 COMBO FEST',
+    active: true,
+    order: 3,
+    features: [
+      '🍔 2 Hamburguesas de pura carne seleccionada',
+      '🍗 6 Alitas Broaster en salsa BBQ',
+      '🍟 Papas fritas doradas tamaño familiar',
+      '🥤 Gaseosa grande de 1.5L'
+    ],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'promo-4',
+    title: 'Banquete Amazónico BuchiSapa',
+    description: '1 Hamburguesa Amazónica (cecina + plátano bellaco) + 1 Porción de Patacones con Cecina + 1 Refresco de Camu Camu',
+    price: 28.00,
+    originalPrice: 36.00,
+    image: '/imagenes/portada/Portada4E.webp',
+    badge: '🌴 100% REGIONAL',
+    active: true,
+    order: 4,
+    features: [
+      '🍔 Hamburguesa Amazónica especial',
+      '🌴 Crujientes patacones con cecina ahumada',
+      '🔥 Ají de cocona con charapita',
+      '🍹 Refresco natural de Camu Camu'
+    ],
+    createdAt: new Date().toISOString()
   }
 ];
+
+function loadPromotionsFromDisk(): Promotion[] {
+  try {
+    if (fs.existsSync(PROMOTIONS_FILE)) {
+      const raw = fs.readFileSync(PROMOTIONS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn('No se pudo cargar promociones de disco, usando iniciales:', err);
+  }
+  return [...initialPromotions];
+}
+
+function savePromotionsToDisk() {
+  try {
+    const dir = path.dirname(PROMOTIONS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(PROMOTIONS_FILE, JSON.stringify(promotionsStore, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error al guardar promociones en disco:', err);
+  }
+}
 
 // IN-MEMORY STORES
 const categoriesStore = [...initialCategories];
 let productsStore = [...initialProducts];
 const saucesStore = [...initialSauces];
-const promotionsStore = [...initialPromotions];
+let promotionsStore: Promotion[] = loadPromotionsFromDisk();
 const ordersStore: Order[] = [
   {
     id: 'ORD-1001',
@@ -775,8 +862,69 @@ export async function getSauces(): Promise<Sauce[]> {
   return saucesStore;
 }
 
-export async function getPromotions(): Promise<Promotion[]> {
-  return promotionsStore;
+export async function getPromotions(includeInactive = false): Promise<Promotion[]> {
+  let list = [...promotionsStore];
+  if (!includeInactive) {
+    list = list.filter(p => p.active !== false);
+  }
+  return list.sort((a, b) => (a.order || 0) - (b.order || 0));
+}
+
+export async function getPromotionById(id: string): Promise<Promotion | null> {
+  const p = promotionsStore.find(item => item.id === id);
+  return p || null;
+}
+
+export async function createPromotion(data: Partial<Promotion>): Promise<Promotion> {
+  const newPromo: Promotion = {
+    id: data.id || `promo-${Date.now()}`,
+    title: data.title || 'NUEVA PROMOCIÓN',
+    description: data.description || 'Promoción especial BuchiSapa',
+    price: Number(data.price) || 0,
+    originalPrice: Number(data.originalPrice) || Number(data.price) || 0,
+    image: data.image || '/imagenes/portada/Portada1E.webp',
+    badge: data.badge || '🔥 OFERTA',
+    active: data.active !== undefined ? data.active : true,
+    order: data.order !== undefined ? data.order : promotionsStore.length + 1,
+    features: Array.isArray(data.features) ? data.features : (typeof data.features === 'string' ? (data.features as string).split('\n').filter(Boolean) : ['✦ CALIDAD BUCHISAPA', '🔥 PREPARADO AL MOMENTO']),
+    createdAt: new Date().toISOString()
+  };
+
+  promotionsStore.push(newPromo);
+  savePromotionsToDisk();
+  return newPromo;
+}
+
+export async function updatePromotion(id: string, data: Partial<Promotion>): Promise<Promotion | null> {
+  const index = promotionsStore.findIndex(item => item.id === id);
+  if (index === -1) return null;
+
+  const current = promotionsStore[index];
+  promotionsStore[index] = {
+    ...current,
+    ...data,
+    price: data.price !== undefined ? Number(data.price) : current.price,
+    originalPrice: data.originalPrice !== undefined ? Number(data.originalPrice) : current.originalPrice,
+    id // preserve id
+  };
+  savePromotionsToDisk();
+  return promotionsStore[index];
+}
+
+export async function deletePromotion(id: string): Promise<boolean> {
+  const initialLength = promotionsStore.length;
+  promotionsStore = promotionsStore.filter(item => item.id !== id);
+  savePromotionsToDisk();
+  return promotionsStore.length < initialLength;
+}
+
+export async function reorderPromotions(orderedIds: string[]): Promise<Promotion[]> {
+  orderedIds.forEach((id, index) => {
+    const p = promotionsStore.find(item => item.id === id);
+    if (p) p.order = index + 1;
+  });
+  savePromotionsToDisk();
+  return promotionsStore.sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 
 export async function getOrders(status?: string, email?: string): Promise<Order[]> {

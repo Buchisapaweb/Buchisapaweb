@@ -588,6 +588,110 @@
         </div>
       </form>
     </div>
+  <!-- ====================================================================
+       MODAL: CREAR / EDITAR PROMOCIÓN COMERCIAL
+       ==================================================================== -->
+  <div class="modal-overlay" id="promotion-modal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="promotion-modal-title" class="modal-title-white">Nueva Promoción Comercial</h3>
+          <p class="modal-subtitle-text">Configura el título, precios de oferta, foto y detalles del combo</p>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="document.getElementById('promotion-modal').classList.remove('active')" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="promotion-form">
+        <input type="hidden" id="promotion-form-id">
+
+        <div class="modal-body">
+          <!-- Vista previa de la promoción -->
+          <div class="modal-preview-container" style="display: flex; gap: 14px; background: #0b0f19; padding: 12px; border-radius: 12px; border: 1px solid var(--border-subtle); align-items: center; margin-bottom: 16px;">
+            <img id="promotion-form-preview-img" src="/imagenes/portada/Portada1E.webp" alt="Preview" style="width: 100px; height: 75px; object-fit: cover; border-radius: 8px;">
+            <div style="flex: 1;">
+              <h5 id="promotion-form-preview-title" style="color: #fff; font-size: 0.95rem; font-weight: 800; margin: 0 0 4px;">COMBO BUCHISAPA</h5>
+              <div id="promotion-form-preview-price" style="font-size: 1.1rem; font-weight: 900; color: #ef4444;">S/ 35.00 <span style="text-decoration: line-through; color: #94a3b8; font-size: 0.8rem; margin-left: 6px;">S/ 45.00</span></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+              <label class="form-label" for="promotion-form-title">Título de la Promoción *</label>
+              <input type="text" class="form-input" id="promotion-form-title" required placeholder="Ej. Combo Familiar Amazónico" oninput="window.updatePromotionFormPreview()">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="promotion-form-badge">Etiqueta (Badge)</label>
+              <input type="text" class="form-input" id="promotion-form-badge" placeholder="Ej. 🔥 MÁS PEDIDO">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="promotion-form-price">Precio de Oferta (S/) *</label>
+              <input type="number" step="0.5" class="form-input" id="promotion-form-price" required placeholder="45.00" oninput="window.updatePromotionFormPreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="promotion-form-original-price">Precio Regular / Anterior (S/)</label>
+              <input type="number" step="0.5" class="form-input" id="promotion-form-original-price" placeholder="58.00" oninput="window.updatePromotionFormPreview()">
+              <span class="text-muted-xs">Aparecerá tachado para resaltar el ahorro del cliente.</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="promotion-form-description">Descripción de lo que incluye *</label>
+            <textarea class="form-textarea" id="promotion-form-description" rows="2" required placeholder="Ej. 1 Juane Tradicional + 1 Tacacho con Cecina + 1/4 Pollo Broaster + 2 Refrescos de Cocona helados"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="promotion-form-image">URL de la Imagen *</label>
+            <input type="text" class="form-input" id="promotion-form-image" required placeholder="Ej. /imagenes/portada/Portada2E.webp" oninput="window.updatePromotionFormPreview()">
+          </div>
+
+          <!-- Sugerencias locales rápidas -->
+          <div class="form-group mt-neg6">
+            <label class="form-label text-muted-sm">Sugerencias de imágenes disponibles:</label>
+            <div class="portada-preset-thumbs">
+              <div class="portada-preset-item" onclick="window.selectPromotionPreset('/imagenes/portada/Portada1E.webp')" title="Broaster">
+                <img src="/imagenes/portada/Portada1E.webp" alt="Broaster">
+              </div>
+              <div class="portada-preset-item" onclick="window.selectPromotionPreset('/imagenes/portada/Portada2E.webp')" title="Juane / Selva">
+                <img src="/imagenes/portada/Portada2E.webp" alt="Juane">
+              </div>
+              <div class="portada-preset-item" onclick="window.selectPromotionPreset('/imagenes/portada/Portada3E.webp')" title="Hamburguesas">
+                <img src="/imagenes/portada/Portada3E.webp" alt="Burger">
+              </div>
+              <div class="portada-preset-item" onclick="window.selectPromotionPreset('/imagenes/portada/Portada4E.webp')" title="Amazónica">
+                <img src="/imagenes/portada/Portada4E.webp" alt="Amazónica">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="promotion-form-features">Detalles en Viñetas (Una por línea)</label>
+            <textarea class="form-textarea" id="promotion-form-features" rows="3" placeholder="✦ 1 Juane Tradicional en hoja de bijao&#10;🌴 Tacacho artesanal con cecina ahumada&#10;🍗 1/4 Pollo Broaster crujiente&#10;🍹 2 Refrescos de Cocona natural"></textarea>
+            <span class="text-muted-xs">Se mostrarán como etiquetas resaltadas en la tarjeta de la tienda.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-checkbox-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+              <input type="checkbox" id="promotion-form-active" checked style="width: 18px; height: 18px; accent-color: var(--accent-orange);">
+              <span style="color: #fff; font-weight: 700; font-size: 0.88rem;">Promoción Activa (Visible inmediatamente para clientes)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('promotion-modal').classList.remove('active')">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Guardar Promoción
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- CONTENEDOR DE ALERTAS TOAST -->

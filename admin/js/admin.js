@@ -97,6 +97,7 @@
         window.fetchCaja?.(),
         window.fetchTickets?.(),
         window.fetchPortadas?.(),
+        window.fetchPromociones?.(),
         window.fetchSupplies?.(),
         window.fetchUtensils?.()
       ]);

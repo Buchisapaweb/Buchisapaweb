@@ -75,6 +75,7 @@ export function compileHtml() {
     'VIEW_CAJA': 'admin/views/caja.html',
     'VIEW_TICKET': 'admin/views/ticket.html',
     'VIEW_PORTADA': 'admin/views/portada.html',
+    'VIEW_PROMOCIONES': 'admin/views/promociones.html',
     'VIEW_INSUMOS': 'admin/views/insumos.html',
     'VIEW_UTENSILIOS': 'admin/views/utensilios.html',
     'VIEW_DELIVERY': 'admin/views/delivery.html',

@@ -294,6 +294,8 @@
     currentPortadaSlide: 0,
     portadaPreviewInterval: null,
     currentPortadaFilter: 'all',
+    allPromociones: [],
+    currentPromocionesFilter: 'all',
     defaultSignatureProducts: defaultSignatureProducts
   };
 

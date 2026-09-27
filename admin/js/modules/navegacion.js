@@ -42,6 +42,11 @@
       desc: 'Gestión de diapositivas del carrusel de la tienda web',
       button: { text: '+ Agregar Portada', action: () => window.openCreatePortadaModal() }
     },
+    'promociones': {
+      title: 'Promociones y Ofertas',
+      desc: 'Combos con descuento y promociones especiales para clientes',
+      button: { text: '+ Nueva Promoción', action: () => window.openCreatePromotionModal() }
+    },
     'insumos': {
       title: 'Insumos de Cocina',
       desc: 'Control de inventario de materia prima y stock crítico',

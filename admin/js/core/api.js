@@ -361,6 +361,41 @@
       const res = await fetch(`/api/portadas/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Error al eliminar portada');
       return await res.json();
+    },
+
+    // PROMOCIONES
+    async getPromotions(all = true) {
+      const res = await fetch(`/api/promotions${all ? '?all=true' : ''}`);
+      if (!res.ok) throw new Error('Error al cargar promociones');
+      return await res.json();
+    },
+
+    async savePromotion(promoData, isEdit = false, id = null) {
+      const url = isEdit ? `/api/promotions/${id}` : '/api/promotions';
+      const method = isEdit ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(promoData)
+      });
+      if (!res.ok) throw new Error('Error al guardar promoción');
+      return await res.json();
+    },
+
+    async deletePromotion(id) {
+      const res = await fetch(`/api/promotions/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al eliminar promoción');
+      return await res.json();
+    },
+
+    async reorderPromotions(ids) {
+      const res = await fetch('/api/promotions/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids })
+      });
+      if (!res.ok) throw new Error('Error al reordenar promociones');
+      return await res.json();
     }
   };
 

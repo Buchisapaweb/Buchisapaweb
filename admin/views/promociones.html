@@ -1,0 +1,127 @@
+        <!-- ====================================================================
+             VISTA PROMOCIONES (CONTROL Y GESTIÓN DE OFERTAS Y COMBOS)
+             ==================================================================== -->
+        <section class="admin-view" id="view-promociones">
+          <div class="section-panel">
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+              <div>
+                <h3 class="panel-title">Control de Promociones y Ofertas Especiales</h3>
+                <p class="panel-description">Crea, edita, pausa o elimina combos con descuento que se mostrarán en la tienda de clientes.</p>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="/#promociones-section" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                  <span>Ver Ofertas en Vivo ↗</span>
+                </a>
+                <button class="btn btn-primary btn-sm" onclick="window.openCreatePromotionModal()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  <span>+ Nueva Promoción</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Métricas de Promociones -->
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-icon-wrap orange">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Total Promociones</span>
+                  <span class="metric-value" id="promo-metric-total">4</span>
+                  <span class="metric-hint">Combos registrados</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap green">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Activas en Web</span>
+                  <span class="metric-value" id="promo-metric-active">4</span>
+                  <span class="metric-hint">Visibles para pedir hoy</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap amber">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Ahorro Promedio</span>
+                  <span class="metric-value" id="promo-metric-savings">S/ 10.00</span>
+                  <span class="metric-hint">Por cada combo</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon-wrap blue">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
+                <div class="metric-details">
+                  <span class="metric-label">Integración Directa</span>
+                  <span class="metric-value">Al Carrito</span>
+                  <span class="metric-hint">Pedido inmediato con 1 clic</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTROLES, FILTROS Y PLANTILLAS RÁPIDAS -->
+            <div style="margin-top: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h4 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>🏷️ Listado de Promociones Vigentes</span>
+                    <span style="font-size: 0.72rem; background: rgba(255, 98, 0, 0.2); color: var(--accent-orange); padding: 2px 8px; border-radius: 9999px; border: 1px solid rgba(255, 98, 0, 0.4);">Control Total</span>
+                  </h4>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0;">
+                    Agrega, edita precios, pausa temporalmente o elimina ofertas. Cualquier cambio se refleja de inmediato en la tienda online.
+                  </p>
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button class="btn btn-secondary btn-sm" onclick="window.duplicatePromotion(window.AdminState.allPromociones[0]?.id)" title="Duplicar primera promoción">
+                    <span>📋 Duplicar Primera</span>
+                  </button>
+                  <button class="btn btn-primary btn-sm" onclick="window.openCreatePromotionModal()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                    <span>+ Nueva Promoción</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- BARRA DE FILTROS Y PLANTILLAS RÁPIDAS -->
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 14px; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 16px;">
+                <!-- Filtros por estado -->
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn btn-sm btn-secondary promo-filter-btn active" data-filter="all" onclick="window.filterPromotions('all')">
+                    Todas
+                  </button>
+                  <button class="btn btn-sm btn-secondary promo-filter-btn" data-filter="active" onclick="window.filterPromotions('active')">
+                    Activas
+                  </button>
+                  <button class="btn btn-sm btn-secondary promo-filter-btn" data-filter="inactive" onclick="window.filterPromotions('inactive')">
+                    Pausadas
+                  </button>
+                </div>
+
+                <!-- Plantillas con un solo clic -->
+                <div class="preset-chips-row">
+                  <span class="preset-chips-label">Añadir plantilla rápida:</span>
+                  <button class="btn btn-secondary btn-preset-chip" onclick="window.quickAddPromotionPreset('familiar')">🍗 + Familiar</button>
+                  <button class="btn btn-secondary btn-preset-chip" onclick="window.quickAddPromotionPreset('duo')">✨ + Dúo Broaster</button>
+                  <button class="btn btn-secondary btn-preset-chip" onclick="window.quickAddPromotionPreset('burger')">🍔 + Burger Fest</button>
+                  <button class="btn btn-secondary btn-preset-chip" onclick="window.quickAddPromotionPreset('amazonica')">🌴 + Banquete Selva</button>
+                  <button class="btn btn-secondary btn-preset-chip" onclick="window.quickAddPromotionPreset('alitas')">🔥 + Alitas Party</button>
+                  <button class="btn btn-secondary btn-preset-chip" onclick="window.quickAddPromotionPreset('salchipapa')">🍟 + Super Salchipapa</button>
+                </div>
+              </div>
+
+              <!-- CONTENEDOR DE TARJETAS DE PROMOCIONES -->
+              <div class="promociones-admin-grid" id="promociones-grid-container">
+                <!-- Render dinámico vía promociones.js -->
+              </div>
+            </div>
+
+          </div>
+        </section>
