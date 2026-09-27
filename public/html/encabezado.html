@@ -1,4 +1,35 @@
 <!-- HEADER NAVEGACIÓN Y BÚSQUEDA OFICIAL BUCHISAPA -->
+<script>
+  if (typeof window.toggleMobileMenu !== 'function') {
+    window.toggleMobileMenu = function(forceState) {
+      var backdrop = document.getElementById('mobile-menu-backdrop');
+      if (!backdrop) return;
+      var isOpen = backdrop.classList.contains('active') || backdrop.classList.contains('open') || backdrop.style.display === 'flex';
+      var shouldOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
+      if (shouldOpen) {
+        backdrop.style.display = 'flex';
+        void backdrop.offsetWidth;
+        backdrop.classList.add('active', 'open');
+        document.body.style.overflow = 'hidden';
+        if (window.BuchisapaCart && typeof window.BuchisapaCart.getItemsCount === 'function') {
+          var countEl = document.getElementById('drawer-cart-count');
+          if (countEl) countEl.textContent = String(window.BuchisapaCart.getItemsCount());
+        }
+      } else {
+        backdrop.classList.remove('active', 'open');
+        setTimeout(function() {
+          if (!backdrop.classList.contains('active') && !backdrop.classList.contains('open')) {
+            backdrop.style.display = 'none';
+          }
+        }, 280);
+        document.body.style.overflow = '';
+      }
+    };
+    window.openMobileMenu = function() { window.toggleMobileMenu(true); };
+    window.closeMobileDrawer = function() { window.toggleMobileMenu(false); };
+    window.closeMobileMenu = function() { window.toggleMobileMenu(false); };
+  }
+</script>
 <header class="site-header">
   <div class="container header-nav">
     

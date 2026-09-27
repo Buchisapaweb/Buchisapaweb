@@ -2478,7 +2478,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use('/admin', express.static(path.join(process.cwd(), 'admin'), staticOptions));
 
   // 4. Servir HTML Compilado del Panel de Administración para /admin y cualquier subruta (/admin/dashboard, /admin/productos, etc.)
-  app.get(['/admin', '/admin/*', '/admin.html'], (req: Request, res: Response, next) => {
+  app.get(['/admin', '/admin.html', /^\/admin(?:\/.*)?$/], (req: Request, res: Response, next) => {
     // Si la petición solicita un archivo específico con extensión (.css, .js, .png, etc.) que no existe, pasar al siguiente handler
     if (path.extname(req.path)) {
       return next();
@@ -2596,7 +2596,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   });
 
   // Fallback a index.html para SPA/rutas directas
-  app.get('*all', (req: Request, res: Response) => {
+  app.get(/.*/, (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');

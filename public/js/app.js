@@ -2536,8 +2536,12 @@ window.closeCheckoutModal = closeCheckoutModal;
 window.submitOrder = submitOrder;
 
 function openFullMenuModal() {
-  toggleMobileMenu();
-  openFooterInfoModal('carta');
+  if (typeof toggleMobileMenu === 'function') {
+    toggleMobileMenu(false);
+  }
+  if (typeof openFooterInfoModal === 'function') {
+    openFooterInfoModal('carta');
+  }
 }
 
 /* =========================================================
