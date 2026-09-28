@@ -25,12 +25,12 @@ body.preview-ticket-body {
 }
 
 img.ticket-logo {
-  max-width: 100%;
+  max-width: 85%;
   height: auto;
-  width: 125px;
+  width: 220px;
   display: block;
   margin: 0 auto;
-  filter: grayscale(100%) contrast(150%);
+  filter: contrast(130%);
 }
 
 .ticket-wrapper {

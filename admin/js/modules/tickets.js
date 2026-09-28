@@ -772,11 +772,13 @@
               margin-bottom: 6px;
             }
             .ticket-logo-img {
-              width: 140px;
-              max-width: 100%;
+              width: 220px;
+              max-width: 85%;
               height: auto;
               object-fit: contain;
-              filter: contrast(120%);
+              filter: contrast(130%);
+              display: block;
+              margin: 0 auto;
             }
             .ticket-brand-name {
               font-size: 17px;
