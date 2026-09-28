@@ -333,6 +333,17 @@
                         <span class="dropdown-item-check">✓</span>
                       </div>
 
+                      <div class="custom-dropdown-item" data-value="recojo" onclick="window.selectCustomDropdownOption('type', 'recojo', '🛍️', 'Recojo')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">🛍️</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Recojo</span>
+                            <span class="dropdown-item-sub">Para llevar en local</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
                       <div class="custom-dropdown-item" data-value="salon" onclick="window.selectCustomDropdownOption('type', 'salon', '🍽️', 'Salón')">
                         <div class="dropdown-item-content">
                           <span class="dropdown-item-icon">🍽️</span>
@@ -461,11 +472,11 @@
                   <input type="text" class="form-input" id="ticket-form-customer" required placeholder="Ej. Carlos Paredes" value="Cliente">
                 </div>
 
-                <!-- Selector Visual Llamativo: Tipo de Pedido (Salón, Delivery o Recojo en Local) -->
+                <!-- Selector Visual Llamativo: Tipo de Pedido (Salón, Delivery o Recojo en Local) - 1 POR FILA -->
                 <div class="form-group" style="margin-top: 6px;">
                   <label class="form-label">Tipo de Pedido *</label>
                   <input type="hidden" id="ticket-form-type" value="salon" required>
-                  <div class="ticket-visual-option-grid" id="ticket-form-type-selector" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+                  <div class="ticket-visual-option-grid" id="ticket-form-type-selector" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
                     <div class="ticket-visual-card is-selected" data-value="salon" onclick="window.selectTicketFormType('salon', this)">
                       <div class="ticket-visual-card-icon">🍽️</div>
                       <div class="ticket-visual-card-info">

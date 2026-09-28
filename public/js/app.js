@@ -156,7 +156,7 @@ async function initHeroCarousel() {
   startAutoPlay();
 }
 
-function renderDynamicHeroCarousel(portadas) {
+async function renderDynamicHeroCarousel(portadas) {
   const track = document.getElementById('hero-carousel-track');
   const dotsContainer = document.getElementById('carousel-dots-container');
   if (!track || !dotsContainer || !Array.isArray(portadas) || portadas.length === 0) return;
@@ -169,41 +169,71 @@ function renderDynamicHeroCarousel(portadas) {
   const activePortadas = portadas.filter(p => p.active !== false);
   const listToRender = activePortadas.length > 0 ? activePortadas : portadas;
 
-  track.innerHTML = listToRender.map((p, idx) => {
-    const slideNum = p.order || (idx + 1);
-    const ts = p.updatedAt ? new Date(p.updatedAt).getTime() : Date.now();
-    const versionParam = `?v=${ts}`;
+  // Comprobar si las portadas actuales en el DOM ya coinciden exactamente para NO destruir e inyectar el HTML de nuevo
+  const existingSlides = track.querySelectorAll('.carousel-slide');
+  let isIdentical = existingSlides.length === listToRender.length;
 
-    let rawDesktop = (p.image || p.imageDesktop || `/imagenes/portada/Portada${slideNum}E.webp`).split('?')[0];
-    let rawMobile = (p.imageMobile || p.image_mobile || `/imagenes/portada/Portada${slideNum}M.webp` || rawDesktop).split('?')[0];
+  if (isIdentical) {
+    existingSlides.forEach((slide, idx) => {
+      const p = listToRender[idx];
+      const img = slide.querySelector('img');
+      if (!img) { isIdentical = false; return; }
+      const currentSrc = img.getAttribute('src') || '';
+      const slideNum = p.order || (idx + 1);
+      const rawDesktop = (p.image || p.imageDesktop || `/imagenes/portada/Portada${slideNum}E.webp`).split('?')[0];
+      if (!currentSrc.includes(rawDesktop) && !currentSrc.includes(`Portada${slideNum}E.webp`)) {
+        isIdentical = false;
+      }
+    });
+  }
 
-    let desktopImg = `${rawDesktop}${versionParam}`;
-    let mobileImg = `${rawMobile}${versionParam}`;
+  // Solo re-renderizar el DOM si las portadas han cambiado activamente en el panel de administración
+  if (!isIdentical) {
+    const firstP = listToRender[0];
+    const firstNum = firstP.order || 1;
+    const firstRaw = (firstP.image || firstP.imageDesktop || `/imagenes/portada/Portada${firstNum}E.webp`).split('?')[0];
+    try {
+      const preloadImg = new Image();
+      preloadImg.src = firstRaw;
+      if (preloadImg.decode) await preloadImg.decode();
+    } catch (e) {}
 
-    const isFirst = idx === 0;
-    const activeClass = isFirst ? 'active' : '';
+    track.innerHTML = listToRender.map((p, idx) => {
+      const slideNum = p.order || (idx + 1);
+      const ts = p.updatedAt ? new Date(p.updatedAt).getTime() : (p.id || p.order || '20260928');
+      const versionParam = `?v=${ts}`;
 
-    return `
-      <div class="carousel-slide ${activeClass}">
-        <picture class="carousel-slide-picture">
-          <source media="(max-width: 768px)" srcset="${safeStr(mobileImg)}">
-          <source media="(min-width: 769px)" srcset="${safeStr(desktopImg)}">
-          <img 
-            src="${safeStr(desktopImg)}" 
-            alt="Portada BuchiSapa ${slideNum}" 
-            class="carousel-slide-img loaded" 
-            loading="${isFirst ? 'eager' : 'lazy'}" 
-            ${isFirst ? 'fetchpriority="high"' : ''} 
-            decoding="async"
-          >
-        </picture>
-      </div>
-    `;
-  }).join('');
+      let rawDesktop = (p.image || p.imageDesktop || `/imagenes/portada/Portada${slideNum}E.webp`).split('?')[0];
+      let rawMobile = (p.imageMobile || p.image_mobile || `/imagenes/portada/Portada${slideNum}M.webp` || rawDesktop).split('?')[0];
 
-  dotsContainer.innerHTML = listToRender.map((_, idx) => `
-    <span class="carousel-dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></span>
-  `).join('');
+      let desktopImg = `${rawDesktop}${versionParam}`;
+      let mobileImg = `${rawMobile}${versionParam}`;
+
+      const isFirst = idx === 0;
+      const activeClass = isFirst ? 'active' : '';
+
+      return `
+        <div class="carousel-slide ${activeClass}">
+          <picture class="carousel-slide-picture">
+            <source media="(max-width: 768px)" srcset="${safeStr(mobileImg)}">
+            <source media="(min-width: 769px)" srcset="${safeStr(desktopImg)}">
+            <img 
+              src="${safeStr(desktopImg)}" 
+              alt="Portada BuchiSapa ${slideNum}" 
+              class="carousel-slide-img loaded" 
+              loading="${isFirst ? 'eager' : 'lazy'}" 
+              ${isFirst ? 'fetchpriority="high"' : ''} 
+              decoding="${isFirst ? 'sync' : 'async'}"
+            >
+          </picture>
+        </div>
+      `;
+    }).join('');
+
+    dotsContainer.innerHTML = listToRender.map((_, idx) => `
+      <span class="carousel-dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></span>
+    `).join('');
+  }
 
   currentSlideIndex = 0;
   updateCarouselView();

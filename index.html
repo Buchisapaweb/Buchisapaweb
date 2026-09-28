@@ -39,11 +39,11 @@
   <link rel="stylesheet" href="/css/rastreo.css?v=20260926_1">
   <link rel="stylesheet" href="/css/notificaciones.css?v=20260926_1">
   
-  <!-- Preload de Imágenes de Portada en WebP para Carga Ultrarrápida -->
-  <link rel="preload" as="image" href="/imagenes/portada/portada-1.webp" type="image/webp" fetchpriority="high">
-  <link rel="prefetch" as="image" href="/imagenes/portada/portada-2.webp" type="image/webp">
-  <link rel="prefetch" as="image" href="/imagenes/portada/portada-3.webp" type="image/webp">
-  <link rel="prefetch" as="image" href="/imagenes/portada/portada-4.webp" type="image/webp">
+  <!-- Preload de Imágenes de Portada en WebP para Carga Ultrarrápida sin Parpadeos -->
+  <link rel="preload" as="image" href="/imagenes/portada/Portada1M.webp" media="(max-width: 640px)" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="/imagenes/portada/Portada1E.webp" media="(min-width: 641px)" type="image/webp" fetchpriority="high">
+  <link rel="prefetch" as="image" href="/imagenes/portada/Portada2M.webp" media="(max-width: 640px)" type="image/webp">
+  <link rel="prefetch" as="image" href="/imagenes/portada/Portada2E.webp" media="(min-width: 641px)" type="image/webp">
 
   <!-- Tipografía -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
