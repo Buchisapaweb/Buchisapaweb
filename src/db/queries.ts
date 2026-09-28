@@ -1573,6 +1573,15 @@ const initialPortadas: PortadaBanner[] = [
 
 function loadPortadasFromDisk(): PortadaBanner[] {
   try {
+    const targetDir = path.join(process.cwd(), 'public', 'imagenes', 'portada');
+    const p5e = path.join(targetDir, 'Portada5E.webp');
+    const p5m = path.join(targetDir, 'Portada5M.webp');
+    if (fs.existsSync(p5e)) {
+      try {
+        fs.copyFileSync(p5e, p5m);
+      } catch (e) {}
+    }
+
     if (fs.existsSync(PORTADAS_FILE)) {
       const raw = fs.readFileSync(PORTADAS_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
@@ -1627,6 +1636,13 @@ export function savePortadaImageBase64(base64Str: string, slideNumber: number, t
     const fileName = `Portada${slideNumber}${type}.webp`;
     const filePath = path.join(targetDir, fileName);
     fs.writeFileSync(filePath, buffer);
+
+    // Guardar también en la otra versión (E/M) para que tanto móviles como escritorios y tabletas se sincronicen de inmediato
+    const otherType = type === 'E' ? 'M' : 'E';
+    const otherFileName = `Portada${slideNumber}${otherType}.webp`;
+    const otherFilePath = path.join(targetDir, otherFileName);
+    fs.writeFileSync(otherFilePath, buffer);
+
     return `/imagenes/portada/${fileName}`;
   } catch (e) {
     console.error('Error saving portada image:', e);

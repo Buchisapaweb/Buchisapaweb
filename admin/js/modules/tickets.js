@@ -6,6 +6,24 @@
 (function () {
   'use strict';
 
+  function formatTicketNumber(numOrStr) {
+    if (!numOrStr) return 'TK-00001';
+    let str = String(numOrStr).trim();
+    if (str.startsWith('TK-') || str.startsWith('tk-')) {
+      const clean = str.replace(/^tk-/i, '');
+      return `TK-${clean.padStart(5, '0')}`;
+    }
+    if (str.startsWith('#')) {
+      const clean = str.replace(/^#/, '');
+      return `TK-${clean.padStart(5, '0')}`;
+    }
+    const digits = str.replace(/\D/g, '');
+    if (digits) {
+      return `TK-${digits.padStart(5, '0')}`;
+    }
+    return `TK-${str}`;
+  }
+
   async function fetchTickets() {
     const state = window.AdminState = window.AdminState || {};
     try {
@@ -27,12 +45,15 @@
   async function deleteTicket(ticketId) {
     if (!ticketId) return;
     const state = window.AdminState = window.AdminState || {};
-    const targetTicket = (state.allTickets || []).find(t => t.id === ticketId || t.id === `tk-${ticketId}` || String(t.orderNumber) === String(ticketId));
-    const num = targetTicket?.number || (String(ticketId).startsWith('#') ? ticketId : `#${ticketId}`);
-
-    if (!confirm(`¿Estás seguro de eliminar el pedido ${num} y su comprobante por completo?`)) return;
-
-    const rawId = String(ticketId).replace(/^tk-/, '');
+    const targetTicket = (state.allTickets || []).find(t => 
+      t.id === ticketId || 
+      t.id === `tk-${ticketId}` || 
+      String(t.orderNumber) === String(ticketId) ||
+      t.number === ticketId
+    );
+    
+    const num = targetTicket ? formatTicketNumber(targetTicket.number || targetTicket.orderNumber) : formatTicketNumber(ticketId);
+    const rawId = String(ticketId).replace(/^tk-/, '').replace(/^ord-/, '');
     
     // Inmediatamente filtrar del estado local para respuesta instantánea (0ms)
     state.allTickets = (state.allTickets || []).filter(t => 
@@ -41,9 +62,12 @@
       t.id !== rawId && 
       t.id !== `tk-${rawId}` &&
       t.orderId !== rawId && 
+      t.orderId !== ticketId &&
       String(t.orderNumber) !== String(rawId) &&
       String(t.orderNumber) !== String(ticketId) &&
-      t.number !== num
+      t.number !== ticketId &&
+      t.number !== num &&
+      formatTicketNumber(t.number || t.orderNumber) !== num
     );
 
     state.allOrders = (state.allOrders || []).filter(o => 
@@ -51,9 +75,10 @@
       o.id !== `tk-${ticketId}` && 
       o.id !== rawId && 
       o.id !== `ord-${rawId}` &&
+      o.id !== `ord-${ticketId}` &&
       String(o.orderNumber) !== String(rawId) &&
       String(o.orderNumber) !== String(ticketId) &&
-      `#${o.orderNumber}` !== num
+      formatTicketNumber(o.orderNumber) !== num
     );
 
     if (state.allTickets.length === 0) {
@@ -62,20 +87,34 @@
 
     filterTickets();
 
+    // Actualizar pedidos y cocina si las funciones existen
+    if (typeof window.renderAllOrders === 'function') {
+      window.renderAllOrders();
+    }
+    if (typeof window.updateMetricsAndViews === 'function') {
+      window.updateMetricsAndViews();
+    }
+
     // Sincronizar en segundo plano con el servidor
     try {
       if (window.AdminApi && typeof window.AdminApi.deleteTicket === 'function') {
         await window.AdminApi.deleteTicket(ticketId);
+      } else {
+        await fetch(`/api/tickets/${ticketId}`, { method: 'DELETE' }).catch(() => {});
       }
       if (window.AdminApi && typeof window.AdminApi.deleteOrder === 'function') {
         await window.AdminApi.deleteOrder(rawId);
+      } else {
+        await fetch(`/api/orders/${rawId}`, { method: 'DELETE' }).catch(() => {});
       }
     } catch (e) {
       console.warn('Error deleting ticket from API:', e);
     }
 
-    if (window.showToast) {
-      window.showToast(`Pedido ${num} eliminado con éxito`, 'success');
+    if (window.AdminUtils && typeof window.AdminUtils.showToast === 'function') {
+      window.AdminUtils.showToast(`🗑️ Pedido ${num} eliminado correctamente`, 'success');
+    } else if (window.showToast) {
+      window.showToast(`🗑️ Pedido ${num} eliminado correctamente`, 'success');
     }
   }
 
@@ -176,11 +215,27 @@
           ? '<span class="badge badge-blue">🛵 Delivery</span>' 
           : (t.type === 'salon' ? '<span class="badge badge-purple">🍽️ Salón</span>' : '<span class="badge badge-amber">🛍️ Mostrador</span>');
         
+        const numFormatted = formatTicketNumber(t.number || t.orderNumber);
+        const phoneVal = t.phone || t.customerPhone || '';
+        const cleanPhone = phoneVal.replace(/\D/g, '');
+        const waLink = cleanPhone ? `https://wa.me/51${cleanPhone.length === 9 ? cleanPhone : cleanPhone}?text=${encodeURIComponent('Hola ' + (t.customer || 'Cliente') + ', te saludamos de BuchiSapa sobre tu pedido ' + numFormatted + '.')}` : '';
+
         return `
           <tr>
-            <td style="font-weight: 800; color: #ff8c00; font-family: monospace; font-size: 0.95rem;">${t.number}</td>
+            <td style="font-weight: 800; color: #ff8c00; font-family: monospace; font-size: 0.95rem;">${numFormatted}</td>
             <td style="font-size: 0.82rem; color: #94a3b8;">${new Date(t.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-            <td style="font-weight: 700; color: #f8fafc;">${window.AdminUtils.escapeHtml(t.customer || 'Cliente Mostrador')}</td>
+            <td>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-weight: 700; color: #f8fafc;">${window.AdminUtils.escapeHtml(t.customer || 'Cliente Mostrador')}</span>
+                ${cleanPhone ? `
+                  <a href="${waLink}" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; color: #4ade80; font-size: 0.78rem; font-weight: 700; text-decoration: none; width: fit-content;" title="Abrir WhatsApp para coordinar entrega">
+                    <span style="font-size: 0.9rem;">📱</span>
+                    <span>${window.AdminUtils.escapeHtml(phoneVal)}</span>
+                    <span style="font-size: 0.72rem; background: rgba(34,197,94,0.2); padding: 1px 4px; border-radius: 4px;">WhatsApp</span>
+                  </a>
+                ` : ''}
+              </div>
+            </td>
             <td>${typeBadge}</td>
             <td style="color: #cbd5e1;">${t.payment || 'Efectivo'}</td>
             <td style="color: #94a3b8;">${(t.items || []).length} items</td>
@@ -188,6 +243,11 @@
             <td><span class="badge badge-green">✓ ${t.status || 'Emitido'}</span></td>
             <td style="text-align: right;">
               <div style="display: inline-flex; gap: 8px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
+                ${cleanPhone ? `
+                  <a href="${waLink}" target="_blank" class="btn btn-sm" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 800; padding: 6px 10px; border-radius: 8px; background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); color: #4ade80; text-decoration: none;" title="Chatear por WhatsApp">
+                    <span>📲 WhatsApp</span>
+                  </a>
+                ` : ''}
                 <button class="btn btn-secondary btn-sm" onclick="window.previewThermalTicket('${t.id}', 'sale')" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 6px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4); color: #60a5fa;" title="Ver e imprimir Ticket de Venta">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                   <span>Ticket de Venta</span>
@@ -212,18 +272,31 @@
         const typeClass = t.type === 'delivery' ? 'type-delivery' : (t.type === 'salon' ? 'type-salon' : 'type-pickup');
         const typeLabel = t.type === 'delivery' ? '🛵 Delivery' : (t.type === 'salon' ? '🍽️ Salón' : '🛍️ Mostrador');
         const timeStr = new Date(t.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const numFormatted = formatTicketNumber(t.number || t.orderNumber);
+        const phoneVal = t.phone || t.customerPhone || '';
+        const cleanPhone = phoneVal.replace(/\D/g, '');
+        const waLink = cleanPhone ? `https://wa.me/51${cleanPhone.length === 9 ? cleanPhone : cleanPhone}?text=${encodeURIComponent('Hola ' + (t.customer || 'Cliente') + ', te saludamos de BuchiSapa sobre tu pedido ' + numFormatted + '.')}` : '';
 
         return `
           <div class="ticket-mobile-card">
             <div class="ticket-card-header">
-              <div class="ticket-number-badge">${t.number}</div>
+              <div class="ticket-number-badge">${numFormatted}</div>
               <div class="ticket-card-time">${timeStr}</div>
               <div class="ticket-card-status">✓ ${t.status || 'Emitido'}</div>
             </div>
             
             <div class="ticket-card-body">
               <div class="ticket-card-customer-row">
-                <span class="ticket-card-customer">${window.AdminUtils.escapeHtml(t.customer || 'Cliente Mostrador')}</span>
+                <div>
+                  <span class="ticket-card-customer">${window.AdminUtils.escapeHtml(t.customer || 'Cliente Mostrador')}</span>
+                  ${cleanPhone ? `
+                    <div style="margin-top: 3px;">
+                      <a href="${waLink}" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; background: rgba(34,197,94,0.18); border: 1px solid rgba(34,197,94,0.4); color: #4ade80; padding: 2px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 800; text-decoration: none;">
+                        <span>📲 WhatsApp: ${window.AdminUtils.escapeHtml(phoneVal)}</span>
+                      </a>
+                    </div>
+                  ` : ''}
+                </div>
                 <span class="ticket-card-type ${typeClass}">${typeLabel}</span>
               </div>
               <div class="ticket-card-details-row">
@@ -289,7 +362,7 @@
     if (btnKitchen) btnKitchen.style.display = tab === 'kitchen' ? 'inline-flex' : 'none';
 
     if (ticket) {
-      const num = ticket.number || '#00001';
+      const num = formatTicketNumber(ticket.number || ticket.orderNumber);
       if (titleEl) {
         titleEl.textContent = tab === 'kitchen' 
           ? `Ticket de Cocina ${num}` 
@@ -330,7 +403,7 @@
     if (!order) return;
 
     const rawNum = order.orderNumber || (order.id ? order.id.replace('ord-', '') : '00001');
-    const orderNumFormatted = rawNum.startsWith('#') ? rawNum : `#${rawNum}`;
+    const orderNumFormatted = formatTicketNumber(rawNum);
 
     const ticketLike = {
       id: order.id,
@@ -408,14 +481,7 @@
     const formattedTime = `${formattedHours}:${minutes}:${seconds} ${ampm}`;
 
     const rawNum = t.number || t.orderNumber || (t.id ? t.id.replace('tk-', '').replace('ord-', '') : '00001');
-    let orderNumber = String(rawNum).trim();
-    if (!orderNumber.startsWith('#')) {
-      if (orderNumber.startsWith('TK-')) {
-        orderNumber = `#${orderNumber.replace('TK-', '')}`;
-      } else {
-        orderNumber = `#${orderNumber}`;
-      }
-    }
+    const orderNumber = formatTicketNumber(rawNum);
 
     const customerName = t.customer || t.clientName || 'Cliente';
     const statusText = t.status || 'Emitido';
@@ -475,6 +541,18 @@
             <span class="ticket-meta-label">Cliente</span>
             <span class="ticket-meta-val">${window.AdminUtils.escapeHtml(customerName)}</span>
           </div>
+          ${(t.phone || t.customerPhone) ? `
+            <div class="ticket-meta-row">
+              <span class="ticket-meta-label">Teléfono</span>
+              <span class="ticket-meta-val">${window.AdminUtils.escapeHtml(t.phone || t.customerPhone)}</span>
+            </div>
+          ` : ''}
+          ${(t.type === 'delivery' && (t.address || t.deliveryAddress)) ? `
+            <div class="ticket-meta-row">
+              <span class="ticket-meta-label">Dirección</span>
+              <span class="ticket-meta-val">${window.AdminUtils.escapeHtml(t.address || t.deliveryAddress)}</span>
+            </div>
+          ` : ''}
           <div class="ticket-meta-row">
             <span class="ticket-meta-label">Tipo</span>
             <span class="ticket-meta-val">${t.type === 'delivery' ? 'Delivery' : 'Salón'}</span>
@@ -567,17 +645,12 @@
     const formattedTime = `${formattedHours}:${minutes} ${ampm}`;
 
     const rawNum = t.number || t.orderNumber || (t.id ? t.id.replace('tk-', '').replace('ord-', '') : '00001');
-    let orderNumber = String(rawNum).trim();
-    if (!orderNumber.startsWith('#')) {
-      if (orderNumber.startsWith('TK-')) {
-        orderNumber = `#${orderNumber.replace('TK-', '')}`;
-      } else {
-        orderNumber = `#${orderNumber}`;
-      }
-    }
+    const orderNumber = formatTicketNumber(rawNum);
 
     const customerName = t.customer || t.clientName || 'Cliente';
     const orderType = t.type === 'delivery' ? 'DELIVERY 🛵' : 'SALÓN 🍽️';
+    const clientPhone = t.phone || t.customerPhone || '';
+    const clientAddress = t.address || t.deliveryAddress || '';
     const items = t.items || [];
 
     return `
@@ -586,6 +659,8 @@
           <h2 class="kitchen-ticket-title">COCINA</h2>
           <div class="kitchen-ticket-order-badge">Pedido ${orderNumber}</div>
           <div class="kitchen-ticket-client-line">${window.AdminUtils.escapeHtml(customerName)}</div>
+          ${clientPhone ? `<div style="font-size: 11.5px; font-weight: 700; color: #111827; margin-top: 2px;">Tel/WhatsApp: ${window.AdminUtils.escapeHtml(clientPhone)}</div>` : ''}
+          ${(t.type === 'delivery' && clientAddress) ? `<div style="font-size: 11px; font-weight: 600; color: #374151; margin-top: 2px;">Dirección: ${window.AdminUtils.escapeHtml(clientAddress)}</div>` : ''}
           <div class="kitchen-ticket-meta">${orderType} &bull; ${formattedDate} ${formattedTime}</div>
         </div>
 
@@ -1442,21 +1517,36 @@
       const subtotal = (item.price * (item.qty || 1)).toFixed(2);
 
       const sidesHtml = (item.availableSides && item.availableSides.length > 0) ? `
-        <div class="ticket-cart-item-custom-section" style="background: rgba(0, 0, 0, 0.2); padding: 10px 12px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255, 255, 255, 0.05);">
-          <div class="ticket-cart-custom-header" style="margin-bottom: 6px;">
-            <span class="ticket-cart-custom-title" style="font-weight: 800; font-size: 0.8rem; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.04em;">🍟 Acompañamiento / Guarnición para esta unidad:</span>
+        <div class="admin-client-section-box">
+          <div class="admin-client-section-header">
+            <div class="admin-client-section-title-group">
+              <div class="admin-client-section-icon pink">🍴</div>
+              <div>
+                <h3 class="admin-client-section-h3">Acompañamientos e Ingredientes</h3>
+                <p class="admin-client-section-subtitle">Personaliza lo que incluye este plato</p>
+              </div>
+            </div>
+            <div class="admin-client-section-actions">
+              <button type="button" class="admin-preset-btn teal" onclick="window.setTicketItemSidesPreset(${index}, true)">
+                ✓ Con todo
+              </button>
+              <button type="button" class="admin-preset-btn outline" onclick="window.setTicketItemSidesPreset(${index}, false)">
+                ↺ Quitar
+              </button>
+            </div>
           </div>
-          <div class="ticket-items-toggle-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px;">
+          <div class="admin-client-items-list">
             ${item.availableSides.map(sideName => {
               const isChecked = item.selectedSides && item.selectedSides.includes(sideName);
               return `
-                <div class="ticket-item-toggle-card ${isChecked ? 'active' : ''}" style="cursor: pointer; padding: 6px 10px; border-radius: 6px; font-size: 0.82rem;" onclick="window.toggleTicketItemSide(${index}, '${window.AdminUtils.escapeHtml(sideName)}')">
-                  <div class="ticket-item-left" style="display: flex; align-items: center; gap: 6px;">
-                    <div class="ticket-item-checkbox" style="width: 16px; height: 16px; font-size: 11px;">
-                      <span class="ticket-item-checkbox-check">${isChecked ? '✓' : ''}</span>
+                <div class="admin-client-toggle-card ${isChecked ? 'active' : ''}" onclick="window.toggleTicketItemSide(${index}, '${window.AdminUtils.escapeHtml(sideName)}')">
+                  <div class="admin-client-item-left">
+                    <div class="admin-client-item-checkbox">
+                      <span class="admin-client-item-check">✓</span>
                     </div>
-                    <span class="ticket-item-name" style="font-weight: 700;">${window.AdminUtils.escapeHtml(sideName)}</span>
+                    <span class="admin-client-item-name">${window.AdminUtils.escapeHtml(sideName)}</span>
                   </div>
+                  <span class="admin-client-item-badge">${isChecked ? 'Incluido' : 'Sin esto'}</span>
                 </div>
               `;
             }).join('')}
@@ -1465,21 +1555,39 @@
       ` : '';
 
       const saucesHtml = (!item.isDrink && item.availableSauces && item.availableSauces.length > 0) ? `
-        <div class="ticket-cart-item-custom-section" style="background: rgba(0, 0, 0, 0.2); padding: 10px 12px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255, 255, 255, 0.05);">
-          <div class="ticket-cart-custom-header" style="margin-bottom: 6px;">
-            <span class="ticket-cart-custom-title" style="font-weight: 800; font-size: 0.8rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.04em;">🥫 Cremas y Salsas para esta unidad:</span>
+        <div class="admin-client-section-box">
+          <div class="admin-client-section-header">
+            <div class="admin-client-section-title-group">
+              <div class="admin-client-section-icon yellow">✨</div>
+              <div>
+                <h3 class="admin-client-section-h3">Cremas y Salsas de la Casa</h3>
+                <p class="admin-client-section-subtitle">Selecciona las cremas que deseas</p>
+              </div>
+            </div>
+            <div class="admin-client-section-actions">
+              <button type="button" class="admin-preset-btn teal" onclick="window.setTicketItemSaucesPreset(${index}, 'all')">
+                ✓ Todas
+              </button>
+              <button type="button" class="admin-preset-btn yellow" onclick="window.setTicketItemSaucesPreset(${index}, 'classics')">
+                Clásicas
+              </button>
+              <button type="button" class="admin-preset-btn outline" onclick="window.setTicketItemSaucesPreset(${index}, 'none')">
+                ↺ Ninguna
+              </button>
+            </div>
           </div>
-          <div class="ticket-items-toggle-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px;">
+          <div class="admin-client-items-list">
             ${item.availableSauces.map(sName => {
               const isChecked = item.selectedSauces && item.selectedSauces.includes(sName);
               return `
-                <div class="ticket-item-toggle-card ${isChecked ? 'active' : ''}" style="cursor: pointer; padding: 6px 10px; border-radius: 6px; font-size: 0.82rem;" onclick="window.toggleTicketItemSauce(${index}, '${sName}')">
-                  <div class="ticket-item-left" style="display: flex; align-items: center; gap: 6px;">
-                    <div class="ticket-item-checkbox" style="width: 16px; height: 16px; font-size: 11px;">
-                      <span class="ticket-item-checkbox-check">${isChecked ? '✓' : ''}</span>
+                <div class="admin-client-toggle-card ${isChecked ? 'active' : ''}" onclick="window.toggleTicketItemSauce(${index}, '${sName}')">
+                  <div class="admin-client-item-left">
+                    <div class="admin-client-item-checkbox">
+                      <span class="admin-client-item-check">✓</span>
                     </div>
-                    <span class="ticket-item-name" style="font-weight: 700;">${sName}</span>
+                    <span class="admin-client-item-name">${sName}</span>
                   </div>
+                  <span class="admin-client-item-badge">${isChecked ? 'Incluido' : 'Sin esto'}</span>
                 </div>
               `;
             }).join('')}
@@ -1488,24 +1596,24 @@
       ` : '';
 
       return `
-        <div class="ticket-cart-item-card" id="ticket-cart-item-${index}" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
-          <div class="ticket-cart-item-header">
-            <div class="ticket-cart-item-top-row" style="display: flex; justify-content: space-between; align-items: center;">
-              <div class="ticket-cart-item-info">
-                <span class="ticket-cart-item-name" style="font-weight: 800; font-size: 1rem; color: #ffffff;">${window.AdminUtils.escapeHtml(item.name)}<span style="color: #fb923c; font-weight: 800; margin-left: 6px;">${unitLabel}</span></span>
-                <span class="ticket-cart-item-price-unit" style="display: block; font-size: 0.82rem; color: #10b981; font-weight: 700; margin-top: 2px;">S/ ${item.price.toFixed(2)}</span>
-              </div>
-              <div style="display: flex; gap: 6px; align-items: center;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="window.duplicateTicketItem(${index})" title="Agregar otra unidad igual para personalizar" style="padding: 5px 9px; font-size: 0.78rem; font-weight: 700; border-radius: 6px; color: #38bdf8; border-color: rgba(56, 189, 248, 0.35); background: rgba(56, 189, 248, 0.1);">
-                  + Otra Unidad
-                </button>
-                <button type="button" class="btn-remove-ticket-item" title="Eliminar esta unidad" onclick="window.removeTicketItem(${index})" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; border-radius: 6px; padding: 5px 8px; cursor: pointer;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                </button>
-              </div>
+        <div class="admin-client-card" id="ticket-cart-item-${index}">
+          <div class="admin-client-card-top">
+            <div>
+              <h4 class="admin-client-card-title">${window.AdminUtils.escapeHtml(item.name)} <span style="color: #ea580c; font-weight: 800;">${unitLabel}</span></h4>
+              <span class="admin-client-card-category">PLATO PERSONALIZABLE</span>
+              <div class="admin-client-card-price">S/ ${item.price.toFixed(2)}</div>
+              <span class="admin-client-card-unit-label">Precio unitario</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="window.duplicateTicketItem(${index})" title="Agregar otra unidad igual para personalizar" style="padding: 6px 12px; font-size: 0.8rem; font-weight: 700; border-radius: 8px; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">
+                + Otra Unidad
+              </button>
+              <button type="button" class="btn-remove-ticket-item" title="Eliminar esta unidad" onclick="window.removeTicketItem(${index})" style="background: #fef2f2; border: 1.5px solid #fecaca; color: #dc2626; border-radius: 8px; padding: 6px 9px; cursor: pointer;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
             </div>
           </div>
           ${sidesHtml}
@@ -1513,6 +1621,26 @@
         </div>
       `;
     }).join('');
+  }
+
+  function setTicketItemSidesPreset(index, includeAll) {
+    if (!activeTicketItems[index]) return;
+    const item = activeTicketItems[index];
+    item.selectedSides = includeAll ? [...(item.availableSides || [])] : [];
+    renderTicketCartItems();
+  }
+
+  function setTicketItemSaucesPreset(index, preset) {
+    if (!activeTicketItems[index]) return;
+    const item = activeTicketItems[index];
+    if (preset === 'all') {
+      item.selectedSauces = ALL_CLIENT_SAUCES.map(s => s.name);
+    } else if (preset === 'classics') {
+      item.selectedSauces = ALL_CLIENT_SAUCES.filter(s => s.default).map(s => s.name);
+    } else {
+      item.selectedSauces = [];
+    }
+    renderTicketCartItems();
   }
 
   function updateTicketItemQty(index, delta) {
@@ -1586,6 +1714,17 @@
 
     // Inicializar categorías, carrito y tipo de atención por defecto (Salón)
     activeTicketItems = [];
+    const customerInput = document.getElementById('ticket-form-customer');
+    if (customerInput) customerInput.value = 'Cliente';
+    const phoneInput = document.getElementById('ticket-form-phone');
+    if (phoneInput) phoneInput.value = '';
+    const addressInput = document.getElementById('ticket-form-address');
+    if (addressInput) addressInput.value = '';
+    const notesInput = document.getElementById('ticket-form-notes');
+    if (notesInput) notesInput.value = '';
+    const deliveryInput = document.getElementById('ticket-form-delivery-fee');
+    if (deliveryInput) deliveryInput.value = '5.00';
+
     selectTicketFormType('salon');
     populateTicketFormCategories();
     renderTicketCartItems();
@@ -1627,6 +1766,10 @@
     const customer = customerInput?.value.trim() || 'Cliente';
     const type = document.getElementById('ticket-form-type')?.value || 'salon';
     const payment = document.getElementById('ticket-form-payment')?.value || 'Efectivo';
+    const phoneInput = document.getElementById('ticket-form-phone');
+    const phone = phoneInput?.value.trim() || '';
+    const addressInput = document.getElementById('ticket-form-address');
+    const address = addressInput?.value.trim() || '';
     const generalNote = document.getElementById('ticket-form-notes')?.value.trim() || '';
 
     const deliveryInput = document.getElementById('ticket-form-delivery-fee');
@@ -1647,7 +1790,7 @@
     });
 
     const rawNum = getNextOrderNumber(); // ej. "00001"
-    const orderNumFormatted = `#${rawNum}`; // ej. "#00001"
+    const orderNumFormatted = formatTicketNumber(rawNum); // ej. "TK-00001"
     const ticketId = `tk-${Date.now()}`;
     const orderId = `ord-${Date.now()}`;
 
@@ -1658,6 +1801,10 @@
       orderId: orderId,
       created_at: new Date().toISOString(),
       customer: customer,
+      phone: phone,
+      customerPhone: phone,
+      address: address,
+      deliveryAddress: address,
       type: type,
       payment: payment,
       items: itemsFormatted,
@@ -1680,8 +1827,8 @@
       status: 'recibido',
       type: type,
       customerName: customer,
-      customerPhone: '',
-      deliveryAddress: type === 'delivery' ? (generalNote || 'Dirección no especificada') : 'Salón / Mesa Local',
+      customerPhone: phone,
+      deliveryAddress: type === 'delivery' ? (address || generalNote || 'Dirección no especificada') : 'Salón / Mesa Local',
       items: itemsFormatted.map(i => ({
         name: i.name,
         quantity: i.qty,
@@ -1708,6 +1855,8 @@
           ticketNumber: orderNumFormatted,
           orderNumber: parseInt(rawNum, 10) || 1,
           customerName: customer,
+          customerPhone: phone,
+          deliveryAddress: address,
           orderType: type,
           paymentMethod: payment,
           items: itemsFormatted,
@@ -1721,10 +1870,12 @@
 
     // Resetear formulario y carrito local
     activeTicketItems = [];
-    if (customerInput) customerInput.value = '';
+    if (customerInput) customerInput.value = 'Cliente';
+    if (phoneInput) phoneInput.value = '';
+    if (addressInput) addressInput.value = '';
     const notesInput = document.getElementById('ticket-form-notes');
     if (notesInput) notesInput.value = '';
-    if (deliveryInput) deliveryInput.value = '';
+    if (deliveryInput) deliveryInput.value = '5.00';
 
     // Actualizar pedidos y cocina si la función existe
     if (typeof window.renderAllOrders === 'function') {
@@ -1845,6 +1996,11 @@
       if (target) target.classList.add('is-selected');
     }
 
+    const deliveryBox = document.getElementById('ticket-form-delivery-box');
+    if (deliveryBox) {
+      deliveryBox.style.display = (type === 'delivery') ? 'block' : 'none';
+    }
+
     const deliveryGroup = document.getElementById('ticket-form-delivery-fee-group');
     if (deliveryGroup) {
       deliveryGroup.style.display = (type === 'delivery') ? 'block' : 'none';
@@ -1909,6 +2065,8 @@
   window.addTicketItem = addTicketItem;
   window.renderTicketCartItems = renderTicketCartItems;
   window.duplicateTicketItem = duplicateTicketItem;
+  window.setTicketItemSidesPreset = setTicketItemSidesPreset;
+  window.setTicketItemSaucesPreset = setTicketItemSaucesPreset;
   window.updateTicketItemQty = updateTicketItemQty;
   window.removeTicketItem = removeTicketItem;
   window.toggleTicketItemSauce = toggleTicketItemSauce;

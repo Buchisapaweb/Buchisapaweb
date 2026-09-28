@@ -166,23 +166,32 @@ function renderDynamicHeroCarousel(portadas) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  track.innerHTML = portadas.map((p, idx) => {
-    const versionParam = p.updatedAt ? `?v=${new Date(p.updatedAt).getTime()}` : '';
-    let desktopImg = (p.image || p.imageDesktop || `/imagenes/portada/Portada${(idx % 4) + 1}E.webp`) + versionParam;
-    let mobileImg = (p.imageMobile || p.image_mobile || `/imagenes/portada/Portada${(idx % 4) + 1}M.webp` || desktopImg) + versionParam;
+  const activePortadas = portadas.filter(p => p.active !== false);
+  const listToRender = activePortadas.length > 0 ? activePortadas : portadas;
+
+  track.innerHTML = listToRender.map((p, idx) => {
+    const slideNum = p.order || (idx + 1);
+    const ts = p.updatedAt ? new Date(p.updatedAt).getTime() : Date.now();
+    const versionParam = `?v=${ts}`;
+
+    let rawDesktop = (p.image || p.imageDesktop || `/imagenes/portada/Portada${slideNum}E.webp`).split('?')[0];
+    let rawMobile = (p.imageMobile || p.image_mobile || `/imagenes/portada/Portada${slideNum}M.webp` || rawDesktop).split('?')[0];
+
+    let desktopImg = `${rawDesktop}${versionParam}`;
+    let mobileImg = `${rawMobile}${versionParam}`;
 
     const isFirst = idx === 0;
     const activeClass = isFirst ? 'active' : '';
 
     return `
-      <div class="carousel-slide ${activeClass} ${!isFirst ? 'lazy-bg' : ''}" ${isFirst ? `style="background-image: url('${desktopImg}');"` : `data-bg="url('${desktopImg}')"`}>
+      <div class="carousel-slide ${activeClass}" style="background-image: url('${desktopImg}');">
         <picture class="carousel-slide-picture">
-          <source media="(max-width: 640px)" srcset="${safeStr(mobileImg)}">
-          <source media="(min-width: 641px)" srcset="${safeStr(desktopImg)}">
+          <source media="(max-width: 768px)" srcset="${safeStr(mobileImg)}">
+          <source media="(min-width: 769px)" srcset="${safeStr(desktopImg)}">
           <img 
-            ${isFirst ? `src="${safeStr(desktopImg)}"` : `src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3C/svg%3E" data-src="${safeStr(desktopImg)}"`} 
-            alt="Portada BuchiSapa" 
-            class="carousel-slide-img ${isFirst ? 'loaded' : 'lazy-img'}" 
+            src="${safeStr(desktopImg)}" 
+            alt="Portada BuchiSapa ${slideNum}" 
+            class="carousel-slide-img loaded" 
             loading="${isFirst ? 'eager' : 'lazy'}" 
             ${isFirst ? 'fetchpriority="high"' : ''} 
             decoding="async"
@@ -192,7 +201,7 @@ function renderDynamicHeroCarousel(portadas) {
     `;
   }).join('');
 
-  dotsContainer.innerHTML = portadas.map((_, idx) => `
+  dotsContainer.innerHTML = listToRender.map((_, idx) => `
     <span class="carousel-dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></span>
   `).join('');
 
