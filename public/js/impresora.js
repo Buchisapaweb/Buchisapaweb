@@ -162,7 +162,7 @@ Items                                          ${d.totalItemsCount}
 TOTAL                                  S/ ${d.total}
 ----------------------------------------
          Gracias por su compra
-           www.buchisapa.com
+       https://buchisapaweb.vercel.app
 `;
   }
 
@@ -203,7 +203,7 @@ TOTAL                                  S/ ${d.total}
         
         <!-- LOGO OFICIAL BUCHISAPA -->
         <div style="text-align: center; margin-bottom: 10px;">
-          <img src="/imagenes/logo/logo-buchisapa.png" alt="Buchisapa" style="width: 125px; height: auto; display: block; margin: 0 auto; filter: grayscale(100%) contrast(150%);" onerror="this.onerror=null; this.src='/imagenes/logo/logo-buchisapa.png'">
+          <img src="/imagenes/logo/logo-ticket-bn.png" alt="Buchisapa" style="width: 140px; height: auto; display: block; margin: 0 auto; filter: contrast(120%);" onerror="this.onerror=null; this.src='/imagenes/logo/logo-buchisapa.png'">
         </div>
 
         <!-- ENCABEZADO FISCAL Y DIRECCIÓN -->
@@ -280,7 +280,7 @@ TOTAL                                  S/ ${d.total}
         <!-- PIE DE TICKET -->
         <div style="text-align: center; font-size: 12px; margin-top: 10px; line-height: 1.4;">
           <div style="margin-bottom: 2px;">Gracias por su compra</div>
-          <div style="font-weight: 700;">www.buchisapa.com</div>
+          <div style="font-weight: 700;">https://buchisapaweb.vercel.app</div>
         </div>
 
       </div>

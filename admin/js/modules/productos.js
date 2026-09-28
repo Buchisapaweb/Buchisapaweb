@@ -8,13 +8,18 @@
 
   async function fetchProducts() {
     const state = window.AdminState = window.AdminState || {};
-    const validCats = getAllCategories();
-    const validCatKeys = new Set(validCats.flatMap(c => [c.id, c.code, c.slug].filter(Boolean)));
+    const fallbackList = (state.defaultSignatureProducts && state.defaultSignatureProducts.length > 0)
+      ? state.defaultSignatureProducts
+      : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []);
+
     try {
       const rawData = await window.AdminApi.getProducts();
       const list = Array.isArray(rawData) ? rawData : (rawData && Array.isArray(rawData.data) ? rawData.data : []);
-      const activeList = (list && list.length > 0) ? list : (state.defaultSignatureProducts && state.defaultSignatureProducts.length > 0 ? state.defaultSignatureProducts : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []));
-      
+      const activeList = (list && list.length > 0) ? list : fallbackList;
+
+      const validCats = getAllCategories();
+      const validCatKeys = new Set(validCats.flatMap(c => [c.id, c.code, c.slug].filter(Boolean)));
+
       let filtered = activeList.filter(p => {
         const cat = (p.category_id || p.category || '').toLowerCase().trim();
         const code = getCategoryCode(cat);
@@ -25,22 +30,33 @@
         filtered = activeList;
       }
 
-      state.allProducts = filtered;
+      state.allProducts = (filtered && filtered.length > 0) ? filtered : fallbackList;
     } catch (e) {
-      console.warn('Usando catálogo local de contingencia:', e);
-      state.allProducts = state.defaultSignatureProducts || (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []);
+      console.warn('Usando catálogo local de contingencia en Admin:', e);
+      state.allProducts = (state.defaultSignatureProducts && state.defaultSignatureProducts.length > 0)
+        ? state.defaultSignatureProducts
+        : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []);
     }
+
+    if (!state.allProducts || state.allProducts.length === 0) {
+      state.allProducts = fallbackList;
+    }
+
     applyProductFilters();
     window.updateDashboardMetrics?.();
   }
 
   function applyProductFilters() {
     const state = window.AdminState = window.AdminState || {};
+    const fallbackList = (state.defaultSignatureProducts && state.defaultSignatureProducts.length > 0)
+      ? state.defaultSignatureProducts
+      : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []);
+
     let prods = [...(state.allProducts || [])];
 
-    // Si por alguna razón allProducts está vacío, restaurar productos predeterminados inmediatamente
+    // Restaurar catálogo predeterminado si el arreglo de productos está vacío
     if (prods.length === 0) {
-      prods = [...(state.defaultSignatureProducts || (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []))];
+      prods = [...fallbackList];
       state.allProducts = prods;
     }
 

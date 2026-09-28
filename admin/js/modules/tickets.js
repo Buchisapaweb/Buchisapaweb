@@ -625,7 +625,7 @@
         <!-- PIE DE PÁGINA -->
         <div class="ticket-footer-block">
           <p class="ticket-thanks-msg">Gracias por su compra</p>
-          <p class="ticket-website">www.buchisapa.com</p>
+          <p class="ticket-website">https://buchisapaweb.vercel.app</p>
         </div>
       </div>
     `;
@@ -772,10 +772,11 @@
               margin-bottom: 6px;
             }
             .ticket-logo-img {
-              width: 75px;
-              height: 75px;
+              width: 140px;
+              max-width: 100%;
+              height: auto;
               object-fit: contain;
-              filter: grayscale(100%) contrast(160%);
+              filter: contrast(120%);
             }
             .ticket-brand-name {
               font-size: 17px;

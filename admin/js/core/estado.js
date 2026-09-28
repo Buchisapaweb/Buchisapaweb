@@ -6,33 +6,7 @@
 (function () {
   'use strict';
 
-  if (!window.AdminState) {
-    window.AdminState = {
-      allProducts: [],
-      filteredProducts: [],
-      currentCategory: 'todos',
-      searchQuery: '',
-      currentSort: 'recent',
-      viewMode: 'grid',
-      currentPage: 1,
-      itemsPerPage: 12,
-      allSupplies: [],
-      allUtensils: [],
-      allOrders: [],
-      allUsers: [],
-      cajaData: null,
-      allTickets: [],
-      filteredTickets: [],
-      activePreviewTicket: null,
-      allPortadas: [],
-      currentPortadaSlide: 0,
-      portadaPreviewInterval: null,
-      currentPortadaFilter: 'all',
-      allPromociones: [],
-      currentPromocionesFilter: 'all',
-      defaultSignatureProducts: []
-    };
-  }
+
 
   const defaultSignatureProducts = [
     // 1. PLATOS AMAZÓNICOS (7)
@@ -667,4 +641,7 @@
     window.AdminState.allProducts = defaultSignatureProducts;
   }
 
+  window.getFallbackProducts = function () {
+    return defaultSignatureProducts;
+  };
 })();
