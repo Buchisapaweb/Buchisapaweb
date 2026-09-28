@@ -5,105 +5,193 @@
 
           <!-- CONTENEDOR 1: LISTADO DE TICKETS Y MÉTRICAS -->
           <div id="ticket-list-section">
-            <div class="section-panel">
-              <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-                <div>
-                  <h3 class="panel-title">Emisión y Control de Tickets / Boletas Térmicas</h3>
-                  <p class="panel-description">Comprobantes oficiales de venta, comandas de cocina y reimpresión en 80mm.</p>
+            <div class="section-panel ticket-main-panel">
+              
+              <!-- Cabecera de la Vista -->
+              <div class="ticket-header-block">
+                <div class="ticket-title-group">
+                  <div class="ticket-title-badge">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    <span>Módulo de Comprobantes</span>
+                  </div>
+                  <h3 class="ticket-view-title">Emisión y Control de Tickets</h3>
+                  <p class="ticket-view-subtitle">Comprobantes oficiales de venta, comandas de cocina y reimpresión térmica en 80mm.</p>
                 </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                  <button class="btn btn-secondary btn-sm" onclick="window.testThermalPrinter()">
+                
+                <div class="ticket-header-actions">
+                  <button type="button" class="btn-ticket-secondary" onclick="window.testThermalPrinter()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                    <span>Probar Impresora 80mm</span>
+                    <span>Probar Impresora</span>
                   </button>
-                  <button class="btn btn-primary btn-sm" onclick="window.openNewTicketModal()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-                    <span>+ Emitir Ticket Rápido</span>
+                  <button type="button" class="btn-ticket-primary" onclick="window.openNewTicketModal()">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                    <span>Emitir Ticket Rápido</span>
                   </button>
                 </div>
               </div>
 
-              <!-- Métricas de Tickets -->
-              <div class="metrics-grid">
-                <div class="metric-card">
-                  <div class="metric-icon-wrap orange">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/></svg>
+              <!-- Métricas de Tickets Centradas y Estilizadas -->
+              <div class="ticket-metrics-grid">
+                <div class="ticket-stat-card card-orange">
+                  <div class="ticket-stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/></svg>
                   </div>
-                  <div class="metric-details">
-                    <span class="metric-label">Tickets Emitidos Hoy</span>
-                    <span class="metric-value" id="ticket-metric-count">38</span>
-                    <span class="metric-hint">Comprobantes generados</span>
-                  </div>
+                  <span class="ticket-stat-label">TICKETS EMITIDOS HOY</span>
+                  <span class="ticket-stat-number" id="ticket-metric-count">0</span>
+                  <span class="ticket-stat-desc">Comprobantes generados</span>
                 </div>
 
-                <div class="metric-card">
-                  <div class="metric-icon-wrap green">
-                    <span class="soles-badge-icon">S/</span>
+                <div class="ticket-stat-card card-green">
+                  <div class="ticket-stat-icon">
+                    <span class="ticket-soles-icon">S/</span>
                   </div>
-                  <div class="metric-details">
-                    <span class="metric-label">Total Facturado</span>
-                    <span class="metric-value" id="ticket-metric-total">S/ 0.00</span>
-                    <span class="metric-hint">Ventas con ticket</span>
-                  </div>
-                </div>
-
-                <div class="metric-card">
-                  <div class="metric-icon-wrap blue">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/></svg>
-                  </div>
-                  <div class="metric-details">
-                    <span class="metric-label">Ticket Promedio</span>
-                    <span class="metric-value" id="ticket-metric-avg">S/ 0.00</span>
-                    <span class="metric-hint">Por cada comprobante</span>
-                  </div>
-                </div>
-
-                <div class="metric-card">
-                  <div class="metric-icon-wrap amber">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" x2="17" y1="8" y2="8"/><line x1="7" x2="13" y1="12" y2="12"/></svg>
-                  </div>
-                  <div class="metric-details">
-                    <span class="metric-label">Último Folio Emitido</span>
-                    <span class="metric-value" id="ticket-metric-last">#TK-0038</span>
-                    <span class="metric-hint">Serie continua activa</span>
-                  </div>
+                  <span class="ticket-stat-label">TOTAL FACTURADO</span>
+                  <span class="ticket-stat-number" id="ticket-metric-total">S/ 0.00</span>
+                  <span class="ticket-stat-desc">Ventas con comprobante</span>
                 </div>
               </div>
 
-              <!-- Filtros y Búsqueda de Tickets -->
-              <div style="display: flex; gap: 12px; margin: 18px 0; flex-wrap: wrap;">
-                <div class="search-box" style="flex: 1; min-width: 240px;">
-                  <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                  <input type="text" id="ticket-search-input" class="admin-search-input" placeholder="Buscar ticket por número (ej. TK-0012) o cliente..." oninput="window.filterTickets()">
+              <!-- Filtros y Búsqueda de Tickets Adaptativos -->
+              <div class="ticket-filters-wrapper">
+                <div class="ticket-search-box">
+                  <svg class="ticket-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input type="text" id="ticket-search-input" class="ticket-search-input" placeholder="Buscar por número (ej. #1132) o cliente..." oninput="window.filterTickets()">
                 </div>
-                <select class="sort-select" id="ticket-filter-type" onchange="window.filterTickets()" style="max-width: 170px;">
-                  <option value="todos">Todos los Tipos</option>
-                  <option value="delivery">Delivery</option>
-                  <option value="pickup">Mostrador</option>
-                  <option value="salon">Salón</option>
-                </select>
-                <select class="sort-select" id="ticket-filter-payment" onchange="window.filterTickets()" style="max-width: 170px;">
-                  <option value="todos">Todos los Pagos</option>
-                  <option value="efectivo">Efectivo</option>
-                  <option value="yape">Yape / Plin</option>
-                  <option value="tarjeta">Tarjeta POS</option>
-                </select>
+
+                <!-- Selectores Desplegables Sucesivos Hacia Abajo (Custom In-Page Dropdowns) -->
+                <div class="ticket-custom-selects-grid">
+                  
+                  <!-- Selector 1: Tipo de Pedido -->
+                  <div class="custom-dropdown-container" id="dropdown-ticket-type">
+                    <label class="custom-dropdown-label">🛵 TIPO DE PEDIDO</label>
+                    <button type="button" class="custom-dropdown-trigger" onclick="window.toggleCustomDropdown('dropdown-ticket-type', event)">
+                      <div class="custom-dropdown-selected-val">
+                        <span class="dropdown-val-icon" id="type-dropdown-current-icon">✨</span>
+                        <span class="dropdown-val-text" id="type-dropdown-current-text">Todos los Tipos</span>
+                      </div>
+                      <svg class="dropdown-chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    
+                    <div class="custom-dropdown-menu">
+                      <div class="custom-dropdown-item is-selected" data-value="todos" onclick="window.selectCustomDropdownOption('type', 'todos', '✨', 'Todos los Tipos')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">✨</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Todos los Tipos</span>
+                            <span class="dropdown-item-sub">Ver todos los comprobantes</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="delivery" onclick="window.selectCustomDropdownOption('type', 'delivery', '🛵', 'Delivery')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">🛵</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Delivery</span>
+                            <span class="dropdown-item-sub">Pedidos con motorizado</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="salon" onclick="window.selectCustomDropdownOption('type', 'salon', '🍽️', 'Salón')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">🍽️</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Salón</span>
+                            <span class="dropdown-item-sub">Consumo en mesa local</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Selector 2: Método de Pago -->
+                  <div class="custom-dropdown-container" id="dropdown-ticket-payment">
+                    <label class="custom-dropdown-label">💳 MÉTODO DE PAGO</label>
+                    <button type="button" class="custom-dropdown-trigger" onclick="window.toggleCustomDropdown('dropdown-ticket-payment', event)">
+                      <div class="custom-dropdown-selected-val">
+                        <span class="dropdown-val-icon" id="payment-dropdown-current-icon">⚡</span>
+                        <span class="dropdown-val-text" id="payment-dropdown-current-text">Todos los Pagos</span>
+                      </div>
+                      <svg class="dropdown-chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    
+                    <div class="custom-dropdown-menu">
+                      <div class="custom-dropdown-item is-selected" data-value="todos" onclick="window.selectCustomDropdownOption('payment', 'todos', '⚡', 'Todos los Pagos')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">⚡</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Todos los Pagos</span>
+                            <span class="dropdown-item-sub">Cualquier forma de pago</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="efectivo" onclick="window.selectCustomDropdownOption('payment', 'efectivo', '💵', 'Efectivo')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">💵</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Efectivo</span>
+                            <span class="dropdown-item-sub">Moneda física en caja</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="yape" onclick="window.selectCustomDropdownOption('payment', 'yape', '📱', 'Yape / Plin')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">📱</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Yape / Plin</span>
+                            <span class="dropdown-item-sub">Billeteras digitales móviles</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="tarjeta" onclick="window.selectCustomDropdownOption('payment', 'tarjeta', '💳', 'Tarjeta POS')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">💳</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Tarjeta POS</span>
+                            <span class="dropdown-item-sub">Débito / Crédito Niubiz</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Inputs ocultos sincronizados para estado -->
+                <input type="hidden" id="ticket-filter-type" value="todos">
+                <input type="hidden" id="ticket-filter-payment" value="todos">
               </div>
 
-              <!-- Tabla de Tickets Emitidos -->
-              <div class="table-container">
-                <table class="admin-table">
+              <!-- Vista de Tickets en Tarjetas para Móvil -->
+              <div class="ticket-cards-mobile-view" id="tickets-cards-container">
+                <!-- Se inyecta dinámicamente vía tickets.js -->
+              </div>
+
+              <!-- Tabla de Tickets Emitidos para Escritorio -->
+              <div class="ticket-table-desktop-view">
+                <table class="admin-table ticket-data-table">
                   <thead>
                     <tr>
-                      <th>N° Ticket / Folio</th>
-                      <th>Fecha &amp; Hora</th>
-                      <th>Cliente</th>
-                      <th>Tipo</th>
-                      <th>Método de Pago</th>
-                      <th>Items</th>
-                      <th>Total</th>
-                      <th>Estado</th>
-                      <th>Acciones</th>
+                      <th>N° TICKET / FOLIO</th>
+                      <th>FECHA &amp; HORA</th>
+                      <th>CLIENTE</th>
+                      <th>TIPO</th>
+                      <th>MÉTODO DE PAGO</th>
+                      <th>ITEMS</th>
+                      <th>TOTAL</th>
+                      <th>ESTADO</th>
+                      <th style="text-align: right;">ACCIONES</th>
                     </tr>
                   </thead>
                   <tbody id="tickets-table-body">
@@ -124,70 +212,108 @@
               </button>
               <div class="form-page-title-group">
                 <h3 class="form-page-title">+ Emitir Nuevo Ticket Rápido</h3>
-                <p class="form-page-subtitle">Genera comprobantes directos de venta en mostrador, consumo en salón o comanda.</p>
+                <p class="form-page-subtitle">Genera comprobantes directos de venta en delivery o salón.</p>
               </div>
             </div>
 
             <form id="new-ticket-form">
               <div class="form-card-panel" style="max-width: 680px; margin: 0 auto;">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label" for="ticket-form-customer">Nombre del Cliente *</label>
-                    <input type="text" class="form-input" id="ticket-form-customer" required placeholder="Ej. Carlos Paredes" value="Cliente Mostrador">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="ticket-form-phone">Teléfono / WhatsApp</label>
-                    <input type="tel" class="form-input" id="ticket-form-phone" placeholder="984 123 456">
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label" for="ticket-form-type">Tipo de Pedido *</label>
-                    <select class="form-select" id="ticket-form-type" required>
-                      <option value="pickup">Mostrador / Para Llevar</option>
-                      <option value="salon">Consumo en Salón</option>
-                      <option value="delivery">Delivery</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="ticket-form-payment">Método de Pago *</label>
-                    <select class="form-select" id="ticket-form-payment" required>
-                      <option value="Efectivo">Efectivo</option>
-                      <option value="Yape">Yape</option>
-                      <option value="Plin">Plin</option>
-                      <option value="Tarjeta Niubiz POS">Tarjeta Niubiz POS</option>
-                      <option value="Transferencia BCP">Transferencia BCP</option>
-                    </select>
-                  </div>
-                </div>
-
                 <div class="form-group">
-                  <label class="form-label" for="ticket-form-product-select">Seleccionar Plato de la Carta *</label>
-                  <select class="form-select" id="ticket-form-product-select">
-                    <!-- Cargado dinámicamente -->
+                  <label class="form-label" for="ticket-form-customer">Nombre del Cliente *</label>
+                  <input type="text" class="form-input" id="ticket-form-customer" required placeholder="Ej. Carlos Paredes" value="Cliente">
+                </div>
+
+                <!-- Selector Visual Llamativo: Tipo de Pedido (Solo Delivery o Salón) -->
+                <div class="form-group" style="margin-top: 6px;">
+                  <label class="form-label">Tipo de Pedido *</label>
+                  <input type="hidden" id="ticket-form-type" value="salon" required>
+                  <div class="ticket-visual-option-grid" id="ticket-form-type-selector">
+                    <div class="ticket-visual-card is-selected" data-value="salon" onclick="window.selectTicketFormType('salon', this)">
+                      <div class="ticket-visual-card-icon">🍽️</div>
+                      <div class="ticket-visual-card-info">
+                        <span class="ticket-visual-card-title">Salón</span>
+                        <span class="ticket-visual-card-sub">Consumo en mesa</span>
+                      </div>
+                      <div class="ticket-visual-check">✓</div>
+                    </div>
+
+                    <div class="ticket-visual-card" data-value="delivery" onclick="window.selectTicketFormType('delivery', this)">
+                      <div class="ticket-visual-card-icon">🛵</div>
+                      <div class="ticket-visual-card-info">
+                        <span class="ticket-visual-card-title">Delivery</span>
+                        <span class="ticket-visual-card-sub">Envío a domicilio</span>
+                      </div>
+                      <div class="ticket-visual-check">✓</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Campo Independiente de Costo de Delivery (Solo cuando se elige Delivery) -->
+                <div class="form-group" id="ticket-form-delivery-fee-group" style="display: none; margin-top: 8px;">
+                  <label class="form-label" for="ticket-form-delivery-fee">Costo de Envío / Delivery (S/)</label>
+                  <input type="number" step="0.5" class="form-input" id="ticket-form-delivery-fee" min="0" value="5.00" placeholder="0.00" oninput="window.updateTicketFormTotal()">
+                </div>
+
+                <!-- Selector Visual Llamativo: Método de Pago -->
+                <div class="form-group" style="margin-top: 10px;">
+                  <label class="form-label">Método de Pago *</label>
+                  <input type="hidden" id="ticket-form-payment" value="Efectivo" required>
+                  <div class="ticket-payment-badges-grid" id="ticket-form-payment-selector">
+                    <button type="button" class="ticket-payment-badge is-selected" data-value="Efectivo" onclick="window.selectTicketFormPayment('Efectivo', this)">
+                      <span class="payment-badge-icon">💵</span>
+                      <span class="payment-badge-text">Efectivo</span>
+                    </button>
+                    <button type="button" class="ticket-payment-badge" data-value="Yape" onclick="window.selectTicketFormPayment('Yape', this)">
+                      <span class="payment-badge-icon">📱</span>
+                      <span class="payment-badge-text">Yape</span>
+                    </button>
+                    <button type="button" class="ticket-payment-badge" data-value="Plin" onclick="window.selectTicketFormPayment('Plin', this)">
+                      <span class="payment-badge-icon">🟣</span>
+                      <span class="payment-badge-text">Plin</span>
+                    </button>
+                    <button type="button" class="ticket-payment-badge" data-value="Tarjeta POS" onclick="window.selectTicketFormPayment('Tarjeta POS', this)">
+                      <span class="payment-badge-icon">💳</span>
+                      <span class="payment-badge-text">Tarjeta POS</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 1. Selección por Categoría del Admin de Productos (MAYÚSCULAS SIN EMOJIS) -->
+                <div class="form-group" style="margin-top: 14px;">
+                  <label class="form-label" for="ticket-form-category-select">CATEGORÍA DE CARTA *</label>
+                  <select class="form-select" id="ticket-form-category-select" onchange="window.onTicketCategoryChange(this.value)">
+                    <!-- Cargado en mayúsculas sin emojis -->
                   </select>
                 </div>
 
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label" for="ticket-form-quantity">Cantidad</label>
-                    <input type="number" class="form-input" id="ticket-form-quantity" min="1" max="50" value="1">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="ticket-form-unit-price">Precio Unitario (S/)</label>
-                    <input type="number" step="0.5" class="form-input" id="ticket-form-unit-price" value="18.00">
+                <!-- 2. Catálogo Visual de Productos de la Categoría Seleccionada -->
+                <div class="form-group" style="margin-top: 12px;">
+                  <label class="form-label">PRODUCTOS DISPONIBLES</label>
+                  <div class="ticket-prods-grid" id="ticket-products-grid-container">
+                    <!-- Se inyectan las tarjetas de productos con imagen, ID, categoría, nombre, precio y botón agregar -->
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label" for="ticket-form-notes">Notas / Especificaciones (Opcional)</label>
-                  <input type="text" class="form-input" id="ticket-form-notes" placeholder="Ej. Sin cebolla, extra salsa de cocona">
+                <!-- 3. Lista Dinámica de Productos Agregados al Ticket (con salsas, acompañamientos y stepper) -->
+                <div class="form-group" style="margin-top: 18px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="form-label" style="margin-bottom: 0; font-weight: 800;">PRODUCTOS AGREGADOS AL TICKET *</label>
+                    <span class="badge badge-purple" id="ticket-items-count-badge">0 items</span>
+                  </div>
+                  <div id="ticket-items-list-container" class="ticket-items-cart-container">
+                    <!-- Renderizado dinámico de items en el ticket -->
+                  </div>
+                </div>
+
+                <!-- Notas Generales Opcionales (Solo para Delivery) -->
+                <div class="form-group" id="ticket-form-notes-group" style="display: none; margin-top: 14px;">
+                  <label class="form-label" for="ticket-form-notes">Notas / Indicaciones Generales (Opcional)</label>
+                  <input type="text" class="form-input" id="ticket-form-notes" placeholder="Ej. Para llevar bien embalado, enviar servilletas, etc.">
                 </div>
 
                 <div class="modal-total-box">
                   <span class="text-white-bold">Total a Cobrar:</span>
-                  <span class="modal-total-display" id="ticket-form-total-display">S/ 18.00</span>
+                  <span class="modal-total-display" id="ticket-form-total-display">S/ 0.00</span>
                 </div>
 
                 <div class="form-page-actions">
@@ -216,7 +342,7 @@
             </div>
 
             <div style="display: flex; justify-content: center; padding: 20px 0;">
-              <div class="thermal-ticket-container" id="thermal-receipt-render-target" style="width: 100%; max-width: 420px; background: #fff; color: #000; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+              <div class="thermal-ticket-container" id="thermal-receipt-render-target" style="width: 100%; max-width: 360px;">
                 <!-- Renderizado dinámico vía scripts -->
               </div>
             </div>

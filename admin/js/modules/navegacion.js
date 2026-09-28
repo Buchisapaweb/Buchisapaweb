@@ -161,6 +161,8 @@
         window.renderCategoryListInManager();
       } else if (viewId === 'ventas') {
         window.renderVentasView?.();
+      } else if (viewId === 'ticket' && typeof window.fetchTickets === 'function') {
+        window.fetchTickets();
       } else if (viewId === 'dashboard') {
         window.updateDashboardMetrics?.();
       }
