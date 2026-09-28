@@ -18,7 +18,7 @@ convert -size 512x512 radial-gradient:"#ff7a00"-"#b91c1c" \
   -fill "#fed7aa" -gravity center -pointsize 32 -annotate +0+-20 "POLLERIA & SABOR AMAZONICO" \
   -fill "#ffffff" -gravity center -pointsize 64 -annotate +0+50 "🔥 BUCHISAPA 🔥" \
   -fill "#fef08a" -gravity south -pointsize 26 -annotate +0+80 "Santa Clara - Ate | Delivery Nocturno" \
-  public/imagenes/logo/logo-buchisapa.png
+  public/imagenes/logo/logo-buchisapa.webp
 
 echo "Generating portadas..."
 convert -size 1200x600 gradient:"#1e1b4b"-"#ea580c" \

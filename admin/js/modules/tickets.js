@@ -504,7 +504,7 @@
         <!-- LOGO Y ENCABEZADO OFICIAL -->
         <div class="ticket-header-block">
           <div class="ticket-logo-wrapper">
-            <img src="/imagenes/logo/logo-ticket-bn.png" alt="BuchiSapa" class="ticket-logo-img" onerror="this.onerror=null; this.src='/imagenes/logo/logo-buchisapa.png';">
+            <img src="/imagenes/logo/logo-ticket-bn.webp" alt="BuchiSapa" class="ticket-logo-img" onerror="this.onerror=null; this.src='/imagenes/logo/logo-buchisapa.webp';">
           </div>
           <h2 class="ticket-brand-name">BUCHISAPA</h2>
           <p class="ticket-slogan">Sabor que te llena</p>

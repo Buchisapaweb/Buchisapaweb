@@ -203,7 +203,7 @@ TOTAL                                  S/ ${d.total}
         
         <!-- LOGO OFICIAL BUCHISAPA -->
         <div style="text-align: center; margin-bottom: 10px;">
-          <img src="/imagenes/logo/logo-ticket-bn.png" alt="Buchisapa" style="width: 220px; max-width: 85%; height: auto; display: block; margin: 0 auto; filter: contrast(130%);" onerror="this.onerror=null; this.src='/imagenes/logo/logo-buchisapa.png'">
+          <img src="/imagenes/logo/logo-ticket-bn.webp" alt="Buchisapa" style="width: 220px; max-width: 85%; height: auto; display: block; margin: 0 auto; filter: contrast(130%);" onerror="this.onerror=null; this.src='/imagenes/logo/logo-buchisapa.webp'">
         </div>
 
         <!-- ENCABEZADO FISCAL Y DIRECCIÓN -->

@@ -147,7 +147,7 @@ export function compileHtml() {
   console.log('✅ Rutas estáticas limpias creadas (/kitchen, /ubicacion, /rastreo, /reclamaciones).');
 
   // 5. Verificar carpeta de imágenes en dist/ para Vercel
-  const logoDist = path.join(DIST_DIR, 'imagenes', 'logo', 'logo-buchisapa.png');
+  const logoDist = path.join(DIST_DIR, 'imagenes', 'logo', 'logo-buchisapa.webp');
   console.log(`✅ Archivos de imágenes verificados en dist/imagenes.`);
 }
 

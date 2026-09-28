@@ -12,8 +12,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'BuchiSapa - Tu Pedido';
   const options = {
     body: data.message || 'Actualización de tu pedido en Buchisapa',
-    icon: '/imagenes/logo/logo-buchisapa.png',
-    badge: '/imagenes/logo/logo-buchisapa.png',
+    icon: '/imagenes/logo/logo-buchisapa.webp',
+    badge: '/imagenes/logo/logo-buchisapa.webp',
     data: data
   };
   event.waitUntil(self.registration.showNotification(title, options));

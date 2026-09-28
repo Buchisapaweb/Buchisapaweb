@@ -8,12 +8,12 @@
   "theme_color": "#f97316",
   "icons": [
     {
-      "src": "/imagenes/logo/logo-buchisapa.png",
+      "src": "/imagenes/logo/logo-buchisapa.webp",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/imagenes/logo/logo-buchisapa.png",
+      "src": "/imagenes/logo/logo-buchisapa.webp",
       "sizes": "512x512",
       "type": "image/png"
     }
