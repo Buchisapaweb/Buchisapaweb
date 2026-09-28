@@ -1599,16 +1599,19 @@
         <div class="admin-client-card" id="ticket-cart-item-${index}">
           <div class="admin-client-card-top">
             <div>
-              <h4 class="admin-client-card-title">${window.AdminUtils.escapeHtml(item.name)} <span style="color: #ea580c; font-weight: 800;">${unitLabel}</span></h4>
-              <span class="admin-client-card-category">PLATO PERSONALIZABLE</span>
+              <h4 class="admin-client-card-title">
+                ${window.AdminUtils.escapeHtml(item.name)} 
+                ${unitLabel ? `<span style="display: inline-block; margin-left: 6px; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.45); color: #fb923c; font-size: 0.78rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">${unitLabel.trim()}</span>` : ''}
+              </h4>
+              <span class="admin-client-card-category">✦ PLATO PERSONALIZABLE</span>
               <div class="admin-client-card-price">S/ ${item.price.toFixed(2)}</div>
               <span class="admin-client-card-unit-label">Precio unitario</span>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
-              <button type="button" class="btn btn-secondary btn-sm" onclick="window.duplicateTicketItem(${index})" title="Agregar otra unidad igual para personalizar" style="padding: 6px 12px; font-size: 0.8rem; font-weight: 700; border-radius: 8px; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">
-                + Otra Unidad
+              <button type="button" class="btn btn-sm" onclick="window.duplicateTicketItem(${index})" title="Agregar otra unidad igual para personalizar" style="padding: 7px 13px; font-size: 0.82rem; font-weight: 800; border-radius: 10px; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.14); cursor: pointer; transition: all 0.18s ease; display: inline-flex; align-items: center; gap: 4px;">
+                <span>+ Otra Unidad</span>
               </button>
-              <button type="button" class="btn-remove-ticket-item" title="Eliminar esta unidad" onclick="window.removeTicketItem(${index})" style="background: #fef2f2; border: 1.5px solid #fecaca; color: #dc2626; border-radius: 8px; padding: 6px 9px; cursor: pointer;">
+              <button type="button" class="btn-remove-ticket-item" title="Eliminar esta unidad" onclick="window.removeTicketItem(${index})" style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid rgba(239, 68, 68, 0.4); color: #f87171; border-radius: 10px; padding: 7px 10px; cursor: pointer; transition: all 0.18s ease; display: inline-flex; align-items: center; justify-content: center;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
