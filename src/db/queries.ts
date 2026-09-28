@@ -3,6 +3,7 @@ import path from 'path';
 
 export interface Category {
   id: string;
+  code?: string;
   name: string;
   icon: string;
   description: string;
@@ -10,6 +11,7 @@ export interface Category {
 
 export interface Product {
   id: string;
+  code?: string;
   name: string;
   category_id: string;
   price: number;
@@ -85,15 +87,14 @@ export interface Claim {
 
 // 1. CATEGORÍAS OFICIALES BUCHISAPA
 const initialCategories: Category[] = [
-  { id: 'hamburguesas', name: 'Burgers', icon: 'Beef', description: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
-  { id: 'broaster', name: 'Broaster', icon: 'Drumstick', description: 'Pollo broaster ultra crocante con papas, arroz, ensalada y cremas.' },
-  { id: 'combos', name: 'Combos', icon: 'Sparkles', description: 'Combos familiares y promociones especiales.' },
-  { id: 'bebidas', name: 'Bebidas', icon: 'Coffee', description: 'Gaseosas heladas, chicha morada casera y refrescos naturales.' },
-  { id: 'extras', name: 'Extras', icon: 'Utensils', description: 'Papas fritas, porciones de cremas caseras y complementos.' },
-  { id: 'salchipapas', name: 'Salchipapas', icon: 'Flame', description: 'Papas crocantes, salchichas, chorizos y combinaciones broaster.' },
-  { id: 'platos-amazonicos', name: 'Platos Amazónicos', icon: 'Flame', description: 'Auténticos sabores de la selva peruana: tacacho, cecina, juanes y patacones.' },
-  { id: 'refrescos', name: 'Refrescos', icon: 'GlassWater', description: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
-  { id: 'infusiones', name: 'Infusiones', icon: 'CupSoda', description: 'Infusiones calientes y café aromático pasado.' }
+  { id: 'alitas', code: '1001', name: 'ALITAS', icon: 'Drumstick', description: 'Alitas crujientes en salsa acevichada y BBQ.' },
+  { id: 'bebidas', code: '1002', name: 'BEBIDAS', icon: 'Coffee', description: 'Gaseosas heladas, agua y bebidas en botella.' },
+  { id: 'broaster', code: '1003', name: 'BROASTER', icon: 'Drumstick', description: 'Pollo broaster ultra crocante con papas, arroz y cremas.' },
+  { id: 'hamburguesas', code: '1004', name: 'HAMBURGUESAS', icon: 'Beef', description: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
+  { id: 'infusiones', code: '1005', name: 'INFUSIONES', icon: 'CupSoda', description: 'Infusiones calientes y café aromático pasado.' },
+  { id: 'platos-amazonicos', code: '1006', name: 'PLATOS AMAZÓNICOS', icon: 'Flame', description: 'Auténticos sabores de la selva peruana: tacacho, cecina, juanes y patacones.' },
+  { id: 'refrescos', code: '1007', name: 'REFRESCOS', icon: 'GlassWater', description: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
+  { id: 'salchipapas', code: '1008', name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'Flame', description: 'Papas crocantes, salchichas, chorizos y combinaciones broaster.' }
 ];
 
 // 2. SALSAS DE LA CASA
@@ -703,101 +704,6 @@ const initialProducts: Product[] = [
     stock: 30,
     image: 'https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80',
     includes_sauces: false
-  },
-
-  // 9. COMBOS ESPECIALES (3)
-  {
-    id: 'com-1',
-    name: 'Combo Familiar Broaster',
-    category_id: 'combos',
-    price: 45,
-    description: '1 Pollo broaster entero crocante + porción familiar de papas fritas + ensalada + chicha morada 1.5L.',
-    badge: 'FAMILIAR',
-    popular: true,
-    available: true,
-    stock: 20,
-    image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-  {
-    id: 'com-2',
-    name: 'Combo Selvático Dúo',
-    category_id: 'combos',
-    price: 32,
-    description: '1 Tacacho con cecina + 1 Arroz chaufa amazónico + 2 refrescos de cocona helados.',
-    badge: 'SELVÁTICO',
-    popular: true,
-    available: true,
-    stock: 20,
-    image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-  {
-    id: 'com-3',
-    name: 'Combo Burger Lover',
-    category_id: 'combos',
-    price: 28,
-    description: '2 Hamburguesas a lo Pobre + 2 porciones de papas crujientes + 2 Inca Cola 500ml.',
-    badge: 'COMBO DÚO',
-    popular: true,
-    available: true,
-    stock: 20,
-    image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-
-  // 10. EXTRAS Y SALSAS (4)
-  {
-    id: 'ext-1',
-    name: 'Porción de Papas Fritas',
-    category_id: 'extras',
-    price: 6,
-    description: 'Papas amarillas crocantes saladas al punto, doradas al momento.',
-    badge: 'EXTRA',
-    popular: false,
-    available: true,
-    stock: 50,
-    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-  {
-    id: 'ext-2',
-    name: 'Porción Extra de Cecina',
-    category_id: 'extras',
-    price: 8,
-    description: 'Láminas jugosas de cecina ahumada artesanal de la selva.',
-    badge: 'EXTRA',
-    popular: false,
-    available: true,
-    stock: 40,
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-  {
-    id: 'ext-3',
-    name: 'Porción de Tacacho',
-    category_id: 'extras',
-    price: 6,
-    description: 'Bolas de plátano majado con chicharrón y sazón amazónica.',
-    badge: 'EXTRA',
-    popular: false,
-    available: true,
-    stock: 40,
-    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-  {
-    id: 'ext-4',
-    name: 'Porción de Cremas de la Casa',
-    category_id: 'extras',
-    price: 3,
-    description: 'Variedad de salsas caseras: ají pollero, tártara, mayonesa y rocoto.',
-    badge: 'SALSAS',
-    popular: false,
-    available: true,
-    stock: 50,
-    image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
   }
 ];
 

@@ -12,9 +12,6 @@
                   <p class="panel-description">Configura la cantidad de diapositivas, fotos, títulos y promociones visibles en la portada de BuchiSapa.</p>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                  <a href="/" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-                    <span>Ver Tienda en Vivo ↗</span>
-                  </a>
                   <button class="btn btn-primary btn-sm" onclick="window.openCreatePortadaModal()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                     <span>+ Agregar Imagen de Portada</span>
@@ -45,40 +42,32 @@
                     <span class="metric-hint">Visibles en la página de inicio</span>
                   </div>
                 </div>
-
-                <div class="metric-card">
-                  <div class="metric-icon-wrap blue">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  </div>
-                  <div class="metric-details">
-                    <span class="metric-label">Rotación Automática</span>
-                    <span class="metric-value">5 Segundos</span>
-                    <span class="metric-hint">Transición fluida</span>
-                  </div>
-                </div>
-
-                <div class="metric-card">
-                  <div class="metric-icon-wrap amber">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m13 2-2 2.5V8l2 2 5-5-2-2.5L13 2Z"/><path d="m11 8-7 7 2 2 7-7"/></svg>
-                  </div>
-                  <div class="metric-details">
-                    <span class="metric-label">Diseño Adaptativo</span>
-                    <span class="metric-value">100% Móvil &amp; PC</span>
-                    <span class="metric-hint">Ultra HD optimizado</span>
-                  </div>
-                </div>
               </div>
 
-              <!-- SIMULADOR INTERACTIVO / VISTA PREVIA RÁPIDA -->
-              <div style="background-color: var(--bg-surface); border-radius: var(--radius-lg); padding: 18px; border: 1px solid var(--border-subtle); margin-top: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                  <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff;">🖥️ Vista Previa en Directo de la Portada</h4>
-                  <div style="display: flex; gap: 8px;" id="portada-sim-dots">
-                    <!-- Dots dinámicos -->
+              <!-- SIMULADOR INTERACTIVO DUAL / VISTA PREVIA RÁPIDA (ESCRITORIO + MÓVIL POR SEPARADO) -->
+              <div style="background: rgba(18, 11, 36, 0.85); border-radius: var(--radius-lg); padding: 18px; border: 1px solid var(--border-card); margin-top: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="display: flex; gap: 6px;">
+                      <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+                      <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                      <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                    </div>
+                    <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin: 0;">🖥️ Vista Escritorio (PortadaXE.webp) &amp; 📱 Vista Móvil (PortadaXM.webp)</h4>
+                  </div>
+
+                  <!-- SELECTOR DE SLIDE -->
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700;">Seleccionar Diapositiva:</span>
+                    <div style="display: flex; gap: 6px;" id="portada-sim-dots">
+                      <!-- Dots dinámicos -->
+                    </div>
                   </div>
                 </div>
-                <div id="portada-live-preview-box" style="position: relative; height: 200px; border-radius: var(--radius-md); overflow: hidden; background: #000; border: 1px solid var(--border-card);">
-                  <!-- Render dinámico de preview -->
+
+                <!-- CONTENEDOR DUAL: VISTAS SEPARADAS PARA ESCRITORIO Y MÓVIL -->
+                <div id="portada-live-preview-box" style="display: flex; gap: 16px; width: 100%; align-items: stretch; flex-wrap: wrap;">
+                  <!-- Render dinámico dual en JS (Escritorio e Imagen Móvil por separado) -->
                 </div>
               </div>
 

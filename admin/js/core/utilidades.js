@@ -37,20 +37,32 @@
 
   function formatCategoryName(cat) {
     const map = {
-      'platos-amazonicos': 'Amazónicos',
-      'hamburguesas': 'Burgers',
-      'broaster': 'Broaster',
-      'salchipapas': 'Salchipapas',
-      'alitas': 'Alitas',
-      'bebidas': 'Bebidas',
-      'refrescos': 'Refrescos',
-      'infusiones': 'Infusiones',
-      'combos': 'Combos',
-      'extras': 'Extras',
-      'guarniciones': 'Guarniciones'
+      '1001': 'ALITAS',
+      '1002': 'BEBIDAS',
+      '1003': 'BROASTER',
+      '1004': 'HAMBURGUESAS',
+      '1005': 'INFUSIONES',
+      '1006': 'PLATOS AMAZÓNICOS',
+      '1007': 'REFRESCOS',
+      '1008': 'SALCHIPAPAS Y SALCHIBROASTERS',
+      'alitas': 'ALITAS',
+      'bebidas': 'BEBIDAS',
+      'broaster': 'BROASTER',
+      'hamburguesas': 'HAMBURGUESAS',
+      'infusiones': 'INFUSIONES',
+      'platos-amazonicos': 'PLATOS AMAZÓNICOS',
+      'refrescos': 'REFRESCOS',
+      'salchipapas': 'SALCHIPAPAS Y SALCHIBROASTERS'
     };
     const key = (cat || '').toLowerCase().trim();
-    return map[key] || cat || 'General';
+    if (map[key]) return map[key];
+
+    // Check custom categories in state or localStorage
+    const customList = window.AdminState?.customCategories || JSON.parse(localStorage.getItem('buchisapa_custom_categories') || '[]');
+    const found = customList.find(c => c.id === key || c.code === key || c.slug === key);
+    if (found) return found.name;
+
+    return cat || 'General';
   }
 
   function escapeHtml(str) {

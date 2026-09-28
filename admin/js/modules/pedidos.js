@@ -330,20 +330,23 @@
               <span class="order-type-badge">${isDelivery ? '🛵 Delivery' : '🛍️ Recojo'}</span>
               <span class="badge ${getStatusBadgeClass(status)}">${getStatusLabel(status)}</span>
             </div>
-            <span class="order-timestamp">${new Date(order.created_at || order.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span class="order-timestamp">⏰ ${new Date(order.created_at || order.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
 
           <div class="order-customer-info">
-            <span class="order-customer-name">👤 ${window.AdminUtils.escapeHtml(order.customerName || order.customer?.name || 'Cliente')}</span>
-            ${(order.customerPhone || order.customer?.phone) ? `<span>📞 ${order.customerPhone || order.customer.phone}</span>` : ''}
-            ${(order.deliveryAddress || order.customer?.address) ? `<span>📍 ${window.AdminUtils.escapeHtml(order.deliveryAddress || order.customer.address)}</span>` : ''}
-            <span>💳 ${order.payment_method || order.paymentMethod || 'Efectivo'}</span>
+            <div class="customer-info-line">
+              <span class="order-customer-name">👤 ${window.AdminUtils.escapeHtml(order.customerName || order.customer?.name || 'Cliente')}</span>
+              ${(order.customerPhone || order.customer?.phone) ? `<span class="order-customer-phone">📞 ${order.customerPhone || order.customer.phone}</span>` : ''}
+            </div>
+            ${(order.deliveryAddress || order.customer?.address) ? `<div class="customer-address-line">📍 ${window.AdminUtils.escapeHtml(order.deliveryAddress || order.customer.address)}</div>` : ''}
+            <div class="customer-payment-line">💳 Pago: ${order.payment_method || order.paymentMethod || 'Efectivo'}</div>
           </div>
 
           <div class="order-items-summary">
+            <div class="order-items-header">📋 Platos del Pedido:</div>
             ${parsedItems.map(item => `
               <div class="order-item-row">
-                <div>
+                <div class="order-item-detail">
                   <span class="order-item-qty">${item.quantity || 1}x</span>
                   <span class="order-item-name">${window.AdminUtils.escapeHtml(item.name || item.title || 'Plato')}</span>
                 </div>
@@ -353,31 +356,31 @@
           </div>
 
           <div class="order-card-footer">
-            <div>
-              <span style="font-size: 0.8rem; color: var(--text-muted, #94a3b8);">Total a cobrar:</span>
-              <span class="order-total-amount" style="margin-left: 6px;">${window.AdminUtils.formatSoles(order.total || 0)}</span>
+            <div class="order-total-group">
+              <span class="total-label">Total a cobrar:</span>
+              <span class="order-total-amount">${window.AdminUtils.formatSoles(order.total || 0)}</span>
             </div>
 
             <div class="order-stage-actions">
               ${status === 'pendiente' || status === 'recibido' ? `
-                <button class="btn btn-primary btn-sm" onclick="window.changeOrderStatus('${order.id}', 'en_preparacion')">
-                  🧑‍🍳 A Cocina
+                <button class="btn btn-primary btn-sm btn-action-step" onclick="window.changeOrderStatus('${order.id}', 'en_preparacion')">
+                  🧑‍🍳 En Preparación
                 </button>
               ` : ''}
 
               ${status === 'en_preparacion' || status === 'preparando' ? `
-                <button class="btn btn-secondary btn-sm" style="border-color: #10b981; color: #10b981;" onclick="window.changeOrderStatus('${order.id}', 'listo')">
-                  ✅ Marcar Listo
+                <button class="btn btn-secondary btn-sm btn-action-step" style="border-color: #10b981; color: #10b981;" onclick="window.changeOrderStatus('${order.id}', 'listo')">
+                  🚀 Despachar
                 </button>
               ` : ''}
 
-              ${status === 'listo' || status === 'en_camino' ? `
-                <button class="btn btn-primary btn-sm" onclick="window.changeOrderStatus('${order.id}', 'entregado')">
-                  🚀 Entregar
+              ${status === 'listo' || status === 'en_camino' || status === 'despachado' ? `
+                <button class="btn btn-primary btn-sm btn-action-step" onclick="window.changeOrderStatus('${order.id}', 'entregado')">
+                  ✅ Marcar Entregado
                 </button>
               ` : ''}
 
-              <button class="btn btn-secondary btn-sm" onclick="window.previewThermalTicketFromOrder('${order.id}')" title="Imprimir Ticket">
+              <button class="btn btn-secondary btn-sm btn-action-step" onclick="window.previewThermalTicketFromOrder('${order.id}')" title="Imprimir Ticket">
                 🖨️ Ticket
               </button>
             </div>
@@ -389,17 +392,18 @@
 
   function getStatusBadgeClass(status) {
     if (status === 'en_preparacion' || status === 'preparando') return 'badge-blue';
-    if (status === 'listo' || status === 'en_camino' || status === 'entregado') return 'badge-green';
+    if (status === 'listo' || status === 'en_camino' || status === 'despachado') return 'badge-green';
+    if (status === 'entregado') return 'badge-purple';
     if (status === 'cancelado') return 'badge-red';
     return 'badge-amber';
   }
 
   function getStatusLabel(status) {
-    if (status === 'en_preparacion' || status === 'preparando') return 'En Cocina';
-    if (status === 'listo' || status === 'en_camino') return 'Listo / En Ruta';
+    if (status === 'en_preparacion' || status === 'preparando') return 'En Preparación';
+    if (status === 'listo' || status === 'en_camino' || status === 'despachado') return 'Despachado';
     if (status === 'entregado') return 'Entregado';
     if (status === 'cancelado') return 'Cancelado';
-    return 'Recibido / Pendiente';
+    return 'Pendiente';
   }
 
   async function changeOrderStatus(id, newStatus) {

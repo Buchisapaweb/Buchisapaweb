@@ -1,0 +1,78 @@
+<!-- ====================================================================
+     VISTA DE GESTIÓN DE CATEGORÍAS (NUEVA PÁGINA COMPLETA PROFESIONAL)
+     ==================================================================== -->
+<section class="admin-view" id="view-categorias">
+  
+  <!-- CABECERA PRINCIPAL Y NAVEGACIÓN DE VISTA -->
+  <div class="category-page-header">
+    <div class="category-page-nav-row">
+      <button type="button" class="btn-back-pill" onclick="window.switchAdminView('productos')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        <span>Volver al Catálogo</span>
+      </button>
+      <div class="form-page-badge">
+        <span class="pulse-dot"></span>
+        <span>MÓDULO DE CARTA DIGITAL</span>
+      </div>
+    </div>
+
+    <div class="category-page-title-box">
+      <h2 class="category-page-main-title">📁 Gestión de Categorías de la Carta</h2>
+      <p class="category-page-sub-title">Añade nuevas categorías personalizadas o elimina de forma rápida las que ya no requieras en tu menú web.</p>
+    </div>
+  </div>
+
+  <!-- DISPOSICIÓN PRINCIPAL DE PÁGINA EN 2 COLUMNAS AMPLIAS -->
+  <div class="category-page-body-grid">
+    
+    <!-- SECCIÓN IZQUIERDA: CREAR CATEGORÍA -->
+    <div class="category-form-section">
+      <div class="section-title-wrap">
+        <div class="squircle-icon-badge squircle-cyan">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+        </div>
+        <div>
+          <h3 class="section-title-text">Crear Nueva Categoría</h3>
+          <p class="section-subtitle-text">Se activará inmediatamente para filtrar y asociar platos</p>
+        </div>
+      </div>
+
+      <form id="new-category-page-form" onsubmit="window.handleCreateCategorySubmit(event)" class="category-flat-form">
+        <div class="cat-form-grid">
+          <div class="form-group form-group-code">
+            <label class="form-label" for="form-cat-page-code">Código (4 Dígitos)</label>
+            <input type="text" class="form-input form-input-lg form-input-code" id="form-cat-page-code" readonly placeholder="1011">
+          </div>
+          <div class="form-group form-group-name">
+            <label class="form-label" for="form-cat-page-name">Nombre de la Categoría *</label>
+            <input type="text" class="form-input form-input-lg" id="form-cat-page-name" required placeholder="Ej. Parrillas & Carnes, Postres, Tragos">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-save-category-hero">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+          <span>Guardar Categoría</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- SECCIÓN DERECHA: LISTADO Y ELIMINACIÓN -->
+    <div class="category-list-section">
+      <div class="section-title-wrap">
+        <div class="squircle-icon-badge squircle-purple">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        </div>
+        <div>
+          <h3 class="section-title-text">Categorías Disponibles</h3>
+          <p class="section-subtitle-text">Haz clic en 'Eliminar Categoría' para borrar cualquiera del menú</p>
+        </div>
+      </div>
+
+      <div class="categories-list-container" id="categories-full-list-container">
+        <!-- Carga dinámica vía JavaScript -->
+      </div>
+    </div>
+
+  </div>
+
+</section>

@@ -17,6 +17,11 @@
       desc: 'Gestión de platos, precios, disponibilidad y stock',
       button: { text: '+ Nuevo Producto', action: () => window.openProductModal() }
     },
+    'categorias': {
+      title: 'Gestión de Categorías de la Carta',
+      desc: 'Agrega nuevas categorías o elimina categorías del menú digital',
+      button: { text: '+ Volver a Productos', action: () => window.switchAdminView('productos') }
+    },
     'pedidos': {
       title: 'Gestión de Pedidos & Cocina KDS',
       desc: 'Comandas activas, estados de preparación y pedidos listos en tiempo real',
@@ -24,13 +29,8 @@
     },
     'ventas': {
       title: 'Reporte de Ventas',
-      desc: 'Estadísticas de ingresos, volumen y métodos de pago',
+      desc: 'Métricas clave, volumen de ventas y métodos de pago',
       button: { text: 'Exportar Reporte', action: () => window.showToast('Exportando reporte comercial a CSV...', 'info') }
-    },
-    'caja': {
-      title: 'Control de Caja y Arqueo',
-      desc: 'Fondo de apertura, movimientos de caja chica y cierres Z',
-      button: { text: '+ Movimiento', action: () => window.openCajaMovementModal() }
     },
     'ticket': {
       title: 'Tickets y Boletas Térmicas',
@@ -157,10 +157,10 @@
         window.fetchOrders();
       } else if (viewId === 'productos' && typeof window.fetchProducts === 'function') {
         window.fetchProducts();
-      } else if (viewId === 'caja' && typeof window.fetchCaja === 'function') {
-        window.fetchCaja();
-      } else if (viewId === 'ticket' && typeof window.fetchTickets === 'function') {
-        window.fetchTickets();
+      } else if (viewId === 'categorias' && typeof window.renderCategoryListInManager === 'function') {
+        window.renderCategoryListInManager();
+      } else if (viewId === 'ventas') {
+        window.renderVentasView?.();
       } else if (viewId === 'dashboard') {
         window.updateDashboardMetrics?.();
       }

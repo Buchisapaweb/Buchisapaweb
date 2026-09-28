@@ -741,5 +741,115 @@ input:checked + .slider:before {
   border-radius: 12px;
 }
 
+/* DESKTOP VS MOBILE RESPONSIVE DISPLAY RULES */
+.desktop-only-view {
+  display: block;
+}
+.mobile-only-view {
+  display: none !important;
+}
+
+/* MOBILE RESPONSIVE OPTIMIZATIONS FOR TABLES & VENTAS */
+@media (max-width: 768px) {
+  .desktop-only-view {
+    display: none !important;
+  }
+  .mobile-only-view {
+    display: flex !important;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  
+  .panel-header > div {
+    width: 100% !important;
+  }
+
+  .date-filter-group {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .date-filter-group::-webkit-scrollbar {
+    display: none;
+  }
+
+  .date-filter-group .btn-filter-period {
+    flex: 1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    padding: 8px 10px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .metric-card {
+    padding: 12px !important;
+  }
+
+  .metric-card .metric-value {
+    font-size: 1.15rem !important;
+  }
+
+  .metric-card .metric-label {
+    font-size: 0.75rem !important;
+  }
+
+  .metric-card .metric-hint {
+    font-size: 0.68rem !important;
+  }
+
+  /* MOBILE CARD ITEM STYLES */
+  .mobile-sales-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .mobile-sales-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-sales-card-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+
+  .mobile-sales-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+  }
+
+  .mobile-sales-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    font-size: 0.78rem;
+  }
+}
+
+
 
 

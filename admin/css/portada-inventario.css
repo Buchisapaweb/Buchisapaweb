@@ -97,11 +97,39 @@
   border-color: var(--accent-orange);
   transform: scale(1.05);
 }
-
 .portada-preset-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* PORTADA CARD STATES & GLOW BADGES */
+.portada-card-paused {
+  opacity: 0.72;
+  filter: grayscale(0.25);
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+.badge-green-glow {
+  background: rgba(16, 185, 129, 0.25);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.badge-green-glow:hover {
+  background: rgba(16, 185, 129, 0.4);
+}
+
+.badge-amber-glow {
+  background: rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.badge-amber-glow:hover {
+  background: rgba(245, 158, 11, 0.4);
 }
 
 /* UTENSIL / INSUMO CARDS */

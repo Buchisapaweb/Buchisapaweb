@@ -22,21 +22,23 @@
       </div>
     </div>
 
-    <!-- SECTOR DE FILTROS INTERACTIVOS POR ESTADO Y CANAL (CHIPS / PILLS) -->
+    <!-- SECTOR DE FILTROS INTERACTIVOS POR ESTADO Y CANAL (RESPONSIVE PARA MÓVILES) -->
     <div class="pedidos-chips-section">
       <!-- FILTRO DE ESTADOS -->
       <div class="filter-chips-group">
-        <span class="chips-group-label">Estado:</span>
+        <div class="chips-group-header">
+          <span class="chips-group-label">⚡ Estado del Pedido</span>
+        </div>
         <div class="chips-scroll-container" id="status-chips-container">
           <button type="button" class="status-chip active" data-status="todos" onclick="window.selectStatusFilter('todos', this)">
             <span class="chip-icon">✨</span>
-            <span class="chip-label">Todos los Estados</span>
+            <span class="chip-label">Todos</span>
             <span class="chip-count" id="count-chip-todos">0</span>
           </button>
 
           <button type="button" class="status-chip chip-amber" data-status="recibido" onclick="window.selectStatusFilter('recibido', this)">
-            <span class="chip-icon">🔔</span>
-            <span class="chip-label">Recibido</span>
+            <span class="chip-icon">⏳</span>
+            <span class="chip-label">Pendiente</span>
             <span class="chip-count" id="count-chip-recibido">0</span>
           </button>
 
@@ -47,17 +49,20 @@
           </button>
 
           <button type="button" class="status-chip chip-emerald" data-status="listo" onclick="window.selectStatusFilter('listo', this)">
-            <span class="chip-icon">🛵 Listo</span>
+            <span class="chip-icon">🚀</span>
+            <span class="chip-label">Despachado</span>
             <span class="chip-count" id="count-chip-listo">0</span>
           </button>
 
           <button type="button" class="status-chip chip-purple" data-status="entregado" onclick="window.selectStatusFilter('entregado', this)">
-            <span class="chip-icon">✅ Entregado</span>
+            <span class="chip-icon">✅</span>
+            <span class="chip-label">Entregado</span>
             <span class="chip-count" id="count-chip-entregado">0</span>
           </button>
 
           <button type="button" class="status-chip chip-red" data-status="cancelado" onclick="window.selectStatusFilter('cancelado', this)">
-            <span class="chip-icon">❌ Cancelado</span>
+            <span class="chip-icon">❌</span>
+            <span class="chip-label">Cancelado</span>
             <span class="chip-count" id="count-chip-cancelado">0</span>
           </button>
         </div>
@@ -65,10 +70,12 @@
 
       <!-- FILTRO DE CANALES -->
       <div class="filter-chips-group">
-        <span class="chips-group-label">Canal:</span>
+        <div class="chips-group-header">
+          <span class="chips-group-label">📌 Canal de Venta</span>
+        </div>
         <div class="chips-scroll-container" id="type-chips-container">
           <button type="button" class="type-chip active" data-type="todos" onclick="window.selectTypeFilter('todos', this)">
-            <span class="chip-label">🌐 Todos Canales</span>
+            <span class="chip-label">🌐 Todos</span>
           </button>
 
           <button type="button" class="type-chip" data-type="delivery" onclick="window.selectTypeFilter('delivery', this)">

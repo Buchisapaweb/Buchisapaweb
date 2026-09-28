@@ -33,6 +33,7 @@ function getCompiledAdminHtml(): string {
     'TOPBAR': 'admin/partials/topbar.html',
     'VIEW_DASHBOARD': 'admin/views/dashboard.html',
     'VIEW_PRODUCTOS': 'admin/views/productos.html',
+    'VIEW_CATEGORIAS': 'admin/views/categorias.html',
     'VIEW_PEDIDOS': 'admin/views/pedidos.html',
     'VIEW_VENTAS': 'admin/views/ventas.html',
     'VIEW_CAJA': 'admin/views/caja.html',
@@ -2474,12 +2475,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
   app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
 
-  // 3. Panel de Administración Oficial BuchiSapa (Archivos estáticos CSS, JS, etc.)
-  app.use('/admin', express.static(path.join(process.cwd(), 'admin'), staticOptions));
-
-  // 4. Servir HTML Compilado del Panel de Administración para /admin y cualquier subruta (/admin/dashboard, /admin/productos, etc.)
+  // 3. Servir HTML Compilado del Panel de Administración para /admin y cualquier subruta (/admin/dashboard, /admin/productos, etc.)
   app.get(['/admin', '/admin.html', /^\/admin(?:\/.*)?$/], (req: Request, res: Response, next) => {
-    // Si la petición solicita un archivo específico con extensión (.css, .js, .png, etc.) que no existe, pasar al siguiente handler
+    // Si la petición solicita un archivo específico con extensión (.css, .js, .png, etc.), pasar a express.static
     if (path.extname(req.path)) {
       return next();
     }
@@ -2489,6 +2487,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.setHeader('Expires', '0');
     res.send(getCompiledAdminHtml());
   });
+
+  // 4. Panel de Administración Oficial BuchiSapa (Archivos estáticos CSS, JS, imágenes)
+  app.use('/admin', express.static(path.join(process.cwd(), 'admin'), { ...staticOptions, index: false }));
 
   app.get(['/kitchen', '/cocina', '/cocina.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'public/html/cocina.html'));
