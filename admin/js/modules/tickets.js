@@ -11,89 +11,100 @@
     try {
       if (window.AdminApi && typeof window.AdminApi.getTickets === 'function') {
         const data = await window.AdminApi.getTickets();
-        if (Array.isArray(data) && data.length > 0) {
-          state.allTickets = data;
-        } else {
-          throw new Error('Empty api tickets');
-        }
+        state.allTickets = Array.isArray(data) ? data : [];
       } else {
-        throw new Error('No getTickets api');
+        state.allTickets = [];
       }
     } catch (e) {
-      if (!state.allTickets || state.allTickets.length === 0) {
-        if (Array.isArray(state.allOrders) && state.allOrders.length > 0) {
-          state.allTickets = state.allOrders.map((o, idx) => ({
-            id: `tk-${o.id || idx + 1}`,
-            number: `TK-${String(o.orderNumber || idx + 1035).padStart(4, '0').slice(-4)}`,
-            created_at: o.created_at || new Date().toISOString(),
-            customer: o.customer?.name || o.clientName || 'Cliente Mostrador',
-            type: o.type || 'delivery',
-            payment: o.payment_method || o.paymentMethod || 'Yape',
-            items: (o.items || []).map(i => ({ name: i.name || 'Plato', qty: i.quantity || 1, price: i.price || 18 })),
-            subtotal: o.subtotal || o.total || 36,
-            deliveryFee: o.deliveryFee || (o.type === 'delivery' ? 5 : 0),
-            total: o.total || 41,
-            status: 'Emitido'
-          }));
-        } else {
-          state.allTickets = [
-            {
-              id: 'tk-1',
-              number: 'TK-0038',
-              created_at: new Date().toISOString(),
-              customer: 'Juan Carlos Mendoza',
-              type: 'delivery',
-              payment: 'Yape',
-              items: [{ name: 'Bichi Broaster Regional', qty: 2, price: 18 }],
-              subtotal: 36,
-              deliveryFee: 5,
-              total: 41,
-              status: 'Emitido'
-            },
-            {
-              id: 'tk-2',
-              number: 'TK-0037',
-              created_at: new Date(Date.now() - 25 * 60000).toISOString(),
-              customer: 'Elena Rios Vásquez',
-              type: 'salon',
-              payment: 'Efectivo',
-              items: [{ name: 'Hamburguesa Amazónica BuchiSapa', qty: 1, price: 15 }, { name: 'Jugo de Cocona', qty: 1, price: 6 }],
-              subtotal: 21,
-              deliveryFee: 0,
-              total: 21,
-              status: 'Emitido'
-            },
-            {
-              id: 'tk-3',
-              number: 'TK-0036',
-              created_at: new Date(Date.now() - 70 * 60000).toISOString(),
-              customer: 'Marcos Antonio Villegas',
-              type: 'salon',
-              payment: 'Tarjeta POS',
-              items: [{ name: 'Alitas Amazónicas x12', qty: 1, price: 28 }, { name: 'Chicha de Maíz Morado', qty: 2, price: 5 }],
-              subtotal: 38,
-              deliveryFee: 0,
-              total: 38,
-              status: 'Emitido'
-            },
-            {
-              id: 'tk-4',
-              number: 'TK-0035',
-              created_at: new Date(Date.now() - 140 * 60000).toISOString(),
-              customer: 'Fiorella Salazar Mori',
-              type: 'delivery',
-              payment: 'Plin',
-              items: [{ name: 'Buchi Broaster Doble', qty: 2, price: 22 }],
-              subtotal: 44,
-              deliveryFee: 5,
-              total: 49,
-              status: 'Emitido'
-            }
-          ];
-        }
+      console.warn('Error fetching tickets:', e);
+      if (!state.allTickets) {
+        state.allTickets = [];
       }
     }
     filterTickets();
+  }
+
+  async function deleteTicket(ticketId) {
+    if (!ticketId) return;
+    const state = window.AdminState = window.AdminState || {};
+    const targetTicket = (state.allTickets || []).find(t => t.id === ticketId || t.id === `tk-${ticketId}` || String(t.orderNumber) === String(ticketId));
+    const num = targetTicket?.number || (String(ticketId).startsWith('#') ? ticketId : `#${ticketId}`);
+
+    if (!confirm(`¿Estás seguro de eliminar el pedido ${num} y su comprobante por completo?`)) return;
+
+    const rawId = String(ticketId).replace(/^tk-/, '');
+    
+    // Inmediatamente filtrar del estado local para respuesta instantánea (0ms)
+    state.allTickets = (state.allTickets || []).filter(t => 
+      t.id !== ticketId && 
+      t.id !== `tk-${ticketId}` && 
+      t.id !== rawId && 
+      t.id !== `tk-${rawId}` &&
+      t.orderId !== rawId && 
+      String(t.orderNumber) !== String(rawId) &&
+      String(t.orderNumber) !== String(ticketId) &&
+      t.number !== num
+    );
+
+    state.allOrders = (state.allOrders || []).filter(o => 
+      o.id !== ticketId && 
+      o.id !== `tk-${ticketId}` && 
+      o.id !== rawId && 
+      o.id !== `ord-${rawId}` &&
+      String(o.orderNumber) !== String(rawId) &&
+      String(o.orderNumber) !== String(ticketId) &&
+      `#${o.orderNumber}` !== num
+    );
+
+    if (state.allTickets.length === 0) {
+      localStorage.setItem('buchisapa_order_seq', '0');
+    }
+
+    filterTickets();
+
+    // Sincronizar en segundo plano con el servidor
+    try {
+      if (window.AdminApi && typeof window.AdminApi.deleteTicket === 'function') {
+        await window.AdminApi.deleteTicket(ticketId);
+      }
+      if (window.AdminApi && typeof window.AdminApi.deleteOrder === 'function') {
+        await window.AdminApi.deleteOrder(rawId);
+      }
+    } catch (e) {
+      console.warn('Error deleting ticket from API:', e);
+    }
+
+    if (window.showToast) {
+      window.showToast(`Pedido ${num} eliminado con éxito`, 'success');
+    }
+  }
+
+  async function deleteActivePreviewTicket() {
+    if (!currentActivePreviewTicket) return;
+    const ticketId = currentActivePreviewTicket.id;
+    await deleteTicket(ticketId);
+    closeTicketViews();
+  }
+
+  async function clearAllTicketsPrompt() {
+    if (!confirm('¿Deseas eliminar TODOS los tickets y dejar el historial completamente en 0?')) return;
+    const state = window.AdminState = window.AdminState || {};
+    state.allTickets = [];
+    state.allOrders = [];
+    localStorage.setItem('buchisapa_order_seq', '0');
+    filterTickets();
+    
+    try {
+      if (window.AdminApi && typeof window.AdminApi.clearAllTickets === 'function') {
+        await window.AdminApi.clearAllTickets();
+      }
+    } catch (e) {
+      console.warn('Error clearing tickets from API:', e);
+    }
+    
+    if (window.showToast) {
+      window.showToast('Historial restablecido a 0 tickets', 'info');
+    }
   }
 
   function filterTickets() {
@@ -149,11 +160,11 @@
           <div class="ticket-empty-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/></svg>
           </div>
-          <h4>No se encontraron tickets</h4>
-          <p>No hay comprobantes que coincidan con los filtros seleccionados.</p>
+          <h4>No hay tickets registrados</h4>
+          <p>Los nuevos pedidos emitidos iniciarán con la numeración correlativa desde 00001.</p>
         </div>
       `;
-      if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 36px;">No se encontraron tickets con los filtros aplicados.</td></tr>`;
+      if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 36px;">No hay tickets registrados. Inicia emitiendo uno nuevo.</td></tr>`;
       if (cardsContainer) cardsContainer.innerHTML = emptyHtml;
       return;
     }
@@ -176,10 +187,19 @@
             <td style="font-weight: 800; color: #10b981; font-size: 0.98rem;">${window.AdminUtils.formatSoles(t.total)}</td>
             <td><span class="badge badge-green">✓ ${t.status || 'Emitido'}</span></td>
             <td style="text-align: right;">
-              <button class="btn btn-secondary btn-sm" onclick="window.previewThermalTicket('${t.id}')" style="display: inline-flex; align-items: center; gap: 6px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                <span>Ver / Imprimir</span>
-              </button>
+              <div style="display: inline-flex; gap: 8px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="window.previewThermalTicket('${t.id}', 'sale')" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 6px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4); color: #60a5fa;" title="Ver e imprimir Ticket de Venta">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  <span>Ticket de Venta</span>
+                </button>
+                <button class="btn btn-emerald-order btn-sm" onclick="window.previewThermalTicket('${t.id}', 'kitchen')" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 6px 12px; border-radius: 8px;" title="Ver e imprimir Ticket de Cocina">
+                  <span>👨‍🍳 Ticket de Cocina</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="window.deleteTicket('${t.id}')" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 8px; color: #f87171; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.1); font-weight: 700;" title="Eliminar orden y ticket">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Eliminar</span>
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -212,15 +232,26 @@
               </div>
             </div>
 
-            <div class="ticket-card-footer">
-              <div class="ticket-card-total-group">
-                <span class="ticket-card-total-title">Total</span>
-                <span class="ticket-card-total-amount">${window.AdminUtils.formatSoles(t.total)}</span>
+            <div class="ticket-card-footer" style="flex-direction: column; align-items: stretch; gap: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="ticket-card-total-group">
+                  <span class="ticket-card-total-title">Total</span>
+                  <span class="ticket-card-total-amount">${window.AdminUtils.formatSoles(t.total)}</span>
+                </div>
+                <button type="button" onclick="window.deleteTicket('${t.id}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; border-radius: 8px; padding: 6px 12px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Eliminar Pedido</span>
+                </button>
               </div>
-              <button type="button" class="btn-ticket-card-action" onclick="window.previewThermalTicket('${t.id}')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                <span>Imprimir 80mm</span>
-              </button>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button type="button" class="btn-ticket-card-action" style="padding: 10px 6px; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa;" onclick="window.previewThermalTicket('${t.id}', 'sale')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  <span>Ticket de Venta</span>
+                </button>
+                <button type="button" class="btn-ticket-card-action" style="padding: 10px 6px; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(16, 185, 129, 0.18); border: 1px solid rgba(16, 185, 129, 0.5); color: #34d399;" onclick="window.previewThermalTicket('${t.id}', 'kitchen')">
+                  <span>👨‍🍳 Ticket de Cocina</span>
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -240,19 +271,52 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function previewThermalTicket(id) {
+  let currentActivePreviewTicket = null;
+  let currentActivePreviewTab = 'sale'; // 'sale' | 'kitchen'
+
+  function updatePreviewControls(tab, ticket) {
+    const btnSale = document.getElementById('btn-print-preview-sale');
+    const btnKitchen = document.getElementById('btn-print-preview-kitchen');
+    const titleEl = document.getElementById('ticket-preview-page-title');
+    const subEl = document.getElementById('ticket-preview-page-subtitle');
+    const tabSale = document.getElementById('tab-preview-sale');
+    const tabKitchen = document.getElementById('tab-preview-kitchen');
+
+    if (tabSale) tabSale.classList.toggle('is-active', tab === 'sale');
+    if (tabKitchen) tabKitchen.classList.toggle('is-active', tab === 'kitchen');
+
+    if (btnSale) btnSale.style.display = tab === 'sale' ? 'inline-flex' : 'none';
+    if (btnKitchen) btnKitchen.style.display = tab === 'kitchen' ? 'inline-flex' : 'none';
+
+    if (ticket) {
+      const num = ticket.number || '#00001';
+      if (titleEl) {
+        titleEl.textContent = tab === 'kitchen' 
+          ? `Ticket de Cocina ${num}` 
+          : `Ticket de Venta ${num}`;
+      }
+      if (subEl) {
+        subEl.textContent = tab === 'kitchen' 
+          ? 'Comanda térmica para preparación en cocina' 
+          : 'Comprobante oficial de venta para el cliente';
+      }
+    }
+  }
+
+  function previewThermalTicket(id, defaultTab = 'sale') {
     const ticket = (window.AdminState.allTickets || []).find(t => t.id === id);
     if (!ticket) return;
 
+    currentActivePreviewTicket = ticket;
+    currentActivePreviewTab = defaultTab;
     window.AdminState.activePreviewTicket = ticket;
-    renderThermalReceiptHTML(ticket);
+
+    updatePreviewControls(defaultTab, ticket);
+    renderThermalReceiptHTML(ticket, defaultTab);
 
     const listSec = document.getElementById('ticket-list-section');
     const formSec = document.getElementById('ticket-form-page-section');
     const prevSec = document.getElementById('ticket-preview-page-section');
-    const titleEl = document.getElementById('ticket-preview-page-title');
-
-    if (titleEl) titleEl.textContent = `Ticket de Venta ${ticket.number || '#TK-0000'}`;
 
     if (listSec) listSec.style.display = 'none';
     if (formSec) formSec.style.display = 'none';
@@ -261,34 +325,49 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function previewThermalTicketFromOrder(orderId) {
+  function previewThermalTicketFromOrder(orderId, defaultTab = 'sale') {
     const order = (window.AdminState.allOrders || []).find(o => o.id === orderId);
     if (!order) return;
 
+    const rawNum = order.orderNumber || (order.id ? order.id.replace('ord-', '') : '00001');
+    const orderNumFormatted = rawNum.startsWith('#') ? rawNum : `#${rawNum}`;
+
     const ticketLike = {
-      number: `${order.orderNumber || order.id}`,
+      id: order.id,
+      number: orderNumFormatted,
+      orderNumber: rawNum,
       created_at: order.created_at || new Date().toISOString(),
-      customer: order.customer?.name || order.clientName || 'Cliente',
+      customer: order.customerName || order.customer?.name || order.clientName || 'Cliente',
       type: order.type || 'delivery',
       payment: order.payment_method || 'Efectivo',
-      items: (order.items || []).map(i => ({ name: i.name, qty: i.quantity || 1, price: i.price || 0 })),
+      items: (order.items || []).map(i => ({ 
+        name: i.name, 
+        qty: i.quantity || i.qty || 1, 
+        price: i.price || 0,
+        sides: i.sides || [],
+        sauces: i.sauces || [],
+        notes: i.notes || ''
+      })),
       subtotal: (order.items || []).reduce((acc, cur) => acc + (cur.price || 0) * (cur.quantity || 1), 0),
       deliveryFee: order.deliveryFee || 0,
-      total: order.total
+      total: order.total,
+      notes: order.notes || ''
     };
+
+    currentActivePreviewTicket = ticketLike;
+    currentActivePreviewTab = defaultTab;
+    window.AdminState.activePreviewTicket = ticketLike;
 
     if (typeof window.navigateToView === 'function') {
       window.navigateToView('ticket');
     }
 
-    renderThermalReceiptHTML(ticketLike);
+    updatePreviewControls(defaultTab, ticketLike);
+    renderThermalReceiptHTML(ticketLike, defaultTab);
 
     const listSec = document.getElementById('ticket-list-section');
     const formSec = document.getElementById('ticket-form-page-section');
     const prevSec = document.getElementById('ticket-preview-page-section');
-    const titleEl = document.getElementById('ticket-preview-page-title');
-
-    if (titleEl) titleEl.textContent = `Ticket de Venta #${order.orderNumber || order.id}`;
 
     if (listSec) listSec.style.display = 'none';
     if (formSec) formSec.style.display = 'none';
@@ -297,11 +376,19 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function renderThermalReceiptHTML(t) {
-    if (!t) return;
-    const targets = document.querySelectorAll('#thermal-receipt-render-target, .thermal-ticket-render-zone');
-    if (!targets || targets.length === 0) return;
+  function switchTicketPreviewTab(tabType) {
+    if (!currentActivePreviewTicket) {
+      currentActivePreviewTicket = window.AdminState.activePreviewTicket || (window.AdminState.allTickets && window.AdminState.allTickets[0]);
+    }
+    if (!currentActivePreviewTicket) return;
 
+    currentActivePreviewTab = tabType;
+    updatePreviewControls(tabType, currentActivePreviewTicket);
+    renderThermalReceiptHTML(currentActivePreviewTicket, tabType);
+  }
+
+  function buildSaleReceiptHTML(t) {
+    if (!t) return '';
     const dateObj = t.created_at ? new Date(t.created_at) : new Date();
     
     // Formato DD/MM/YYYY
@@ -316,11 +403,11 @@
     const seconds = String(dateObj.getSeconds()).padStart(2, '0');
     const ampm = hours >= 12 ? 'p. m.' : 'a. m.';
     hours = hours % 12;
-    hours = hours ? hours : 12; // '0' -> 12
+    hours = hours ? hours : 12;
     const formattedHours = String(hours).padStart(2, '0');
     const formattedTime = `${formattedHours}:${minutes}:${seconds} ${ampm}`;
 
-    const rawNum = t.number || t.orderNumber || (t.id ? t.id.replace('tk-', '').replace('order-', '') : '1132');
+    const rawNum = t.number || t.orderNumber || (t.id ? t.id.replace('tk-', '').replace('ord-', '') : '00001');
     let orderNumber = String(rawNum).trim();
     if (!orderNumber.startsWith('#')) {
       if (orderNumber.startsWith('TK-')) {
@@ -331,8 +418,7 @@
     }
 
     const customerName = t.customer || t.clientName || 'Cliente';
-    const statusText = t.status || 'Pendiente';
-    
+    const statusText = t.status || 'Emitido';
     const items = t.items || [];
     let totalItemsCount = 0;
     let computedSubtotal = 0;
@@ -347,8 +433,8 @@
     const deliveryFee = Number(t.deliveryFee || 0);
     const finalTotal = t.total !== undefined ? Number(t.total) : (computedSubtotal + deliveryFee);
 
-    const receiptHtml = `
-      <div class="buchisapa-real-ticket">
+    return `
+      <div class="buchisapa-real-ticket buchisapa-sale-ticket">
         <!-- LOGO Y ENCABEZADO OFICIAL -->
         <div class="ticket-header-block">
           <div class="ticket-logo-wrapper">
@@ -390,6 +476,14 @@
             <span class="ticket-meta-val">${window.AdminUtils.escapeHtml(customerName)}</span>
           </div>
           <div class="ticket-meta-row">
+            <span class="ticket-meta-label">Tipo</span>
+            <span class="ticket-meta-val">${t.type === 'delivery' ? 'Delivery' : 'Salón'}</span>
+          </div>
+          <div class="ticket-meta-row">
+            <span class="ticket-meta-label">Pago</span>
+            <span class="ticket-meta-val">${t.payment || 'Efectivo'}</span>
+          </div>
+          <div class="ticket-meta-row">
             <span class="ticket-meta-label">Estado</span>
             <span class="ticket-meta-val">${statusText}</span>
           </div>
@@ -403,6 +497,8 @@
             const qty = Number(item.qty || item.quantity || 1);
             const unitPrice = Number(item.price || 0);
             const lineTotal = qty * unitPrice;
+            const sides = item.selectedSides || item.sides || [];
+            const sauces = item.selectedSauces || item.sauces || [];
             return `
               <div class="ticket-item-row">
                 <div class="ticket-item-title">${qty} ${window.AdminUtils.escapeHtml(item.name || 'Plato BuchiSapa')}</div>
@@ -410,6 +506,12 @@
                   <span class="ticket-item-unit">S/ ${unitPrice.toFixed(2)} c/u</span>
                   <span class="ticket-item-sum">S/ ${lineTotal.toFixed(2)}</span>
                 </div>
+                ${(sides.length > 0 || sauces.length > 0) ? `
+                  <div class="ticket-item-notes" style="margin-top: 2px;">
+                    ${sides.length > 0 ? `<span>• ${sides.join(', ')}</span><br>` : ''}
+                    ${sauces.length > 0 ? `<span>• Salsas: ${sauces.join(', ')}</span>` : ''}
+                  </div>
+                ` : ''}
                 ${item.notes ? `<div class="ticket-item-notes">Nota: ${window.AdminUtils.escapeHtml(item.notes)}</div>` : ''}
               </div>
             `;
@@ -445,17 +547,105 @@
         </div>
       </div>
     `;
+  }
+
+  function buildKitchenReceiptHTML(t) {
+    if (!t) return '';
+
+    const dateObj = t.created_at ? new Date(t.created_at) : new Date();
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const year = dateObj.getFullYear();
+    const formattedDate = `${day}/${month}/${year}`;
+
+    let hours = dateObj.getHours();
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'p. m.' : 'a. m.';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedTime = `${formattedHours}:${minutes} ${ampm}`;
+
+    const rawNum = t.number || t.orderNumber || (t.id ? t.id.replace('tk-', '').replace('ord-', '') : '00001');
+    let orderNumber = String(rawNum).trim();
+    if (!orderNumber.startsWith('#')) {
+      if (orderNumber.startsWith('TK-')) {
+        orderNumber = `#${orderNumber.replace('TK-', '')}`;
+      } else {
+        orderNumber = `#${orderNumber}`;
+      }
+    }
+
+    const customerName = t.customer || t.clientName || 'Cliente';
+    const orderType = t.type === 'delivery' ? 'DELIVERY 🛵' : 'SALÓN 🍽️';
+    const items = t.items || [];
+
+    return `
+      <div class="buchisapa-real-ticket buchisapa-kitchen-ticket">
+        <div class="kitchen-ticket-header">
+          <h2 class="kitchen-ticket-title">COCINA</h2>
+          <div class="kitchen-ticket-order-badge">Pedido ${orderNumber}</div>
+          <div class="kitchen-ticket-client-line">${window.AdminUtils.escapeHtml(customerName)}</div>
+          <div class="kitchen-ticket-meta">${orderType} &bull; ${formattedDate} ${formattedTime}</div>
+        </div>
+
+        <div class="ticket-dashed-line"></div>
+
+        <div class="kitchen-items-container">
+          ${items.map(item => {
+            const qty = Number(item.qty || item.quantity || 1);
+            const name = window.AdminUtils.escapeHtml(item.name || 'Plato');
+            
+            // Acompañamientos
+            const sides = item.selectedSides || item.sides || [];
+            // Salsas
+            const sauces = item.selectedSauces || item.sauces || [];
+
+            return `
+              <div class="kitchen-item-block">
+                <div class="kitchen-item-head">${qty} ${name}</div>
+                ${(sides.length > 0 || sauces.length > 0) ? `
+                  <div class="kitchen-item-sublist">
+                    ${sides.map(s => `<div class="kitchen-item-subline">. ${window.AdminUtils.escapeHtml(s)}</div>`).join('')}
+                    ${sauces.map(s => `<div class="kitchen-item-subline">. ${window.AdminUtils.escapeHtml(s)}</div>`).join('')}
+                  </div>
+                ` : ''}
+                ${item.notes ? `<div class="kitchen-item-notes">Nota: ${window.AdminUtils.escapeHtml(item.notes)}</div>` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        ${t.notes ? `
+          <div class="ticket-dashed-line"></div>
+          <div class="kitchen-general-notes-box">
+            <strong>INDICACIONES GENERALES:</strong><br>
+            ${window.AdminUtils.escapeHtml(t.notes)}
+          </div>
+        ` : ''}
+
+        <div class="ticket-dashed-line"></div>
+      </div>
+    `;
+  }
+
+  function renderThermalReceiptHTML(t, tabMode = 'sale') {
+    if (!t) return;
+    const targets = document.querySelectorAll('#thermal-receipt-render-target, .thermal-ticket-render-zone');
+    if (!targets || targets.length === 0) return;
+
+    const receiptHtml = tabMode === 'kitchen' 
+      ? buildKitchenReceiptHTML(t) 
+      : buildSaleReceiptHTML(t);
 
     targets.forEach(el => {
       el.innerHTML = receiptHtml;
     });
   }
 
-  function printActiveTicket() {
-    const ticketTarget = document.getElementById('thermal-receipt-render-target');
-    const ticketContent = ticketTarget ? ticketTarget.innerHTML : '';
-    if (!ticketContent || ticketContent.trim() === '') {
-      window.showToast('No hay ticket activo cargado para imprimir', 'warning');
+  function printThermalContent(htmlContent, title = 'Impresión Térmica BuchiSapa') {
+    if (!htmlContent || htmlContent.trim() === '') {
+      window.showToast('No hay contenido activo para imprimir', 'warning');
       return;
     }
 
@@ -471,7 +661,7 @@
         <html lang="es">
         <head>
           <meta charset="utf-8">
-          <title>Ticket BuchiSapa</title>
+          <title>${title}</title>
           <style>
             @page {
               size: 80mm auto;
@@ -609,10 +799,77 @@
               font-weight: 700;
               margin: 2px 0 0;
             }
+
+            /* COCINA COMANDA */
+            .kitchen-ticket-header {
+              text-align: center;
+              margin-bottom: 6px;
+            }
+            .kitchen-ticket-title {
+              font-size: 22px;
+              font-weight: 900;
+              letter-spacing: 2px;
+              margin: 0 0 6px 0;
+              text-transform: uppercase;
+            }
+            .kitchen-ticket-order-badge {
+              font-size: 17px;
+              font-weight: 900;
+              margin: 4px 0;
+            }
+            .kitchen-ticket-client-line {
+              font-size: 14px;
+              font-weight: 700;
+              margin: 2px 0;
+            }
+            .kitchen-ticket-meta {
+              font-size: 12px;
+              color: #333333;
+              margin: 2px 0;
+            }
+            .kitchen-items-container {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              margin: 6px 0;
+            }
+            .kitchen-item-block {
+              margin-bottom: 8px;
+            }
+            .kitchen-item-head {
+              font-size: 15px;
+              font-weight: 900;
+              line-height: 1.3;
+            }
+            .kitchen-item-sublist {
+              padding-left: 14px;
+              margin-top: 3px;
+              display: flex;
+              flex-direction: column;
+              gap: 2px;
+            }
+            .kitchen-item-subline {
+              font-size: 13px;
+              font-weight: 600;
+              line-height: 1.25;
+            }
+            .kitchen-item-notes {
+              font-size: 12px;
+              font-weight: 700;
+              font-style: italic;
+              padding-left: 14px;
+              margin-top: 3px;
+            }
+            .kitchen-general-notes-box {
+              margin: 6px 0;
+              padding: 4px 0;
+              font-size: 12.5px;
+              line-height: 1.35;
+            }
           </style>
         </head>
         <body>
-          ${ticketContent}
+          ${htmlContent}
           <script>
             window.onload = function() {
               window.print();
@@ -631,22 +888,60 @@
     }
   }
 
+  function printSaleTicket(t) {
+    const ticket = t || currentActivePreviewTicket || window.AdminState.activePreviewTicket;
+    if (!ticket) {
+      if (window.showToast) window.showToast('No hay ticket activo para imprimir', 'warning');
+      return;
+    }
+    const html = buildSaleReceiptHTML(ticket);
+    printThermalContent(html, `Ticket Venta ${ticket.number || ''}`);
+  }
+
+  function printKitchenTicket(t) {
+    const ticket = t || currentActivePreviewTicket || window.AdminState.activePreviewTicket;
+    if (!ticket) {
+      if (window.showToast) window.showToast('No hay ticket activo para imprimir', 'warning');
+      return;
+    }
+    const html = buildKitchenReceiptHTML(ticket);
+    printThermalContent(html, `Comanda Cocina ${ticket.number || ''}`);
+  }
+
+  function printActiveTicket() {
+    if (currentActivePreviewTab === 'kitchen') {
+      printKitchenTicket();
+    } else {
+      printSaleTicket();
+    }
+  }
+
   function testThermalPrinter() {
     // Generar un ticket de prueba con el formato real oficial
     const testTicket = {
-      number: '1132',
+      number: '#00001',
+      orderNumber: '00001',
       created_at: new Date().toISOString(),
       customer: 'Cliente',
       type: 'salon',
       payment: 'Efectivo',
-      items: [{ name: 'Encuentro', qty: 1, price: 13 }],
+      items: [
+        { 
+          name: 'Encuentro', 
+          qty: 1, 
+          price: 13,
+          selectedSides: ['Papas fritas', 'Ensalada fresca'],
+          selectedSauces: ['Mayonesa', 'Ají de Rocoto']
+        }
+      ],
       subtotal: 13,
       deliveryFee: 0,
       total: 13,
-      status: 'Pendiente'
+      status: 'Emitido'
     };
-    renderThermalReceiptHTML(testTicket);
-    printActiveTicket();
+    currentActivePreviewTicket = testTicket;
+    renderThermalReceiptHTML(testTicket, 'sale');
+    printSaleTicket(testTicket);
   }
 
   // =========================================================================
@@ -1040,12 +1335,11 @@
               <span class="cat-code-box">[${catCode}]</span>
               <span>${catName}</span>
             </div>
-            <h4 class="ticket-prod-card-title">${window.AdminUtils.escapeHtml(prod.name)}</h4>
             <div class="ticket-prod-card-footer">
               <span class="ticket-prod-card-price">S/ ${priceFormatted}</span>
               <button type="button" class="btn-ticket-add-prod" onclick="event.stopPropagation(); window.addTicketItem('${prod.id}')" title="Agregar producto">
                 <span class="btn-add-icon">+</span>
-                <span>Agregar</span>
+                <span class="btn-add-text">Agregar</span>
               </button>
             </div>
           </div>
@@ -1059,35 +1353,56 @@
     const prod = allProds.find(p => p.id === prodId || String(p.id) === String(prodId));
     if (!prod) return;
 
-    const existingIndex = activeTicketItems.findIndex(it => it.prodId === prod.id);
-    if (existingIndex >= 0) {
-      activeTicketItems[existingIndex].qty += 1;
-    } else {
-      const defaultSauces = ALL_CLIENT_SAUCES.filter(s => s.default).map(s => s.name);
-      const isDrink = (prod.category_id || prod.category || '').toLowerCase().includes('bebida') ||
-                      (prod.category_id || prod.category || '').toLowerCase().includes('refresco') ||
-                      (prod.category_id || prod.category || '').toLowerCase().includes('infusion');
-      const availableAccompaniments = getClientProductAccompaniments(prod);
+    const defaultSauces = ALL_CLIENT_SAUCES.filter(s => s.default).map(s => s.name);
+    const isDrink = (prod.category_id || prod.category || '').toLowerCase().includes('bebida') ||
+                    (prod.category_id || prod.category || '').toLowerCase().includes('refresco') ||
+                    (prod.category_id || prod.category || '').toLowerCase().includes('infusion');
+    const availableAccompaniments = getClientProductAccompaniments(prod);
 
-      activeTicketItems.push({
-        id: `it-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        prodId: prod.id,
-        name: prod.name,
-        price: parseFloat(prod.price || 0),
-        qty: 1,
-        isDrink: isDrink,
-        availableSauces: isDrink ? [] : ALL_CLIENT_SAUCES.map(s => s.name),
-        selectedSauces: isDrink ? [] : defaultSauces,
-        availableSides: availableAccompaniments,
-        selectedSides: [...availableAccompaniments],
-        notes: ''
-      });
-    }
+    activeTicketItems.push({
+      id: `it-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      prodId: prod.id,
+      name: prod.name,
+      price: parseFloat(prod.price || 0),
+      qty: 1,
+      isDrink: isDrink,
+      availableSauces: isDrink ? [] : ALL_CLIENT_SAUCES.map(s => s.name),
+      selectedSauces: isDrink ? [] : [...defaultSauces],
+      availableSides: availableAccompaniments,
+      selectedSides: [...availableAccompaniments],
+      notes: ''
+    });
 
     renderTicketCartItems();
     updateTicketFormTotal();
     if (window.showToast) {
-      window.showToast(`"${prod.name}" agregado al ticket`, 'success');
+      window.showToast(`"${prod.name}" agregado al pedido`, 'success');
+    }
+  }
+
+  function duplicateTicketItem(index) {
+    if (!activeTicketItems[index]) return;
+    const item = activeTicketItems[index];
+    const defaultSauces = ALL_CLIENT_SAUCES.filter(s => s.default).map(s => s.name);
+
+    activeTicketItems.splice(index + 1, 0, {
+      id: `it-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      prodId: item.prodId,
+      name: item.name,
+      price: item.price,
+      qty: 1,
+      isDrink: item.isDrink,
+      availableSauces: [...(item.availableSauces || [])],
+      selectedSauces: item.isDrink ? [] : [...defaultSauces],
+      availableSides: [...(item.availableSides || [])],
+      selectedSides: [...(item.availableSides || [])],
+      notes: ''
+    });
+
+    renderTicketCartItems();
+    updateTicketFormTotal();
+    if (window.showToast) {
+      window.showToast(`Otra porción de "${item.name}" agregada para personalizar`, 'info');
     }
   }
 
@@ -1111,26 +1426,37 @@
       return;
     }
 
+    // Calcular orden / número de unidad para productos repetidos
+    const productCounters = {};
+    const totalCounts = {};
+    activeTicketItems.forEach(it => {
+      totalCounts[it.prodId] = (totalCounts[it.prodId] || 0) + 1;
+    });
+
     container.innerHTML = activeTicketItems.map((item, index) => {
-      const subtotal = (item.price * item.qty).toFixed(2);
+      productCounters[item.prodId] = (productCounters[item.prodId] || 0) + 1;
+      const unitNumber = productCounters[item.prodId];
+      const totalForThis = totalCounts[item.prodId];
+      const unitLabel = totalForThis > 1 ? ` (Unidad ${unitNumber} de ${totalForThis})` : '';
+
+      const subtotal = (item.price * (item.qty || 1)).toFixed(2);
 
       const sidesHtml = (item.availableSides && item.availableSides.length > 0) ? `
-        <div class="ticket-cart-item-custom-section">
-          <div class="ticket-cart-custom-header">
-            <span class="ticket-cart-custom-title">Acompañamientos e Ingredientes:</span>
+        <div class="ticket-cart-item-custom-section" style="background: rgba(0, 0, 0, 0.2); padding: 10px 12px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255, 255, 255, 0.05);">
+          <div class="ticket-cart-custom-header" style="margin-bottom: 6px;">
+            <span class="ticket-cart-custom-title" style="font-weight: 800; font-size: 0.8rem; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.04em;">🍟 Acompañamiento / Guarnición para esta unidad:</span>
           </div>
-          <div class="ticket-items-toggle-list">
+          <div class="ticket-items-toggle-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px;">
             ${item.availableSides.map(sideName => {
               const isChecked = item.selectedSides && item.selectedSides.includes(sideName);
               return `
-                <div class="ticket-item-toggle-card ${isChecked ? 'active' : ''}" onclick="window.toggleTicketItemSide(${index}, '${window.AdminUtils.escapeHtml(sideName)}')">
-                  <div class="ticket-item-left">
-                    <div class="ticket-item-checkbox">
-                      <span class="ticket-item-checkbox-check">✓</span>
+                <div class="ticket-item-toggle-card ${isChecked ? 'active' : ''}" style="cursor: pointer; padding: 6px 10px; border-radius: 6px; font-size: 0.82rem;" onclick="window.toggleTicketItemSide(${index}, '${window.AdminUtils.escapeHtml(sideName)}')">
+                  <div class="ticket-item-left" style="display: flex; align-items: center; gap: 6px;">
+                    <div class="ticket-item-checkbox" style="width: 16px; height: 16px; font-size: 11px;">
+                      <span class="ticket-item-checkbox-check">${isChecked ? '✓' : ''}</span>
                     </div>
-                    <span class="ticket-item-name">${window.AdminUtils.escapeHtml(sideName)}</span>
+                    <span class="ticket-item-name" style="font-weight: 700;">${window.AdminUtils.escapeHtml(sideName)}</span>
                   </div>
-                  <span class="ticket-item-badge">${isChecked ? 'Incluido' : 'Sin esto'}</span>
                 </div>
               `;
             }).join('')}
@@ -1139,22 +1465,21 @@
       ` : '';
 
       const saucesHtml = (!item.isDrink && item.availableSauces && item.availableSauces.length > 0) ? `
-        <div class="ticket-cart-item-custom-section" style="margin-top: 8px;">
-          <div class="ticket-cart-custom-header">
-            <span class="ticket-cart-custom-title">Cremas y Salsas de la Casa:</span>
+        <div class="ticket-cart-item-custom-section" style="background: rgba(0, 0, 0, 0.2); padding: 10px 12px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255, 255, 255, 0.05);">
+          <div class="ticket-cart-custom-header" style="margin-bottom: 6px;">
+            <span class="ticket-cart-custom-title" style="font-weight: 800; font-size: 0.8rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.04em;">🥫 Cremas y Salsas para esta unidad:</span>
           </div>
-          <div class="ticket-items-toggle-list">
+          <div class="ticket-items-toggle-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px;">
             ${item.availableSauces.map(sName => {
               const isChecked = item.selectedSauces && item.selectedSauces.includes(sName);
               return `
-                <div class="ticket-item-toggle-card ${isChecked ? 'active' : ''}" onclick="window.toggleTicketItemSauce(${index}, '${sName}')">
-                  <div class="ticket-item-left">
-                    <div class="ticket-item-checkbox">
-                      <span class="ticket-item-checkbox-check">✓</span>
+                <div class="ticket-item-toggle-card ${isChecked ? 'active' : ''}" style="cursor: pointer; padding: 6px 10px; border-radius: 6px; font-size: 0.82rem;" onclick="window.toggleTicketItemSauce(${index}, '${sName}')">
+                  <div class="ticket-item-left" style="display: flex; align-items: center; gap: 6px;">
+                    <div class="ticket-item-checkbox" style="width: 16px; height: 16px; font-size: 11px;">
+                      <span class="ticket-item-checkbox-check">${isChecked ? '✓' : ''}</span>
                     </div>
-                    <span class="ticket-item-name">${sName}</span>
+                    <span class="ticket-item-name" style="font-weight: 700;">${sName}</span>
                   </div>
-                  <span class="ticket-item-badge">${isChecked ? 'Incluido' : 'Sin esto'}</span>
                 </div>
               `;
             }).join('')}
@@ -1163,20 +1488,24 @@
       ` : '';
 
       return `
-        <div class="ticket-cart-item-card" id="ticket-cart-item-${index}">
+        <div class="ticket-cart-item-card" id="ticket-cart-item-${index}" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
           <div class="ticket-cart-item-header">
-            <div class="ticket-cart-item-info">
-              <span class="ticket-cart-item-name">${window.AdminUtils.escapeHtml(item.name)}</span>
-              <span class="ticket-cart-item-price-unit">S/ ${item.price.toFixed(2)} c/u</span>
-            </div>
-            <div class="ticket-cart-item-controls">
-              <button type="button" class="ticket-stepper-btn" onclick="window.updateTicketItemQty(${index}, -1)">-</button>
-              <span class="ticket-stepper-val">${item.qty}</span>
-              <button type="button" class="ticket-stepper-btn" onclick="window.updateTicketItemQty(${index}, 1)">+</button>
-              <span class="ticket-cart-item-subtotal">S/ ${subtotal}</span>
-              <button type="button" class="btn-remove-ticket-item" title="Eliminar producto" onclick="window.removeTicketItem(${index})">
-                🗑️
-              </button>
+            <div class="ticket-cart-item-top-row" style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="ticket-cart-item-info">
+                <span class="ticket-cart-item-name" style="font-weight: 800; font-size: 1rem; color: #ffffff;">${window.AdminUtils.escapeHtml(item.name)}<span style="color: #fb923c; font-weight: 800; margin-left: 6px;">${unitLabel}</span></span>
+                <span class="ticket-cart-item-price-unit" style="display: block; font-size: 0.82rem; color: #10b981; font-weight: 700; margin-top: 2px;">S/ ${item.price.toFixed(2)}</span>
+              </div>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="window.duplicateTicketItem(${index})" title="Agregar otra unidad igual para personalizar" style="padding: 5px 9px; font-size: 0.78rem; font-weight: 700; border-radius: 6px; color: #38bdf8; border-color: rgba(56, 189, 248, 0.35); background: rgba(56, 189, 248, 0.1);">
+                  + Otra Unidad
+                </button>
+                <button type="button" class="btn-remove-ticket-item" title="Eliminar esta unidad" onclick="window.removeTicketItem(${index})" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; border-radius: 6px; padding: 5px 8px; cursor: pointer;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           ${sidesHtml}
@@ -1188,7 +1517,7 @@
 
   function updateTicketItemQty(index, delta) {
     if (!activeTicketItems[index]) return;
-    activeTicketItems[index].qty += delta;
+    activeTicketItems[index].qty = (activeTicketItems[index].qty || 1) + delta;
     if (activeTicketItems[index].qty <= 0) {
       activeTicketItems.splice(index, 1);
     }
@@ -1269,15 +1598,33 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function handleNewTicketSubmit(e) {
+  function getNextOrderNumber() {
+    const state = window.AdminState = window.AdminState || {};
+    const tickets = state.allTickets || [];
+    if (tickets.length === 0) {
+      localStorage.setItem('buchisapa_order_seq', '1');
+      return '00001';
+    }
+    let stored = localStorage.getItem('buchisapa_order_seq');
+    let seq = stored !== null ? parseInt(stored, 10) : tickets.length;
+    if (isNaN(seq) || seq < 0) seq = tickets.length;
+    seq += 1;
+    localStorage.setItem('buchisapa_order_seq', seq.toString());
+    return String(seq).padStart(5, '0');
+  }
+
+  function submitTicketForm(action = 'order', e) {
     if (e && e.preventDefault) e.preventDefault();
 
     if (activeTicketItems.length === 0) {
-      window.showToast('Por favor agrega al menos un producto al ticket', 'warning');
+      if (window.showToast) {
+        window.showToast('Por favor agrega al menos un producto antes de continuar', 'warning');
+      }
       return;
     }
 
-    const customer = document.getElementById('ticket-form-customer')?.value.trim() || 'Cliente';
+    const customerInput = document.getElementById('ticket-form-customer');
+    const customer = customerInput?.value.trim() || 'Cliente';
     const type = document.getElementById('ticket-form-type')?.value || 'salon';
     const payment = document.getElementById('ticket-form-payment')?.value || 'Efectivo';
     const generalNote = document.getElementById('ticket-form-notes')?.value.trim() || '';
@@ -1299,12 +1646,16 @@
       };
     });
 
-    const count = (window.AdminState.allTickets || []).length + 1130;
-    const newNum = `#${count}`;
+    const rawNum = getNextOrderNumber(); // ej. "00001"
+    const orderNumFormatted = `#${rawNum}`; // ej. "#00001"
+    const ticketId = `tk-${Date.now()}`;
+    const orderId = `ord-${Date.now()}`;
 
     const newTicket = {
-      id: `tk-${Date.now()}`,
-      number: newNum,
+      id: ticketId,
+      number: orderNumFormatted,
+      orderNumber: rawNum,
+      orderId: orderId,
       created_at: new Date().toISOString(),
       customer: customer,
       type: type,
@@ -1314,15 +1665,87 @@
       deliveryFee: deliveryFee,
       total: subtotal + deliveryFee,
       notes: generalNote,
-      status: 'Pendiente'
+      status: 'Emitido'
     };
 
+    window.AdminState = window.AdminState || {};
     window.AdminState.allTickets = window.AdminState.allTickets || [];
     window.AdminState.allTickets.unshift(newTicket);
 
+    // Registrar también en el módulo de Pedidos y Cocina KDS
+    const newOrder = {
+      id: orderId,
+      orderNumber: rawNum,
+      created_at: new Date().toISOString(),
+      status: 'recibido',
+      type: type,
+      customerName: customer,
+      customerPhone: '',
+      deliveryAddress: type === 'delivery' ? (generalNote || 'Dirección no especificada') : 'Salón / Mesa Local',
+      items: itemsFormatted.map(i => ({
+        name: i.name,
+        quantity: i.qty,
+        price: i.price,
+        total: i.price * i.qty,
+        notes: [i.notes, (i.sides && i.sides.length ? 'Guarniciones: ' + i.sides.join(', ') : ''), (i.sauces && i.sauces.length ? 'Cremas: ' + i.sauces.join(', ') : '')].filter(Boolean).join(' | ')
+      })),
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
+      total: subtotal + deliveryFee,
+      payment_method: payment,
+      notes: generalNote
+    };
+
+    window.AdminState.allOrders = window.AdminState.allOrders || [];
+    window.AdminState.allOrders.unshift(newOrder);
+
+    // Sincronizar con API backend en segundo plano
+    try {
+      if (window.AdminApi && typeof window.AdminApi.createTicket === 'function') {
+        window.AdminApi.createTicket({
+          id: ticketId,
+          orderId: orderId,
+          ticketNumber: orderNumFormatted,
+          orderNumber: parseInt(rawNum, 10) || 1,
+          customerName: customer,
+          orderType: type,
+          paymentMethod: payment,
+          items: itemsFormatted,
+          subtotal: subtotal,
+          deliveryFee: deliveryFee,
+          total: subtotal + deliveryFee,
+          status: 'Emitido'
+        }).catch(e => console.warn('Ticket server sync warning:', e));
+      }
+    } catch (err) {}
+
+    // Resetear formulario y carrito local
+    activeTicketItems = [];
+    if (customerInput) customerInput.value = '';
+    const notesInput = document.getElementById('ticket-form-notes');
+    if (notesInput) notesInput.value = '';
+    if (deliveryInput) deliveryInput.value = '';
+
+    // Actualizar pedidos y cocina si la función existe
+    if (typeof window.renderAllOrders === 'function') {
+      window.renderAllOrders();
+    }
+    if (typeof window.updateMetricsAndViews === 'function') {
+      window.updateMetricsAndViews();
+    }
+
     filterTickets();
-    previewThermalTicket(newTicket.id);
-    window.showToast(`Ticket ${newNum} emitido con éxito. Listo para imprimir.`, 'success');
+
+    // Redirigir de vuelta a la lista inicial de tickets
+    closeTicketViews();
+
+    if (window.showToast) {
+      window.showToast(`✓ ¡Pedido ${orderNumFormatted} registrado con éxito!`, 'success');
+    }
+  }
+
+  function handleNewTicketSubmit(e) {
+    submitTicketForm('ticket', e);
   }
 
   function toggleCustomDropdown(dropdownId, event) {
@@ -1467,11 +1890,15 @@
   window.previewThermalTicket = previewThermalTicket;
   window.previewThermalTicketFromOrder = previewThermalTicketFromOrder;
   window.renderThermalReceiptHTML = renderThermalReceiptHTML;
+  window.switchTicketPreviewTab = switchTicketPreviewTab;
+  window.printSaleTicket = printSaleTicket;
+  window.printKitchenTicket = printKitchenTicket;
   window.printActiveTicket = printActiveTicket;
   window.testThermalPrinter = testThermalPrinter;
   window.openNewTicketModal = openNewTicketModal;
   window.closeTicketViews = closeTicketViews;
   window.handleNewTicketSubmit = handleNewTicketSubmit;
+  window.submitTicketForm = submitTicketForm;
   window.setTicketChipFilter = setTicketChipFilter;
   window.selectTicketFormType = selectTicketFormType;
   window.selectTicketFormPayment = selectTicketFormPayment;
@@ -1481,10 +1908,15 @@
   window.onTicketCategoryChange = onTicketCategoryChange;
   window.addTicketItem = addTicketItem;
   window.renderTicketCartItems = renderTicketCartItems;
+  window.duplicateTicketItem = duplicateTicketItem;
   window.updateTicketItemQty = updateTicketItemQty;
   window.removeTicketItem = removeTicketItem;
   window.toggleTicketItemSauce = toggleTicketItemSauce;
   window.toggleTicketItemSide = toggleTicketItemSide;
+  window.deleteTicket = deleteTicket;
+  window.deleteActivePreviewTicket = deleteActivePreviewTicket;
+  window.clearAllTicketsPrompt = clearAllTicketsPrompt;
+  window.clearAllTickets = clearAllTicketsPrompt;
 
 })();
 

@@ -817,28 +817,7 @@ const categoriesStore = [...initialCategories];
 let productsStore = [...initialProducts];
 const saucesStore = [...initialSauces];
 let promotionsStore: Promotion[] = loadPromotionsFromDisk();
-const ordersStore: Order[] = [
-  {
-    id: 'ORD-1001',
-    orderNumber: 101,
-    customerName: 'Juan Pérez',
-    customerPhone: '943 312 024',
-    customerEmail: 'juan.perez@example.com',
-    orderType: 'delivery',
-    deliveryAddress: 'Av. La Estrella 124, Santa Clara, Ate',
-    deliveryReference: 'Frente al parque',
-    paymentMethod: 'Yape',
-    notes: 'Por favor enviar bastante ají de pollería',
-    status: 'en_camino',
-    total: 35.00,
-    items: JSON.stringify([
-      { id: 'ama-2', name: 'Tacacho con Cecina', quantity: 1, price: 12.00 },
-      { id: 'bro-1', name: 'Broaster Pecho', quantity: 1, price: 18.00 },
-      { id: 'ref-1', name: 'Maracuyá', quantity: 1, price: 3.00 }
-    ]),
-    createdAt: new Date(Date.now() - 3600000).toISOString()
-  }
-];
+const ordersStore: Order[] = [];
 const claimsStore: Claim[] = [];
 
 // QUERIES
@@ -974,6 +953,15 @@ export async function updateOrderStatus(id: string, status: string): Promise<Ord
   if (!order) return null;
   order.status = status;
   return order;
+}
+
+export async function deleteOrder(id: string): Promise<boolean> {
+  const rawId = id.replace(/^tk-/, '');
+  const filtered = ordersStore.filter(o => o.id !== id && o.id !== rawId && String(o.orderNumber) !== id && String(o.orderNumber) !== rawId);
+  ordersStore.length = 0;
+  ordersStore.push(...filtered);
+  customTicketsStore = customTicketsStore.filter(t => t.id !== id && t.id !== `tk-${id}` && t.orderId !== id && String(t.orderNumber) !== id);
+  return true;
 }
 
 export async function getClaims(): Promise<Claim[]> {
@@ -1445,13 +1433,13 @@ export async function getTickets(): Promise<TicketRecord[]> {
       notes: it.notes || it.customization?.notes || ''
     }));
 
-    const ticketSeq = String(orders.length - idx).padStart(4, '0');
-    const orderNum = o.orderNumber || 1000 + idx;
+    const rawNum = typeof o.orderNumber === 'number' ? o.orderNumber : parseInt(String(o.orderNumber).replace(/\D/g, ''), 10) || (orders.length - idx);
+    const formattedNum = String(rawNum).padStart(5, '0');
 
     return {
       id: `tk-${o.id}`,
-      ticketNumber: `TK-${ticketSeq}`,
-      orderNumber: orderNum,
+      ticketNumber: `TK-${formattedNum}`,
+      orderNumber: rawNum,
       orderId: o.id,
       customerName: o.customerName || 'Cliente Mostrador',
       customerPhone: o.customerPhone || '',
@@ -1474,8 +1462,8 @@ export async function getTickets(): Promise<TicketRecord[]> {
 
 export async function createQuickTicket(data: Partial<TicketRecord>): Promise<TicketRecord> {
   const now = new Date();
-  const nextNumber = customTicketsStore.length + 1050;
-  const seq = String(nextNumber).slice(-4);
+  const nextNumber = customTicketsStore.length + 1;
+  const seq = String(nextNumber).padStart(5, '0');
 
   const newTicket: TicketRecord = {
     id: `tk-quick-${Date.now()}`,
@@ -1498,6 +1486,25 @@ export async function createQuickTicket(data: Partial<TicketRecord>): Promise<Ti
 
   customTicketsStore.unshift(newTicket);
   return newTicket;
+}
+
+export async function deleteTicket(id: string): Promise<boolean> {
+  const rawId = id.replace(/^tk-/, '');
+  const initialTicketsLen = customTicketsStore.length;
+  customTicketsStore = customTicketsStore.filter(t => t.id !== id && t.id !== `tk-${id}` && t.orderId !== id && String(t.orderNumber) !== id && String(t.orderNumber) !== rawId);
+  
+  // Also delete corresponding order from ordersStore
+  const filteredOrders = ordersStore.filter(o => o.id !== id && o.id !== rawId && String(o.orderNumber) !== id && String(o.orderNumber) !== rawId);
+  ordersStore.length = 0;
+  ordersStore.push(...filteredOrders);
+  
+  return true;
+}
+
+export async function clearAllTickets(): Promise<boolean> {
+  customTicketsStore = [];
+  ordersStore.length = 0;
+  return true;
 }
 
 // ============================================================================

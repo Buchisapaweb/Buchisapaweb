@@ -144,6 +144,13 @@
       return await res.json();
     },
 
+    async deleteOrder(id) {
+      const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al eliminar pedido');
+      apiCache.delete('orders');
+      return await res.json();
+    },
+
     // SUPPLIES & UTENSILS
     async getSupplies() {
       const res = await fetch('/api/supplies');
@@ -208,7 +215,8 @@
     async getTickets() {
       const res = await fetch('/api/tickets');
       if (!res.ok) throw new Error('Error al cargar tickets');
-      return await res.json();
+      const data = await res.json();
+      return Array.isArray(data) ? data : (data?.data || []);
     },
 
     async createTicket(ticketData) {
@@ -218,6 +226,18 @@
         body: JSON.stringify(ticketData)
       });
       if (!res.ok) throw new Error('Error al emitir ticket');
+      return await res.json();
+    },
+
+    async deleteTicket(id) {
+      const res = await fetch(`/api/tickets/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al eliminar ticket');
+      return await res.json();
+    },
+
+    async clearAllTickets() {
+      const res = await fetch('/api/tickets', { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al limpiar tickets');
       return await res.json();
     },
 

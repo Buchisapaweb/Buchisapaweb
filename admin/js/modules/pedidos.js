@@ -156,37 +156,8 @@
       state.allOrders = orders;
     } catch (e) {
       console.warn('Error al cargar órdenes del servidor, usando órdenes locales:', e);
-      if (!state.allOrders || state.allOrders.length === 0) {
-        state.allOrders = [
-          {
-            id: 'ord-101',
-            orderNumber: 'TK-0038',
-            created_at: new Date().toISOString(),
-            status: 'en_preparacion',
-            type: 'delivery',
-            customerName: 'Juan Carlos Mendoza',
-            customerPhone: '984 555 123',
-            deliveryAddress: 'Jr. Prospero 342, Tarapoto',
-            items: [
-              { name: '1/4 Pollo Broaster Clásico', quantity: 2, price: 18, total: 36, notes: 'Papas bien doradas' },
-              { name: 'Refresco de Cocona 1L', quantity: 1, price: 8, total: 8 }
-            ],
-            total: 44,
-            payment_method: 'Yape'
-          },
-          {
-            id: 'ord-102',
-            orderNumber: 'TK-0037',
-            created_at: new Date(Date.now() - 12 * 60000).toISOString(),
-            status: 'recibido',
-            type: 'pickup',
-            customerName: 'Elena Rios',
-            customerPhone: '965 222 344',
-            items: [{ name: 'Hamburguesa Amazónica BuchiSapa', quantity: 1, price: 18, total: 18, notes: 'Sin cebolla' }],
-            total: 18,
-            payment_method: 'Efectivo'
-          }
-        ];
+      if (!state.allOrders) {
+        state.allOrders = [];
       }
     }
 
@@ -380,8 +351,14 @@
                 </button>
               ` : ''}
 
-              <button class="btn btn-secondary btn-sm btn-action-step" onclick="window.previewThermalTicketFromOrder('${order.id}')" title="Imprimir Ticket">
-                🖨️ Ticket
+              <button class="btn btn-emerald-order btn-sm btn-action-step" style="padding: 6px 12px; font-size: 0.8rem; font-weight: 700;" onclick="window.previewThermalTicketFromOrder('${order.id}', 'kitchen')" title="Ver e imprimir Ticket de Cocina">
+                👨‍🍳 Ticket de Cocina
+              </button>
+              <button class="btn btn-secondary btn-sm btn-action-step" style="padding: 6px 12px; font-size: 0.8rem; font-weight: 700; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4); color: #60a5fa;" onclick="window.previewThermalTicketFromOrder('${order.id}', 'sale')" title="Ver e imprimir Ticket de Venta">
+                🧾 Ticket de Venta
+              </button>
+              <button class="btn btn-secondary btn-sm btn-action-step" style="padding: 6px 10px; font-size: 0.8rem; font-weight: 700; color: #f87171; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.1);" onclick="window.deleteTicket('${order.id}')" title="Eliminar este pedido por completo">
+                🗑️ Eliminar
               </button>
             </div>
           </div>

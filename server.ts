@@ -83,6 +83,7 @@ import {
   getOrderById,
   createOrder,
   updateOrderStatus,
+  deleteOrder,
   getClaims,
   createClaim,
   checkCartStock,
@@ -100,6 +101,8 @@ import {
   cerrarCaja,
   getTickets,
   createQuickTicket,
+  deleteTicket,
+  clearAllTickets,
   getPortadas,
   createPortada,
   updatePortada,
@@ -420,6 +423,27 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     try {
       const ticket = await createQuickTicket(req.body);
       res.json({ success: true, data: ticket });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Admin tickets: Eliminar ticket individual
+  app.delete(['/api/admin/tickets/:id', '/api/tickets/:id'], async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id as string;
+      const success = await deleteTicket(id);
+      res.json({ success, message: success ? 'Ticket eliminado' : 'Ticket no encontrado' });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Admin tickets: Limpiar todos los tickets
+  app.delete(['/api/admin/tickets', '/api/tickets'], async (_req: Request, res: Response) => {
+    try {
+      await clearAllTickets();
+      res.json({ success: true, message: 'Todos los tickets anteriores han sido eliminados' });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
@@ -927,6 +951,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     } catch (error: any) {
       console.error('Error updating order status:', error);
       res.status(500).json({ success: false, error: error.message || 'Error updating order status' });
+    }
+  });
+
+  // Orders: Delete order completely
+  app.delete('/api/orders/:id', async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id as string;
+      const success = await deleteOrder(id);
+      res.json({ success, message: success ? 'Pedido y ticket eliminados' : 'Pedido no encontrado' });
+    } catch (error: any) {
+      console.error('Error deleting order:', error);
+      res.status(500).json({ success: false, error: error.message });
     }
   });
 
