@@ -40,7 +40,7 @@
     'portada': {
       title: 'Banners de Portada',
       desc: 'Gestión de diapositivas del carrusel de la tienda web',
-      button: { text: '+ Agregar Portada', action: () => window.openCreatePortadaModal() }
+      button: { text: '+ Nueva Portada', action: () => window.openCreatePortadaPage() }
     },
     'promociones': {
       title: 'Promociones y Ofertas',

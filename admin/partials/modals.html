@@ -386,117 +386,45 @@
        MODAL: CREAR / EDITAR IMAGEN DE PORTADA
        ========================================================================== -->
   <div class="modal-overlay" id="portada-modal">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-md">
       <div class="modal-header">
         <div>
-          <h3 id="portada-modal-title" class="modal-title-white">Nueva Imagen de Portada</h3>
-          <p class="modal-subtitle-text">Configura la imagen, textos y llamada a la acción</p>
+          <h3 id="portada-modal-title" class="modal-title-white">Configurar Portada</h3>
+          <p class="modal-subtitle-text">Imágenes para Escritorio (PortadaXE.webp) y Móvil (PortadaXM.webp)</p>
         </div>
         <button class="modal-close-btn modal-close-trigger" title="Cerrar">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
 
-      <form id="portada-form">
-        <input type="hidden" id="portada-form-id">
+      <form id="portada-form-modal">
+        <input type="hidden" id="portada-modal-form-id">
 
         <div class="modal-body">
-          <!-- Vista previa de imagen limpia -->
-          <div class="modal-preview-container">
-            <img id="portada-form-preview-img" src="/imagenes/portada/Portada1E.webp" alt="Preview" class="modal-preview-img">
+          <div class="form-group">
+            <label class="form-label" for="portada-modal-form-title">Nombre / Identificador *</label>
+            <input type="text" class="form-input" id="portada-modal-form-title" required placeholder="Ej. Portada 1">
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="portada-form-image">URL de la Imagen (Escritorio / Panorámica) *</label>
-            <input type="text" class="form-input" id="portada-form-image" required placeholder="https://... o /imagenes/portada/Portada1E.webp" oninput="window.updatePortadaFormPreview()">
-            <span class="text-muted-xs">Recomendado para PC, Smart TV y Tablets: formato horizontal panorámico (1920x800 o 16:9).</span>
+            <label class="form-label" for="portada-modal-form-image">🖥️ Imagen para Escritorio (Panorámica / PC) *</label>
+            <input type="text" class="form-input" id="portada-modal-form-image" required placeholder="Ej. /imagenes/portada/Portada1E.webp">
+            <span class="text-muted-xs">Formato horizontal panorámico para computadoras y laptops.</span>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="portada-form-image-mobile">URL de la Imagen para Móviles (Opcional - Formato Vertical)</label>
-            <input type="text" class="form-input" id="portada-form-image-mobile" placeholder="Ej. /imagenes/portada/Portada1M.webp o formato 4:5 (1080x1350)">
-            <span class="text-muted-xs">Para teléfonos: si se ingresa, los móviles mostrarán esta imagen vertical y las pantallas grandes la panorámica.</span>
-          </div>
-
-          <!-- Selector rápido de imágenes locales disponibles -->
-          <div class="form-group" class="form-group mt-neg6">
-            <label class="form-label" class="text-muted-sm">Sugerencias de la galería local BuchiSapa:</label>
-            <div class="portada-preset-thumbs">
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/Portada1E.webp', '/imagenes/portada/Portada1M.webp')" title="Broaster (Portada1E / Portada1M)">
-                <img src="/imagenes/portada/Portada1E.webp" alt="Broaster">
-              </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/Portada2E.webp', '/imagenes/portada/Portada2M.webp')" title="Juane (Portada2E / Portada2M)">
-                <img src="/imagenes/portada/Portada2E.webp" alt="Juane">
-              </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/Portada3E.webp', '/imagenes/portada/Portada3M.webp')" title="Burger (Portada3E / Portada3M)">
-                <img src="/imagenes/portada/Portada3E.webp" alt="Burger">
-              </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('/imagenes/portada/Portada4E.webp', '/imagenes/portada/Portada4M.webp')" title="Amazónica (Portada4E / Portada4M)">
-                <img src="/imagenes/portada/Portada4E.webp" alt="Amazónica">
-              </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&amp;auto=format&amp;fit=crop&amp;q=80', 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&amp;auto=format&amp;fit=crop&amp;q=80')">
-                <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=200&amp;auto=format&amp;fit=crop&amp;q=80" alt="Burger Gourmet">
-              </div>
-              <div class="portada-preset-item" onclick="window.selectPortadaPreset('https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=1200&amp;auto=format&amp;fit=crop&amp;q=80', 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&amp;auto=format&amp;fit=crop&amp;q=80')">
-                <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=200&amp;auto=format&amp;fit=crop&amp;q=80" alt="Pollo Frito">
-              </div>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="portada-form-title">Título Principal (Línea 1) *</label>
-              <input type="text" class="form-input" id="portada-form-title" required placeholder="Ej. POLLO BROASTER" oninput="window.updatePortadaFormPreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="portada-form-highlight">Texto Resaltado (Línea 2 en Rojo)</label>
-              <input type="text" class="form-input" id="portada-form-highlight" placeholder="Ej. ULTRA CROCANTE" oninput="window.updatePortadaFormPreview()">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="portada-form-badge">Etiqueta Superior (Badge)</label>
-              <input type="text" class="form-input" id="portada-form-badge" placeholder="Ej. ✨ ESPECIALIDAD DE LA CASA">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="portada-form-category">Categoría al hacer Clic *</label>
-              <select class="form-select" id="portada-form-category" required>
-                <option value="broaster">🍗 Pollo Broaster</option>
-                <option value="hamburguesas">🍔 Hamburguesas</option>
-                <option value="platos-amazonicos">🌿 Platos Amazónicos</option>
-                <option value="alitas">🍗 Alitas Crujientes</option>
-                <option value="salchipapas">🍟 Salchipapas</option>
-                <option value="combos">✨ Combos Especiales</option>
-                <option value="bebidas">🥤 Bebidas y Refrescos</option>
-                <option value="todos">📖 Menú Completo</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="portada-form-subtitle">Descripción / Subtítulo *</label>
-            <textarea class="form-textarea" id="portada-form-subtitle" rows="2" required placeholder="Ej. Empanizado artesanal dorado a la perfección, jugoso por dentro con papas crocantes..."></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="portada-form-btn-text">Texto del Botón *</label>
-              <input type="text" class="form-input" id="portada-form-btn-text" required value="PIDE TU BROASTER AQUÍ">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="portada-form-secret">Frase Destacada / Secreta (Opcional)</label>
-              <input type="text" class="form-input" id="portada-form-secret" placeholder="Ej. 100% SAZÓN REGIONAL desde S/ 12.00">
-            </div>
+            <label class="form-label" for="portada-modal-form-image-mobile">📱 Imagen para Móviles (Vertical / Smartphone) *</label>
+            <input type="text" class="form-input" id="portada-modal-form-image-mobile" required placeholder="Ej. /imagenes/portada/Portada1M.webp">
+            <span class="text-muted-xs">Formato vertical adaptado a la pantalla de celulares.</span>
           </div>
 
           <div class="modal-switch-box">
             <div>
-              <p class="modal-title-white">Visible en el Carousel de Portada</p>
-              <p class="modal-subtitle-text">Aparecerá en la pantalla principal para todos los comensales</p>
+              <p class="modal-title-white">Visible en Carousel</p>
+              <p class="modal-subtitle-text">Aparecerá en el inicio para todos los clientes</p>
             </div>
             <label class="switch">
-              <input type="checkbox" id="portada-form-active" checked>
+              <input type="checkbox" id="portada-modal-form-active" checked>
               <span class="slider"></span>
             </label>
           </div>
@@ -504,7 +432,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Guardar Imagen de Portada</button>
+          <button type="submit" class="btn btn-primary">Guardar Portada</button>
         </div>
       </form>
     </div>

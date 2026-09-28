@@ -1505,17 +1505,17 @@ export async function createQuickTicket(data: Partial<TicketRecord>): Promise<Ti
 // ============================================================================
 export interface PortadaBanner {
   id: string;
-  title: string;
+  title?: string;
   highlight?: string;
-  subtitle: string;
+  subtitle?: string;
   badge?: string;
   badgeType?: string;
   image: string;
   imageMobile?: string;
   secretPillIcon?: string;
   secretPillText?: string;
-  buttonText: string;
-  buttonCategory: string;
+  buttonText?: string;
+  buttonCategory?: string;
   features?: string[];
   active: boolean;
   order: number;
@@ -1527,72 +1527,36 @@ const PORTADAS_FILE = path.join(process.cwd(), 'data', 'portadas.json');
 const initialPortadas: PortadaBanner[] = [
   {
     id: 'portada-1',
-    title: 'POLLO BROASTER',
-    highlight: 'ULTRA CROCANTE',
-    subtitle: 'Empanizado artesanal dorado a la perfección, jugoso por dentro con papas crocantes y nuestras mejores cremas caseras.',
-    badge: '✨ ESPECIALIDAD DE LA CASA',
-    badgeType: 'red-pill',
+    title: 'Portada 1',
     image: '/imagenes/portada/Portada1E.webp',
     imageMobile: '/imagenes/portada/Portada1M.webp',
-    secretPillIcon: '💡',
-    secretPillText: 'RECETA SECRETA BUCHISAPA | Pecho, Pierna, Encuentro y Alitas desde S/ 12.00',
-    buttonText: 'PIDE TU BROASTER AQUÍ',
-    buttonCategory: 'broaster',
-    features: ['✦ 100% POLLO FRESCO', '👤 EMPANIZADO CRUJIENTE', '🤍 CREMAS CASERAS'],
     active: true,
     order: 1,
     createdAt: new Date().toISOString()
   },
   {
     id: 'portada-2',
-    title: 'AUTÉNTICO JUANE',
-    highlight: '& SABORES AMAZÓNICOS',
-    subtitle: 'Elaborado con aromática hoja de bijao, arroz sazonado con mishkina, gallina tierna, huevo y aceitunas. Acompañado de tacacho con cecina y patacones crocantes.',
-    badge: '🌿 ESPECIALIDAD DE LA SELVA',
-    badgeType: 'red-pill',
+    title: 'Portada 2',
     image: '/imagenes/portada/Portada2E.webp',
     imageMobile: '/imagenes/portada/Portada2M.webp',
-    secretPillIcon: '🌴',
-    secretPillText: '100% SAZÓN REGIONAL | Juanes, Tacacho con Cecina y Patacones desde S/ 12.00',
-    buttonText: 'PEDIR PLATOS AMAZÓNICOS',
-    buttonCategory: 'platos-amazonicos',
-    features: ['✦ HOJA DE BIJAO FRESCA', '🔥 CECINA AHUMADA', '🌶️ AJÍ DE COCONA'],
     active: true,
     order: 2,
     createdAt: new Date().toISOString()
   },
   {
     id: 'portada-3',
-    title: 'HAMBURGUESAS ARTESANALES',
-    highlight: 'AL CARBÓN',
-    subtitle: 'Carne jugosa, queso cheddar, huevo, tocino, plátano y papas fritas doradas.',
-    badge: 'BURGUERS & ROYALS',
-    badgeType: 'text',
+    title: 'Portada 3',
     image: '/imagenes/portada/Portada3E.webp',
     imageMobile: '/imagenes/portada/Portada3M.webp',
-    secretPillIcon: '🍔',
-    secretPillText: 'SABOR AUTÉNTICO | 100% Carne de res seleccionada con papas artesanales',
-    buttonText: 'VER HAMBURGUESAS',
-    buttonCategory: 'hamburguesas',
-    features: ['✦ CARNE PREMIUM', '🔥 PAN ARTESANAL', '🧀 CHEDDAR FUNDIDO'],
     active: true,
     order: 3,
     createdAt: new Date().toISOString()
   },
   {
     id: 'portada-4',
-    title: 'HAMBURGUESA',
-    highlight: 'AMAZÓNICA BUCHISAPA',
-    subtitle: 'Carne jugosa artesanal de res con fina cecina ahumada de Tarapoto, queso cheddar derretido, plátano bellaco crujiente y cremosa salsa de cocona con ají charapita.',
-    badge: '🔥 EDICIÓN ESPECIAL AMAZÓNICA',
-    badgeType: 'red-pill',
+    title: 'Portada 4',
     image: '/imagenes/portada/Portada4E.webp',
     imageMobile: '/imagenes/portada/Portada4M.webp',
-    secretPillIcon: '🌴',
-    secretPillText: 'NUEVO DE TEMPORADA | Incluye Papas Nativas Crocantes + Refresco desde S/ 18.00',
-    buttonText: 'PROBAR HAMBURGUESA AMAZÓNICA',
-    buttonCategory: 'hamburguesas',
-    features: ['✦ CECINA DE TARAPOTO', '🌴 PLÁTANO BELLACO CRISPY', '🔥 SALSA CHARAPITA & COCONA'],
     active: true,
     order: 4,
     createdAt: new Date().toISOString()
