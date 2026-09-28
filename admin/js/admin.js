@@ -418,17 +418,19 @@
     if (cajaOpenForm) {
       cajaOpenForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const initial = parseFloat(document.getElementById('modal-open-initial-cash').value) || 250;
-        const cajero = document.getElementById('modal-open-cajero').value;
+        const initialInput = document.getElementById('modal-open-initial-cash');
+        const cajeroInput = document.getElementById('modal-open-cajero');
+        const initial = initialInput ? parseFloat(initialInput.value) || 250 : 250;
+        const cajero = cajeroInput ? cajeroInput.value : 'Administrador';
         try {
           await window.AdminApi.abrirCaja(initial, cajero);
           window.showToast('Caja abierta con éxito', 'success');
-          document.getElementById('caja-open-modal').classList.remove('active');
+          document.getElementById('caja-open-modal')?.classList.remove('active');
           await window.fetchCaja();
         } catch (err) {
           if (window.AdminState.cajaData) window.AdminState.cajaData.isOpen = true;
           window.renderCajaView();
-          document.getElementById('caja-open-modal').classList.remove('active');
+          document.getElementById('caja-open-modal')?.classList.remove('active');
           window.showToast('Caja abierta localmente', 'info');
         }
       });
@@ -438,17 +440,19 @@
     if (cajaCloseForm) {
       cajaCloseForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const realCash = parseFloat(document.getElementById('modal-close-real-cash').value) || 0;
-        const notes = document.getElementById('modal-close-notes').value;
+        const realCashInput = document.getElementById('modal-close-real-cash');
+        const notesInput = document.getElementById('modal-close-notes');
+        const realCash = realCashInput ? parseFloat(realCashInput.value) || 0 : 0;
+        const notes = notesInput ? notesInput.value : '';
         try {
           await window.AdminApi.cerrarCaja({ real_cash: realCash, notes });
           window.showToast('Turno cerrado (Reporte Z generado)', 'success');
-          document.getElementById('caja-close-modal').classList.remove('active');
+          document.getElementById('caja-close-modal')?.classList.remove('active');
           await window.fetchCaja();
         } catch (err) {
           if (window.AdminState.cajaData) window.AdminState.cajaData.isOpen = false;
           window.renderCajaView();
-          document.getElementById('caja-close-modal').classList.remove('active');
+          document.getElementById('caja-close-modal')?.classList.remove('active');
           window.showToast('Turno cerrado localmente', 'info');
         }
       });
@@ -462,14 +466,14 @@
         const selectedOpt = select ? select.options[select.selectedIndex] : null;
         const prodName = selectedOpt ? selectedOpt.textContent.split(' - ')[0] : 'Plato';
         const price = selectedOpt ? parseFloat(selectedOpt.dataset.price) : 18;
-        const qty = parseInt(document.getElementById('ticket-form-quantity').value, 10) || 1;
+        const qty = parseInt(document.getElementById('ticket-form-quantity')?.value, 10) || 1;
 
         const ticketData = {
           number: `TK-${Math.floor(1000 + Math.random() * 9000)}`,
-          customer: document.getElementById('ticket-form-customer').value,
-          phone: document.getElementById('ticket-form-phone').value,
-          type: document.getElementById('ticket-form-type').value,
-          payment: document.getElementById('ticket-form-payment').value,
+          customer: document.getElementById('ticket-form-customer')?.value || 'Cliente',
+          phone: document.getElementById('ticket-form-phone')?.value || '',
+          type: document.getElementById('ticket-form-type')?.value || 'Mesa',
+          payment: document.getElementById('ticket-form-payment')?.value || 'Efectivo',
           items: [{ name: prodName, qty, price }],
           subtotal: price * qty,
           total: price * qty,
@@ -480,53 +484,15 @@
         try {
           await window.AdminApi.createTicket(ticketData);
           window.showToast(`Ticket #${ticketData.number} emitido`, 'success');
-          document.getElementById('new-ticket-modal').classList.remove('active');
+          document.getElementById('new-ticket-modal')?.classList.remove('active');
           await window.fetchTickets();
           window.previewThermalTicket(ticketData.id || window.AdminState.allTickets[0]?.id);
         } catch (err) {
           window.AdminState.allTickets.unshift(ticketData);
           window.filterTickets();
-          document.getElementById('new-ticket-modal').classList.remove('active');
+          document.getElementById('new-ticket-modal')?.classList.remove('active');
           window.showToast(`Ticket #${ticketData.number} emitido localmente`, 'info');
           window.previewThermalTicket(ticketData.id || ticketData.number);
-        }
-      });
-    }
-
-    const portadaForm = document.getElementById('portada-form');
-    if (portadaForm) {
-      portadaForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('portada-form-id').value;
-        const isEdit = Boolean(id);
-
-        const data = {
-          title: document.getElementById('portada-form-title').value.trim(),
-          highlight: document.getElementById('portada-form-highlight').value.trim(),
-          badge: document.getElementById('portada-form-badge').value.trim(),
-          category: document.getElementById('portada-form-category').value,
-          subtitle: document.getElementById('portada-form-subtitle').value.trim(),
-          buttonText: document.getElementById('portada-form-btn-text').value.trim(),
-          image: document.getElementById('portada-form-image').value.trim() || '/imagenes/portada/Portada1E.webp',
-          imageMobile: document.getElementById('portada-form-image-mobile')?.value.trim() || undefined,
-          active: document.getElementById('portada-form-active').checked
-        };
-
-        try {
-          await window.AdminApi.savePortada(data, isEdit, id);
-          window.showToast(isEdit ? 'Portada actualizada' : 'Portada guardada con éxito', 'success');
-          document.getElementById('portada-modal').classList.remove('active');
-          await window.fetchPortadas();
-        } catch (err) {
-          if (isEdit) {
-            const idx = window.AdminState.allPortadas.findIndex(p => p.id === id);
-            if (idx !== -1) window.AdminState.allPortadas[idx] = { ...window.AdminState.allPortadas[idx], ...data };
-          } else {
-            window.AdminState.allPortadas.push({ id: 'portada-' + Date.now(), ...data });
-          }
-          window.renderPortadas();
-          document.getElementById('portada-modal').classList.remove('active');
-          window.showToast('Portada guardada en sesión activa', 'info');
         }
       });
     }

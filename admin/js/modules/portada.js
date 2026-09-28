@@ -1,50 +1,64 @@
 /**
- * BUCHISAPA ADMIN - HERO BANNER & PORTADA MODULE
- * Layer: /admin/js/modules/portada.js
- * 
- * Control de Portadas de Inicio con:
- * - Métricas y tarjetas de estado elegantes.
- * - Página propia e independiente para Agregar / Editar Portadas.
- * - Botones independientes para elegir si configurar Escritorio, Móvil o Ambas.
- * - Subida de archivos (Galería/Dispositivo) o ingreso por URL para cada dispositivo.
+ * BuchiSapa Admin - Módulo de Portadas (Hero Banners)
+ * Visualización vertical centrada, soporte 1920×1080 para pantallas grandes y móvil vertical adaptado
+ * Guardado automático de imágenes en /imagenes/portada/Portada{N}E.webp y /imagenes/portada/Portada{N}M.webp
+ * Cache-busting automático para refresco visual instantáneo al guardar
+ * Botones de acción centrados y perfectamente balanceados
  */
 
 (function () {
   'use strict';
 
-  let currentDesktopImage = '';
-  let currentMobileImage = '';
-  let currentDeviceTarget = 'both';
+  let currentEditingId = null;
+  let activeDeviceTarget = 'both'; // 'both', 'desktop', 'mobile'
+  let pendingDesktopBase64 = null;
+  let pendingMobileBase64 = null;
 
-  async function fetchPortadas() {
-    const state = window.AdminState = window.AdminState || {};
-    try {
-      const data = await window.AdminApi.getPortadas();
-      if (Array.isArray(data) && data.length > 0) {
-        state.allPortadas = data.map((p, idx) => normalizePortada(p, idx + 1));
-      } else {
-        state.allPortadas = defaultPortadas();
-      }
-    } catch (e) {
-      console.warn('Fallback portadas locales:', e);
-      state.allPortadas = defaultPortadas();
-    }
-    renderPortadas();
+  function init() {
+    loadPortadas();
+    setupEventListeners();
   }
 
-  function normalizePortada(p, defaultIndex) {
-    const num = defaultIndex || 1;
-    let desktopImg = p.image || p.imageDesktop || `/imagenes/portada/Portada${num}E.webp`;
-    let mobileImg = p.imageMobile || p.image_mobile || `/imagenes/portada/Portada${num}M.webp`;
+  function setupEventListeners() {
+    document.addEventListener('admin-data-loaded', () => {
+      renderPortadas();
+    });
 
-    return {
-      id: p.id || `portada-${num}`,
-      title: p.title || `Portada ${num}`,
-      image: desktopImg,
-      imageMobile: mobileImg,
-      active: p.active !== false,
-      order: p.order !== undefined ? p.order : num
-    };
+    const activeCheck = document.getElementById('portada-form-active');
+    const activeLabel = document.getElementById('portada-active-label');
+    if (activeCheck && activeLabel) {
+      activeCheck.addEventListener('change', () => {
+        activeLabel.textContent = activeCheck.checked ? '🟢 Visible en la tienda' : '⏸️ Pausada (Oculta)';
+        activeLabel.style.color = activeCheck.checked ? '#6ee7b7' : '#fde047';
+      });
+    }
+
+    const desktopUrl = document.getElementById('portada-form-image');
+    const mobileUrl = document.getElementById('portada-form-image-mobile');
+    if (desktopUrl) desktopUrl.addEventListener('input', updatePreviews);
+    if (mobileUrl) mobileUrl.addEventListener('input', updatePreviews);
+  }
+
+  async function loadPortadas() {
+    try {
+      const res = await fetch(`/api/portadas?t=${Date.now()}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          window.AdminState.allPortadas = json.data;
+        } else {
+          window.AdminState.allPortadas = defaultPortadas();
+        }
+      } else {
+        window.AdminState.allPortadas = defaultPortadas();
+      }
+    } catch (e) {
+      console.warn('Error al cargar portadas desde API:', e);
+      if (!window.AdminState.allPortadas || window.AdminState.allPortadas.length === 0) {
+        window.AdminState.allPortadas = defaultPortadas();
+      }
+    }
+    renderPortadas();
   }
 
   function defaultPortadas() {
@@ -86,9 +100,23 @@
 
   function getFilename(url) {
     if (!url) return '';
-    if (url.startsWith('data:image')) return 'Imagen subida (Archivo local)';
-    const parts = url.split('/');
+    if (url.startsWith('data:image')) return 'Imagen cargada desde dispositivo';
+    const cleanUrl = url.split('?')[0];
+    const parts = cleanUrl.split('/');
     return parts[parts.length - 1];
+  }
+
+  // Obtener el número 'n' de la diapositiva en edición o creación
+  function getCurrentSlideNumber() {
+    const portadas = window.AdminState.allPortadas || [];
+    if (currentEditingId) {
+      const idx = portadas.findIndex(p => p.id === currentEditingId);
+      if (idx !== -1) {
+        return portadas[idx].order || (idx + 1);
+      }
+    }
+    // Si es nueva
+    return portadas.length + 1;
   }
 
   function renderPortadas() {
@@ -97,444 +125,584 @@
     const metricDesktop = document.getElementById('portada-metric-desktop');
     const metricMobile = document.getElementById('portada-metric-mobile');
     const statusGrid = document.getElementById('portadas-status-grid');
+    const badgeStatus = document.getElementById('portada-banner-status-badge');
 
     const portadas = window.AdminState.allPortadas || [];
     const activeList = portadas.filter(p => p.active !== false);
 
-    // 4 Cuadros de métricas
+    // 4 Cuadros de métricas informativos
     if (metricTotal) metricTotal.textContent = portadas.length.toString();
-    if (metricActive) metricActive.textContent = activeList.length.toString();
+    if (metricActive) metricActive.textContent = `${activeList.length} activas`;
     if (metricDesktop) metricDesktop.textContent = portadas.length.toString();
     if (metricMobile) metricMobile.textContent = portadas.length.toString();
+
+    if (badgeStatus) {
+      if (activeList.length === 0) {
+        badgeStatus.textContent = 'TODAS LAS PORTADAS PAUSADAS';
+        badgeStatus.parentElement.style.background = 'rgba(239, 68, 68, 0.2)';
+        badgeStatus.parentElement.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+        badgeStatus.style.color = '#fca5a5';
+      } else {
+        badgeStatus.textContent = `${activeList.length} DE ${portadas.length} PORTADAS ACTIVAS EN TIENDA`;
+        badgeStatus.parentElement.style.background = 'rgba(16, 185, 129, 0.18)';
+        badgeStatus.parentElement.style.borderColor = 'rgba(16, 185, 129, 0.45)';
+        badgeStatus.style.color = '#6ee7b7';
+      }
+    }
 
     if (!statusGrid) return;
 
     if (portadas.length === 0) {
       statusGrid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-card);">
-          <p style="font-size: 1rem; font-weight: 700; color: #fff;">No hay portadas configuradas en el sistema</p>
-          <p style="font-size: 0.85rem; margin-top: 4px;">Haz clic en "+ Agregar Nueva Portada" para configurar la primera diapositiva.</p>
+        <div style="text-align: center; padding: 48px 24px; color: #cbd5e1; background: rgba(26, 16, 51, 0.85); border-radius: var(--radius-lg); border: 2px dashed rgba(255, 98, 0, 0.4); max-width: 600px; margin: 0 auto;">
+          <div style="font-size: 2.8rem; margin-bottom: 12px;">🖼️</div>
+          <p style="font-size: 1.2rem; font-weight: 900; color: #ffffff; margin: 0;">No hay portadas registradas</p>
+          <p style="font-size: 0.92rem; margin: 6px 0 18px; color: #e2e8f0;">Haz clic en el botón superior para agregar tu primera portada.</p>
+          <button class="btn-clean-primary" onclick="window.openCreatePortadaPage()" style="font-weight: 800; min-height: 48px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Agregar Portada</span>
+          </button>
         </div>
       `;
       return;
     }
 
-    // Renderizar tarjetas de estado
+    // Renderizar tarjetas centradas con imágenes apiladas (1920x1080 arriba, Móvil centrado abajo)
     statusGrid.innerHTML = portadas.map((p, idx) => {
       const isActive = p.active !== false;
-      const desktopFilename = getFilename(p.image) || `Portada${idx + 1}E.webp`;
-      const mobileFilename = getFilename(p.imageMobile) || `Portada${idx + 1}M.webp`;
+      const slideNum = p.order || (idx + 1);
+      const defaultDesktop = `/imagenes/portada/Portada${slideNum}E.webp`;
+      const defaultMobile = `/imagenes/portada/Portada${slideNum}M.webp`;
+
+      const rawDesktop = p.image || defaultDesktop;
+      const rawMobile = p.imageMobile || defaultMobile;
+
+      const versionParam = `?v=${p.updatedAt ? new Date(p.updatedAt).getTime() : Date.now()}`;
+      const desktopSrc = rawDesktop.startsWith('data:image') ? rawDesktop : `${rawDesktop.split('?')[0]}${versionParam}`;
+      const mobileSrc = rawMobile.startsWith('data:image') ? rawMobile : `${rawMobile.split('?')[0]}${versionParam}`;
+
+      const desktopFilename = getFilename(rawDesktop) || `Portada${slideNum}E.webp`;
+      const mobileFilename = getFilename(rawMobile) || `Portada${slideNum}M.webp`;
 
       return `
-        <div class="portada-status-card ${isActive ? 'is-active' : 'is-paused'}">
+        <div class="portada-status-card-centered ${isActive ? 'is-active' : 'is-paused'}">
+          
           <!-- CABECERA DE LA TARJETA -->
           <div class="portada-status-header">
             <div class="portada-status-slide-name">
-              <span style="font-size: 1.2rem;">🖼️</span>
-              <h4>${window.AdminUtils.escapeHtml(p.title || `Portada ${idx + 1}`)}</h4>
+              <span class="portada-card-idx">#${slideNum}</span>
+              <h4 class="portada-card-title-text">${window.AdminUtils.escapeHtml(p.title || `Portada ${slideNum}`)}</h4>
             </div>
             <span class="portada-status-badge ${isActive ? 'active' : 'paused'}">
-              ${isActive ? '🟢 ACTIVA' : '⏸️ PAUSADA'}
+              ${isActive ? '🟢 ACTIVA (Visible en Tienda)' : '⏸️ PAUSADA (Oculta)'}
             </span>
           </div>
 
-          <!-- LISTA DE ARCHIVOS VINCULADOS -->
-          <div class="portada-files-list">
-            <div class="portada-file-item">
-              <span class="portada-file-label">
-                <span style="color: #06b6d4;">🖥️</span>
-                <span>Escritorio:</span>
-              </span>
-              <code class="portada-file-badge">${desktopFilename}</code>
+          <!-- CONTENEDOR DE IMÁGENES APILADAS VERTICALMENTE -->
+          <div class="portada-stacked-showcase">
+            
+            <!-- 1. IMAGEN DE ESCRITORIO (1920 × 1080 - 16:9 PROPORCIÓN COMPLETA) -->
+            <div class="portada-showcase-item desktop-item">
+              <div class="showcase-header-tag">
+                <div class="tag-left">
+                  <span class="tag-icon">🖥️</span>
+                  <strong class="tag-title">Versión Escritorio / Tabletas (Pantalla Grande)</strong>
+                </div>
+                <span class="tag-res cyan-res">1920 × 1080 px (16:9)</span>
+              </div>
+              
+              <div class="portada-thumb-container desktop-1080-wrap">
+                <img src="${desktopSrc}" alt="Portada Escritorio ${slideNum}" loading="lazy" onerror="this.src='${defaultDesktop}'">
+              </div>
+
+              <div class="portada-file-pill" title="${desktopFilename}">
+                <span class="pill-dot cyan-dot"></span>
+                <span class="pill-label">Ruta:</span>
+                <span class="pill-name">${rawDesktop.startsWith('/imagenes/portada/') ? rawDesktop.split('?')[0] : `/imagenes/portada/Portada${slideNum}E.webp`}</span>
+              </div>
             </div>
-            <div class="portada-file-item">
-              <span class="portada-file-label">
-                <span style="color: #a855f7;">📱</span>
-                <span>Móvil:</span>
-              </span>
-              <code class="portada-file-badge">${mobileFilename}</code>
+
+            <!-- 2. IMAGEN DE MÓVIL (VERTICAL SMARTPHONE CENTRADA Y SIN DISTORSIÓN) -->
+            <div class="portada-showcase-item mobile-item">
+              <div class="showcase-header-tag">
+                <div class="tag-left">
+                  <span class="tag-icon">📱</span>
+                  <strong class="tag-title">Versión Móvil (Vertical Smartphone / Celular)</strong>
+                </div>
+                <span class="tag-res purple-res">Vertical Smartphone</span>
+              </div>
+
+              <div class="mobile-thumb-centered-frame">
+                <div class="portada-thumb-container mobile-vertical-wrap">
+                  <img src="${mobileSrc}" alt="Portada Móvil ${slideNum}" loading="lazy" onerror="this.src='${defaultMobile}'">
+                </div>
+              </div>
+
+              <div class="portada-file-pill" title="${mobileFilename}">
+                <span class="pill-dot purple-dot"></span>
+                <span class="pill-label">Ruta:</span>
+                <span class="pill-name">${rawMobile.startsWith('/imagenes/portada/') ? rawMobile.split('?')[0] : `/imagenes/portada/Portada${slideNum}M.webp`}</span>
+              </div>
             </div>
+
           </div>
 
-          <!-- BOTONES DE ACCIÓN: ACTIVAR/PAUSAR, EDITAR Y ELIMINAR -->
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button 
-              type="button" 
-              class="portada-status-toggle-btn ${isActive ? 'btn-active-state' : 'btn-paused-state'}"
-              onclick="window.togglePortadaActive('${p.id}')"
-            >
-              <span>${isActive ? '🟢 Portada Activa en Tienda (Clic para Pausar)' : '▶️ Portada Pausada (Clic para Activar)'}</span>
+          <!-- BOTONES DE ACCIÓN RÁPIDA -->
+          <div class="portada-card-actions-row-centered">
+            <button type="button" 
+                    class="btn-portada-toggle ${isActive ? 'btn-pause' : 'btn-activate-prominent'}" 
+                    onclick="window.togglePortadaStatus('${p.id}')"
+                    title="${isActive ? 'Pausar esta portada' : 'Activar y hacer visible'}">
+              ${isActive 
+                ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg><span>Pausar</span>` 
+                : `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Activar</span>`
+              }
             </button>
-
-            <div style="display: flex; gap: 8px;">
-              <button 
-                type="button" 
-                class="btn btn-secondary btn-sm" 
-                style="flex: 1; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px;"
-                onclick="window.editPortada('${p.id}')"
-              >
-                <span>✏️ Configurar / Editar</span>
-              </button>
-              <button 
-                type="button" 
-                class="btn btn-danger btn-sm" 
-                style="padding: 8px 12px;"
-                onclick="window.deletePortada('${p.id}')" 
-                title="Eliminar Portada"
-              >
-                🗑️
-              </button>
-            </div>
+            <button type="button" 
+                    class="btn-portada-edit" 
+                    onclick="window.openEditPortadaPage('${p.id}')"
+                    title="Cambiar imágenes o nombre">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              <span>Editar Fotos</span>
+            </button>
+            <button type="button" 
+                    class="btn-portada-delete" 
+                    onclick="window.deletePortadaSlide('${p.id}')" 
+                    title="Eliminar portada">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            </button>
           </div>
+
         </div>
       `;
     }).join('');
   }
 
-  // ==========================================================================
-  // PÁGINA PROPIA: ABRIR / CERRAR / NAVEGAR
-  // ==========================================================================
-  function openCreatePortadaPage() {
+  // NAVEGACIÓN Y APERTURA DE FORMULARIO
+  window.openCreatePortadaPage = function () {
+    currentEditingId = null;
+    pendingDesktopBase64 = null;
+    pendingMobileBase64 = null;
+
     const listSec = document.getElementById('portada-list-section');
     const formSec = document.getElementById('portada-form-page-section');
     const titleEl = document.getElementById('portada-form-page-title');
-    const form = document.getElementById('portada-form');
+    const btnDelete = document.getElementById('btn-portada-form-delete');
 
-    if (!formSec || !listSec) return;
+    if (listSec) listSec.style.display = 'none';
+    if (formSec) formSec.style.display = 'block';
+    if (btnDelete) btnDelete.style.display = 'none';
 
-    const count = (window.AdminState?.allPortadas || []).length;
-    const nextNum = count + 1;
+    const portadas = window.AdminState.allPortadas || [];
+    const nextIdx = portadas.length + 1;
 
-    if (titleEl) titleEl.textContent = `Nueva Diapositiva (Portada ${nextNum})`;
-    if (form) form.reset();
+    if (titleEl) titleEl.textContent = `Agregar Nueva Portada (Portada ${nextIdx})`;
 
-    document.getElementById('portada-form-id').value = '';
-    document.getElementById('portada-form-title').value = `Portada ${nextNum}`;
-    
-    currentDesktopImage = `/imagenes/portada/Portada${nextNum}E.webp`;
-    currentMobileImage = `/imagenes/portada/Portada${nextNum}M.webp`;
+    const idInput = document.getElementById('portada-form-id');
+    const titleInput = document.getElementById('portada-form-title');
+    const imgDesktop = document.getElementById('portada-form-image');
+    const imgMobile = document.getElementById('portada-form-image-mobile');
+    const activeCheck = document.getElementById('portada-form-active');
+    const activeLabel = document.getElementById('portada-active-label');
 
-    document.getElementById('portada-form-image').value = currentDesktopImage;
-    document.getElementById('portada-form-image-mobile').value = currentMobileImage;
-    document.getElementById('portada-form-active').checked = true;
+    const defaultDesktop = `/imagenes/portada/Portada${nextIdx}E.webp`;
+    const defaultMobile = `/imagenes/portada/Portada${nextIdx}M.webp`;
 
-    // Resetear labels de archivos
-    const labelDesktop = document.getElementById('desktop-file-name-label');
-    const labelMobile = document.getElementById('mobile-file-name-label');
-    if (labelDesktop) labelDesktop.textContent = '';
-    if (labelMobile) labelMobile.textContent = '';
+    if (idInput) idInput.value = '';
+    if (titleInput) titleInput.value = `Portada ${nextIdx}`;
+    if (imgDesktop) imgDesktop.value = defaultDesktop;
+    if (imgMobile) imgMobile.value = defaultMobile;
+    if (activeCheck) activeCheck.checked = true;
+    if (activeLabel) {
+      activeLabel.textContent = '🟢 Visible en la tienda';
+      activeLabel.style.color = '#6ee7b7';
+    }
 
-    setPortadaDeviceTarget('both');
-    setDesktopInputMethod('upload');
-    setMobileInputMethod('upload');
-    updatePortadaFormPreview();
+    const previewDesktop = document.getElementById('preview-img-desktop');
+    const previewMobile = document.getElementById('preview-img-mobile');
+    if (previewDesktop) previewDesktop.src = defaultDesktop;
+    if (previewMobile) previewMobile.src = defaultMobile;
 
-    listSec.style.display = 'none';
-    formSec.style.display = 'block';
+    window.setPortadaDeviceTarget('both');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  };
 
-  function closePortadaFormView() {
+  window.openEditPortadaPage = function (id) {
+    const portadas = window.AdminState.allPortadas || [];
+    const item = portadas.find(p => p.id === id);
+    if (!item) return;
+
+    currentEditingId = id;
+    pendingDesktopBase64 = null;
+    pendingMobileBase64 = null;
+
     const listSec = document.getElementById('portada-list-section');
     const formSec = document.getElementById('portada-form-page-section');
+    const titleEl = document.getElementById('portada-form-page-title');
+    const btnDelete = document.getElementById('btn-portada-form-delete');
+
+    if (listSec) listSec.style.display = 'none';
+    if (formSec) formSec.style.display = 'block';
+    if (btnDelete) btnDelete.style.display = 'inline-flex';
+
+    const slideNum = item.order || (portadas.findIndex(p => p.id === id) + 1);
+
+    if (titleEl) titleEl.textContent = `Editar: ${item.title || `Portada ${slideNum}`}`;
+
+    const idInput = document.getElementById('portada-form-id');
+    const titleInput = document.getElementById('portada-form-title');
+    const imgDesktop = document.getElementById('portada-form-image');
+    const imgMobile = document.getElementById('portada-form-image-mobile');
+    const activeCheck = document.getElementById('portada-form-active');
+    const activeLabel = document.getElementById('portada-active-label');
+
+    const expectedDesktop = `/imagenes/portada/Portada${slideNum}E.webp`;
+    const expectedMobile = `/imagenes/portada/Portada${slideNum}M.webp`;
+
+    const versionParam = `?v=${item.updatedAt ? new Date(item.updatedAt).getTime() : Date.now()}`;
+
+    const currentDesktopUrl = (item.image && !item.image.startsWith('data:image')) ? item.image.split('?')[0] : expectedDesktop;
+    const currentMobileUrl = (item.imageMobile && !item.imageMobile.startsWith('data:image')) ? item.imageMobile.split('?')[0] : expectedMobile;
+
+    if (idInput) idInput.value = item.id;
+    if (titleInput) titleInput.value = item.title || `Portada ${slideNum}`;
+    if (imgDesktop) imgDesktop.value = currentDesktopUrl;
+    if (imgMobile) imgMobile.value = currentMobileUrl;
+    if (activeCheck) activeCheck.checked = item.active !== false;
+    if (activeLabel) {
+      activeLabel.textContent = item.active !== false ? '🟢 Visible en la tienda' : '⏸️ Pausada (Oculta)';
+      activeLabel.style.color = item.active !== false ? '#6ee7b7' : '#fde047';
+    }
+
+    const previewDesktop = document.getElementById('preview-img-desktop');
+    const previewMobile = document.getElementById('preview-img-mobile');
+    if (previewDesktop) previewDesktop.src = `${currentDesktopUrl}${versionParam}`;
+    if (previewMobile) previewMobile.src = `${currentMobileUrl}${versionParam}`;
+
+    window.setPortadaDeviceTarget('both');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.closePortadaPages = function () {
+    currentEditingId = null;
+    pendingDesktopBase64 = null;
+    pendingMobileBase64 = null;
+
+    const listSec = document.getElementById('portada-list-section');
+    const formSec = document.getElementById('portada-form-page-section');
+
     if (formSec) formSec.style.display = 'none';
     if (listSec) listSec.style.display = 'block';
+
+    renderPortadas();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  };
 
-  function editPortada(id) {
-    const p = (window.AdminState.allPortadas || []).find(item => item.id === id);
-    if (!p) return;
-
-    const listSec = document.getElementById('portada-list-section');
-    const formSec = document.getElementById('portada-form-page-section');
-    const titleEl = document.getElementById('portada-form-page-title');
-
-    if (!formSec || !listSec) return;
-
-    if (titleEl) titleEl.textContent = `Editar ${p.title || 'Portada'}`;
-    document.getElementById('portada-form-id').value = p.id;
-    document.getElementById('portada-form-title').value = p.title || '';
-    
-    currentDesktopImage = p.image || '';
-    currentMobileImage = p.imageMobile || p.image_mobile || '';
-
-    document.getElementById('portada-form-image').value = currentDesktopImage;
-    document.getElementById('portada-form-image-mobile').value = currentMobileImage;
-    document.getElementById('portada-form-active').checked = p.active !== false;
-
-    // Si ya tiene URLs personalizadas, seleccionar modo URL
-    const isDesktopUpload = currentDesktopImage.startsWith('data:image');
-    const isMobileUpload = currentMobileImage.startsWith('data:image');
-
-    setDesktopInputMethod(isDesktopUpload ? 'upload' : 'url');
-    setMobileInputMethod(isMobileUpload ? 'upload' : 'url');
-
-    setPortadaDeviceTarget('both');
-    updatePortadaFormPreview();
-
-    listSec.style.display = 'none';
-    formSec.style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // ==========================================================================
-  // SELECTOR DE DISPOSITIVOS INDEPENDIENTES (AMBAS, ESCRITORIO, MÓVIL)
-  // ==========================================================================
-  function setPortadaDeviceTarget(target) {
-    currentDeviceTarget = target;
+  // CONTROL DE BOTONES INDEPENDIENTES
+  window.setPortadaDeviceTarget = function (target) {
+    activeDeviceTarget = target;
 
     const btnBoth = document.getElementById('btn-device-target-both');
     const btnDesktop = document.getElementById('btn-device-target-desktop');
     const btnMobile = document.getElementById('btn-device-target-mobile');
 
-    const secDesktop = document.getElementById('portada-section-desktop');
-    const secMobile = document.getElementById('portada-section-mobile');
+    const cardDesktop = document.getElementById('portada-card-desktop-box');
+    const cardMobile = document.getElementById('portada-card-mobile-box');
 
     [btnBoth, btnDesktop, btnMobile].forEach(btn => {
       if (btn) btn.classList.remove('active');
     });
 
-    if (target === 'both') {
-      if (btnBoth) btnBoth.classList.add('active');
-      if (secDesktop) secDesktop.style.display = 'block';
-      if (secMobile) secMobile.style.display = 'block';
-    } else if (target === 'desktop') {
+    if (target === 'desktop') {
       if (btnDesktop) btnDesktop.classList.add('active');
-      if (secDesktop) secDesktop.style.display = 'block';
-      if (secMobile) secMobile.style.display = 'none';
+      if (cardDesktop) cardDesktop.style.display = 'flex';
+      if (cardMobile) cardMobile.style.display = 'none';
     } else if (target === 'mobile') {
       if (btnMobile) btnMobile.classList.add('active');
-      if (secDesktop) secDesktop.style.display = 'none';
-      if (secMobile) secMobile.style.display = 'block';
-    }
-  }
-
-  // ==========================================================================
-  // PESTAÑAS DE MÉTODO (SUBIR ARCHIVO O INGRESAR URL)
-  // ==========================================================================
-  function setDesktopInputMethod(method) {
-    const tabUpload = document.getElementById('tab-desktop-upload');
-    const tabUrl = document.getElementById('tab-desktop-url');
-    const conUpload = document.getElementById('desktop-upload-container');
-    const conUrl = document.getElementById('desktop-url-container');
-
-    if (method === 'upload') {
-      if (tabUpload) tabUpload.classList.add('active');
-      if (tabUrl) tabUrl.classList.remove('active');
-      if (conUpload) conUpload.style.display = 'block';
-      if (conUrl) conUrl.style.display = 'none';
+      if (cardDesktop) cardDesktop.style.display = 'none';
+      if (cardMobile) cardMobile.style.display = 'flex';
     } else {
-      if (tabUpload) tabUpload.classList.remove('active');
-      if (tabUrl) tabUrl.classList.add('active');
-      if (conUpload) conUpload.style.display = 'none';
-      if (conUrl) conUrl.style.display = 'block';
+      if (btnBoth) btnBoth.classList.add('active');
+      if (cardDesktop) cardDesktop.style.display = 'flex';
+      if (cardMobile) cardMobile.style.display = 'flex';
     }
-  }
+  };
 
-  function setMobileInputMethod(method) {
-    const tabUpload = document.getElementById('tab-mobile-upload');
-    const tabUrl = document.getElementById('tab-mobile-url');
-    const conUpload = document.getElementById('mobile-upload-container');
-    const conUrl = document.getElementById('mobile-url-container');
-
-    if (method === 'upload') {
-      if (tabUpload) tabUpload.classList.add('active');
-      if (tabUrl) tabUrl.classList.remove('active');
-      if (conUpload) conUpload.style.display = 'block';
-      if (conUrl) conUrl.style.display = 'none';
-    } else {
-      if (tabUpload) tabUpload.classList.remove('active');
-      if (tabUrl) tabUrl.classList.add('active');
-      if (conUpload) conUpload.style.display = 'none';
-      if (conUrl) conUrl.style.display = 'block';
-    }
-  }
-
-  // ==========================================================================
-  // MANEJADORES DE SUBIDA DE ARCHIVOS (FILE UPLOAD & DRAG/DROP)
-  // ==========================================================================
-  function handleDesktopFileSelect(input) {
-    if (!input || !input.files || !input.files[0]) return;
-    const file = input.files[0];
-    readAndSetImageFile(file, 'desktop');
-  }
-
-  function handleMobileFileSelect(input) {
-    if (!input || !input.files || !input.files[0]) return;
-    const file = input.files[0];
-    readAndSetImageFile(file, 'mobile');
-  }
-
-  function handleDragOver(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.currentTarget) e.currentTarget.classList.add('dragover');
-    }
-  }
-
-  function handleDragLeave(e) {
-    if (e && e.currentTarget) {
-      e.currentTarget.classList.remove('dragover');
-    }
-  }
-
-  function handleDesktopDrop(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.currentTarget) e.currentTarget.classList.remove('dragover');
-      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-        readAndSetImageFile(e.dataTransfer.files[0], 'desktop');
-      }
-    }
-  }
-
-  function handleMobileDrop(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.currentTarget) e.currentTarget.classList.remove('dragover');
-      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-        readAndSetImageFile(e.dataTransfer.files[0], 'mobile');
-      }
-    }
-  }
-
-  function readAndSetImageFile(file, device) {
+  // SUBIDA Y GUARDADO DIRECTO DE ARCHIVOS A /imagenes/portada/Portada{N}{E|M}.webp
+  window.handleDesktopImageFileSelect = function (e) {
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      window.showToast('Por favor selecciona un archivo de imagen válido', 'error');
+      window.AdminUtils.showToast('Por favor selecciona un archivo de imagen válido.', 'error');
       return;
     }
 
+    const slideNum = getCurrentSlideNumber();
+    const targetUrl = `/imagenes/portada/Portada${slideNum}E.webp`;
+
     const reader = new FileReader();
-    reader.onload = function (event) {
-      const dataUrl = event.target.result;
-      if (device === 'desktop') {
-        currentDesktopImage = dataUrl;
-        const inputUrl = document.getElementById('portada-form-image');
-        if (inputUrl) inputUrl.value = dataUrl;
-        const label = document.getElementById('desktop-file-name-label');
-        if (label) label.textContent = `✓ Archivo cargado: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-      } else {
-        currentMobileImage = dataUrl;
-        const inputUrl = document.getElementById('portada-form-image-mobile');
-        if (inputUrl) inputUrl.value = dataUrl;
-        const label = document.getElementById('mobile-file-name-label');
-        if (label) label.textContent = `✓ Archivo cargado: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    reader.onload = async function (evt) {
+      const base64 = evt.target.result;
+      pendingDesktopBase64 = base64;
+      
+      // Actualizar vista previa visual instantánea
+      const previewDesktop = document.getElementById('preview-img-desktop');
+      if (previewDesktop) previewDesktop.src = base64;
+
+      // Asignar ruta limpia al campo de texto
+      const input = document.getElementById('portada-form-image');
+      if (input) input.value = targetUrl;
+
+      // Enviar al servidor para guardar en disco como Portada{N}E.webp
+      try {
+        const res = await fetch('/api/portadas/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slideNumber: slideNum,
+            type: 'E',
+            file: base64
+          })
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.url && input) input.value = json.url;
+        }
+      } catch (err) {
+        console.warn('Upload guardado en sesión:', err);
       }
-      updatePortadaFormPreview();
-      window.showToast(`Imagen ${device === 'desktop' ? 'Escritorio' : 'Móvil'} lista para guardar`, 'success');
+
+      window.AdminUtils.showToast(`✅ Imagen de escritorio cargada: ${targetUrl}`, 'success');
     };
     reader.readAsDataURL(file);
+  };
+
+  window.handleMobileImageFileSelect = function (e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      window.AdminUtils.showToast('Por favor selecciona un archivo de imagen válido.', 'error');
+      return;
+    }
+
+    const slideNum = getCurrentSlideNumber();
+    const targetUrl = `/imagenes/portada/Portada${slideNum}M.webp`;
+
+    const reader = new FileReader();
+    reader.onload = async function (evt) {
+      const base64 = evt.target.result;
+      pendingMobileBase64 = base64;
+      
+      // Actualizar vista previa visual instantánea
+      const previewMobile = document.getElementById('preview-img-mobile');
+      if (previewMobile) previewMobile.src = base64;
+
+      // Asignar ruta limpia al campo de texto
+      const input = document.getElementById('portada-form-image-mobile');
+      if (input) input.value = targetUrl;
+
+      // Enviar al servidor para guardar en disco como Portada{N}M.webp
+      try {
+        const res = await fetch('/api/portadas/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slideNumber: slideNum,
+            type: 'M',
+            file: base64
+          })
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.url && input) input.value = json.url;
+        }
+      } catch (err) {
+        console.warn('Upload guardado en sesión:', err);
+      }
+
+      window.AdminUtils.showToast(`✅ Imagen móvil cargada: ${targetUrl}`, 'success');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  function updatePreviews() {
+    const imgDesktopInput = document.getElementById('portada-form-image');
+    const imgMobileInput = document.getElementById('portada-form-image-mobile');
+    const previewDesktop = document.getElementById('preview-img-desktop');
+    const previewMobile = document.getElementById('preview-img-mobile');
+
+    if (imgDesktopInput && previewDesktop) {
+      const val = (imgDesktopInput.value || '').trim();
+      if (val && !val.startsWith('data:image')) {
+        previewDesktop.src = `${val.split('?')[0]}?t=${Date.now()}`;
+      } else if (val) {
+        previewDesktop.src = val;
+      }
+    }
+    if (imgMobileInput && previewMobile) {
+      const val = (imgMobileInput.value || '').trim();
+      if (val && !val.startsWith('data:image')) {
+        previewMobile.src = `${val.split('?')[0]}?t=${Date.now()}`;
+      } else if (val) {
+        previewMobile.src = val;
+      }
+    }
   }
 
-  function updatePortadaFormPreview() {
-    const desktopInput = document.getElementById('portada-form-image')?.value || currentDesktopImage || '/imagenes/portada/Portada1E.webp';
-    const mobileInput = document.getElementById('portada-form-image-mobile')?.value || currentMobileImage || '/imagenes/portada/Portada1M.webp';
+  // ACTIVAR / PAUSAR DIRECTO CON 1 CLIC
+  window.togglePortadaStatus = async function (id) {
+    const portadas = window.AdminState.allPortadas || [];
+    const item = portadas.find(p => p.id === id);
+    if (!item) return;
 
-    const desktopImgEl = document.getElementById('portada-form-preview-img');
-    const mobileImgEl = document.getElementById('portada-form-preview-img-mobile');
-    const desktopBadge = document.getElementById('preview-desktop-badge');
-    const mobileBadge = document.getElementById('preview-mobile-badge');
+    item.active = item.active === false ? true : false;
+    item.updatedAt = new Date().toISOString();
 
-    if (desktopImgEl) desktopImgEl.src = desktopInput;
-    if (mobileImgEl) mobileImgEl.src = mobileInput;
-    if (desktopBadge) desktopBadge.textContent = getFilename(desktopInput);
-    if (mobileBadge) mobileBadge.textContent = getFilename(mobileInput);
-  }
+    try {
+      const res = await fetch(`/api/portadas/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      });
+      if (res.ok) {
+        window.AdminUtils.showToast(
+          item.active ? `🟢 "${item.title}" ahora está visible en la tienda` : `⏸️ "${item.title}" ha sido pausada`,
+          item.active ? 'success' : 'info'
+        );
+      }
+    } catch (e) {
+      console.warn('Guardado local:', e);
+    }
+    renderPortadas();
+  };
 
-  // ==========================================================================
-  // GUARDAR PORTADA (API O LOCAL STATE)
-  // ==========================================================================
-  async function handlePortadaFormSubmit(e) {
+  // ELIMINAR PORTADA (Sin bloqueo de window.confirm)
+  window.deletePortadaSlide = async function (id, fromForm = false) {
+    const portadas = window.AdminState.allPortadas || [];
+    const item = portadas.find(p => p.id === id);
+    if (!item) return;
+
+    const itemName = item.title || 'Portada';
+
+    try {
+      const res = await fetch(`/api/portadas/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        window.AdminState.allPortadas = portadas.filter(p => p.id !== id);
+        window.AdminState.allPortadas.forEach((p, idx) => {
+          p.order = idx + 1;
+        });
+        window.AdminUtils.showToast(`🗑️ "${itemName}" eliminada del sistema`, 'success');
+      }
+    } catch (e) {
+      window.AdminState.allPortadas = portadas.filter(p => p.id !== id);
+      window.AdminState.allPortadas.forEach((p, idx) => {
+        p.order = idx + 1;
+      });
+      window.AdminUtils.showToast(`🗑️ "${itemName}" eliminada`, 'info');
+    }
+
+    if (fromForm) {
+      window.closePortadaPages();
+    } else {
+      renderPortadas();
+    }
+  };
+
+  // ELIMINAR PORTADA DESDE EL FORMULARIO DE EDICIÓN
+  window.deleteCurrentEditingPortada = async function () {
+    if (!currentEditingId) {
+      window.closePortadaPages();
+      return;
+    }
+    await window.deletePortadaSlide(currentEditingId, true);
+  };
+
+  // GUARDAR FORMULARIO
+  window.handlePortadaFormSubmit = async function (e) {
     if (e && e.preventDefault) e.preventDefault();
-    const id = document.getElementById('portada-form-id').value;
-    const isEdit = Boolean(id);
 
-    const title = document.getElementById('portada-form-title').value.trim() || 'Portada';
-    const desktopImage = document.getElementById('portada-form-image').value.trim() || currentDesktopImage || '/imagenes/portada/Portada1E.webp';
-    const mobileImage = document.getElementById('portada-form-image-mobile').value.trim() || currentMobileImage || '/imagenes/portada/Portada1M.webp';
+    const idInput = document.getElementById('portada-form-id');
+    const titleInput = document.getElementById('portada-form-title');
+    const imgDesktopInput = document.getElementById('portada-form-image');
+    const imgMobileInput = document.getElementById('portada-form-image-mobile');
+    const activeCheck = document.getElementById('portada-form-active');
 
-    const data = {
+    const portadas = window.AdminState.allPortadas || [];
+    const id = (idInput && idInput.value) ? idInput.value : `portada-${Date.now()}`;
+    const existingIndex = portadas.findIndex(p => p.id === id);
+
+    const slideNum = existingIndex >= 0 ? (portadas[existingIndex].order || existingIndex + 1) : portadas.length + 1;
+    const defaultDesktop = `/imagenes/portada/Portada${slideNum}E.webp`;
+    const defaultMobile = `/imagenes/portada/Portada${slideNum}M.webp`;
+
+    const title = (titleInput && titleInput.value) ? titleInput.value.trim() : `Portada ${slideNum}`;
+    
+    // Si hay un archivo cargado pendiente en base64, usarlo para que el servidor lo procese
+    const desktopImg = pendingDesktopBase64 || ((imgDesktopInput && imgDesktopInput.value) ? imgDesktopInput.value.trim() : defaultDesktop);
+    const mobileImg = pendingMobileBase64 || ((imgMobileInput && imgMobileInput.value) ? imgMobileInput.value.trim() : defaultMobile);
+    const isActive = activeCheck ? activeCheck.checked : true;
+
+    const payload = {
+      id: id,
       title: title,
-      image: desktopImage,
-      imageMobile: mobileImage,
-      active: document.getElementById('portada-form-active').checked
+      image: desktopImg,
+      imageMobile: mobileImg,
+      active: isActive,
+      order: slideNum,
+      updatedAt: new Date().toISOString()
     };
 
     try {
-      await window.AdminApi.savePortada(data, isEdit, id);
-      window.showToast(`Portada ${isEdit ? 'actualizada' : 'creada'} con éxito`, 'success');
-      closePortadaFormView();
-      await fetchPortadas();
-    } catch (err) {
-      console.warn('Fallback guardado local de portada:', err);
-      if (isEdit) {
-        const idx = (window.AdminState.allPortadas || []).findIndex(p => p.id === id);
-        if (idx !== -1) window.AdminState.allPortadas[idx] = { ...window.AdminState.allPortadas[idx], ...data };
+      if (existingIndex >= 0) {
+        // Actualizar
+        const res = await fetch(`/api/portadas/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data) portadas[existingIndex] = json.data;
+          else portadas[existingIndex] = payload;
+        } else {
+          portadas[existingIndex] = payload;
+        }
+        window.AdminUtils.showToast('✅ Portada actualizada correctamente', 'success');
       } else {
-        const nextOrder = (window.AdminState.allPortadas || []).length + 1;
-        window.AdminState.allPortadas.push({ id: 'portada-' + Date.now(), ...data, order: nextOrder });
+        // Crear
+        const res = await fetch('/api/portadas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data) portadas.push(json.data);
+          else portadas.push(payload);
+        } else {
+          portadas.push(payload);
+        }
+        window.AdminUtils.showToast('🎉 Nueva portada agregada con éxito', 'success');
       }
-      renderPortadas();
-      closePortadaFormView();
-      window.showToast('Portada guardada en sesión local', 'info');
+    } catch (err) {
+      console.warn('Error al guardar en backend:', err);
+      if (existingIndex >= 0) portadas[existingIndex] = payload;
+      else portadas.push(payload);
     }
+
+    pendingDesktopBase64 = null;
+    pendingMobileBase64 = null;
+    window.AdminState.allPortadas = portadas;
+
+    // Recargar del servidor y refrescar visualmente
+    await loadPortadas();
+    window.closePortadaPages();
+  };
+
+  document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    init();
   }
-
-  async function togglePortadaActive(id) {
-    const p = (window.AdminState.allPortadas || []).find(item => item.id === id);
-    if (!p) return;
-
-    const newActiveState = p.active === false ? true : false;
-    p.active = newActiveState;
-
-    try {
-      await window.AdminApi.savePortada(p, true, id);
-      window.showToast(`Portada ${newActiveState ? 'activada' : 'pausada'} con éxito`, 'success');
-      await fetchPortadas();
-    } catch (e) {
-      renderPortadas();
-      window.showToast(`Estado actualizado (${newActiveState ? 'Activa' : 'Pausada'})`, 'info');
-    }
-  }
-
-  async function deletePortada(id) {
-    if (!confirm('¿Deseas eliminar permanentemente esta diapositiva de portada?')) return;
-    try {
-      await window.AdminApi.deletePortada(id);
-      window.showToast('Portada eliminada', 'success');
-      await fetchPortadas();
-    } catch (e) {
-      window.AdminState.allPortadas = (window.AdminState.allPortadas || []).filter(p => p.id !== id);
-      renderPortadas();
-      window.showToast('Portada eliminada localmente', 'info');
-    }
-  }
-
-  // Window Bindings
-  window.fetchPortadas = fetchPortadas;
-  window.renderPortadas = renderPortadas;
-  window.openCreatePortadaPage = openCreatePortadaPage;
-  window.openCreatePortadaModal = openCreatePortadaPage; // alias
-  window.closePortadaFormView = closePortadaFormView;
-  window.editPortada = editPortada;
-  window.setPortadaDeviceTarget = setPortadaDeviceTarget;
-  window.setDesktopInputMethod = setDesktopInputMethod;
-  window.setMobileInputMethod = setMobileInputMethod;
-  window.handleDesktopFileSelect = handleDesktopFileSelect;
-  window.handleMobileFileSelect = handleMobileFileSelect;
-  window.handleDragOver = handleDragOver;
-  window.handleDragLeave = handleDragLeave;
-  window.handleDesktopDrop = handleDesktopDrop;
-  window.handleMobileDrop = handleMobileDrop;
-  window.updatePortadaFormPreview = updatePortadaFormPreview;
-  window.handlePortadaFormSubmit = handlePortadaFormSubmit;
-  window.togglePortadaActive = togglePortadaActive;
-  window.deletePortada = deletePortada;
-
 })();

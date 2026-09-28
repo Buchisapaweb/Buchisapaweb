@@ -105,6 +105,7 @@ import {
   updatePortada,
   deletePortada,
   reorderPortadas,
+  savePortadaImageBase64,
 } from './src/db/queries.ts';
 
 export const app = express();
@@ -469,14 +470,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  app.post(['/api/portadas/reorder', '/api/admin/portadas/reorder'], async (req: Request, res: Response) => {
+  app.post(['/api/portadas/upload', '/api/admin/portadas/upload'], async (req: Request, res: Response) => {
     try {
-      const { ids } = req.body;
-      if (!Array.isArray(ids)) {
-        return res.status(400).json({ success: false, error: 'Lista de IDs requerida' });
+      const { slideNumber, type, file } = req.body;
+      const num = parseInt(slideNumber, 10) || 1;
+      const typeCode: 'E' | 'M' = (type === 'M' || type === 'mobile' || type === 'm') ? 'M' : 'E';
+      if (!file) {
+        return res.status(400).json({ success: false, error: 'No se recibió ninguna imagen' });
       }
-      const portadas = await reorderPortadas(ids);
-      res.json({ success: true, data: portadas });
+      const savedPath = savePortadaImageBase64(file, num, typeCode);
+      res.json({ success: true, url: savedPath });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
@@ -2452,8 +2455,24 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   };
 
+  const portadaStaticOptions = {
+    maxAge: 0,
+    etag: true,
+    setHeaders: (res: Response) => {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    }
+  };
+
+  // 1. Archivos de portadas dinámicas (sin bloqueo de caché para actualización en vivo)
+  app.use('/imagenes/portada', express.static(path.join(process.cwd(), 'public/imagenes/portada'), portadaStaticOptions));
+  app.use('/public/imagenes/portada', express.static(path.join(process.cwd(), 'public/imagenes/portada'), portadaStaticOptions));
+  app.use('/portada', express.static(path.join(process.cwd(), 'public/imagenes/portada'), portadaStaticOptions));
+
   const imageStaticOptions = {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días en caché de navegador
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     etag: true,
     setHeaders: (res: Response) => {
       res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
@@ -2462,14 +2481,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   };
 
-  // 1. Archivos de imágenes con caché optimizada para velocidad instantánea
+  // 2. Archivos de imágenes generales con caché optimizada
   app.use('/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
   app.use('/images', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
   app.use('/img', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
   app.use('/public/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
   app.use('/publico/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
   app.use(encodeURI('/público/imágenes'), express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
-  app.use('/portada', express.static(path.join(process.cwd(), 'public/imagenes/portada'), imageStaticOptions));
 
   // 2. Archivos estáticos de css, js, html y raíz pública (todos dentro de public/)
   app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));

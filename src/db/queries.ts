@@ -1520,6 +1520,7 @@ export interface PortadaBanner {
   active: boolean;
   order: number;
   createdAt: string;
+  updatedAt?: string;
 }
 
 const PORTADAS_FILE = path.join(process.cwd(), 'data', 'portadas.json');
@@ -1605,16 +1606,48 @@ export async function getPortadaById(id: string): Promise<PortadaBanner | null> 
   return p || null;
 }
 
+export function savePortadaImageBase64(base64Str: string, slideNumber: number, type: 'E' | 'M'): string {
+  if (!base64Str || typeof base64Str !== 'string' || !base64Str.startsWith('data:image')) {
+    return base64Str;
+  }
+  try {
+    const base64Data = base64Str.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    const targetDir = path.join(process.cwd(), 'public', 'imagenes', 'portada');
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+    const fileName = `Portada${slideNumber}${type}.webp`;
+    const filePath = path.join(targetDir, fileName);
+    fs.writeFileSync(filePath, buffer);
+    return `/imagenes/portada/${fileName}`;
+  } catch (e) {
+    console.error('Error saving portada image:', e);
+    return base64Str;
+  }
+}
+
 export async function createPortada(data: Partial<PortadaBanner>): Promise<PortadaBanner> {
+  const slideNum = data.order || (portadasStore.length + 1);
+  let finalImage = data.image || `/imagenes/portada/Portada${slideNum}E.webp`;
+  let finalImageMobile = data.imageMobile || `/imagenes/portada/Portada${slideNum}M.webp`;
+
+  if (finalImage && finalImage.startsWith('data:image')) {
+    finalImage = savePortadaImageBase64(finalImage, slideNum, 'E');
+  }
+  if (finalImageMobile && finalImageMobile.startsWith('data:image')) {
+    finalImageMobile = savePortadaImageBase64(finalImageMobile, slideNum, 'M');
+  }
+
   const newPortada: PortadaBanner = {
     id: data.id || `portada-${Date.now()}`,
-    title: data.title || 'NUEVA PORTADA',
+    title: data.title || `Portada ${slideNum}`,
     highlight: data.highlight || '',
     subtitle: data.subtitle || 'Promoción especial BuchiSapa Burger & Broaster',
     badge: data.badge || '✨ DESTACADO',
     badgeType: data.badgeType || 'red-pill',
-    image: data.image || '/imagenes/portada/Portada1E.webp',
-    imageMobile: data.imageMobile || data.image || '/imagenes/portada/Portada1M.webp',
+    image: finalImage,
+    imageMobile: finalImageMobile,
     secretPillIcon: data.secretPillIcon || '💡',
     secretPillText: data.secretPillText || '',
     buttonText: data.buttonText || 'VER CARTA',
@@ -1634,9 +1667,25 @@ export async function updatePortada(id: string, data: Partial<PortadaBanner>): P
   const index = portadasStore.findIndex(item => item.id === id);
   if (index === -1) return null;
 
+  const current = portadasStore[index];
+  const slideNum = data.order || current.order || (index + 1);
+
+  let finalImage = data.image !== undefined ? data.image : current.image;
+  let finalImageMobile = data.imageMobile !== undefined ? data.imageMobile : current.imageMobile;
+
+  if (finalImage && finalImage.startsWith('data:image')) {
+    finalImage = savePortadaImageBase64(finalImage, slideNum, 'E');
+  }
+  if (finalImageMobile && finalImageMobile.startsWith('data:image')) {
+    finalImageMobile = savePortadaImageBase64(finalImageMobile, slideNum, 'M');
+  }
+
   portadasStore[index] = {
-    ...portadasStore[index],
+    ...current,
     ...data,
+    image: finalImage,
+    imageMobile: finalImageMobile,
+    updatedAt: new Date().toISOString(),
     id // preserve id
   };
   savePortadasToDisk();
@@ -1646,6 +1695,9 @@ export async function updatePortada(id: string, data: Partial<PortadaBanner>): P
 export async function deletePortada(id: string): Promise<boolean> {
   const initialLength = portadasStore.length;
   portadasStore = portadasStore.filter(item => item.id !== id);
+  portadasStore.forEach((p, idx) => {
+    p.order = idx + 1;
+  });
   savePortadasToDisk();
   return portadasStore.length < initialLength;
 }

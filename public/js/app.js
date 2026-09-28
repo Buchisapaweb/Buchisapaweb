@@ -167,8 +167,9 @@ function renderDynamicHeroCarousel(portadas) {
   }
 
   track.innerHTML = portadas.map((p, idx) => {
-    let desktopImg = p.image || p.imageDesktop || `/imagenes/portada/Portada${(idx % 4) + 1}E.webp`;
-    let mobileImg = p.imageMobile || p.image_mobile || `/imagenes/portada/Portada${(idx % 4) + 1}M.webp` || desktopImg;
+    const versionParam = p.updatedAt ? `?v=${new Date(p.updatedAt).getTime()}` : '';
+    let desktopImg = (p.image || p.imageDesktop || `/imagenes/portada/Portada${(idx % 4) + 1}E.webp`) + versionParam;
+    let mobileImg = (p.imageMobile || p.image_mobile || `/imagenes/portada/Portada${(idx % 4) + 1}M.webp` || desktopImg) + versionParam;
 
     const isFirst = idx === 0;
     const activeClass = isFirst ? 'active' : '';

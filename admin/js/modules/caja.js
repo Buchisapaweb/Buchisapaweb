@@ -249,12 +249,12 @@
   async function handleCajaMovementSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     const data = {
-      tipo: document.getElementById('mov-form-tipo').value,
-      categoria: document.getElementById('mov-form-categoria').value,
-      monto: parseFloat(document.getElementById('mov-form-monto').value) || 0,
-      motivo: document.getElementById('mov-form-motivo').value.trim(),
-      comprobante: document.getElementById('mov-form-comprobante').value.trim(),
-      responsable: document.getElementById('mov-form-responsable').value,
+      tipo: document.getElementById('mov-form-tipo')?.value || 'Egreso',
+      categoria: document.getElementById('mov-form-categoria')?.value || 'Varios',
+      monto: parseFloat(document.getElementById('mov-form-monto')?.value || '0') || 0,
+      motivo: (document.getElementById('mov-form-motivo')?.value || '').trim(),
+      comprobante: (document.getElementById('mov-form-comprobante')?.value || '').trim(),
+      responsable: document.getElementById('mov-form-responsable')?.value || 'Cajero',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
