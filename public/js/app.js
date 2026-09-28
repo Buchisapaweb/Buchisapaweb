@@ -184,7 +184,7 @@ function renderDynamicHeroCarousel(portadas) {
     const activeClass = isFirst ? 'active' : '';
 
     return `
-      <div class="carousel-slide ${activeClass}" style="background-image: url('${desktopImg}');">
+      <div class="carousel-slide ${activeClass}">
         <picture class="carousel-slide-picture">
           <source media="(max-width: 768px)" srcset="${safeStr(mobileImg)}">
           <source media="(min-width: 769px)" srcset="${safeStr(desktopImg)}">

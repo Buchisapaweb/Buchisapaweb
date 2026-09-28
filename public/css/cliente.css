@@ -693,8 +693,8 @@
    CARGA DIFERIDA Y OPTIMIZACIÓN DE IMÁGENES (LAZY LOADING)
    ========================================================= */
 .lazy-bg {
-  background-color: #1e293b;
-  transition: background-image 0.35s ease-in-out;
+  background-color: #f1f5f9;
+  transition: background-image 0.25s ease-in-out;
 }
 
 .lazy-bg {
@@ -1050,10 +1050,10 @@ img.lazy-img.loaded {
   max-width: 1200px;
   margin: 8px auto 20px;
   border-radius: 16px;
-  background: #090d16;
-  color: #ffffff;
+  background: #f8fafc;
+  color: #0f172a;
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   /* Relación 4:5 / 1080x1350 para encuadre vertical óptimo en móviles */
   aspect-ratio: 4 / 5;
   min-height: 380px;
@@ -1117,22 +1117,12 @@ img.lazy-img.loaded {
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
-  background-color: #0b0f19;
+  background-color: #f8fafc;
 }
 
-/* Fondo ambiental difuminado para evitar espacios negros y cortes abruptos en pantallas grandes */
+/* Eliminado el fondo ambiental difuminado para garantizar imágenes 100% nítidas y sin parpadeos oscuros */
 .carousel-slide::before {
-  content: '';
-  position: absolute;
-  inset: -15px;
-  background-image: inherit;
-  background-size: cover;
-  background-position: center center;
-  filter: blur(24px) brightness(0.65);
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.85;
-  transform: scale(1.08);
+  display: none !important;
 }
 
 .carousel-slide-picture {
@@ -1148,6 +1138,15 @@ img.lazy-img.loaded {
   z-index: 2;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  color: transparent;
+  font-size: 0;
+}
   object-fit: cover;
   object-position: center center;
   display: block;
@@ -1261,7 +1260,7 @@ img.lazy-img.loaded {
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
-  background-color: #1e293b;
+  background-color: #f1f5f9;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;

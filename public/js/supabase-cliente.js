@@ -119,7 +119,18 @@ const BuchisapaAPI = {
    * Obtener productos
    */
   async getProducts() {
-    return await this.request('products?select=*&order=popular.desc');
+    try {
+      const res = await this.request('products?select=*&order=popular.desc');
+      if (Array.isArray(res) && res.length > 0) {
+        return res;
+      }
+    } catch (e) {
+      console.warn('Fallback de productos desde Supabase:', e);
+    }
+    if (typeof window.getFallbackProducts === 'function') {
+      return window.getFallbackProducts();
+    }
+    return [];
   },
 
   /**

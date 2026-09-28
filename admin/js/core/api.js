@@ -81,12 +81,24 @@
         const cached = getCachedData('products');
         if (cached && Array.isArray(cached) && cached.length > 0) return cached;
       }
-      const res = await fetch('/api/products');
-      if (!res.ok) throw new Error('Error al cargar productos');
-      const json = await res.json();
-      const list = Array.isArray(json) ? json : (json && Array.isArray(json.data) ? json.data : []);
-      setCachedData('products', list);
-      return list;
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const json = await res.json();
+          const list = Array.isArray(json) ? json : (json && Array.isArray(json.data) ? json.data : []);
+          if (Array.isArray(list) && list.length > 0) {
+            setCachedData('products', list);
+            return list;
+          }
+        }
+      } catch (e) {
+        console.warn('Notice /api/products, using signature default catalog:', e);
+      }
+      const fallback = (window.AdminState && Array.isArray(window.AdminState.defaultSignatureProducts) && window.AdminState.defaultSignatureProducts.length > 0)
+        ? window.AdminState.defaultSignatureProducts
+        : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []);
+      setCachedData('products', fallback);
+      return fallback;
     },
 
     async saveProduct(productData, isEdit = false, id = null) {

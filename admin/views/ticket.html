@@ -461,11 +461,11 @@
                   <input type="text" class="form-input" id="ticket-form-customer" required placeholder="Ej. Carlos Paredes" value="Cliente">
                 </div>
 
-                <!-- Selector Visual Llamativo: Tipo de Pedido (Solo Delivery o Salón) -->
+                <!-- Selector Visual Llamativo: Tipo de Pedido (Salón, Delivery o Recojo en Local) -->
                 <div class="form-group" style="margin-top: 6px;">
                   <label class="form-label">Tipo de Pedido *</label>
                   <input type="hidden" id="ticket-form-type" value="salon" required>
-                  <div class="ticket-visual-option-grid" id="ticket-form-type-selector">
+                  <div class="ticket-visual-option-grid" id="ticket-form-type-selector" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
                     <div class="ticket-visual-card is-selected" data-value="salon" onclick="window.selectTicketFormType('salon', this)">
                       <div class="ticket-visual-card-icon">🍽️</div>
                       <div class="ticket-visual-card-info">
@@ -483,36 +483,57 @@
                       </div>
                       <div class="ticket-visual-check">✓</div>
                     </div>
+
+                    <div class="ticket-visual-card" data-value="recojo" onclick="window.selectTicketFormType('recojo', this)">
+                      <div class="ticket-visual-card-icon">🛍️</div>
+                      <div class="ticket-visual-card-info">
+                        <span class="ticket-visual-card-title">Recojo</span>
+                        <span class="ticket-visual-card-sub">Para llevar en local</span>
+                      </div>
+                      <div class="ticket-visual-check">✓</div>
+                    </div>
                   </div>
                 </div>
 
-                <!-- Sección de Campos Específicos para Delivery (Teléfono/WhatsApp, Dirección, Costo) -->
-                <div id="ticket-form-delivery-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 14px; margin-top: 12px;">
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                    <span style="font-size: 1.15rem;">🛵</span>
-                    <strong style="color: #34d399; font-size: 0.95rem; letter-spacing: -0.01em;">Datos de Contacto y Entrega (Delivery)</strong>
+                <!-- Sección de Campos Específicos para Delivery (Teléfono/WhatsApp, Dirección, Costo) - OBLIGATORIOS -->
+                <div id="ticket-form-delivery-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.4); border-radius: 14px; padding: 16px; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 1.25rem;">🛵</span>
+                      <strong style="color: #34d399; font-size: 0.95rem;">Datos de Entrega y Delivery</strong>
+                    </div>
+                    <span style="font-size: 0.72rem; font-weight: 800; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 2px 8px; border-radius: 6px;">OBLIGATORIOS</span>
                   </div>
 
                   <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label" for="ticket-form-phone" style="display: flex; align-items: center; gap: 6px;">
-                      <span style="color: #22c55e; font-size: 1.1rem;">📱</span>
-                      <span style="font-weight: 800; color: #ffffff;">Número de Teléfono / WhatsApp *</span>
+                    <label class="form-label" for="ticket-form-phone" style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #22c55e; font-size: 1.1rem;">📱</span>
+                        <span style="font-weight: 800; color: #ffffff;">Teléfono / WhatsApp *</span>
+                      </span>
+                      <span style="font-size: 0.75rem; color: #f87171; font-weight: 700;">Requerido</span>
                     </label>
                     <input type="tel" class="form-input" id="ticket-form-phone" placeholder="Ej. 987654321" style="border-color: rgba(34, 197, 94, 0.4); font-weight: 700; font-size: 1rem;">
                   </div>
 
                   <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label" for="ticket-form-address" style="display: flex; align-items: center; gap: 6px;">
-                      <span style="color: #38bdf8; font-size: 1.1rem;">📍</span>
-                      <span style="font-weight: 800; color: #ffffff;">Dirección de Entrega / Referencia</span>
+                    <label class="form-label" for="ticket-form-address" style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #38bdf8; font-size: 1.1rem;">📍</span>
+                        <span style="font-weight: 800; color: #ffffff;">Dirección de Entrega / Referencia *</span>
+                      </span>
+                      <span style="font-size: 0.75rem; color: #f87171; font-weight: 700;">Requerido</span>
                     </label>
                     <input type="text" class="form-input" id="ticket-form-address" placeholder="Ej. Av. Nicolás de Piérola 425 - Santa Clara" style="font-weight: 600;">
                   </div>
 
                   <!-- Campo Independiente de Costo de Delivery -->
                   <div class="form-group" id="ticket-form-delivery-fee-group" style="margin-bottom: 0;">
-                    <label class="form-label" for="ticket-form-delivery-fee" style="font-weight: 800; color: #ffffff;">Costo de Envío / Delivery (S/)</label>
-                    <input type="number" step="0.5" class="form-input" id="ticket-form-delivery-fee" min="0" value="5.00" placeholder="0.00" oninput="window.updateTicketFormTotal()" style="font-weight: 700;">
+                    <label class="form-label" for="ticket-form-delivery-fee" style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="font-weight: 800; color: #ffffff;">Costo de Envío / Delivery (S/) *</span>
+                      <span style="font-size: 0.75rem; color: #f87171; font-weight: 700;">Requerido</span>
+                    </label>
+                    <input type="number" step="0.5" class="form-input" id="ticket-form-delivery-fee" min="0" value="5.00" placeholder="0.00" oninput="window.updateTicketFormTotal()" style="font-weight: 700; border-color: rgba(16, 185, 129, 0.4);">
                   </div>
                 </div>
 

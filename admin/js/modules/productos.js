@@ -13,19 +13,22 @@
     try {
       const rawData = await window.AdminApi.getProducts();
       const list = Array.isArray(rawData) ? rawData : (rawData && Array.isArray(rawData.data) ? rawData.data : []);
-      const activeList = (list && list.length > 0) ? list : (state.defaultSignatureProducts || []);
-      state.allProducts = activeList.filter(p => {
-        const cat = (p.category_id || '').toLowerCase().trim();
+      const activeList = (list && list.length > 0) ? list : (state.defaultSignatureProducts && state.defaultSignatureProducts.length > 0 ? state.defaultSignatureProducts : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []));
+      
+      let filtered = activeList.filter(p => {
+        const cat = (p.category_id || p.category || '').toLowerCase().trim();
         const code = getCategoryCode(cat);
-        return validCatKeys.has(cat) || validCatKeys.has(code);
+        return validCatKeys.size === 0 || validCatKeys.has(cat) || validCatKeys.has(code);
       });
+
+      if (!filtered || filtered.length === 0) {
+        filtered = activeList;
+      }
+
+      state.allProducts = filtered;
     } catch (e) {
       console.warn('Usando catálogo local de contingencia:', e);
-      state.allProducts = (state.defaultSignatureProducts || []).filter(p => {
-        const cat = (p.category_id || '').toLowerCase().trim();
-        const code = getCategoryCode(cat);
-        return validCatKeys.has(cat) || validCatKeys.has(code);
-      });
+      state.allProducts = state.defaultSignatureProducts || (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []);
     }
     applyProductFilters();
     window.updateDashboardMetrics?.();
@@ -35,12 +38,20 @@
     const state = window.AdminState = window.AdminState || {};
     let prods = [...(state.allProducts || [])];
 
+    // Si por alguna razón allProducts está vacío, restaurar productos predeterminados inmediatamente
+    if (prods.length === 0) {
+      prods = [...(state.defaultSignatureProducts || (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []))];
+      state.allProducts = prods;
+    }
+
     // Filtro Categoría
     if (state.currentCategory && state.currentCategory !== 'todos') {
       const activeCatCode = getCategoryCode(state.currentCategory);
+      const targetCatClean = String(state.currentCategory).toLowerCase().trim();
       prods = prods.filter(p => {
-        const pCatCode = getCategoryCode(p.category_id);
-        return p.category_id === state.currentCategory || pCatCode === activeCatCode;
+        const pCat = String(p.category_id || p.category || '').toLowerCase().trim();
+        const pCatCode = getCategoryCode(pCat);
+        return pCat === targetCatClean || pCatCode === activeCatCode || pCat.includes(targetCatClean) || targetCatClean.includes(pCat);
       });
     }
 

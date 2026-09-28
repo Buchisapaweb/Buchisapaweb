@@ -555,7 +555,7 @@
           ` : ''}
           <div class="ticket-meta-row">
             <span class="ticket-meta-label">Tipo</span>
-            <span class="ticket-meta-val">${t.type === 'delivery' ? 'Delivery' : 'Salón'}</span>
+            <span class="ticket-meta-val">${t.type === 'delivery' ? 'Delivery 🛵' : (t.type === 'recojo' ? 'Recojo en Local 🛍️' : 'Salón 🍽️')}</span>
           </div>
           <div class="ticket-meta-row">
             <span class="ticket-meta-label">Pago</span>
@@ -604,9 +604,13 @@
             <span class="ticket-totals-label">Items</span>
             <span class="ticket-totals-val">${totalItemsCount}</span>
           </div>
-          ${deliveryFee > 0 ? `
+          ${t.type === 'delivery' ? `
             <div class="ticket-totals-row">
-              <span class="ticket-totals-label">Delivery</span>
+              <span class="ticket-totals-label">Subtotal Platos</span>
+              <span class="ticket-totals-val">S/ ${computedSubtotal.toFixed(2)}</span>
+            </div>
+            <div class="ticket-totals-row">
+              <span class="ticket-totals-label">Costo Delivery</span>
               <span class="ticket-totals-val">S/ ${deliveryFee.toFixed(2)}</span>
             </div>
           ` : ''}
@@ -1776,7 +1780,45 @@
     const generalNote = document.getElementById('ticket-form-notes')?.value.trim() || '';
 
     const deliveryInput = document.getElementById('ticket-form-delivery-fee');
-    const deliveryFee = type === 'delivery' ? (parseFloat(deliveryInput?.value) || 0) : 0;
+    const rawDeliveryVal = deliveryInput?.value !== undefined ? String(deliveryInput.value).trim() : '';
+    const deliveryFee = type === 'delivery' ? (parseFloat(rawDeliveryVal) || 0) : 0;
+
+    // VALIDACIÓN OBLIGATORIA DE CAMPOS CUANDO ES DELIVERY
+    if (type === 'delivery') {
+      if (!phone) {
+        if (window.showToast) {
+          window.showToast('⚠️ El Número de Teléfono / WhatsApp es OBLIGATORIO para pedidos de Delivery', 'warning');
+        }
+        if (phoneInput) {
+          phoneInput.focus();
+          phoneInput.style.borderColor = '#ef4444';
+          setTimeout(() => { phoneInput.style.borderColor = ''; }, 3000);
+        }
+        return;
+      }
+      if (!address) {
+        if (window.showToast) {
+          window.showToast('⚠️ La Dirección de Entrega es OBLIGATORIA para pedidos de Delivery', 'warning');
+        }
+        if (addressInput) {
+          addressInput.focus();
+          addressInput.style.borderColor = '#ef4444';
+          setTimeout(() => { addressInput.style.borderColor = ''; }, 3000);
+        }
+        return;
+      }
+      if (rawDeliveryVal === '' || isNaN(parseFloat(rawDeliveryVal)) || parseFloat(rawDeliveryVal) < 0) {
+        if (window.showToast) {
+          window.showToast('⚠️ El Costo de Delivery es OBLIGATORIO para pedidos de Delivery', 'warning');
+        }
+        if (deliveryInput) {
+          deliveryInput.focus();
+          deliveryInput.style.borderColor = '#ef4444';
+          setTimeout(() => { deliveryInput.style.borderColor = ''; }, 3000);
+        }
+        return;
+      }
+    }
 
     let subtotal = 0;
     const itemsFormatted = activeTicketItems.map(it => {
@@ -1831,7 +1873,7 @@
       type: type,
       customerName: customer,
       customerPhone: phone,
-      deliveryAddress: type === 'delivery' ? (address || generalNote || 'Dirección no especificada') : 'Salón / Mesa Local',
+      deliveryAddress: type === 'delivery' ? address : (type === 'recojo' ? 'Recojo en Local' : 'Salón / Mesa Local'),
       items: itemsFormatted.map(i => ({
         name: i.name,
         quantity: i.qty,
