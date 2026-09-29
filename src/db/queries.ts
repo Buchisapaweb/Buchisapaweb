@@ -15,6 +15,8 @@ export interface Product {
   name: string;
   category_id: string;
   price: number;
+  originalPrice?: number;
+  original_price?: number;
   description: string;
   badge?: string | null;
   popular?: boolean;
@@ -75,12 +77,22 @@ export interface Claim {
   phone: string;
   email: string;
   address: string;
+  department?: string;
+  province?: string;
+  district?: string;
+  branch?: string;
+  orderNumber?: string;
+  orderDate?: string;
+  isMinor?: boolean;
+  tutorName?: string;
+  tutorDoc?: string;
   claimType: 'queja' | 'reclamo';
-  contractedGood: 'producto' | 'servicio';
+  contractedGood?: 'producto' | 'servicio';
   claimedAmount?: number;
   productDescription?: string;
   detail: string;
   consumerRequest: string;
+  attachmentName?: string;
   status: string;
   createdAt: string;
 }
@@ -704,6 +716,119 @@ const initialProducts: Product[] = [
     stock: 30,
     image: 'https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80',
     includes_sauces: false
+  },
+  // 9. PROMOCIONES OFICIALES (8)
+  {
+    id: 'promo-1',
+    name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.',
+    category_id: 'promociones',
+    price: 90.90,
+    original_price: 105.00,
+    description: '1 BuchiSapa Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoción incluye ensalada fresca o cocida a elección.',
+    badge: 'PROMO',
+    popular: true,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'promo-2',
+    name: 'Promoción Tu Chicha 1.5 LT.',
+    category_id: 'promociones',
+    price: 95.50,
+    original_price: 110.00,
+    description: '1 BuchiSapa Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción incluye ensalada fresca o cocida a elección.',
+    badge: 'PROMO',
+    popular: true,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'promo-3',
+    name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.',
+    category_id: 'promociones',
+    price: 95.50,
+    original_price: 112.00,
+    description: '1 BuchiSapa Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoción incluye ensalada fresca o cocida a elección.',
+    badge: 'PROMO',
+    popular: true,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'promo-4',
+    name: 'Promoción Para 2',
+    category_id: 'promociones',
+    price: 57.90,
+    original_price: 68.00,
+    description: '1/2 BuchiSapa Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción incluye cremas de la casa a elección.',
+    badge: 'PROMO',
+    popular: true,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'promo-5',
+    name: 'Promoción Brasa Para Mí',
+    category_id: 'promociones',
+    price: 35.90,
+    original_price: 42.00,
+    description: '1/4 BuchiSapa Brasa + papas fritas + guarnición de ensalada BuchiSapa + bebida personal. Esta Promoción incluye cremas de la casa.',
+    badge: 'PROMO',
+    popular: true,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'promo-6',
+    name: 'Parrillero Original Para Mí',
+    category_id: 'promociones',
+    price: 38.50,
+    original_price: 45.00,
+    description: '1/4 BuchiSapa Parrillero original con papas fritas y guarnición de ensalada BuchiSapa + bebida personal.',
+    badge: 'PARRILLA',
+    popular: true,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'promo-7',
+    name: 'Promoción Chicharrón Para Mí',
+    category_id: 'promociones',
+    price: 38.50,
+    original_price: 45.00,
+    description: '5 unidades de chicharrón + papas fritas o doradas + guarnición de ensalada BuchiSapa + bebida personal.',
+    badge: 'CHICHARRÓN',
+    popular: true,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'promo-8',
+    name: 'Parrillero BBQ Para Mí',
+    category_id: 'promociones',
+    price: 39.50,
+    original_price: 46.00,
+    description: '1/4 BuchiSapa Parrillero bbq con papas fritas y guarnición de ensalada BuchiSapa + bebida personal.',
+    badge: 'PARRILLA',
+    popular: true,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
   }
 ];
 
@@ -978,12 +1103,22 @@ export async function createClaim(data: any): Promise<Claim> {
     phone: data.phone,
     email: data.email,
     address: data.address || '',
-    claimType: data.claimType || 'reclamo',
+    department: data.department || 'Lima',
+    province: data.province || 'Lima',
+    district: data.district || 'Ate',
+    branch: data.branch || 'BuchiSapa - Sede Central (Santa Clara, Ate)',
+    orderNumber: data.orderNumber || '',
+    orderDate: data.orderDate || '',
+    isMinor: Boolean(data.isMinor),
+    tutorName: data.tutorName || '',
+    tutorDoc: data.tutorDoc || '',
+    claimType: (data.claimType || 'reclamo').toLowerCase().includes('queja') ? 'queja' : 'reclamo',
     contractedGood: data.contractedGood || 'producto',
     claimedAmount: data.claimedAmount ? Number(data.claimedAmount) : undefined,
-    productDescription: data.productDescription || 'Atención en restaurante',
+    productDescription: data.productDescription || 'Consumo en restaurante / Pedido delivery',
     detail: data.detail,
     consumerRequest: data.consumerRequest || '',
+    attachmentName: data.attachmentName || '',
     status: 'pendiente',
     createdAt: new Date().toISOString()
   };

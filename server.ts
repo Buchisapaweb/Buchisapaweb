@@ -997,39 +997,65 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       const {
         claimCode,
         fullName,
+        firstName,
+        paternalSurname,
+        maternalSurname,
         docType,
         docNumber,
         documentType,
         documentNumber,
         phone,
         email,
+        department,
+        province,
+        district,
         address,
+        branch,
+        orderNumber,
+        orderDate,
+        isMinor,
+        tutorName,
+        tutorDoc,
         claimType,
         contractedGood,
         claimedAmount,
         productDescription,
         detail,
         consumerRequest,
+        attachmentName
       } = req.body;
 
-      if (!fullName || !phone || !email || !detail) {
+      const finalName = fullName || [firstName, paternalSurname, maternalSurname].filter(Boolean).join(' ');
+      const finalDetail = detail || consumerRequest || 'Reclamación registrada por el cliente';
+
+      if (!finalName || !phone || !email || !finalDetail) {
         return res.status(400).json({ success: false, error: 'Faltan campos obligatorios para el reclamo' });
       }
 
       const claim = await createClaim({
         claimCode: claimCode || `REC-${Date.now()}`,
-        fullName,
+        fullName: finalName,
         docType: docType || documentType || 'DNI',
         docNumber: docNumber || documentNumber || '',
         phone,
         email,
+        department: department || 'Lima',
+        province: province || 'Lima',
+        district: district || 'Ate',
         address: address || '',
+        branch: branch || 'BuchiSapa - Sede Central (Santa Clara, Ate)',
+        orderNumber: orderNumber || '',
+        orderDate: orderDate || '',
+        isMinor: Boolean(isMinor),
+        tutorName: tutorName || '',
+        tutorDoc: tutorDoc || '',
         claimType: claimType || 'reclamo',
         contractedGood: contractedGood || 'producto',
         claimedAmount: claimedAmount ? Number(claimedAmount) : undefined,
-        productDescription: productDescription || 'Atención en restaurante',
-        detail,
-        consumerRequest: consumerRequest || '',
+        productDescription: productDescription || 'Consumo en restaurante / Pedido delivery',
+        detail: finalDetail,
+        consumerRequest: consumerRequest || finalDetail,
+        attachmentName: attachmentName || ''
       });
 
       res.status(201).json({ success: true, data: claim });

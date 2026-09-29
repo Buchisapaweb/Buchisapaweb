@@ -3696,6 +3696,8 @@ function exitSearchMode() {
   const clearBtn = document.getElementById('search-clear-btn');
   const closeBtn = document.getElementById('search-close-action-btn');
   const searchWrap = document.getElementById('buchisapa-search-bar-wrap');
+  const container = document.getElementById('search-view-list');
+  const backBtn = document.querySelector('#search-results-section .btn-volver');
 
   if (input) input.value = '';
   if (clearBtn) clearBtn.style.display = 'none';
@@ -3708,6 +3710,16 @@ function exitSearchMode() {
   if (searchSec) {
     searchSec.style.display = 'none';
     searchSec.classList.add('is-hidden');
+    searchSec.classList.remove('promociones-mode');
+  }
+  if (container) {
+    container.classList.remove('promo-grid-4col');
+  }
+  if (backBtn) {
+    backBtn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+      Volver a Categorías
+    `;
   }
   if (catSec) catSec.style.display = 'grid';
   if (heroSec) heroSec.style.display = 'block';
@@ -3741,6 +3753,7 @@ function openCategoryView(catId, catTitle) {
   const container = document.getElementById('search-view-list');
   const input = document.getElementById('main-search-input');
   const closeBtn = document.getElementById('search-close-action-btn');
+  const backBtn = document.querySelector('#search-results-section .btn-volver');
 
   if (input) input.value = '';
   if (searchSec) {
@@ -3751,6 +3764,23 @@ function openCategoryView(catId, catTitle) {
   if (heroSec) heroSec.style.display = 'none';
   if (titleWrap) titleWrap.style.display = 'none';
   if (closeBtn) closeBtn.style.display = 'block';
+
+  const isPromo = (catId || catTitle || '').toLowerCase().includes('promo');
+
+  if (backBtn) {
+    backBtn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+      ${isPromo ? 'Volver al inicio' : 'Volver a Categorías'}
+    `;
+  }
+
+  if (isPromo) {
+    if (searchSec) searchSec.classList.add('promociones-mode');
+    if (container) container.classList.add('promo-grid-4col');
+  } else {
+    if (searchSec) searchSec.classList.remove('promociones-mode');
+    if (container) container.classList.remove('promo-grid-4col');
+  }
 
   // Sincronizar active state en quick category pills
   document.querySelectorAll('.quick-cat-btn').forEach(btn => {
@@ -3763,10 +3793,27 @@ function openCategoryView(catId, catTitle) {
     }
   });
 
+  // Sincronizar active state en dropdown items de escritorio
+  document.querySelectorAll('.desktop-dropdown-menu .dropdown-item').forEach(btn => {
+    const text = (btn.textContent || '').trim().toLowerCase();
+    const target = (catTitle || catId || '').trim().toLowerCase();
+    if (text === target || (target.includes('amazon') && text.includes('amazon'))) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
   const displayTitle = (catTitle || catId || 'PLATOS').toUpperCase();
   if (titleEl) titleEl.textContent = displayTitle;
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // SI ES PROMOCIONES, RENDERIZAR LA CUADRÍCULA OFICIAL DE 4 COLUMNAS
+  if (isPromo) {
+    renderOfficialPromotionsInApp(container);
+    return;
+  }
 
   const items = getAllProducts();
   const rawTarget = normalizeText(catId || catTitle || '');
@@ -3850,6 +3897,114 @@ function openCategoryView(catId, catTitle) {
   filtered.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' }));
 
   renderCardsInContainer(filtered, container);
+}
+
+function renderOfficialPromotionsInApp(container) {
+  if (!container) return;
+
+  const promos = [
+    {
+      id: 'promo-1',
+      name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.',
+      price: 90.90,
+      shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoció...',
+      image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80',
+      fallbackImg: '/imagenes/portada/Portada2E.webp'
+    },
+    {
+      id: 'promo-2',
+      name: 'Promoción Tu Chicha 1.5 LT.',
+      price: 95.50,
+      shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción in...',
+      image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80',
+      fallbackImg: '/imagenes/portada/Portada1E.webp'
+    },
+    {
+      id: 'promo-3',
+      name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.',
+      price: 95.50,
+      shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoci...',
+      image: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80',
+      fallbackImg: '/imagenes/portada/Portada3E.webp'
+    },
+    {
+      id: 'promo-4',
+      name: 'Promoción Para 2',
+      price: 57.90,
+      shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción in...',
+      image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80',
+      fallbackImg: '/imagenes/portada/Portada4E.webp'
+    },
+    {
+      id: 'promo-5',
+      name: 'Promoción Brasa Para Mí',
+      price: 35.90,
+      shortDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal. Esta Pro...',
+      image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
+      fallbackImg: '/imagenes/categorias/broaster/banner.webp'
+    },
+    {
+      id: 'promo-6',
+      name: 'Parrillero Original Para Mí',
+      price: 38.50,
+      shortDesc: '1/4 Pardos Parrillero original con papas fritas y guarnición de ensalada Pardos + bebida per...',
+      image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80',
+      fallbackImg: '/imagenes/categorias/hamburguesas/banner.webp'
+    },
+    {
+      id: 'promo-7',
+      name: 'Promoción Chicharrón Para Mí',
+      price: 38.50,
+      shortDesc: '5 unidades de chicharrón + papas fritas o doradas + guarnición de ensalada Pardos + bebida p...',
+      image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80',
+      fallbackImg: '/imagenes/categorias/alitas/banner.webp'
+    },
+    {
+      id: 'promo-8',
+      name: 'Parrillero BBQ Para Mí',
+      price: 39.50,
+      shortDesc: '1/4 Pardos Parrillero bbq con papas fritas y guarnición de ensalada Pardos + bebida personal...',
+      image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
+      fallbackImg: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp'
+    }
+  ];
+
+  container.innerHTML = promos.map((p, idx) => `
+    <article class="promo-item-card" onclick="openProductDetailModal('${p.id}')" style="cursor: pointer;">
+      <div class="promo-item-img-box">
+        <img 
+          src="${p.image}" 
+          alt="${escapeHtml(p.name)}" 
+          class="promo-item-img"
+          loading="${idx < 4 ? 'eager' : 'lazy'}"
+          onerror="this.onerror=null; this.src='${p.fallbackImg}';"
+        >
+      </div>
+      <div class="promo-item-body">
+        <h3 class="promo-item-title">${escapeHtml(p.name)}</h3>
+        <p class="promo-item-desc">
+          ${escapeHtml(p.shortDesc)}
+          <button type="button" class="promo-ver-mas-inline" onclick="event.stopPropagation(); openProductDetailModal('${p.id}')">VER MÁS</button>
+        </p>
+        <div class="promo-item-footer">
+          <span class="promo-item-price">S/ ${p.price.toFixed(2)}</span>
+          <button 
+            type="button" 
+            class="promo-btn-agregar" 
+            onclick="event.stopPropagation(); if(window.BuchisapaCart) { window.BuchisapaCart.addItem({id:'${p.id}', name:'${escapeHtml(p.name)}', price:${p.price}, image:'${p.image}', includes_sauces:true}, 1); window.BuchisapaCart.openDrawer(); }"
+            aria-label="Agregar ${escapeHtml(p.name)} al pedido"
+          >
+            <svg class="promo-basket-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+              <path d="M3 6h18"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <span>Agregar</span>
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join('');
 }
 
 function renderSearchResultsList(normQuery, sectionLabel) {

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Libro de Reclamaciones Virtual | BuchiSapa</title>
-  <meta name="description" content="Libro de Reclamaciones Virtual de BuchiSapa conforme a lo establecido en el Código de Protección y Defensa del Consumidor (INDECOPI).">
+  <title>Libro de Reclamaciones | BuchiSapa</title>
+  <meta name="description" content="Libro de Reclamaciones Virtual de BuchiSapa conforme a lo establecido en el Código de Protección y Defensa del Consumidor (INDECOPI - Ley N° 29571).">
   <link rel="icon" type="image/png" href="/imagenes/logo/logo-buchisapa.webp">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,10 +13,13 @@
 
   <link rel="stylesheet" href="/css/comun.css">
   <link rel="stylesheet" href="/css/reclamaciones.css">
+
+  <!-- Librería jsPDF para descarga de Hoja de Reclamación -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="reclamaciones-page-body">
 
-    <!-- NAVBAR DE PÁGINA SECUNDARIA (VOLVER A LA DERECHA, SIN CUADRADO) -->
+  <!-- NAVBAR DE PÁGINA SECUNDARIA -->
   <header class="subpage-navbar">
     <div class="subpage-nav-wrap">
       <a href="/" class="subpage-brand" title="BuchiSapa - Inicio">
@@ -30,102 +33,369 @@
     </div>
   </header>
 
-  <div class="container reclamaciones-container-sm">
-    <div class="reclamaciones-card">
-      
-      <div class="reclamaciones-header">
-        <img src="/imagenes/logo/logo-buchisapa.webp" alt="BuchiSapa Logo" class="reclamaciones-header-logo">
-        <h1 class="reclamaciones-header-title">LIBRO DE RECLAMACIONES VIRTUAL</h1>
-        <p class="reclamaciones-header-sub">Conforme a lo establecido en el Código de Protección y Defensa del Consumidor - Ley N° 29571 (INDECOPI - Perú)</p>
+  <main class="container reclamaciones-main-container">
+    
+    <!-- ENCABEZADO OFICIAL LIBRO DE RECLAMACIONES -->
+    <div class="claim-top-header">
+      <h1 class="claim-page-title">LIBRO DE RECLAMACIONES</h1>
+      <p class="claim-page-description">
+        Conforme a lo establecido en código de la Protección y Defensa del consumidor contamos con un Libro de Reclamaciones a tu disposición para que puedas registrar tu queja o reclamo acerca de algún pedido o transacción realizada.
+      </p>
+
+      <div class="claim-sub-info">
+        <h2 class="claim-sub-heading">Hoja de reclamación</h2>
+        <div class="claim-registration-date">
+          Fecha de registro: <strong id="claim-current-date">--/--/----</strong>
+        </div>
+        <p class="claim-instructions-text">
+          En la siguiente lista desplegable elija el restaurante responsable de su queja o reclamo, si tiene dudas puede ubicar el restaurante en la parte superior de la boleta de venta o escríbanos un mensaje al correo <a href="mailto:buchisapaweb@gmail.com" class="claim-support-email">buchisapaweb@gmail.com</a> para poder orientarlo.
+        </p>
+      </div>
+    </div>
+
+    <!-- FORMULARIO OFICIAL DE RECLAMACIÓN -->
+    <form id="claim-main-form" onsubmit="handleClaimSubmit(event)">
+
+      <!-- CARD 1: SELECCIONA UN LOCAL -->
+      <section class="claim-card">
+        <div class="claim-card-header">
+          <div class="claim-card-title-wrap">
+            <svg class="claim-card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <h3 class="claim-card-title">Selecciona un local*</h3>
+          </div>
+        </div>
+
+        <div class="claim-card-body">
+          <div class="claim-input-icon-wrap">
+            <svg class="claim-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <select id="claim-local" class="claim-form-input claim-select-with-icon" required>
+              <option value="" disabled selected>Busca por nombre o dirección</option>
+              <option value="BuchiSapa - Sede Central (Av. La Estrella con Calle 28 de Julio, Santa Clara, Ate - Lima)">BuchiSapa - Sede Central: Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima)</option>
+              <option value="BuchiSapa - Pedidos en Línea y Delivery Oficial (Lima Este)">BuchiSapa - Pedidos en Línea y Delivery Oficial (Lima Este)</option>
+              <option value="BuchiSapa - Salón Principal y Eventos (Santa Clara, Ate)">BuchiSapa - Salón Principal y Eventos (Santa Clara, Ate)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARD 2: INFORMACIÓN DEL USUARIO -->
+      <section class="claim-card">
+        <div class="claim-card-header">
+          <div class="claim-card-title-wrap">
+            <svg class="claim-card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <h3 class="claim-card-title">Información del usuario*</h3>
+          </div>
+        </div>
+
+        <div class="claim-card-body">
+          <!-- FILA 1: NOMBRES Y APELLIDOS -->
+          <div class="claim-grid-3col">
+            <div class="claim-form-group">
+              <label for="claim-firstname" class="claim-form-label">Nombres*</label>
+              <input type="text" id="claim-firstname" class="claim-form-input" required autocomplete="given-name">
+            </div>
+            <div class="claim-form-group">
+              <label for="claim-lastname1" class="claim-form-label">Apellido paterno*</label>
+              <input type="text" id="claim-lastname1" class="claim-form-input" required autocomplete="family-name">
+            </div>
+            <div class="claim-form-group">
+              <label for="claim-lastname2" class="claim-form-label">Apellido materno*</label>
+              <input type="text" id="claim-lastname2" class="claim-form-input" required autocomplete="additional-name">
+            </div>
+          </div>
+
+          <!-- FILA 2: TIPO DOC, NUM DOC, EMAIL, TELÉFONO -->
+          <div class="claim-grid-doc-contact">
+            <div class="claim-form-group doc-type-col">
+              <label for="claim-doc-type" class="claim-form-label">Tipo de documento*</label>
+              <select id="claim-doc-type" class="claim-form-input claim-select" required onchange="onDocTypeChange(this.value)">
+                <option value="DNI" selected>DNI</option>
+                <option value="CE">C.E.</option>
+                <option value="Pasaporte">Pasaporte</option>
+                <option value="RUC">RUC</option>
+              </select>
+            </div>
+            <div class="claim-form-group doc-num-col">
+              <label for="claim-doc-num" class="claim-form-label">N° Doc.*</label>
+              <input type="text" id="claim-doc-num" class="claim-form-input" required maxlength="12" inputmode="numeric">
+            </div>
+            <div class="claim-form-group">
+              <label for="claim-email" class="claim-form-label">Email*</label>
+              <input type="email" id="claim-email" class="claim-form-input" required autocomplete="email">
+            </div>
+            <div class="claim-form-group">
+              <label for="claim-phone" class="claim-form-label">Teléfono*</label>
+              <input type="tel" id="claim-phone" class="claim-form-input" required autocomplete="tel" maxlength="15">
+            </div>
+          </div>
+
+          <!-- FILA 3: DEPARTAMENTO, PROVINCIA, DISTRITO -->
+          <div class="claim-grid-3col">
+            <div class="claim-form-group">
+              <label for="claim-department" class="claim-form-label">Departamento*</label>
+              <select id="claim-department" class="claim-form-input claim-select" required onchange="onDepartmentChanged(this.value)">
+                <option value="Lima" selected>Lima</option>
+                <option value="Callao">Callao</option>
+                <option value="Arequipa">Arequipa</option>
+                <option value="Cusco">Cusco</option>
+                <option value="La Libertad">La Libertad</option>
+                <option value="Piura">Piura</option>
+                <option value="Lambayeque">Lambayeque</option>
+                <option value="Junín">Junín</option>
+                <option value="Ucayali">Ucayali</option>
+                <option value="Loreto">Loreto</option>
+                <option value="San Martín">San Martín</option>
+                <option value="Ica">Ica</option>
+                <option value="Ancash">Ancash</option>
+                <option value="Tacna">Tacna</option>
+              </select>
+            </div>
+            <div class="claim-form-group">
+              <label for="claim-province" class="claim-form-label">Provincia*</label>
+              <select id="claim-province" class="claim-form-input claim-select" required onchange="onProvinceChanged(this.value)">
+                <option value="Lima" selected>Lima</option>
+                <option value="Barranca">Barranca</option>
+                <option value="Cañete">Cañete</option>
+                <option value="Huaral">Huaral</option>
+                <option value="Huaura">Huaura</option>
+              </select>
+            </div>
+            <div class="claim-form-group">
+              <label for="claim-district" class="claim-form-label">Distrito*</label>
+              <select id="claim-district" class="claim-form-input claim-select" required>
+                <option value="Ate" selected>Ate (Santa Clara / Vitarte)</option>
+                <option value="Santa Anita">Santa Anita</option>
+                <option value="La Molina">La Molina</option>
+                <option value="Chosica (Lurigancho)">Chosica (Lurigancho)</option>
+                <option value="Chaclacayo">Chaclacayo</option>
+                <option value="San Juan de Lurigancho">San Juan de Lurigancho</option>
+                <option value="El Agustino">El Agustino</option>
+                <option value="Santiago de Surco">Santiago de Surco</option>
+                <option value="San Borja">San Borja</option>
+                <option value="San Isidro">San Isidro</option>
+                <option value="Miraflores">Miraflores</option>
+                <option value="Lima Cercado">Lima Cercado</option>
+                <option value="Otro">Otro distrito</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- FILA 4: DIRECCIÓN -->
+          <div class="claim-form-group">
+            <label for="claim-address" class="claim-form-label">Dirección*</label>
+            <input type="text" id="claim-address" class="claim-form-input claim-input-address" required placeholder="Av., Calle, Jr., N° y Urbanización">
+          </div>
+
+          <!-- FILA 5: RADIO MENOR O MAYOR DE EDAD -->
+          <div class="claim-age-radio-row">
+            <label class="claim-radio-box">
+              <input type="radio" name="claim-age" value="menor" onchange="toggleTutorFields(true)">
+              <span class="claim-radio-custom"></span>
+              <span class="claim-radio-text">Menor de edad</span>
+            </label>
+            <span class="claim-radio-divider">/</span>
+            <label class="claim-radio-box">
+              <input type="radio" name="claim-age" value="mayor" checked onchange="toggleTutorFields(false)">
+              <span class="claim-radio-custom"></span>
+              <span class="claim-radio-text">Mayor de edad <span class="claim-required-asterisk">*</span></span>
+            </label>
+          </div>
+
+          <!-- CAMPOS CONDICIONALES PARA APODERADO / TUTOR (SI ES MENOR DE EDAD) -->
+          <div id="claim-tutor-container" class="claim-tutor-container" style="display: none;">
+            <div class="claim-tutor-banner">
+              <strong>Información del Padre, Madre o Tutor Legal:</strong>
+            </div>
+            <div class="claim-grid-2col">
+              <div class="claim-form-group">
+                <label for="claim-tutor-name" class="claim-form-label">Nombres y Apellidos del Apoderado*</label>
+                <input type="text" id="claim-tutor-name" class="claim-form-input" placeholder="Nombre completo del apoderado">
+              </div>
+              <div class="claim-form-group">
+                <label for="claim-tutor-doc" class="claim-form-label">N° de Documento del Apoderado*</label>
+                <input type="text" id="claim-tutor-doc" class="claim-form-input" placeholder="DNI / C.E. del apoderado">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- CARD 3: DETALLE DEL PRODUCTO O SERVICIO ADQUIRIDO -->
+      <section class="claim-card">
+        <div class="claim-card-header">
+          <div class="claim-card-title-wrap">
+            <svg class="claim-card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <h3 class="claim-card-title">Detalle del producto o servicio adquirido</h3>
+          </div>
+        </div>
+
+        <div class="claim-card-body">
+          <!-- FILA 1: NÚMERO DE PEDIDO Y FECHA DE PEDIDO -->
+          <div class="claim-grid-2col">
+            <div class="claim-form-group">
+              <label for="claim-order-num" class="claim-form-label">Número de pedido</label>
+              <input type="text" id="claim-order-num" class="claim-form-input" placeholder="Ej: BS-94821 o ticket de boleta">
+            </div>
+            <div class="claim-form-group">
+              <label for="claim-order-date" class="claim-form-label">Fecha de Pedido</label>
+              <input type="date" id="claim-order-date" class="claim-form-input">
+            </div>
+          </div>
+
+          <!-- FILA 2: TIPO DE RECLAMACIÓN (RECLAMO / QUEJA) -->
+          <div class="claim-type-selector-wrap">
+            <span class="claim-form-label" style="display: block; margin-bottom: 6px;">Tipo de Reclamación*</span>
+            <div class="claim-type-pill-group">
+              <label class="claim-type-pill-label">
+                <input type="radio" name="claim-type-option" value="Reclamo" checked>
+                <span class="claim-type-pill-btn">
+                  <strong>Reclamo</strong>
+                  <small>Disconformidad con el producto o servicio recibido</small>
+                </span>
+              </label>
+              <label class="claim-type-pill-label">
+                <input type="radio" name="claim-type-option" value="Queja">
+                <span class="claim-type-pill-btn">
+                  <strong>Queja</strong>
+                  <small>Disconformidad con la atención o malestar en el local</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- FILA 3: PEDIDO DEL RECLAMANTE -->
+          <div class="claim-form-group">
+            <label for="claim-user-request" class="claim-form-label">Pedido del reclamante*</label>
+            <textarea 
+              id="claim-user-request" 
+              class="claim-form-textarea" 
+              maxlength="4000" 
+              required 
+              placeholder="Ingrese su pedido"
+              oninput="handleTextareaCounter(this)"
+            ></textarea>
+            <div class="claim-counter-row">
+              <span class="claim-counter-text" id="claim-char-count">0/4000</span>
+            </div>
+          </div>
+
+          <!-- FILA 4: ADJUNTAR ARCHIVO (OPCIONAL) -->
+          <div class="claim-form-group">
+            <label class="claim-form-label">Adjuntar archivo (opcional)</label>
+            
+            <div 
+              class="claim-file-dropzone" 
+              id="claim-dropzone" 
+              onclick="triggerFileInput()"
+              ondragover="handleDragOver(event)"
+              ondragleave="handleDragLeave(event)"
+              ondrop="handleFileDrop(event)"
+            >
+              <svg class="claim-clip-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+              </svg>
+              <div class="claim-dropzone-title">Selecciona un archivo</div>
+              <div class="claim-dropzone-subtitle">Formatos permitidos: PNG, JPG o PDF. Tamaño máximo: 2 MB</div>
+              <input type="file" id="claim-file-input" class="claim-hidden-file" accept=".png,.jpg,.jpeg,.pdf" onchange="handleFileChange(event)">
+            </div>
+
+            <!-- PREVIEW DE ARCHIVO ADJUNTADO -->
+            <div id="claim-file-preview" class="claim-file-preview-wrap" style="display: none;">
+              <div class="claim-file-badge">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span id="claim-preview-filename" class="claim-preview-name">archivo.pdf</span>
+                <span id="claim-preview-filesize" class="claim-preview-size">(0 KB)</span>
+              </div>
+              <button type="button" class="claim-remove-file-btn" onclick="removeAttachedFile(event)" aria-label="Eliminar archivo adjunto">✕</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TEXTOS LEGALES OBLIGATORIOS INDECOPI -->
+      <div class="claim-legal-disclaimers">
+        <p class="claim-legal-p"><strong>*La formulación del reclamo no impide acudir a otras vias de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</strong></p>
+        <p class="claim-legal-p"><strong>*El proveedor debe dar respuesta al reclamo o queja en un plazo no mayor a quince(15) días hábiles, el cual es improrrogable.</strong></p>
       </div>
 
-      <form id="claim-form" onsubmit="submitClaimForm(event)">
-        <h2 class="reclamaciones-section-title">1. IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE</h2>
-        
-        <div class="form-group">
-          <label class="form-label" for="claim-name">Nombre Completo *</label>
-          <input type="text" id="claim-name" class="form-input" required placeholder="Ej: Juan Pérez">
-        </div>
+      <!-- CHECKBOX DE TÉRMINOS Y POLÍTICAS -->
+      <div class="claim-terms-wrap">
+        <label class="claim-checkbox-container">
+          <input type="checkbox" id="claim-terms-check" required>
+          <span class="claim-checkbox-custom"></span>
+          <span class="claim-terms-text">
+            Acepto <a href="/terminos" target="_blank" class="claim-legal-link">Términos y Condiciones</a> del tratamiento de datos y <a href="/politicas-privacidad" target="_blank" class="claim-legal-link">Políticas de Privacidad</a> de la empresa*
+          </span>
+        </label>
+      </div>
 
-        <div class="reclamaciones-grid-doc">
-          <div class="form-group">
-            <label class="form-label" for="claim-doc-type">Tipo Doc. *</label>
-            <select id="claim-doc-type" class="form-select">
-              <option value="DNI">DNI</option>
-              <option value="CE">Carnet Extranjería</option>
-              <option value="PASAPORTE">Pasaporte</option>
-              <option value="RUC">RUC</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="claim-doc-num">N° de Documento *</label>
-            <input type="text" id="claim-doc-num" class="form-input" required placeholder="Ej: 74839201">
-          </div>
-        </div>
-
-        <div class="reclamaciones-grid-2col">
-          <div class="form-group">
-            <label class="form-label" for="claim-phone">Celular / WhatsApp *</label>
-            <input type="tel" id="claim-phone" class="form-input" required placeholder="Ej: 927486448">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="claim-email">Correo Electrónico *</label>
-            <input type="email" id="claim-email" class="form-input" required placeholder="juan@ejemplo.com">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="claim-address">Dirección Domiciliaria</label>
-          <input type="text" id="claim-address" class="form-input" placeholder="Av. La Estrella 123, Santa Clara, Ate">
-        </div>
-
-        <h2 class="reclamaciones-section-title reclamaciones-section-title-mt">2. IDENTIFICACIÓN DEL BIEN CONTRATADO</h2>
-        
-        <div class="reclamaciones-grid-2col">
-          <div class="form-group">
-            <label class="form-label" for="claim-type">Tipo de Reclamación *</label>
-            <select id="claim-type" class="form-select">
-              <option value="Reclamo">Reclamo (Disconformidad con producto/atención)</option>
-              <option value="Queja">Queja (Disconformidad no relacionada directamente al producto)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="claim-amount">Monto Reclamado (S/) *</label>
-            <input type="number" step="0.10" id="claim-amount" class="form-input" required placeholder="Ej: 45.00">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="claim-desc">Descripción del Producto o Servicio Adquirido *</label>
-          <input type="text" id="claim-desc" class="form-input" required placeholder="Ej: Combo Familiar Broaster + Cecina ordenado por Delivery">
-        </div>
-
-        <h2 class="reclamaciones-section-title reclamaciones-section-title-mt">3. DETALLE DE LA RECLAMACIÓN Y PEDIDO DEL CONSUMIDOR</h2>
-
-        <div class="form-group">
-          <label class="form-label" for="claim-detail">Detalle de los Hechos *</label>
-          <textarea id="claim-detail" class="reclamaciones-textarea" required placeholder="Describe de forma clara lo sucedido..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="claim-request">Pedido del Consumidor (Solución solicitada) *</label>
-          <textarea id="claim-request" class="reclamaciones-textarea" required placeholder="Indica qué solución o respuesta esperas del establecimiento..."></textarea>
-        </div>
-
-        <div class="reclamaciones-terms-box">
-          * La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es condición previa para interponer una denuncia ante el INDECOPI.<br>
-          * El proveedor deberá dar respuesta al reclamo en un plazo no mayor a quince (15) días hábiles improrrogables.
-        </div>
-
-        <button type="submit" id="claim-submit-btn" class="btn btn-primary reclamaciones-btn-submit" style="background: #dc2626; border: none; border-radius: 12px; padding: 14px 24px; color: white; font-weight: 800; font-size: 15px; width: 100%; cursor: pointer;">
-          Enviar Hoja de Reclamación Virtual
+      <!-- BOTÓN ROJO ENVIAR (RED PILL) -->
+      <div class="claim-submit-action-row">
+        <button type="submit" id="claim-submit-btn" class="claim-btn-enviar">
+          <svg class="claim-send-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          <span>ENVIAR</span>
         </button>
-      </form>
+      </div>
 
+    </form>
+
+  </main>
+
+  <!-- MODAL DE CONFIRMACIÓN Y HOJA DE RECLAMACIÓN -->
+  <div id="claim-success-modal" class="claim-modal-backdrop" style="display: none;">
+    <div class="claim-modal-card">
+      <div class="claim-modal-check">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h3 class="claim-modal-title">¡Hoja de Reclamación Registrada!</h3>
+      <p class="claim-modal-desc">
+        Su reclamo ha sido registrado satisfactoriamente en el Libro de Reclamaciones de BuchiSapa.
+      </p>
+
+      <div class="claim-code-highlight-box">
+        <span class="claim-code-label">CÓDIGO DE HOJA DE RECLAMACIÓN</span>
+        <strong class="claim-code-val" id="modal-claim-code">REC-2026-000000</strong>
+      </div>
+
+      <div class="claim-modal-details" id="modal-claim-summary">
+        <!-- Resumen generado dinámicamente -->
+      </div>
+
+      <div class="claim-modal-actions">
+        <button type="button" class="btn-modal-download" onclick="downloadClaimSheetPDF()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar Hoja en PDF
+        </button>
+        <button type="button" class="btn-modal-close" onclick="closeClaimSuccessModal()">
+          Volver a la Página Principal
+        </button>
+      </div>
     </div>
   </div>
 
-  <script src="/js/supabase-cliente.js"></script>
-  <script src="/js/reclamaciones.js"></script>
+  <script src="/js/reclamaciones.js?v=20260928_1"></script>
 </body>
 </html>

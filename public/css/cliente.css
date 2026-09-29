@@ -1,8 +1,7 @@
 /* =========================================================
    BUCHISAPA - ESTILOS DEL CLIENTE (client/css/client.css)
    (Los estilos del encabezado residen en /css/encabezado.css)
-   ========================================================= */
-
+@import url("/css/promociones.css");
 
 /* =========================================================
    ENCABEZADOS DE SECCIÓN EDITORIALES
@@ -676,6 +675,40 @@
 
 .search-view-title {
   display: none;
+}
+
+/* MODO PROMOCIONES EXACTO COMO EN LA CAPTURA DE REFERENCIA */
+.search-view-section.promociones-mode .search-view-title {
+  display: block;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  color: #000000;
+  margin: 10px 0 32px;
+  text-transform: uppercase;
+}
+
+.search-view-section.promociones-mode .buchisapa-cards-list,
+.buchisapa-cards-list.promo-grid-4col {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 22px !important;
+}
+
+@media (max-width: 1024px) {
+  .search-view-section.promociones-mode .buchisapa-cards-list,
+  .buchisapa-cards-list.promo-grid-4col {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 18px !important;
+  }
+}
+
+@media (max-width: 580px) {
+  .search-view-section.promociones-mode .buchisapa-cards-list,
+  .buchisapa-cards-list.promo-grid-4col {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .buchisapa-cards-list {
