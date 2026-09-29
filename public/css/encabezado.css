@@ -830,9 +830,9 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
 }
 
 .mobile-menu-backdrop.active,

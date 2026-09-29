@@ -44,6 +44,24 @@
                 </button>
               </div>
 
+              <!-- BOTONES DE ACCIONES RÁPIDAS: CATEGORÍA, ACOMPAÑAMIENTO, CREMA DE LA CASA -->
+              <div class="catalog-quick-actions-row">
+                <button type="button" class="btn-quick-action btn-quick-cat" onclick="window.openCategoryManagerView('add')" title="Crear nueva categoría">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  <span>Nueva Categoría</span>
+                </button>
+
+                <button type="button" class="btn-quick-action btn-quick-side" onclick="window.openAccompanimentModal()" title="Crear nuevo acompañamiento o guarnición">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  <span>Nuevo Acompañamiento</span>
+                </button>
+
+                <button type="button" class="btn-quick-action btn-quick-sauce" onclick="window.openSauceModal()" title="Crear nueva crema o salsa de la casa">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  <span>Nueva Crema de la Casa</span>
+                </button>
+              </div>
+
               <!-- 3. CONTROLES DE ORDENAMIENTO Y MODO DE VISTA -->
               <div class="toolbar-controls">
                 <div class="sort-select-wrapper">

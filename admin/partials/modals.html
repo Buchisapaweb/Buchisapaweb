@@ -622,5 +622,130 @@
     </div>
   </div>
 
+  <!-- ==========================================================================
+       MODAL: NUEVO ACOMPAÑAMIENTO / GUARNICIÓN
+       ========================================================================== -->
+  <div class="modal-overlay" id="accompaniment-modal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <h3 class="modal-title-white">🥔 Nuevo Acompañamiento / Guarnición</h3>
+        <button class="modal-close-btn modal-close-trigger" onclick="document.getElementById('accompaniment-modal').classList.remove('active')" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="accompaniment-form" onsubmit="window.handleAccompanimentFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="form-acc-name">Nombre del Acompañamiento *</label>
+            <input type="text" class="form-input" id="form-acc-name" required placeholder="Ej. Papas Fritas Artesanales, Tacacho de Plátano Bellaco, Yucas Fritas">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="form-acc-price">Precio Adicional (S/) *</label>
+              <input type="number" step="0.5" class="form-input" id="form-acc-price" required value="0.00" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="form-acc-category">Categoría Asociada</label>
+              <select class="form-select" id="form-acc-category">
+                <option value="todas">Todas las categorías</option>
+                <option value="platos-amazonicos">🌿 Amazónicos</option>
+                <option value="broaster">🍗 Pollo Broaster</option>
+                <option value="hamburguesas">🍔 Hamburguesas</option>
+                <option value="salchipapas">🍟 Salchipapas</option>
+                <option value="alitas">🍗 Alitas</option>
+                <option value="extras">🔥 Extras</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-acc-desc">Descripción / Porción</label>
+            <textarea class="form-textarea" id="form-acc-desc" rows="2" placeholder="Ej. Porción personal de papas crujientes con sal marina."></textarea>
+          </div>
+
+          <div class="modal-switch-box">
+            <div>
+              <p class="modal-title-white">Disponible para Selección</p>
+              <p class="modal-subtitle-text">Los clientes podrán agregarlo a sus platos</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="form-acc-available" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('accompaniment-modal').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Acompañamiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: NUEVA CREMA DE LA CASA
+       ========================================================================== -->
+  <div class="modal-overlay" id="sauce-modal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <h3 class="modal-title-white">🧴 Nueva Crema / Salsa de la Casa</h3>
+        <button class="modal-close-btn modal-close-trigger" onclick="document.getElementById('sauce-modal').classList.remove('active')" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="sauce-form" onsubmit="window.handleSauceFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="form-sauce-name">Nombre de la Crema / Salsa *</label>
+            <input type="text" class="form-input" id="form-sauce-name" required placeholder="Ej. Ají Pollero BuchiSapa, Tártara Artesanal, Crema de Cocona">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="form-sauce-price">Precio Adicional / Porción Extra (S/)</label>
+              <input type="number" step="0.5" class="form-input" id="form-sauce-price" value="0.00" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="form-sauce-level">Nivel de Picante / Tipo</label>
+              <select class="form-select" id="form-sauce-level">
+                <option value="Sin Picante">🟢 Sin Picante (Suave)</option>
+                <option value="Picante Medio">🟡 Picante Medio</option>
+                <option value="Furia Picante">🔴 Picante Intenso / Furia</option>
+                <option value="Cremosa Especial">✨ Cremosa Especial</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-sauce-desc">Descripción de Ingredientes / Receta</label>
+            <textarea class="form-textarea" id="form-sauce-desc" rows="2" placeholder="Ej. Preparada con ají amarillo fresco, huacatay, queso fresco y especias de la casa."></textarea>
+          </div>
+
+          <div class="modal-switch-box">
+            <div>
+              <p class="modal-title-white">Disponible en Barra de Cremas</p>
+              <p class="modal-subtitle-text">Aparecerá en el selector de cremas para los clientes</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="form-sauce-available" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('sauce-modal').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Crema de la Casa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- CONTENEDOR DE ALERTAS TOAST -->
   <div class="toast-container" id="toast-container"></div>

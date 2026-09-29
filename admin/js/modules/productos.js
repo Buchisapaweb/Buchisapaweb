@@ -787,6 +787,73 @@
     }
   }
 
+  // Modales y Manejadores para Acompañamientos y Cremas de la Casa
+  function openAccompanimentModal() {
+    const modal = document.getElementById('accompaniment-modal');
+    const form = document.getElementById('accompaniment-form');
+    if (form) form.reset();
+    if (modal) modal.classList.add('active');
+  }
+
+  function handleAccompanimentFormSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('form-acc-name')?.value.trim();
+    if (!name) return;
+
+    const price = parseFloat(document.getElementById('form-acc-price')?.value) || 0;
+    const category = document.getElementById('form-acc-category')?.value || 'todas';
+    const description = document.getElementById('form-acc-desc')?.value.trim() || '';
+    const available = document.getElementById('form-acc-available')?.checked !== false;
+
+    const newAcc = { id: 'acc-' + Date.now(), name, price, category, description, available };
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('buchisapa_custom_accompaniments') || '[]');
+      stored.unshift(newAcc);
+      localStorage.setItem('buchisapa_custom_accompaniments', JSON.stringify(stored));
+    } catch (err) {
+      console.warn('Error guardando acompañamiento:', err);
+    }
+
+    const modal = document.getElementById('accompaniment-modal');
+    if (modal) modal.classList.remove('active');
+
+    window.showToast(`✓ Acompañamiento "${name}" guardado con éxito`, 'success');
+  }
+
+  function openSauceModal() {
+    const modal = document.getElementById('sauce-modal');
+    const form = document.getElementById('sauce-form');
+    if (form) form.reset();
+    if (modal) modal.classList.add('active');
+  }
+
+  function handleSauceFormSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('form-sauce-name')?.value.trim();
+    if (!name) return;
+
+    const price = parseFloat(document.getElementById('form-sauce-price')?.value) || 0;
+    const level = document.getElementById('form-sauce-level')?.value || 'Sin Picante';
+    const description = document.getElementById('form-sauce-desc')?.value.trim() || '';
+    const available = document.getElementById('form-sauce-available')?.checked !== false;
+
+    const newSauce = { id: 'sauce-' + Date.now(), name, price, level, description, available };
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('buchisapa_custom_sauces') || '[]');
+      stored.unshift(newSauce);
+      localStorage.setItem('buchisapa_custom_sauces', JSON.stringify(stored));
+    } catch (err) {
+      console.warn('Error guardando crema de la casa:', err);
+    }
+
+    const modal = document.getElementById('sauce-modal');
+    if (modal) modal.classList.remove('active');
+
+    window.showToast(`✓ Crema de la Casa "${name}" guardada con éxito`, 'success');
+  }
+
   // Auto-init category chips on load
   document.addEventListener('DOMContentLoaded', () => {
     renderCategoryChips();
@@ -809,6 +876,11 @@
   window.deleteCategory = deleteCategory;
   window.handleCreateCategorySubmit = handleCreateCategorySubmit;
   window.handleProductImageFileUpload = handleProductImageFileUpload;
+
+  window.openAccompanimentModal = openAccompanimentModal;
+  window.handleAccompanimentFormSubmit = handleAccompanimentFormSubmit;
+  window.openSauceModal = openSauceModal;
+  window.handleSauceFormSubmit = handleSauceFormSubmit;
 
   window.toggleCategoryDropdown = toggleCategoryDropdown;
   window.selectCategoryOption = selectCategoryOption;

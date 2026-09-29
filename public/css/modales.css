@@ -18,9 +18,9 @@
   visibility: hidden;
   pointer-events: none;
   transition: opacity 0.25s ease, visibility 0.25s ease;
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
 }
 
 .modal-backdrop.open,
@@ -110,9 +110,10 @@
   transition: opacity 0.22s ease, visibility 0.22s ease;
   justify-content: center;
   align-items: stretch;
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y !important;
 }
 
 .cart-drawer-backdrop.open,
@@ -450,11 +451,7 @@ body.cart-drawer-open,
 body.menu-open,
 body.search-open {
   overflow: hidden !important;
-  height: 100vh !important;
-  height: 100dvh !important;
-  position: fixed !important;
-  width: 100% !important;
-  touch-action: none;
+  touch-action: pan-y !important;
 }
 
 @media (max-width: 768px) {
@@ -472,6 +469,8 @@ body.search-open {
     height: 100dvh !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-y: contain !important;
     padding: 0 !important;
     background: #ffffff !important;
   }
@@ -493,6 +492,7 @@ body.search-open {
     display: flex !important;
     flex-direction: column !important;
     overflow: visible !important;
+    touch-action: pan-y !important;
     z-index: 100000 !important;
     box-sizing: border-box !important;
     background: #ffffff !important;
@@ -503,11 +503,11 @@ body.search-open {
   .modal-header,
   .google-dark-topbar,
   .otp-modal-header {
-    position: static !important;
+    position: sticky !important;
+    top: 0 !important;
     flex-shrink: 0 !important;
-    top: auto !important;
-    background: transparent !important;
-    z-index: auto !important;
+    background: #ffffff !important;
+    z-index: 100 !important;
   }
 
   .cart-drawer-body,
@@ -519,8 +519,9 @@ body.search-open {
   #auth-view-register,
   #auth-view-recovery,
   #auth-view-profile {
-    flex: none !important;
+    flex: 1 0 auto !important;
     overflow: visible !important;
+    touch-action: pan-y !important;
   }
 
   #auth-view-login,
