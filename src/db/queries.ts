@@ -1709,12 +1709,31 @@ const initialPortadas: PortadaBanner[] = [
 function loadPortadasFromDisk(): PortadaBanner[] {
   try {
     const targetDir = path.join(process.cwd(), 'public', 'imagenes', 'portada');
-    const p5e = path.join(targetDir, 'Portada5E.webp');
-    const p5m = path.join(targetDir, 'Portada5M.webp');
-    if (fs.existsSync(p5e)) {
-      try {
-        fs.copyFileSync(p5e, p5m);
-      } catch (e) {}
+    const distDir = path.join(process.cwd(), 'dist', 'imagenes', 'portada');
+    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+    if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
+
+    // Auto-reparar archivos WebP corruptos (< 500 bytes)
+    for (let i = 1; i <= 10; i++) {
+      const eFile = path.join(targetDir, `Portada${i}E.webp`);
+      const mFile = path.join(targetDir, `Portada${i}M.webp`);
+
+      const eExist = fs.existsSync(eFile) && fs.statSync(eFile).size > 500;
+      const mExist = fs.existsSync(mFile) && fs.statSync(mFile).size > 500;
+
+      if (!eExist && mExist) {
+        try { fs.copyFileSync(mFile, eFile); } catch (e) {}
+      } else if (eExist && !mExist) {
+        try { fs.copyFileSync(eFile, mFile); } catch (e) {}
+      }
+
+      // Sincronizar hacia dist
+      if (fs.existsSync(eFile) && fs.statSync(eFile).size > 500) {
+        try { fs.copyFileSync(eFile, path.join(distDir, `Portada${i}E.webp`)); } catch (e) {}
+      }
+      if (fs.existsSync(mFile) && fs.statSync(mFile).size > 500) {
+        try { fs.copyFileSync(mFile, path.join(distDir, `Portada${i}M.webp`)); } catch (e) {}
+      }
     }
 
     if (fs.existsSync(PORTADAS_FILE)) {

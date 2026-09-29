@@ -51,29 +51,72 @@ function toggleNavCollapsible(collapsibleId) {
   container.classList.toggle('open');
 }
 
+function openCategoryView(catId, catTitle) {
+  if (typeof window.closeAllDesktopDropdowns === 'function') {
+    window.closeAllDesktopDropdowns();
+  }
+  if (typeof window.closeMobileDrawer === 'function') {
+    window.closeMobileDrawer();
+  }
+  if (typeof window.closeProductDetailModal === 'function') {
+    window.closeProductDetailModal();
+  }
+
+  // Si app.js ya ha inicializado su función de renderizado de categorías, ejecutarla
+  if (window._appOpenCategoryView && typeof window._appOpenCategoryView === 'function') {
+    window._appOpenCategoryView(catId, catTitle);
+    return;
+  }
+
+  // Redirección si estamos en otra subpágina
+  const currentPath = window.location.pathname.toLowerCase();
+  if (currentPath !== '/' && !currentPath.endsWith('/index.html') && currentPath !== '') {
+    window.location.href = '/?cat=' + encodeURIComponent(catId || 'all');
+    return;
+  }
+
+  // Si estamos en la página principal, mostrar la sección de resultados
+  const searchSec = document.getElementById('search-results-section');
+  const catSec = document.getElementById('category-banners-section');
+  const heroSec = document.querySelector('.hero-carousel-container');
+  const titleWrap = document.getElementById('main-section-title-wrap');
+  const titleEl = document.getElementById('search-view-title');
+
+  if (searchSec) {
+    searchSec.style.display = 'block';
+    searchSec.classList.remove('is-hidden');
+  }
+  if (catSec) catSec.style.display = 'none';
+  if (heroSec) heroSec.style.display = 'none';
+  if (titleWrap) titleWrap.style.display = 'none';
+
+  if (titleEl && (catTitle || catId)) {
+    titleEl.textContent = (catTitle || catId).toUpperCase();
+  }
+
+  setTimeout(() => {
+    if (searchSec) {
+      const header = document.querySelector('.site-header');
+      const headerHeight = header ? header.offsetHeight : 80;
+      const rect = searchSec.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const targetY = rect.top + scrollTop - headerHeight - 16;
+      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, 60);
+}
+
 function selectCategoryFromDrawer(catId, catName) {
   closeMobileDrawer();
-  if (typeof window.openCategoryView === 'function') {
-    window.openCategoryView(catId, catName);
-  } else {
-    const el = document.getElementById('category-banners-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  }
+  openCategoryView(catId, catName);
 }
 
 function goToPromociones() {
   if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
   if (typeof window.exitSearchMode === 'function') window.exitSearchMode();
-  if (typeof window.openCategoryView === 'function') {
-    window.openCategoryView('promociones', 'PROMOCIONES');
-  } else {
-    const carousel = document.querySelector('.hero-carousel-container');
-    if (carousel) {
-      carousel.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
+  openCategoryView('promociones', 'PROMOCIONES');
 }
 
 function openCartFromDrawer() {
@@ -236,6 +279,7 @@ window.toggleMobileMenu = toggleMobileMenu;
 window.openMobileMenu = openMobileMenu;
 window.closeMobileDrawer = closeMobileDrawer;
 window.toggleNavCollapsible = toggleNavCollapsible;
+window.openCategoryView = openCategoryView;
 window.selectCategoryFromDrawer = selectCategoryFromDrawer;
 window.goToPromociones = goToPromociones;
 window.openCartFromDrawer = openCartFromDrawer;

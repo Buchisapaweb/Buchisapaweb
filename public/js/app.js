@@ -247,6 +247,7 @@ async function renderDynamicHeroCarousel(portadas) {
               loading="${isFirst ? 'eager' : 'lazy'}" 
               ${isFirst ? 'fetchpriority="high"' : ''} 
               decoding="${isFirst ? 'sync' : 'async'}"
+              onerror="if(!this.dataset.failed){this.dataset.failed='1';this.src='${safeStr(mobileImg)}';}else{this.src='/imagenes/portada/Portada1M.webp';}"
             >
           </picture>
         </div>
@@ -2510,6 +2511,7 @@ window.toggleNavCollapsible = toggleNavCollapsible;
 window.selectCategoryFromDrawer = selectCategoryFromDrawer;
 window.openCartFromDrawer = openCartFromDrawer;
 window.openCategoryView = openCategoryView;
+window._appOpenCategoryView = openCategoryView;
 window.switchAddressTab = switchAddressTab;
 window.toggleAddAddressForm = toggleAddAddressForm;
 window.saveNewCustomerAddress = saveNewCustomerAddress;
@@ -3767,6 +3769,27 @@ function scrollToCategoryBanners() {
 window.scrollToCategoryBanners = scrollToCategoryBanners;
 
 function openCategoryView(catId, catTitle) {
+  // 1. Redirigir a la página principal con la categoría si el usuario está en otra ruta (ej: /nosotros, /ubicacion)
+  const currentPath = window.location.pathname.toLowerCase();
+  if (currentPath !== '/' && !currentPath.endsWith('/index.html') && currentPath !== '') {
+    window.location.href = '/?cat=' + encodeURIComponent(catId || 'all');
+    return;
+  }
+
+  // 2. Cerrar inmediatamente cualquier modal de producto, menú móvil o dropdown de escritorio abierto
+  if (typeof window.closeProductDetailModal === 'function') {
+    window.closeProductDetailModal();
+  }
+  if (typeof window.closeMobileDrawer === 'function') {
+    window.closeMobileDrawer();
+  }
+  if (typeof window.closeMobileMenu === 'function') {
+    window.closeMobileMenu();
+  }
+  if (typeof window.closeAllDesktopDropdowns === 'function') {
+    window.closeAllDesktopDropdowns();
+  }
+
   isSearchMode = true;
   const searchSec = document.getElementById('search-results-section');
   const catSec = document.getElementById('category-banners-section');
@@ -3795,26 +3818,18 @@ function openCategoryView(catId, catTitle) {
   if (backBtn) {
     backBtn.innerHTML = `
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-      ${isPromo ? 'Volver al inicio' : 'Volver a Categorías'}
+      Volver al inicio
     `;
   }
 
-  if (isPromo) {
-    if (searchSec) {
-      searchSec.classList.add('promociones-mode');
-      searchSec.style.display = 'block';
-      searchSec.classList.remove('is-hidden');
-    }
-    if (container) {
-      container.classList.add('promo-grid-4col');
-      container.classList.remove('buchisapa-cards-list');
-    }
-  } else {
-    if (searchSec) searchSec.classList.remove('promociones-mode');
-    if (container) {
-      container.classList.remove('promo-grid-4col');
-      container.classList.add('buchisapa-cards-list');
-    }
+  if (searchSec) {
+    searchSec.classList.add('promociones-mode');
+    searchSec.style.display = 'block';
+    searchSec.classList.remove('is-hidden');
+  }
+  if (container) {
+    container.classList.add('promo-grid-4col');
+    container.classList.remove('buchisapa-cards-list');
   }
 
   // Sincronizar active state en quick category pills
@@ -3842,96 +3857,100 @@ function openCategoryView(catId, catTitle) {
   const displayTitle = isPromo ? 'PROMOCIONES' : (catTitle || catId || 'PLATOS').toUpperCase();
   if (titleEl) titleEl.textContent = displayTitle;
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  // SI ES PROMOCIONES, RENDERIZAR LA CUADRÍCULA OFICIAL DE 4 COLUMNAS
+  // Renderizar los productos correspondientes a la categoría elegida
   if (isPromo) {
     renderOfficialPromotionsInApp(container);
-    return;
+  } else {
+    const items = getAllProducts();
+    const rawTarget = normalizeText(catId || catTitle || '');
+
+    const filtered = items.filter(p => {
+      const pCatId = normalizeText(p.category_id || '');
+      const pCatName = normalizeText(p.category || '');
+      const pName = normalizeText(p.name || '');
+
+      // Coincidencia exacta o directa
+      if (pCatId === rawTarget || pCatName === rawTarget) return true;
+
+      // Promociones y Combos
+      if (rawTarget.includes('promo') || rawTarget.includes('combo')) {
+        return pCatId.includes('promo') || pCatName.includes('promo') || 
+               pCatId.includes('combo') || pCatName.includes('combo') ||
+               p.is_promo === true || (typeof p.discount === 'number' && p.discount > 0);
+      }
+
+      // Platos Amazónicos / Selva
+      if (rawTarget.includes('amazon') || rawTarget.includes('selva')) {
+        return pCatId.includes('amazon') || pCatId.includes('selva') || 
+               pCatName.includes('amazon') || pCatName.includes('selva') ||
+               pName.includes('tacacho') || pName.includes('cecina') || pName.includes('juane') || pName.includes('patacon') || pName.includes('chilcano') || pName.includes('palometa');
+      }
+
+      // Hamburguesas
+      if (rawTarget.includes('hamburg') || rawTarget.includes('burger')) {
+        return pCatId.includes('hamburg') || pCatId.includes('burger') || 
+               pCatName.includes('hamburg') || pCatName.includes('burger');
+      }
+
+      // Broaster
+      if (rawTarget.includes('broaster') && !rawTarget.includes('salchi')) {
+        return (pCatId.includes('broaster') || pCatName.includes('broaster') || pCatName.includes('pollo')) && !pCatName.includes('salchi');
+      }
+
+      // Salchipapas y Salchibroasters
+      if (rawTarget.includes('salchi')) {
+        return pCatId.includes('salchi') || pCatName.includes('salchi');
+      }
+
+      // Alitas
+      if (rawTarget.includes('alita')) {
+        return pCatId.includes('alita') || pCatName.includes('alita');
+      }
+
+      // Bebidas / Gaseosas
+      if (rawTarget.includes('bebida') || rawTarget.includes('gaseosa')) {
+        return pCatId.includes('bebida') || pCatId.includes('gaseosa') || 
+               pCatName.includes('bebida') || pCatName.includes('gaseosa');
+      }
+
+      // Refrescos
+      if (rawTarget.includes('refresco')) {
+        return pCatId.includes('refresco') || pCatName.includes('refresco');
+      }
+
+      // Infusiones / Calientes
+      if (rawTarget.includes('infusion') || rawTarget.includes('caliente')) {
+        return pCatId.includes('infusion') || pCatName.includes('infusion') || 
+               pCatId.includes('caliente') || pCatName.includes('caliente');
+      }
+
+      // Fallback
+      return pCatId.includes(rawTarget) || pCatName.includes(rawTarget) || rawTarget.includes(pCatId);
+    });
+
+    if (filtered.length === 0) {
+      if (container) {
+        container.innerHTML = `
+          <div class="empty-results-box" style="padding: 40px 16px; text-align: center; grid-column: 1 / -1;">
+            <div style="font-size: 36px; margin-bottom: 8px;">🍽️</div>
+            <div style="font-weight: 800; font-size: 16px; color: #1e293b; margin-bottom: 4px;">Platos de ${displayTitle}</div>
+            <div style="font-size: 13px; color: #64748b;">Estamos preparando nuevas delicias y combos para esta categoría.</div>
+          </div>
+        `;
+      }
+    } else {
+      renderCardsInContainer(filtered, container);
+    }
   }
 
-  const items = getAllProducts();
-  const rawTarget = normalizeText(catId || catTitle || '');
-
-  const filtered = items.filter(p => {
-    const pCatId = normalizeText(p.category_id || '');
-    const pCatName = normalizeText(p.category || '');
-    const pName = normalizeText(p.name || '');
-
-    // Coincidencia exacta
-    if (pCatId === rawTarget || pCatName === rawTarget) return true;
-
-    // Promociones y Combos
-    if (rawTarget.includes('promo') || rawTarget.includes('combo')) {
-      return pCatId.includes('promo') || pCatName.includes('promo') || 
-             pCatId.includes('combo') || pCatName.includes('combo') ||
-             p.is_promo === true || (typeof p.discount === 'number' && p.discount > 0);
+  // Redireccionar / Desplazar suavemente a la sección de productos para tabletas, computadoras y teléfonos
+  setTimeout(() => {
+    if (searchSec) {
+      searchSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    // Platos Amazónicos / Selva
-    if (rawTarget.includes('amazon') || rawTarget.includes('selva')) {
-      return pCatId.includes('amazon') || pCatId.includes('selva') || 
-             pCatName.includes('amazon') || pCatName.includes('selva') ||
-             pName.includes('tacacho') || pName.includes('cecina') || pName.includes('juane') || pName.includes('patacon') || pName.includes('chilcano') || pName.includes('palometa');
-    }
-
-    // Hamburguesas
-    if (rawTarget.includes('hamburg') || rawTarget.includes('burger')) {
-      return pCatId.includes('hamburg') || pCatId.includes('burger') || 
-             pCatName.includes('hamburg') || pCatName.includes('burger');
-    }
-
-    // Broaster
-    if (rawTarget.includes('broaster') && !rawTarget.includes('salchi')) {
-      return (pCatId.includes('broaster') || pCatName.includes('broaster') || pCatName.includes('pollo')) && !pCatName.includes('salchi');
-    }
-
-    // Salchipapas y Salchibroasters
-    if (rawTarget.includes('salchi')) {
-      return pCatId.includes('salchi') || pCatName.includes('salchi');
-    }
-
-    // Alitas
-    if (rawTarget.includes('alita')) {
-      return pCatId.includes('alita') || pCatName.includes('alita');
-    }
-
-    // Bebidas / Gaseosas
-    if (rawTarget.includes('bebida') || rawTarget.includes('gaseosa')) {
-      return pCatId.includes('bebida') || pCatId.includes('gaseosa') || 
-             pCatName.includes('bebida') || pCatName.includes('gaseosa');
-    }
-
-    // Refrescos
-    if (rawTarget.includes('refresco')) {
-      return pCatId.includes('refresco') || pCatName.includes('refresco');
-    }
-
-    // Infusiones / Calientes
-    if (rawTarget.includes('infusion') || rawTarget.includes('caliente')) {
-      return pCatId.includes('infusion') || pCatName.includes('infusion') || 
-             pCatId.includes('caliente') || pCatName.includes('caliente');
-    }
-
-    // Fallback: coincidencia parcial en nombre de categoría o ID
-    return pCatId.includes(rawTarget) || pCatName.includes(rawTarget) || rawTarget.includes(pCatId);
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-results-box" style="padding: 40px 16px; text-align: center; grid-column: 1 / -1;">
-        <div style="font-size: 36px; margin-bottom: 8px;">🍽️</div>
-        <div style="font-weight: 800; font-size: 16px; color: #1e293b; margin-bottom: 4px;">Platos de ${displayTitle}</div>
-        <div style="font-size: 13px; color: #64748b;">Estamos preparando nuevas delicias y combos para esta categoría.</div>
-      </div>
-    `;
-    return;
-  }
-
-  // Ordenar los platos de la categoría en orden alfabético (A - Z)
-  filtered.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' }));
-
-  renderCardsInContainer(filtered, container);
+  }, 60);
 }
 
 function renderOfficialPromotionsInApp(container) {
@@ -3949,8 +3968,8 @@ function renderOfficialPromotionsInApp(container) {
       price: 90.90,
       shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoció...',
       fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.',
-      image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80',
-      fallbackImg: '/imagenes/portada/Portada2E.webp'
+      image: '/imagenes/portada/Portada2E.webp',
+      fallbackImg: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80'
     },
     {
       id: 'promo-2',
@@ -3958,8 +3977,8 @@ function renderOfficialPromotionsInApp(container) {
       price: 95.50,
       shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción in...',
       fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.',
-      image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80',
-      fallbackImg: '/imagenes/portada/Portada1E.webp'
+      image: '/imagenes/portada/Portada1M.webp',
+      fallbackImg: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80'
     },
     {
       id: 'promo-3',
@@ -3967,8 +3986,8 @@ function renderOfficialPromotionsInApp(container) {
       price: 95.50,
       shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoci...',
       fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.',
-      image: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80',
-      fallbackImg: '/imagenes/portada/Portada3E.webp'
+      image: '/imagenes/portada/Portada3E.webp',
+      fallbackImg: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80'
     },
     {
       id: 'promo-4',
@@ -3976,44 +3995,8 @@ function renderOfficialPromotionsInApp(container) {
       price: 57.90,
       shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción in...',
       fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.',
-      image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80',
-      fallbackImg: '/imagenes/portada/Portada4E.webp'
-    },
-    {
-      id: 'promo-5',
-      name: 'Promoción Brasa Para Mí',
-      price: 35.90,
-      shortDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal. Esta Pro...',
-      fullDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal helada.',
-      image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
-      fallbackImg: '/imagenes/categorias/broaster/banner.webp'
-    },
-    {
-      id: 'promo-6',
-      name: 'Parrillero Original Para Mí',
-      price: 38.50,
-      shortDesc: '1/4 Pardos Parrillero original con papas fritas y guarnición de ensalada Pardos + bebida per...',
-      fullDesc: '1/4 Pardos Parrillero original a la brasa con papas fritas crocantes, ensalada y bebida personal.',
-      image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80',
-      fallbackImg: '/imagenes/categorias/hamburguesas/banner.webp'
-    },
-    {
-      id: 'promo-7',
-      name: 'Promoción Chicharrón Para Mí',
-      price: 38.50,
-      shortDesc: '5 unidades de chicharrón + papas fritas o doradas + guarnición de ensalada Pardos + bebida p...',
-      fullDesc: '5 unidades de chicharrón crujiente + papas fritas o doradas + ensalada y bebida personal.',
-      image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80',
-      fallbackImg: '/imagenes/categorias/alitas/banner.webp'
-    },
-    {
-      id: 'promo-8',
-      name: 'Parrillero BBQ Para Mí',
-      price: 39.50,
-      shortDesc: '1/4 Pardos Parrillero bbq con papas fritas y guarnición de ensalada Pardos + bebida personal...',
-      fullDesc: '1/4 Pardos Parrillero bañado en salsa BBQ ahumada con papas fritas, ensalada y bebida personal.',
-      image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
-      fallbackImg: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp'
+      image: '/imagenes/portada/Portada4E.webp',
+      fallbackImg: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80'
     }
   ];
 
@@ -4063,14 +4046,10 @@ function openPromoOrProductModal(promoId) {
   const promos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
     ? window.OFFICIAL_PROMOTIONS
     : [
-      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoció...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.', image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/portada/Portada2E.webp' },
-      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción in...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.', image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/portada/Portada1E.webp' },
-      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoci...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.', image: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/portada/Portada3E.webp' },
-      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción in...', fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.', image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/portada/Portada4E.webp' },
-      { id: 'promo-5', name: 'Promoción Brasa Para Mí', price: 35.90, shortDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal. Esta Pro...', fullDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal helada.', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/categorias/broaster/banner.webp' },
-      { id: 'promo-6', name: 'Parrillero Original Para Mí', price: 38.50, shortDesc: '1/4 Pardos Parrillero original con papas fritas y guarnición de ensalada Pardos + bebida per...', fullDesc: '1/4 Pardos Parrillero original a la brasa con papas fritas crocantes, ensalada y bebida personal.', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/categorias/hamburguesas/banner.webp' },
-      { id: 'promo-7', name: 'Promoción Chicharrón Para Mí', price: 38.50, shortDesc: '5 unidades de chicharrón + papas fritas o doradas + guarnición de ensalada Pardos + bebida p...', fullDesc: '5 unidades de chicharrón crujiente + papas fritas o doradas + ensalada y bebida personal.', image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/categorias/alitas/banner.webp' },
-      { id: 'promo-8', name: 'Parrillero BBQ Para Mí', price: 39.50, shortDesc: '1/4 Pardos Parrillero bbq con papas fritas y guarnición de ensalada Pardos + bebida personal...', fullDesc: '1/4 Pardos Parrillero bañado en salsa BBQ ahumada con papas fritas, ensalada y bebida personal.', image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp' }
+      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoció...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.', image: '/imagenes/portada/Portada2E.webp', fallbackImg: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción in...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.', image: '/imagenes/portada/Portada1M.webp', fallbackImg: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoci...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.', image: '/imagenes/portada/Portada3E.webp', fallbackImg: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción in...', fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.', image: '/imagenes/portada/Portada4E.webp', fallbackImg: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80' }
     ];
 
   const promo = promos.find(p => p.id === promoId);
@@ -4095,14 +4074,10 @@ function addPromoToCartFromApp(promoId) {
   const promos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
     ? window.OFFICIAL_PROMOTIONS
     : [
-      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, image: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-5', name: 'Promoción Brasa Para Mí', price: 35.90, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-6', name: 'Parrillero Original Para Mí', price: 38.50, image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-7', name: 'Promoción Chicharrón Para Mí', price: 38.50, image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-8', name: 'Parrillero BBQ Para Mí', price: 39.50, image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80' }
+      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, image: '/imagenes/portada/Portada2E.webp' },
+      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, image: '/imagenes/portada/Portada1M.webp' },
+      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, image: '/imagenes/portada/Portada3E.webp' },
+      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, image: '/imagenes/portada/Portada4E.webp' }
     ];
 
   const p = promos.find(item => item.id === promoId);
@@ -4312,13 +4287,17 @@ function renderCardsInContainer(items, container) {
 
   if (list.length === 0) {
     container.innerHTML = `
-      <div class="empty-results-box">
+      <div class="empty-results-box" style="padding: 40px 16px; text-align: center; grid-column: 1 / -1; width: 100%;">
         <div style="font-size: 36px; margin-bottom: 8px;">🍽️</div>
         <div style="font-weight: 800; font-size: 16px; color: #1e293b; margin-bottom: 4px;">No hay platos disponibles en esta categoría</div>
       </div>
     `;
     return;
   }
+
+  const escapeFn = typeof window !== 'undefined' && typeof window.escapeHtml === 'function'
+    ? window.escapeHtml
+    : (s) => (s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '');
 
   container.innerHTML = list.map((p, idx) => {
     const isFav = isFavorite(p.id);
@@ -4331,17 +4310,17 @@ function renderCardsInContainer(items, container) {
       initialImg = initialImg.replace('.jpg', '.webp');
     }
 
-    const isTopThree = idx < 3;
+    const isTopFour = idx < 4;
     const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect width='100%25' height='100%25' fill='%23f1f5f9'/%3E%3C/svg%3E";
 
     return `
-      <div class="buchisapa-dish-card" onclick="openProductDetailModal('${p.id}')" style="cursor: pointer;" title="${p.name || 'Plato'}">
-        <div class="dish-card-img-wrap">
+      <article class="promo-item-card" onclick="openProductDetailModal('${p.id}')" style="cursor: pointer;" title="${escapeFn(p.name || 'Plato')}">
+        <div class="promo-item-img-box">
           <img 
-            ${isTopThree ? `src="${initialImg}"` : `src="${placeholderSvg}" data-src="${initialImg}"`}
-            alt="${p.name || 'Plato'}" 
-            class="dish-card-img ${isTopThree ? 'loaded' : 'lazy-img'}" 
-            loading="lazy" 
+            ${isTopFour ? `src="${initialImg}"` : `src="${placeholderSvg}" data-src="${initialImg}"`}
+            alt="${escapeFn(p.name || 'Plato')}" 
+            class="promo-item-img ${isTopFour ? 'loaded' : 'lazy-img'}" 
+            loading="${isTopFour ? 'eager' : 'lazy'}" 
             decoding="async" 
             onerror="this.onerror=null; this.src='${fallbackImg}';"
           >
@@ -4351,21 +4330,27 @@ function renderCardsInContainer(items, container) {
             </svg>
           </button>
         </div>
-        <div class="dish-card-content">
-          <div class="dish-card-header">
-            ${p.category ? `<div style="font-size: 11px; font-weight: 700; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">${p.category}</div>` : ''}
-            <h3 class="dish-card-title" title="${p.name || 'Plato'}">${p.name || 'Plato Buchisapa'}</h3>
-          </div>
-          <p class="dish-card-desc">${p.description || 'Delicioso plato Buchisapa preparado con ingredientes frescos y el inconfundible toque amazónico.'}</p>
-          <div class="dish-card-footer">
-            <div class="dish-card-price">S/ ${parseFloat(p.price || 0).toFixed(2)}</div>
-            <button class="dish-card-add-btn" type="button" onclick="event.stopPropagation(); openProductDetailModal('${p.id}')">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <div class="promo-item-body">
+          <h3 class="promo-item-title">${escapeFn(p.name || 'Plato Buchisapa')}</h3>
+          <p class="promo-item-desc">${escapeFn(p.description || 'Delicioso plato Buchisapa preparado con ingredientes frescos y el inconfundible toque amazónico.')}</p>
+          <div class="promo-item-footer">
+            <span class="promo-item-price">S/ ${parseFloat(p.price || 0).toFixed(2)}</span>
+            <button 
+              type="button" 
+              class="promo-btn-agregar" 
+              onclick="event.stopPropagation(); openProductDetailModal('${p.id}')"
+              aria-label="Agregar ${escapeFn(p.name)} al pedido"
+            >
+              <svg class="promo-basket-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
               <span>Agregar</span>
             </button>
           </div>
         </div>
-      </div>
+      </article>
     `;
   }).join('');
 }
@@ -4711,54 +4696,6 @@ function getFallbackProducts() {
       is_promo: true,
       image: "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
       fallbackImg: "/imagenes/portada/Portada4E.webp"
-    },
-    {
-      id: "promo-5",
-      name: "Promoción Brasa Para Mí",
-      category_id: "promociones",
-      category: "promociones",
-      price: 35.90,
-      description: "1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal helada.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/categorias/broaster/banner.webp"
-    },
-    {
-      id: "promo-6",
-      name: "Parrillero Original Para Mí",
-      category_id: "promociones",
-      category: "promociones",
-      price: 38.50,
-      description: "1/4 Pardos Parrillero original a la brasa con papas fritas crocantes, ensalada y bebida personal.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/categorias/hamburguesas/banner.webp"
-    },
-    {
-      id: "promo-7",
-      name: "Promoción Chicharrón Para Mí",
-      category_id: "promociones",
-      category: "promociones",
-      price: 38.50,
-      description: "5 unidades de chicharrón crujiente + papas fritas o doradas + ensalada y bebida personal.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/categorias/alitas/banner.webp"
-    },
-    {
-      id: "promo-8",
-      name: "Parrillero BBQ Para Mí",
-      category_id: "promociones",
-      category: "promociones",
-      price: 39.50,
-      description: "1/4 Pardos Parrillero bañado en salsa BBQ ahumada con papas fritas, ensalada y bebida personal.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp"
     },
     {
       id: "ama-1",

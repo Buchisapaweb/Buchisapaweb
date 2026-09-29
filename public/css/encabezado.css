@@ -12,7 +12,7 @@
   border-bottom: 1px solid #f1f5f9;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 10005 !important;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
   width: 100%;
   transition: background 0.2s ease, box-shadow 0.2s ease;

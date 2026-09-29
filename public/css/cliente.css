@@ -736,6 +736,24 @@
   }
 }
 
+.promo-item-img-box {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  background-color: #f8fafc !important;
+  overflow: hidden !important;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+}
+
+.promo-item-img {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
 .buchisapa-cards-list {
   display: flex;
   flex-direction: column;
@@ -7543,10 +7561,9 @@ body:has(#cart-drawer-modal.active) .floating-sticky-cart-bar {
   color: #64748b;
   margin: 0 0 12px;
   line-height: 1.45;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
+  white-space: normal;
 }
 
 .promo-features-list {

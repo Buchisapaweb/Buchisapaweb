@@ -14,11 +14,20 @@ const BuchisapaCart = {
 
   isDrinkOrNoSauceItem(product) {
     if (!product) return false;
-    if (product.includes_sauces === false) return true;
 
     const catBadge = String(product.categoryBadge || '').toLowerCase();
     const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
     const name = String(product.name || '').toLowerCase();
+
+    // Las promociones, combos y packs NUNCA son bebidas puras (siempre incluyen cremas y salsas de la casa)
+    if (
+      product.is_promotion || product.isPromotion || 
+      cat.includes('promo') || name.includes('promo') || name.includes('combo') || name.includes('pack')
+    ) {
+      return false;
+    }
+
+    if (product.includes_sauces === false) return true;
 
     if (
       catBadge.includes('bebida') || catBadge.includes('infusion') || catBadge.includes('refresco') ||

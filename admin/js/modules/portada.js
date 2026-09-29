@@ -212,7 +212,7 @@
               </div>
               
               <div class="portada-thumb-container desktop-1080-wrap">
-                <img src="${desktopSrc}" alt="Portada Escritorio ${slideNum}" loading="lazy" onerror="this.src='${defaultDesktop}'">
+                <img src="${desktopSrc}" alt="Portada Escritorio ${slideNum}" loading="lazy" onerror="if(!this.dataset.failed){this.dataset.failed='1';this.src='${mobileSrc}';}else{this.src='${defaultDesktop}';}">
               </div>
 
               <div class="portada-file-pill" title="${desktopFilename}">
@@ -234,7 +234,7 @@
 
               <div class="mobile-thumb-centered-frame">
                 <div class="portada-thumb-container mobile-vertical-wrap">
-                  <img src="${mobileSrc}" alt="Portada Móvil ${slideNum}" loading="lazy" onerror="this.src='${defaultMobile}'">
+                  <img src="${mobileSrc}" alt="Portada Móvil ${slideNum}" loading="lazy" onerror="if(!this.dataset.failed){this.dataset.failed='1';this.src='${desktopSrc}';}else{this.src='${defaultMobile}';}">
                 </div>
               </div>
 

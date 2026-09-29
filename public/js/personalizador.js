@@ -417,11 +417,20 @@
 
   function isDrinkOrNoSauceItem(product) {
     if (!product) return false;
-    if (product.includes_sauces === false) return true;
 
     const catBadge = String(product.categoryBadge || '').toLowerCase();
     const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
     const name = String(product.name || '').toLowerCase();
+
+    // Las promociones, combos y packs NUNCA son bebidas puras (siempre incluyen cremas y salsas de la casa)
+    if (
+      product.is_promotion || product.isPromotion || 
+      cat.includes('promo') || name.includes('promo') || name.includes('combo') || name.includes('pack')
+    ) {
+      return false;
+    }
+
+    if (product.includes_sauces === false) return true;
 
     if (
       catBadge.includes('bebida') || catBadge.includes('infusion') || catBadge.includes('refresco') ||
@@ -493,130 +502,140 @@
 
     modal.innerHTML = `
       <div class="product-customizer-container">
-        <!-- HEADER FIJO SUPERIOR -->
-        <header class="product-customizer-header">
-          <button type="button" class="product-nav-back-btn" onclick="closeProductDetailModal()" aria-label="Volver a la carta">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m15 18-6-6 6-6"/>
-            </svg>
-            <span>Volver a la carta</span>
-          </button>
-
-          <span class="product-header-cat-pill">${catLabel}</span>
-
-          <button type="button" class="product-header-close-btn" onclick="closeProductDetailModal()" aria-label="Cerrar">
-            ✕
-          </button>
-        </header>
-
-        <!-- CUERPO PRINCIPAL -->
-        <main class="product-customizer-body">
-          <!-- HERO CARD CON IMAGEN Y BADGE -->
-          <div class="product-hero-card">
-            <img src="${imgSrc}" alt="${escapeHtml(p.name)}" class="product-hero-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
-            <div class="product-hero-badge">
-              <span>${heroBadge}</span>
-            </div>
+        <div class="product-customizer-inner-wrap">
+          
+          <!-- BOTÓN VOLVER AL INICIO EXACTO A LA IMAGEN -->
+          <div class="product-back-bar">
+            <button type="button" class="product-nav-back-clean" onclick="closeProductDetailModal()" aria-label="Volver al inicio">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+              </svg>
+              <span>Volver al inicio</span>
+            </button>
           </div>
 
-          <!-- CARD INFORMACIÓN DEL PLATO -->
-          <div class="product-main-info-card">
-            <h1 class="product-main-title">${escapeHtml(p.name)}</h1>
-            <span class="product-main-cat-label">CATEGORÍA: ${catLabel}</span>
-            <div class="product-main-price">S/ ${priceNum.toFixed(2)}</div>
-            <span class="product-main-unit-label">Precio unitario</span>
-            <p class="product-main-description">${escapeHtml(desc)}</p>
-          </div>
-
-          <!-- SECCIÓN 1: ACOMPAÑAMIENTOS E INGREDIENTES (SI APLICA) -->
-          ${hasAccompaniments ? `
-          <div class="product-section-card">
-            <div class="product-section-header">
-              <div class="product-section-title-group">
-                <div class="product-section-icon">🍴</div>
-                <div>
-                  <h3 class="product-section-h3">Acompañamientos e Ingredientes</h3>
-                  <p class="product-section-subtitle">Personaliza lo que incluye tu plato</p>
+          <!-- GRID PRINCIPAL -->
+          <div class="product-detail-layout-grid">
+            
+            <!-- COLUMNA IZQUIERDA: FOTOGRAFÍA CUADRADA DEL PLATO -->
+            <div class="product-detail-left-col">
+              <div class="product-hero-card">
+                <img src="${imgSrc}" alt="${escapeHtml(p.name)}" class="product-hero-img" loading="eager" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
+                <div class="product-hero-badge">
+                  <span>${heroBadge}</span>
                 </div>
               </div>
-              <div class="product-section-actions">
-                <button type="button" class="preset-pill-btn teal" onclick="window.customizerSetAllAccompaniments(true)">
-                  ✓ Con todo
-                </button>
-                <button type="button" class="preset-pill-btn outline" onclick="window.customizerSetAllAccompaniments(false)">
-                  ↺ Quitar
-                </button>
+            </div>
+
+            <!-- COLUMNA DERECHA: INFORMACIÓN, PERSONALIZACIÓN Y ACCIÓN -->
+            <div class="product-detail-right-col">
+              
+              <!-- CARD INFORMACIÓN DEL PLATO -->
+              <div class="product-main-info-card">
+                <h1 class="product-main-title">${escapeHtml(p.name)}</h1>
+                <div class="product-meta-row">
+                  <span class="product-main-cat-label">CATEGORÍA: ${catLabel}</span>
+                </div>
+                <div class="product-price-wrapper">
+                  <div class="product-main-price">S/ ${priceNum.toFixed(2)}</div>
+                  <span class="product-main-unit-label">Precio unitario</span>
+                </div>
+                <p class="product-main-description">${escapeHtml(desc)}</p>
               </div>
-            </div>
 
-            <!-- LISTA DE ACOMPAÑAMIENTOS -->
-            <div class="product-items-list" id="customizer-accompaniments-list">
-              ${renderAccompanimentsList()}
-            </div>
-          </div>
-          ` : ''}
+              <!-- SECCIÓN 1: ACOMPAÑAMIENTOS E INGREDIENTES (SI APLICA) -->
+              ${hasAccompaniments ? `
+              <div class="product-section-card">
+                <div class="product-section-header">
+                  <div class="product-section-title-group">
+                    <div class="product-section-icon">🍴</div>
+                    <div>
+                      <h3 class="product-section-h3">Acompañamientos e Ingredientes</h3>
+                      <p class="product-section-subtitle">Personaliza lo que incluye tu plato</p>
+                    </div>
+                  </div>
+                  <div class="product-section-actions">
+                    <button type="button" class="preset-pill-btn teal" onclick="window.customizerSetAllAccompaniments(true)">
+                      ✓ Con todo
+                    </button>
+                    <button type="button" class="preset-pill-btn outline" onclick="window.customizerSetAllAccompaniments(false)">
+                      ↺ Quitar
+                    </button>
+                  </div>
+                </div>
 
-          <!-- SECCIÓN 2: CREMAS Y SALSAS DE LA CASA (SI APLICA) -->
-          ${showSauces ? `
-          <div class="product-section-card">
-            <div class="product-section-header">
-              <div class="product-section-title-group">
-                <div class="product-section-icon">✨</div>
-                <div>
-                  <h3 class="product-section-h3">Cremas y Salsas de la Casa</h3>
-                  <p class="product-section-subtitle">Selecciona las cremas que deseas</p>
+                <!-- LISTA DE ACOMPAÑAMIENTOS -->
+                <div class="product-items-list" id="customizer-accompaniments-list">
+                  ${renderAccompanimentsList()}
                 </div>
               </div>
-              <div class="product-section-actions">
-                <button type="button" class="preset-pill-btn teal" onclick="window.customizerSetSaucesPreset('all')">
-                  ✓ Todas
-                </button>
-                <button type="button" class="preset-pill-btn yellow" onclick="window.customizerSetSaucesPreset('classics')">
-                  Clásicas
-                </button>
-                <button type="button" class="preset-pill-btn outline" onclick="window.customizerSetSaucesPreset('none')">
-                  ↺ Ninguna
-                </button>
+              ` : ''}
+
+              <!-- SECCIÓN 2: CREMAS Y SALSAS DE LA CASA (SI APLICA) -->
+              ${showSauces ? `
+              <div class="product-section-card">
+                <div class="product-section-header">
+                  <div class="product-section-title-group">
+                    <div class="product-section-icon">✨</div>
+                    <div>
+                      <h3 class="product-section-h3">Cremas y Salsas de la Casa</h3>
+                      <p class="product-section-subtitle">Selecciona las cremas que deseas</p>
+                    </div>
+                  </div>
+                  <div class="product-section-actions">
+                    <button type="button" class="preset-pill-btn teal" onclick="window.customizerSetSaucesPreset('all')">
+                      ✓ Todas
+                    </button>
+                    <button type="button" class="preset-pill-btn yellow" onclick="window.customizerSetSaucesPreset('classics')">
+                      Clásicas
+                    </button>
+                    <button type="button" class="preset-pill-btn outline" onclick="window.customizerSetSaucesPreset('none')">
+                      ↺ Ninguna
+                    </button>
+                  </div>
+                </div>
+
+                <!-- LISTA DE CREMAS -->
+                <div class="product-items-list" id="customizer-sauces-list">
+                  ${renderSaucesList()}
+                </div>
               </div>
-            </div>
+              ` : ''}
 
-            <!-- LISTA DE CREMAS -->
-            <div class="product-items-list" id="customizer-sauces-list">
-              ${renderSaucesList()}
-            </div>
-          </div>
-          ` : ''}
-
-          <!-- SECCIÓN 3: INDICACIONES ESPECIALES -->
-          <div class="product-section-card">
-            <h3 class="product-section-h3" style="margin-bottom: 10px;">${isDrink ? 'Indicaciones para tu bebida (opcional)' : 'Indicaciones especiales para la cocina (opcional)'}</h3>
-            <textarea id="customizer-kitchen-notes" class="product-notes-textarea" rows="2" placeholder="${isDrink ? 'Ej: Sin hielo, poco dulce, bien helada...' : 'Ej: Papas bien crocantes, cremas aparte en táper, pechuga bien doradita...'}"></textarea>
-            ${!isDrink ? `
-            <div class="product-allergen-note">
-              ¿Tienes alguna alergia alimentaria? <span class="product-allergen-link" onclick="window.showAllergenInfoModal()">Ver información de alérgenos</span>
-            </div>
-            ` : ''}
-          </div>
-
-          <!-- BARRA DE ACCIÓN Y CANTIDAD (FLUYE EN EL SCROLL) -->
-          <div class="product-inline-action-bar">
-            <div class="product-sticky-inner">
-              <!-- SELECTOR DE CANTIDAD -->
-              <div class="product-stepper">
-                <button type="button" class="product-stepper-btn" onclick="window.customizerChangeQty(-1)" aria-label="Disminuir cantidad">−</button>
-                <span class="product-stepper-qty" id="customizer-qty-display">${currentQty}</span>
-                <button type="button" class="product-stepper-btn" onclick="window.customizerChangeQty(1)" aria-label="Aumentar cantidad">+</button>
+              <!-- SECCIÓN 3: INDICACIONES ESPECIALES -->
+              <div class="product-section-card">
+                <h3 class="product-section-h3" style="margin-bottom: 10px;">${isDrink ? 'Indicaciones para tu bebida (opcional)' : 'Indicaciones especiales para la cocina (opcional)'}</h3>
+                <textarea id="customizer-kitchen-notes" class="product-notes-textarea" rows="2" placeholder="${isDrink ? 'Ej: Sin hielo, poco dulce, bien helada...' : 'Ej: Papas bien crocantes, cremas aparte en táper, pechuga bien doradita...'}"></textarea>
+                ${!isDrink ? `
+                <div class="product-allergen-note">
+                  ¿Tienes alguna alergia alimentaria? <span class="product-allergen-link" onclick="window.showAllergenInfoModal()">Ver información de alérgenos</span>
+                </div>
+                ` : ''}
               </div>
 
-              <!-- BOTÓN AGREGAR A MI PEDIDO -->
-              <button type="button" class="product-add-cart-btn" onclick="window.customizerAddToCart()">
-                <span>Agregar a mi pedido</span>
-                <span id="customizer-total-price">S/ ${totalPrice}</span>
-              </button>
-            </div>
-          </div>
-        </main>
-      </div>
+              <!-- BARRA DE ACCIÓN Y CANTIDAD -->
+              <div class="product-inline-action-bar">
+                <div class="product-sticky-inner">
+                  <!-- SELECTOR DE CANTIDAD -->
+                  <div class="product-stepper">
+                    <button type="button" class="product-stepper-btn" onclick="window.customizerChangeQty(-1)" aria-label="Disminuir cantidad">−</button>
+                    <span class="product-stepper-qty" id="customizer-qty-display">${currentQty}</span>
+                    <button type="button" class="product-stepper-btn" onclick="window.customizerChangeQty(1)" aria-label="Aumentar cantidad">+</button>
+                  </div>
+
+                  <!-- BOTÓN AGREGAR A MI PEDIDO -->
+                  <button type="button" class="product-add-cart-btn" onclick="window.customizerAddToCart()">
+                    <span>Agregar a mi pedido</span>
+                    <span id="customizer-total-price">S/ ${totalPrice}</span>
+                  </button>
+                </div>
+              </div>
+
+            </div> <!-- FIN product-detail-right-col -->
+
+          </div> <!-- FIN product-detail-layout-grid -->
+        </div> <!-- FIN product-customizer-inner-wrap -->
+      </div> <!-- FIN product-customizer-container -->
     `;
   }
 
