@@ -349,35 +349,48 @@
   background: #f1f5f9;
 }
 
-/* BOTÓN INGRESAR / MI CUENTA EN DESKTOP */
+/* BOTÓN INGRESAR / MI CUENTA EN DESKTOP, TABLETA Y PANTALLA GRANDE */
 .desktop-user-auth-btn {
-  background: rgba(220, 38, 38, 0.08);
-  border: 1px solid rgba(220, 38, 38, 0.2);
+  background: #dc2626;
+  border: none;
   display: none;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 7px;
   font-size: 13px;
   font-weight: 800;
-  color: #dc2626;
+  color: #ffffff;
   cursor: pointer;
-  padding: 7px 14px;
+  padding: 8px 18px;
   border-radius: 9999px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  transition: all 0.15s ease;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.28);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (min-width: 768px) {
   .desktop-user-auth-btn {
     display: inline-flex;
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktop-user-auth-btn {
+    padding: 9px 20px;
+    font-size: 13.5px;
   }
 }
 
 .desktop-user-auth-btn:hover {
-  background: #dc2626;
+  background: #b91c1c;
   color: #ffffff;
-  border-color: #dc2626;
   transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.38);
 }
 
 /* BOTÓN MI PEDIDO DESKTOP / MÓVIL */

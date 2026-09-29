@@ -434,12 +434,18 @@ function toggleNavCollapsible(collapsibleId) {
 }
 
 function goToPromociones() {
-  closeMobileMenu();
-  const carousel = document.querySelector('.hero-carousel-container');
-  if (carousel) {
-    carousel.scrollIntoView({ behavior: 'smooth' });
+  if (typeof closeMobileMenu === 'function') closeMobileMenu();
+  if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
+  if (typeof exitSearchMode === 'function') exitSearchMode();
+  if (typeof openCategoryView === 'function') {
+    openCategoryView('promociones', 'PROMOCIONES');
   } else {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const carousel = document.querySelector('.hero-carousel-container');
+    if (carousel) {
+      carousel.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 }
 
@@ -2465,7 +2471,7 @@ function updateNavbarUserAuth() {
     }
     if (authBtn) {
       const label = authBtn.querySelector('.header-auth-btn-label');
-      if (label) label.textContent = 'Ingresar';
+      if (label) label.textContent = 'INGRESAR';
       authBtn.classList.remove('logged-in');
     }
   }
@@ -3772,6 +3778,13 @@ function openCategoryView(catId, catTitle) {
 
     // Coincidencia exacta
     if (pCatId === rawTarget || pCatName === rawTarget) return true;
+
+    // Promociones y Combos
+    if (rawTarget.includes('promo') || rawTarget.includes('combo')) {
+      return pCatId.includes('promo') || pCatName.includes('promo') || 
+             pCatId.includes('combo') || pCatName.includes('combo') ||
+             p.is_promo === true || p.popular === true || (typeof p.discount === 'number' && p.discount > 0);
+    }
 
     // Platos Amazónicos / Selva
     if (rawTarget.includes('amazon') || rawTarget.includes('selva')) {

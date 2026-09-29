@@ -280,13 +280,6 @@ const BuchisapaCart = {
     };
   },
 
-    return {
-      title: reasonTitle,
-      subtitle: reasonSubtitle,
-      items: finalItems
-    };
-  },
-
   /**
    * AGREGAR PRODUCTO COMPLEMENTARIO DESDE EL CARRITO EN 1 CLIC
    */

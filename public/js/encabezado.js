@@ -62,11 +62,17 @@ function selectCategoryFromDrawer(catId, catName) {
 }
 
 function goToPromociones() {
-  closeMobileDrawer();
+  if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
+  if (typeof window.exitSearchMode === 'function') window.exitSearchMode();
   if (typeof window.openCategoryView === 'function') {
-    window.openCategoryView('combos', 'PROMOCIONES & COMBOS');
+    window.openCategoryView('promociones', 'PROMOCIONES & COMBOS');
   } else {
-    window.location.href = '/promociones.html';
+    const carousel = document.querySelector('.hero-carousel-container');
+    if (carousel) {
+      carousel.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 }
 

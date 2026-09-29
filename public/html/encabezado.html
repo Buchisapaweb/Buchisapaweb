@@ -48,25 +48,30 @@
       </a>
     </div>
 
-    <!-- SELECTOR DE UBICACIÓN ESTILO CÁPSULA GOURMET (CENTRAL EN MÓVIL Y DESKTOP) -->
-    <div class="location-picker-inline" onclick="openLocationModal()" title="Cambiar ubicación o modo de entrega">
-      <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- SELECTOR DE UBICACIÓN (ESTILO PARDO'S / GOURMET) -->
+    <div class="location-picker-inline" onclick="openLocationModal()" title="Cambiar dirección o modo de entrega">
+      <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
         <circle cx="12" cy="10" r="3.2"/>
       </svg>
-      <span class="location-text-red" id="selected-location-label">Recojo en Santa Clara</span>
-      <svg class="location-arrow-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <span class="location-text-red" id="selected-location-label">Entregar a Santa Clara</span>
+      <svg class="location-arrow-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
         <path d="m6 9 6 6 6-6"/>
       </svg>
     </div>
 
-    <!-- NAVEGACIÓN DE ESCRITORIO Y TABLETA -->
+    <!-- NAVEGACIÓN PRINCIPAL (ESCRITORIO, TABLETA Y PANTALLA GRANDE) -->
     <nav class="desktop-main-nav">
-      <!-- DROPDOWN CATEGORÍAS -->
+      <!-- 1. PROMOCIONES -->
+      <button class="desktop-nav-link" type="button" onclick="goToPromociones()">
+        <span>PROMOCIONES</span>
+      </button>
+
+      <!-- 2. CATEGORÍAS ⌵ -->
       <div class="desktop-dropdown-wrap">
         <button class="desktop-nav-link dropdown-trigger" type="button">
           <span>CATEGORÍAS</span>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="nav-chevron-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div class="desktop-dropdown-menu">
           <button class="dropdown-item" type="button" onclick="openCategoryView('alitas', 'ALITAS')">🔥 Alitas BBQ & Broaster</button>
@@ -80,27 +85,24 @@
         </div>
       </div>
 
-      <!-- CARTA SALÓN -->
-      <button class="desktop-nav-link" type="button" onclick="openFullMenuModal()">
-        <span>CARTA SALÓN</span>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-
-      <!-- RASTREAR PEDIDO -->
-      <button class="desktop-nav-link" type="button" onclick="openOrderTracker()">
-        <span>RASTREO</span>
-      </button>
-
-      <!-- NOSOTROS -->
-      <a href="/nosotros" class="desktop-nav-link" style="text-decoration: none;">
-        <span>NOSOTROS</span>
-      </a>
+      <!-- 3. CARTA SALÓN ⌵ -->
+      <div class="desktop-dropdown-wrap">
+        <button class="desktop-nav-link dropdown-trigger" type="button" onclick="openFullMenuModal()">
+          <span>CARTA SALÓN</span>
+          <svg class="nav-chevron-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="desktop-dropdown-menu">
+          <button class="dropdown-item" type="button" onclick="openFullMenuModal()">📖 Ver Carta Salón Completa</button>
+          <button class="dropdown-item" type="button" onclick="openOrderTracker()">📍 Rastrear mi Pedido</button>
+          <a href="/nosotros" class="dropdown-item" style="text-decoration: none;">ℹ️ Sobre BuchiSapa</a>
+        </div>
+      </div>
     </nav>
 
-    <!-- BARRA DE BÚSQUEDA INTEGRADA EN ESCRITORIO -->
+    <!-- BARRA DE BÚSQUEDA INTEGRADA: [🔍 RED] ¿Qué se te antoja? -->
     <div class="desktop-search-pill-wrap">
       <div class="desktop-search-input-box">
-        <svg class="search-box-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="search-box-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/>
           <path d="m21 21-4.35-4.35"/>
         </svg>
@@ -108,7 +110,7 @@
           type="text" 
           id="desktop-search-input" 
           class="desktop-search-field" 
-          placeholder="Buscar plato, hamburguesa, broaster..." 
+          placeholder="¿Qué se te antoja?" 
           oninput="onSearchInputChanged(this.value)"
           autocomplete="off"
         >
@@ -116,9 +118,9 @@
       </div>
     </div>
 
-    <!-- ACCIONES DE CABECERA (BÚSQUEDA & MI PEDIDO) -->
+    <!-- ACCIONES DE CABECERA: MI PEDIDO & INGRESAR -->
     <div class="header-actions">
-      <!-- BOTÓN BÚSQUEDA SOLO EN MÓVILES -->
+      <!-- BOTÓN BÚSQUEDA SOLO EN MÓVILES PEQUEÑOS -->
       <button class="header-icon-btn mobile-only" id="header-search-btn" aria-label="Buscar platos" onclick="toggleSearchBar()" title="Buscar platos" type="button">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="7.5"/>
@@ -126,24 +128,24 @@
         </svg>
       </button>
 
-      <!-- BOTÓN INGRESAR / USUARIO EN ESCRITORIO -->
-      <button class="desktop-user-auth-btn" id="header-auth-btn" aria-label="Ingresar a mi cuenta" onclick="handleUserIconClick()" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-        <span class="header-auth-btn-label">Ingresar</span>
-      </button>
-
-      <!-- MI PEDIDO (BOTÓN CARRITO / BOLSA DE PEDIDO) -->
-      <button class="desktop-cart-link-btn" aria-label="Mi Pedido" onclick="BuchisapaCart.openDrawer()" type="button">
-        <svg class="cart-bag-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <!-- BOTÓN MI PEDIDO ([🛍️ RED] MI PEDIDO) -->
+      <button class="desktop-cart-link-btn" aria-label="Mi Pedido" onclick="BuchisapaCart.openDrawer()" type="button" title="Ver mi pedido">
+        <svg class="cart-bag-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 3h12l3 5v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8l3-5Z"/>
           <path d="M3 8h18"/>
           <path d="M16 11.5c0 2.2-1.79 4-4 4s-4-1.8-4-4"/>
         </svg>
         <span class="desktop-cart-text">MI PEDIDO</span>
         <span class="cart-count-badge" id="cart-count-badge" style="display: none;">0</span>
+      </button>
+
+      <!-- BOTÓN ROJO SÓLIDO INGRESAR ([👤 WHITE] INGRESAR) -->
+      <button class="desktop-user-auth-btn" id="header-auth-btn" aria-label="Ingresar a mi cuenta" onclick="handleUserIconClick()" type="button">
+        <svg class="auth-user-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span class="header-auth-btn-label">INGRESAR</span>
       </button>
     </div>
 
