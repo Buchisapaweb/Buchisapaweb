@@ -6,22 +6,17 @@
 
 .product-customizer-modal {
   display: none;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  width: 100%;
+  min-height: 100vh;
   background: #ffffff;
-  z-index: 9999; /* Debajo de site-header (z-index: 10005) */
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-top: 64px; /* Altura del header del sitio en móvil */
+  z-index: 9990; /* Debajo de site-header (z-index: 10005) */
   margin: 0;
   box-sizing: border-box;
+  padding-top: 64px; /* Altura del header del sitio en móvil */
 }
 
 @media (min-width: 768px) {

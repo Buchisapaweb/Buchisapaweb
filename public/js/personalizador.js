@@ -407,11 +407,10 @@
 
     const modal = document.getElementById('product-customizer-modal');
     if (modal) {
-      modal.style.display = 'flex';
+      modal.style.display = 'block';
       modal.classList.add('open', 'active');
-      const bodyEl = modal.querySelector('.product-customizer-body');
-      if (bodyEl) bodyEl.scrollTop = 0;
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'auto';
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   };
 
@@ -467,7 +466,7 @@
   window.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
       const modal = document.getElementById('product-customizer-modal');
-      if (modal && (modal.style.display === 'flex' || modal.classList.contains('open'))) {
+      if (modal && (modal.style.display === 'block' || modal.style.display === 'flex' || modal.classList.contains('open'))) {
         window.closeProductDetailModal();
       }
     }

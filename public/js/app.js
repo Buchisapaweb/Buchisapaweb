@@ -76,13 +76,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) {}
 
-  // Si la URL incluye #promociones o parámetro promociones, abrir automáticamente
+  // Si la URL incluye #promociones o parámetro promociones o ?cat=, abrir automáticamente
   try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const catParam = urlParams.get('cat');
     const isPromoRoute = window.location.hash.toLowerCase().includes('promo') || 
-                         new URLSearchParams(window.location.search).has('promociones') ||
-                         window.location.search.toLowerCase().includes('cat=promo');
+                         urlParams.has('promociones') ||
+                         (catParam && catParam.toLowerCase().includes('promo'));
     if (isPromoRoute) {
       setTimeout(() => goToPromociones(), 100);
+    } else if (catParam) {
+      setTimeout(() => {
+        openCategoryView(catParam, catParam.toUpperCase().replace(/-/g, ' '));
+      }, 150);
     }
   } catch (e) {}
 
@@ -3818,7 +3824,7 @@ function openCategoryView(catId, catTitle) {
   if (backBtn) {
     backBtn.innerHTML = `
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-      Volver al inicio
+      Volver a Categorías
     `;
   }
 
@@ -3946,11 +3952,16 @@ function openCategoryView(catId, catTitle) {
   // Redireccionar / Desplazar suavemente a la sección de productos para tabletas, computadoras y teléfonos
   setTimeout(() => {
     if (searchSec) {
-      searchSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const header = document.querySelector('.site-header');
+      const headerHeight = header ? header.offsetHeight : 70;
+      const rect = searchSec.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const targetY = rect.top + scrollTop - headerHeight - 12;
+      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, 60);
+  }, 50);
 }
 
 function renderOfficialPromotionsInApp(container) {
@@ -4005,27 +4016,28 @@ function renderOfficialPromotionsInApp(container) {
     : (s) => (s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '');
 
   container.innerHTML = promos.map((p, idx) => `
-    <article class="promo-item-card" onclick="openPromoOrProductModal('${p.id}')" style="cursor: pointer;">
-      <div class="promo-item-img-box">
+    <article class="promo-item-card buchisapa-dish-card" onclick="openPromoOrProductModal('${p.id}')" style="cursor: pointer;">
+      <div class="promo-item-img-box dish-card-img-wrap">
         <img 
           src="${p.image}" 
           alt="${escapeFn(p.name)}" 
-          class="promo-item-img"
+          class="promo-item-img dish-card-img"
           loading="${idx < 4 ? 'eager' : 'lazy'}"
           onerror="this.onerror=null; this.src='${p.fallbackImg}';"
         >
       </div>
-      <div class="promo-item-body">
-        <h3 class="promo-item-title">${escapeFn(p.name)}</h3>
-        <p class="promo-item-desc">
+      <div class="promo-item-body dish-card-content">
+        <span class="dish-card-cat-label">PROMOCIONES</span>
+        <h3 class="promo-item-title dish-card-title">${escapeFn(p.name)}</h3>
+        <p class="promo-item-desc dish-card-desc">
           ${escapeFn(p.shortDesc)}
           <button type="button" class="promo-ver-mas-inline" onclick="event.stopPropagation(); openPromoOrProductModal('${p.id}')">VER MÁS</button>
         </p>
-        <div class="promo-item-footer">
-          <span class="promo-item-price">S/ ${p.price.toFixed(2)}</span>
+        <div class="promo-item-footer dish-card-footer">
+          <span class="promo-item-price dish-card-price">S/${p.price.toFixed(2)}</span>
           <button 
             type="button" 
-            class="promo-btn-agregar" 
+            class="promo-btn-agregar dish-card-add-btn" 
             onclick="event.stopPropagation(); addPromoToCartFromApp('${p.id}')"
             aria-label="Agregar ${escapeFn(p.name)} al pedido"
           >
@@ -4302,6 +4314,18 @@ function renderCardsInContainer(items, container) {
   container.innerHTML = list.map((p, idx) => {
     const isFav = isFavorite(p.id);
     const catId = p.category_id || p.category || '';
+    
+    let rawCat = String(p.categoryLabel || p.category_id || p.category || p.categoryPill || 'PLATOS').toUpperCase();
+    if (rawCat.includes('ALITA')) rawCat = 'ALITAS';
+    else if (rawCat.includes('BROASTER')) rawCat = 'BROASTER';
+    else if (rawCat.includes('HAMBURG')) rawCat = 'HAMBURGUESAS';
+    else if (rawCat.includes('BEBIDA')) rawCat = 'BEBIDAS';
+    else if (rawCat.includes('INFUSION')) rawCat = 'INFUSIONES';
+    else if (rawCat.includes('AMAZON') || rawCat.includes('SELVA')) rawCat = 'PLATOS AMAZÓNICOS';
+    else if (rawCat.includes('REFRESCO')) rawCat = 'REFRESCOS';
+    else if (rawCat.includes('SALCHI')) rawCat = 'SALCHIPAPAS Y SALCHIBROASTERS';
+    else rawCat = rawCat.replace(/-/g, ' ');
+
     const fallbackImg = getCategoryBannerFallback(catId);
     let initialImg = p.image || fallbackImg;
     if (initialImg.startsWith('/imagenes/categorias/') && initialImg.endsWith('.jpg')) {
@@ -4314,12 +4338,12 @@ function renderCardsInContainer(items, container) {
     const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect width='100%25' height='100%25' fill='%23f1f5f9'/%3E%3C/svg%3E";
 
     return `
-      <article class="promo-item-card" onclick="openProductDetailModal('${p.id}')" style="cursor: pointer;" title="${escapeFn(p.name || 'Plato')}">
-        <div class="promo-item-img-box">
+      <article class="promo-item-card buchisapa-dish-card" onclick="openProductDetailModal('${p.id}')" style="cursor: pointer;" title="${escapeFn(p.name || 'Plato')}">
+        <div class="promo-item-img-box dish-card-img-wrap">
           <img 
             ${isTopFour ? `src="${initialImg}"` : `src="${placeholderSvg}" data-src="${initialImg}"`}
             alt="${escapeFn(p.name || 'Plato')}" 
-            class="promo-item-img ${isTopFour ? 'loaded' : 'lazy-img'}" 
+            class="promo-item-img dish-card-img ${isTopFour ? 'loaded' : 'lazy-img'}" 
             loading="${isTopFour ? 'eager' : 'lazy'}" 
             decoding="async" 
             onerror="this.onerror=null; this.src='${fallbackImg}';"
@@ -4330,14 +4354,15 @@ function renderCardsInContainer(items, container) {
             </svg>
           </button>
         </div>
-        <div class="promo-item-body">
-          <h3 class="promo-item-title">${escapeFn(p.name || 'Plato Buchisapa')}</h3>
-          <p class="promo-item-desc">${escapeFn(p.description || 'Delicioso plato Buchisapa preparado con ingredientes frescos y el inconfundible toque amazónico.')}</p>
-          <div class="promo-item-footer">
-            <span class="promo-item-price">S/ ${parseFloat(p.price || 0).toFixed(2)}</span>
+        <div class="promo-item-body dish-card-content">
+          <span class="dish-card-cat-label">${escapeFn(rawCat)}</span>
+          <h3 class="promo-item-title dish-card-title">${escapeFn(p.name || 'Plato Buchisapa')}</h3>
+          <p class="promo-item-desc dish-card-desc">${escapeFn(p.description || 'Delicioso plato Buchisapa preparado con ingredientes frescos y el inconfundible toque amazónico.')}</p>
+          <div class="promo-item-footer dish-card-footer">
+            <span class="promo-item-price dish-card-price">S/${parseFloat(p.price || 0).toFixed(2)}</span>
             <button 
               type="button" 
-              class="promo-btn-agregar" 
+              class="promo-btn-agregar dish-card-add-btn" 
               onclick="event.stopPropagation(); openProductDetailModal('${p.id}')"
               aria-label="Agregar ${escapeFn(p.name)} al pedido"
             >

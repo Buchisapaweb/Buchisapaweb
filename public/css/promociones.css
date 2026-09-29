@@ -74,10 +74,12 @@ body.promociones-page-body {
   width: 100%;
 }
 
-@media (min-width: 480px) and (max-width: 767px) {
+@media (max-width: 767px) {
   .promo-grid-4col {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+    width: 100% !important;
   }
 }
 
