@@ -6,34 +6,19 @@
 
 .product-customizer-modal {
   display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   width: 100%;
-  min-height: 100vh;
-  background: #ffffff;
-  z-index: 9990; /* Debajo de site-header (z-index: 10005) */
+  min-height: auto;
+  background: transparent;
+  z-index: 100;
   margin: 0;
   box-sizing: border-box;
-  padding-top: 64px; /* Altura del header del sitio en móvil */
+  padding: 4px 0 32px;
 }
 
 @media (min-width: 768px) {
   .product-customizer-modal {
-    padding-top: 68px; /* Altura header en tablet */
-  }
-}
-
-@media (min-width: 1024px) {
-  .product-customizer-modal {
-    padding-top: 72px; /* Altura header en escritorio */
-  }
-}
-
-@media (min-width: 1280px) {
-  .product-customizer-modal {
-    padding-top: 74px; /* Altura header en pantalla ancha */
+    padding: 8px 0 48px;
   }
 }
 
@@ -45,8 +30,7 @@
 .product-customizer-container {
   width: 100% !important;
   max-width: 100% !important;
-  min-height: 100% !important;
-  background: #ffffff;
+  background: transparent;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -57,20 +41,14 @@
 .product-customizer-inner-wrap {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 24px 24px 60px 24px;
+  padding: 0;
   width: 100%;
   box-sizing: border-box;
 }
 
-@media (max-width: 640px) {
-  .product-customizer-inner-wrap {
-    padding: 16px 16px 48px 16px;
-  }
-}
-
-/* BOTÓN VOLVER AL INICIO (EXACTO A LA IMAGEN) */
+/* BOTÓN VOLVER (MISMO ESTILO QUE VISTA DE PRODUCTOS) */
 .product-back-bar {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
 }
@@ -82,16 +60,17 @@
   background: transparent;
   border: none;
   color: #0f172a;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 800;
   cursor: pointer;
   padding: 6px 0;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  font-family: inherit;
+  transition: transform 0.15s ease, color 0.15s ease;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  user-select: none;
 }
 
 .product-nav-back-clean:hover {
-  opacity: 0.75;
+  color: #dc2626;
   transform: translateX(-3px);
 }
 
