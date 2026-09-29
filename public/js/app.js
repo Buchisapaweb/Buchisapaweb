@@ -4149,7 +4149,7 @@ function quickAddToCart(productId, event) {
     const list = Array.isArray(currentProducts) ? currentProducts : getFallbackProducts();
     const product = list.find(p => p.id === productId);
     if (product && window.BuchisapaCart) {
-      window.BuchisapaCart.addItem(product, 1, ['Ají de Pollería', 'Mayonesa Casera', 'Tártara Especial']);
+      window.BuchisapaCart.addItem(product, 1);
     }
   }
 }

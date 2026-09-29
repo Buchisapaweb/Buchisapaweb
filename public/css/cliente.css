@@ -4714,6 +4714,144 @@ img.lazy-img.loaded {
   flex-shrink: 0;
 }
 
+.cross-sell-vertical-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.cross-sell-vertical-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.cross-sell-vertical-card:hover {
+  transform: translateY(-2px);
+  border-color: #f87171;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(225, 29, 72, 0.08);
+}
+
+.cross-sell-v-img-wrap {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.cross-sell-v-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cross-sell-v-badge {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 7.5px;
+  font-weight: 800;
+  padding: 1.5px 3px;
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.2px;
+}
+
+.cross-sell-v-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cross-sell-v-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cross-sell-v-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cross-sell-v-price {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #dc2626;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cross-sell-v-desc {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cross-sell-v-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e11d48;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 7px 13px;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.25);
+  flex-shrink: 0;
+}
+
+.cross-sell-v-add-btn:hover {
+  background: #be123c;
+  transform: scale(1.04);
+}
+
+.cross-sell-v-add-btn:active {
+  transform: scale(0.96);
+}
+
 .cross-sell-carousel {
   display: flex;
   gap: 12px;

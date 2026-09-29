@@ -91,6 +91,13 @@
 
     showToast: function (options = {}) {
       this.ensureToastContainer();
+      
+      // Prevenir superposición de toasts duplicados retirando los anteriores
+      if (this.toastContainer) {
+        const activeToasts = this.toastContainer.querySelectorAll('.buchisapa-dynamic-toast');
+        activeToasts.forEach(t => t.remove());
+      }
+
       const title = options.title || 'BuchiSapa';
       const message = options.message || '';
       const icon = options.icon || '🍗';

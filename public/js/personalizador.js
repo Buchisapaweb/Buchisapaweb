@@ -396,8 +396,12 @@
     availableAccompaniments = getProductAccompaniments(product);
     selectedAccompaniments = [...availableAccompaniments];
 
-    // Inicializar salsas (clásicas seleccionadas por defecto)
-    selectedSauces = ALL_SAUCES.filter(s => s.default).map(s => s.name);
+    // Inicializar salsas (NUNCA para bebidas, infusiones, refrescos o postres)
+    if (isDrinkOrNoSauceItem(product)) {
+      selectedSauces = [];
+    } else {
+      selectedSauces = ALL_SAUCES.filter(s => s.default).map(s => s.name);
+    }
 
     renderProductCustomizerModal();
 
@@ -410,6 +414,33 @@
       document.body.style.overflow = 'hidden';
     }
   };
+
+  function isDrinkOrNoSauceItem(product) {
+    if (!product) return false;
+    if (product.includes_sauces === false) return true;
+
+    const catBadge = String(product.categoryBadge || '').toLowerCase();
+    const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
+    const name = String(product.name || '').toLowerCase();
+
+    if (
+      catBadge.includes('bebida') || catBadge.includes('infusion') || catBadge.includes('refresco') ||
+      cat.includes('bebida') || cat.includes('refresco') || cat.includes('infusion') ||
+      cat.includes('postre') || cat.includes('licor') || cat.includes('trago') ||
+      cat.includes('cafe') || cat.includes('jugo')
+    ) {
+      return true;
+    }
+
+    const drinkKeywords = [
+      'agua', 'cielo', 'san mateo', 'san luis', 'inca', 'coca', 'fanta', 'sprite', 'pepsi', 
+      '7up', 'gaseosa', 'refresco', 'cocona', 'camu', 'aguajina', 'maracuyá', 'maracuya', 
+      'chicha', 'limonada', 'jugo', 'infusión', 'infusion', 'café', 'cafe', 'té', 'te', 
+      'anís', 'anis', 'manzanilla', 'hierba luisa', 'cerveza', 'pilsen', 'cusqueña', 'cristal', 'corona', 'heineken'
+    ];
+
+    return drinkKeywords.some(kw => name.includes(kw));
+  }
 
   /**
    * Cierra el modal de personalización
@@ -456,7 +487,7 @@
       : '/imagenes/portada/Portada1E.webp';
     const imgSrc = p.image || catFallback;
 
-    const isDrink = catLabel === 'BEBIDAS' || catLabel === 'REFRESCOS' || catLabel === 'INFUSIONES' || (p.category_id || '').includes('bebida') || (p.category_id || '').includes('refresco') || (p.category_id || '').includes('infusion');
+    const isDrink = isDrinkOrNoSauceItem(p);
     const hasAccompaniments = availableAccompaniments && availableAccompaniments.length > 0;
     const showSauces = !isDrink && p.includes_sauces !== false;
 
@@ -687,7 +718,11 @@
 
     // Preparar descripción de acompañamientos personalizados
     let accompanimentsSummary = '';
-    if (selectedAccompaniments.length === availableAccompaniments.length) {
+    if (isDrinkOrNoSauceItem(currentProduct) || availableAccompaniments.length === 0) {
+      accompanimentsSummary = (window.BuchisapaCart && typeof window.BuchisapaCart.getDefaultAccompaniments === 'function')
+        ? window.BuchisapaCart.getDefaultAccompaniments(currentProduct)
+        : 'Bebida bien helada servida en empaque sellado para delivery';
+    } else if (selectedAccompaniments.length === availableAccompaniments.length) {
       accompanimentsSummary = 'Con todo: ' + selectedAccompaniments.join(', ');
     } else if (selectedAccompaniments.length === 0) {
       accompanimentsSummary = 'Sin acompañamientos';
@@ -696,24 +731,14 @@
     }
 
     // Agregar al carrito
+    const saucesToPass = isDrinkOrNoSauceItem(currentProduct) ? [] : selectedSauces;
     window.BuchisapaCart.addItem(
       currentProduct,
       currentQty,
-      selectedSauces,
+      saucesToPass,
       kitchenNotes,
       accompanimentsSummary
     );
-
-    // Sonido o toast de éxito
-    if (window.BuchisapaPush) {
-      window.BuchisapaPush.playChime();
-      window.BuchisapaPush.showToast({
-        title: '¡Agregado al Pedido!',
-        message: `${currentQty}x ${currentProduct.name} se agregó con tus preferencias.`,
-        stage: 'en_camino',
-        icon: '🛒'
-      });
-    }
 
     window.closeProductDetailModal();
   };

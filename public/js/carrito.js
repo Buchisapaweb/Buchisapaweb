@@ -12,6 +12,33 @@ const BuchisapaCart = {
   lastStockValid: true,
   outOfStockItems: [],
 
+  isDrinkOrNoSauceItem(product) {
+    if (!product) return false;
+    if (product.includes_sauces === false) return true;
+
+    const catBadge = String(product.categoryBadge || '').toLowerCase();
+    const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
+    const name = String(product.name || '').toLowerCase();
+
+    if (
+      catBadge.includes('bebida') || catBadge.includes('infusion') || catBadge.includes('refresco') ||
+      cat.includes('bebida') || cat.includes('refresco') || cat.includes('infusion') ||
+      cat.includes('postre') || cat.includes('licor') || cat.includes('trago') ||
+      cat.includes('cafe') || cat.includes('jugo')
+    ) {
+      return true;
+    }
+
+    const drinkKeywords = [
+      'agua', 'cielo', 'san mateo', 'san luis', 'inca', 'coca', 'fanta', 'sprite', 'pepsi', 
+      '7up', 'gaseosa', 'refresco', 'cocona', 'camu', 'aguajina', 'maracuyá', 'maracuya', 
+      'chicha', 'limonada', 'jugo', 'infusión', 'infusion', 'café', 'cafe', 'té', 'te', 
+      'anís', 'anis', 'manzanilla', 'hierba luisa', 'cerveza', 'pilsen', 'cusqueña', 'cristal', 'corona', 'heineken'
+    ];
+
+    return drinkKeywords.some(kw => name.includes(kw));
+  },
+
   init() {
     const saved = localStorage.getItem('buchisapa_cart_v1');
     const savedType = localStorage.getItem('buchisapa_order_type');
@@ -31,6 +58,14 @@ const BuchisapaCart = {
     if (!Array.isArray(this.items)) {
       this.items = [];
     }
+
+    // Sanear elementos del carrito para asegurar que bebidas no tengan cremas asignadas
+    this.items.forEach(item => {
+      if (this.isDrinkOrNoSauceItem(item)) {
+        item.selectedSauces = [];
+      }
+    });
+
     this.updateUI();
     if (this.items.length > 0) {
       this.checkRealtimeStock(true);
@@ -41,6 +76,12 @@ const BuchisapaCart = {
     if (!Array.isArray(this.items)) {
       this.items = [];
     }
+    // Asegurar sanitización en guardado
+    this.items.forEach(item => {
+      if (this.isDrinkOrNoSauceItem(item)) {
+        item.selectedSauces = [];
+      }
+    });
     localStorage.setItem('buchisapa_cart_v1', JSON.stringify(this.items));
     this.updateUI();
   },
@@ -62,11 +103,11 @@ const BuchisapaCart = {
     const name = (product.name || '').toLowerCase();
     const cat = (product.category_id || product.category || '').toLowerCase();
     
-    if (cat.includes('bebida') || cat.includes('refresco') || name.includes('kola') || name.includes('cola') || name.includes('maracuy') || name.includes('cocona') || name.includes('camu') || name.includes('chicha') || name.includes('aguajina')) {
+    if (this.isDrinkOrNoSauceItem(product)) {
+      if (cat.includes('infusion') || name.includes('café') || name.includes('cafe') || name.includes('té') || name.includes('te') || name.includes('anís')) {
+        return 'Infusión aromática caliente servida en vaso térmico sellado';
+      }
       return 'Bebida bien helada servida en empaque sellado para delivery';
-    }
-    if (cat.includes('infusion') || name.includes('café') || name.includes('cafe') || name.includes('té') || name.includes('te') || name.includes('anís')) {
-      return 'Infusión aromática caliente servida en vaso térmico sellado';
     }
     if (name.includes('broaster') || cat.includes('broaster')) {
       return 'Con todos sus acompañamientos (1/4 Pollo Broaster (Pecho o Pierna), Papas Fritas artesanales, Ensalada del día, Refresco Chicha Morada 500ml)';
@@ -108,13 +149,15 @@ const BuchisapaCart = {
     }
 
     const catBadge = this.getCategoryBadge(product);
-    const isDrink = catBadge === 'BEBIDAS' || catBadge === 'INFUSIONES' || (product.category_id && (product.category_id.includes('bebida') || product.category_id.includes('refresco') || product.category_id.includes('infusion')));
+    const isDrink = this.isDrinkOrNoSauceItem(product);
 
     let saucesList;
-    if (sauces !== null) {
+    if (isDrink) {
+      saucesList = [];
+    } else if (sauces !== null) {
       saucesList = Array.isArray(sauces) ? sauces : [];
     } else {
-      saucesList = isDrink ? [] : ['Mayonesa Casera', 'Tártara Especial', 'Ají de Pollería'];
+      saucesList = ['Mayonesa Casera', 'Tártara Especial', 'Ají de Pollería'];
     }
 
     const accompaniments = this.getDefaultAccompaniments(product);
@@ -146,13 +189,6 @@ const BuchisapaCart = {
 
     if (window.BuchisapaPush && typeof window.BuchisapaPush.playChime === 'function') {
       window.BuchisapaPush.playChime('cart');
-      window.BuchisapaPush.showToast({
-        title: '¡Plato Agregado!',
-        message: `${product.name} (x${quantity}) sumado a tu pedido`,
-        icon: '🍗',
-        actionText: 'Ver Carrito',
-        onAction: () => this.openDrawer()
-      });
     }
 
     this.openDrawer();
@@ -160,7 +196,7 @@ const BuchisapaCart = {
   },
 
   /**
-   * SUGERENCIAS CROSS-SELLING INTELIGENTES BASADAS EN EL CARRITO
+   * SUGERENCIAS CROSS-SELLING INTELIGENTES (EXCLUSIVAMENTE BEBIDAS)
    */
   getCrossSellSuggestions() {
     const currentItems = Array.isArray(this.items) ? this.items : [];
@@ -184,46 +220,8 @@ const BuchisapaCart = {
     const inCartIds = new Set(currentItems.map(it => String(it.id || '').toLowerCase()));
     const inCartNames = new Set(currentItems.map(it => (it.name || '').toLowerCase().trim()));
 
-    // Analizar el contenido actual del pedido
-    let hasAmazonico = false;
-    let hasBurger = false;
-    let hasBroaster = false;
-    let hasSalchipapa = false;
-    let hasAlitas = false;
-    let hasDrink = false;
-    let hasInfusion = false;
-
-    currentItems.forEach(item => {
-      const cat = (item.categoryBadge || item.category_id || item.category || '').toLowerCase();
-      const name = (item.name || '').toLowerCase();
-
-      if (cat.includes('amazon') || name.includes('tacacho') || name.includes('cecina') || name.includes('juane') || name.includes('patacón') || name.includes('patacon') || name.includes('chaufa') || name.includes('chilcano') || name.includes('palometa') || name.includes('caldo')) {
-        hasAmazonico = true;
-      }
-      if (cat.includes('hamburguesa') || name.includes('burguer') || name.includes('burger') || name.includes('suprema') || name.includes('choripan') || name.includes('royal')) {
-        hasBurger = true;
-      }
-      if (cat.includes('broaster') || name.includes('broaster')) {
-        hasBroaster = true;
-      }
-      if (cat.includes('salchipapa') || name.includes('salchi')) {
-        hasSalchipapa = true;
-      }
-      if (cat.includes('alita') || name.includes('alitas')) {
-        hasAlitas = true;
-      }
-      if (cat.includes('bebida') || cat.includes('refresco') || name.includes('kola') || name.includes('cola') || name.includes('maracuy') || name.includes('cocona') || name.includes('chicha') || name.includes('camu') || name.includes('aguajina') || name.includes('fanta') || name.includes('pepsi') || name.includes('cielo')) {
-        hasDrink = true;
-      }
-      if (cat.includes('infusion') || name.includes('café') || name.includes('cafe') || name.includes('té') || name.includes('te') || name.includes('anís') || name.includes('anis')) {
-        hasInfusion = true;
-      }
-    });
-
-    const hasFood = hasAmazonico || hasBurger || hasBroaster || hasSalchipapa || hasAlitas;
-
-    // Función auxiliar para comprobar disponibilidad
-    const isAvailable = (p) => {
+    // Filtrar catálogo ÚNICAMENTE para bebidas/refrescos/infusiones disponibles que no estén ya en el carrito
+    const availableDrinks = catalog.filter(p => {
       if (!p) return false;
       const pid = String(p.id || '').toLowerCase();
       const pname = (p.name || '').toLowerCase().trim();
@@ -231,130 +229,56 @@ const BuchisapaCart = {
       if (p.available === false) return false;
       const stockStatus = this.stockStatusMap[p.id] || this.stockStatusMap[pname];
       if (stockStatus && stockStatus.hasStock === false) return false;
-      return true;
+      return this.isDrinkOrNoSauceItem(p);
+    });
+
+    if (availableDrinks.length === 0) {
+      return { title: '', subtitle: '', items: [] };
+    }
+
+    const reasonTitle = '🥤 ¡No olvides tu bebida helada!';
+    const reasonSubtitle = 'Elige un refresco natural de la selva o tu gaseosa favorita para acompañar';
+
+    // Asignar badges personalizados según la bebida
+    const suggestions = [];
+    const getDrinkBadge = (p) => {
+      const n = (p.name || '').toLowerCase();
+      if (n.includes('cocona')) return '🥤 De la Selva';
+      if (n.includes('camu')) return '⭐ Vitamina C';
+      if (n.includes('chicha')) return '🍇 Tradicional';
+      if (n.includes('aguajina')) return '🌴 Exótico';
+      if (n.includes('maracuy')) return '🍹 Refrescante';
+      if (n.includes('inca') || n.includes('coca') || n.includes('gaseosa')) return '❄️ Bien Helada';
+      if (n.includes('agua') || n.includes('cielo')) return '💧 Heladita';
+      if (n.includes('café') || n.includes('cafe') || n.includes('té') || n.includes('te') || n.includes('anís')) return '☕ Calientito';
+      return '🥤 Refresco Natural';
     };
 
-    const findProduct = (namePattern) => {
-      return catalog.find(p => {
-        const n = (p.name || '').toLowerCase();
-        return n.includes(namePattern.toLowerCase()) && isAvailable(p);
+    // Priorizar refrescos naturales de la selva
+    const naturalDrinks = availableDrinks.filter(p => {
+      const n = (p.name || '').toLowerCase();
+      return n.includes('cocona') || n.includes('camu') || n.includes('chicha') || n.includes('aguajina') || n.includes('maracuy') || n.includes('limonada');
+    });
+
+    // Luego gaseosas/aguas/infusiones
+    const otherDrinks = availableDrinks.filter(p => !naturalDrinks.includes(p));
+
+    const orderedList = [...naturalDrinks, ...otherDrinks];
+
+    for (const d of orderedList) {
+      suggestions.push({
+        ...d,
+        badge: getDrinkBadge(d)
       });
+      if (suggestions.length >= 4) break;
+    }
+
+    return {
+      title: reasonTitle,
+      subtitle: reasonSubtitle,
+      items: suggestions
     };
-
-    let suggestions = [];
-    let reasonTitle = '¿Te provoca acompañar tu pedido?';
-    let reasonSubtitle = 'Añade el complemento perfecto con un solo toque';
-
-    // ESCENARIO 1: Hay comida pero NO ha añadido bebidas/refrescos
-    if (hasFood && !hasDrink) {
-      reasonTitle = '🥤 ¡No olvides tu bebida helada!';
-      reasonSubtitle = 'Elige un refresco natural de la selva o tu gaseosa favorita para acompañar';
-
-      const cocona = findProduct('Cocona');
-      const camu = findProduct('Camu Camu');
-      const inca = findProduct('Inca Cola') || findProduct('Inca');
-      const chicha = findProduct('Chicha');
-      const maracuya = findProduct('Maracuyá');
-      const patacones = findProduct('Patacones con Chorizo');
-      const alitas = findProduct('BBQ') || findProduct('Acevichadas');
-
-      if (cocona) suggestions.push({ ...cocona, badge: '🥤 De la Selva' });
-      if (camu) suggestions.push({ ...camu, badge: '⭐ Vitamina C' });
-      if (inca) suggestions.push({ ...inca, badge: '❄️ Bien Helada' });
-      if (chicha && suggestions.length < 3) suggestions.push({ ...chicha, badge: '🍇 Tradicional' });
-      if (maracuya && suggestions.length < 3) suggestions.push({ ...maracuya, badge: '🍹 Refrescante' });
-
-      // Sumar 1 piqueo complementario
-      if (hasAmazonico && patacones) {
-        suggestions.push({ ...patacones, badge: '🍌 Entrada Selvática' });
-      } else if (alitas) {
-        suggestions.push({ ...alitas, badge: '🍗 Para Picar' });
-      }
-    }
-    // ESCENARIO 2: Hay platos amazónicos (Tacacho, Juanes, Chaufa, etc.)
-    else if (hasAmazonico) {
-      reasonTitle = '🌿 Completa tu banquete amazónico';
-      reasonSubtitle = 'Entradas típicas y refrescos amazónicos que hacen el match perfecto';
-
-      const patacones = findProduct('Patacones con Chorizo');
-      const cocona = findProduct('Cocona');
-      const camu = findProduct('Camu Camu');
-      const aguajina = findProduct('Aguajina');
-      const chaufa = findProduct('Arroz Chaufa');
-      const cafe = findProduct('Café');
-
-      if (patacones) suggestions.push({ ...patacones, badge: '🍌 Entrada Típica' });
-      if (!hasDrink && cocona) suggestions.push({ ...cocona, badge: '🥤 Refresco Selvático' });
-      if (!hasDrink && camu) suggestions.push({ ...camu, badge: '🍹 Fruta Exótica' });
-      if (aguajina && suggestions.length < 3) suggestions.push({ ...aguajina, badge: '🌴 Aguajina Helada' });
-      if (chaufa && suggestions.length < 3) suggestions.push({ ...chaufa, badge: '🍚 Porción Extra' });
-      if (cafe && suggestions.length < 4) suggestions.push({ ...cafe, badge: '☕ Café de la Selva' });
-    }
-    // ESCENARIO 3: Hamburguesas, Broaster o Salchipapas
-    else if (hasBurger || hasBroaster || hasSalchipapa) {
-      reasonTitle = '🔥 ¿Un piqueo o bebida extra?';
-      reasonSubtitle = 'Combina tus crocantes con las mejores alitas y refrescos';
-
-      const alitasBbq = findProduct('BBQ');
-      const alitasAcev = findProduct('Acevichadas');
-      const inca = findProduct('Inca');
-      const chicha = findProduct('Chicha');
-      const patacones = findProduct('Patacones con Chorizo');
-      const cafe = findProduct('Café');
-
-      if (alitasBbq) suggestions.push({ ...alitasBbq, badge: '🍗 Piqueo Recomendado' });
-      else if (alitasAcev) suggestions.push({ ...alitasAcev, badge: '🍗 Piqueo Recomendado' });
-
-      if (!hasDrink && inca) suggestions.push({ ...inca, badge: '🥤 Heladita' });
-      if (!hasDrink && chicha) suggestions.push({ ...chicha, badge: '🍹 Casera' });
-      if (patacones && suggestions.length < 3) suggestions.push({ ...patacones, badge: '🍌 Toque Crujiente' });
-      if (cafe && suggestions.length < 4) suggestions.push({ ...cafe, badge: '☕ Caliente' });
-    }
-    // ESCENARIO 4: Solo hay bebidas o infusiones en el carrito
-    else if (hasDrink || hasInfusion) {
-      reasonTitle = '🍽️ ¡Elige tu plato favorito!';
-      reasonSubtitle = 'Acompaña tu bebida con nuestras especialidades recién preparadas';
-
-      const tacacho = findProduct('Tacacho con Cecina');
-      const broaster = findProduct('Pecho') || findProduct('Pierna');
-      const burger = findProduct('Royal') || findProduct('Clásica');
-      const juanes = findProduct('Juanes');
-
-      if (tacacho) suggestions.push({ ...tacacho, badge: '🏆 Favorito Selvático' });
-      if (broaster) suggestions.push({ ...broaster, badge: '🍗 Broaster Crocante' });
-      if (burger) suggestions.push({ ...burger, badge: '🍔 Hamburguesa Top' });
-      if (juanes && suggestions.length < 3) suggestions.push({ ...juanes, badge: '🌿 Juane Caliente' });
-    }
-
-    // FALLBACK GENERAL: Platos complementarios destacados
-    if (suggestions.length < 2) {
-      const fallbackList = [
-        { name: 'Cocona', badge: '🥤 Refresco Natural' },
-        { name: 'Patacones con Chorizo', badge: '🍌 Para Picar' },
-        { name: 'Camu Camu', badge: '⭐ Vitamina C' },
-        { name: 'Inca', badge: '🥤 Bebida Clásica' },
-        { name: 'BBQ', badge: '🍗 Alitas Jugosas' },
-        { name: 'Café', badge: '☕ Café de la Selva' }
-      ];
-      for (const fb of fallbackList) {
-        const prod = findProduct(fb.name);
-        if (prod && !suggestions.some(s => s.id === prod.id)) {
-          suggestions.push({ ...prod, badge: fb.badge });
-          if (suggestions.length >= 4) break;
-        }
-      }
-    }
-
-    // Limitar a máximo 4 sugerencias únicas
-    const seen = new Set();
-    const finalItems = [];
-    for (const item of suggestions) {
-      if (!seen.has(item.id)) {
-        seen.add(item.id);
-        finalItems.push(item);
-        if (finalItems.length >= 4) break;
-      }
-    }
+  },
 
     return {
       title: reasonTitle,
@@ -396,17 +320,7 @@ const BuchisapaCart = {
       return;
     }
 
-    const added = this.addItem(product, 1);
-    if (added !== false) {
-      if (window.BuchisapaPush && typeof window.BuchisapaPush.showToast === 'function') {
-        window.BuchisapaPush.showToast({
-          title: '¡Sugerencia agregada!',
-          message: `Sumaste "${product.name}" (S/ ${parseFloat(product.price || 0).toFixed(2)}) a tu orden.`,
-          stage: 'confirmado',
-          icon: '✨'
-        });
-      }
-    }
+    this.addItem(product, 1);
   },
 
   removeItem(index) {
@@ -828,11 +742,11 @@ const BuchisapaCart = {
 
       if (crossSell && Array.isArray(crossSell.items) && crossSell.items.length > 0) {
         crossSellHtml = `
-          <!-- SECCIÓN DE RECOMENDACIONES CROSS-SELLING -->
+          <!-- SECCIÓN DE RECOMENDACIONES CROSS-SELLING (VERTICAL SUCESIVO) -->
           <div class="cart-cross-sell-section">
             <div class="cross-sell-header">
               <div class="cross-sell-header-left">
-                <span class="cross-sell-sparkle">✨</span>
+                <span class="cross-sell-sparkle">🥤</span>
                 <div>
                   <h4 class="cross-sell-title">${crossSell.title}</h4>
                   <p class="cross-sell-subtitle">${crossSell.subtitle}</p>
@@ -841,7 +755,7 @@ const BuchisapaCart = {
               <span class="cross-sell-count-pill">${crossSell.items.length} sugerencias</span>
             </div>
 
-            <div class="cross-sell-carousel">
+            <div class="cross-sell-vertical-list">
               ${crossSell.items.map(item => {
                 const priceFormatted = (parseFloat(item.price) || 0).toFixed(2);
                 const badge = item.badge || 'RECOMENDADO';
@@ -849,23 +763,25 @@ const BuchisapaCart = {
                   ? window.getCategoryBannerFallback(item.category_id || item.category) 
                   : '/imagenes/portada/Portada1E.webp';
                 const imgUrl = item.image || catFallback;
+                const desc = item.description || 'Refresco helado y delicioso para acompañar tu plato';
 
                 return `
-                  <div class="cross-sell-card" onclick="if(typeof openProductDetailModal === 'function') openProductDetailModal('${item.id}')" title="Ver detalles de ${item.name}">
-                    <div class="cross-sell-img-wrap">
-                      <img src="${imgUrl}" alt="${item.name}" class="cross-sell-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
-                      <span class="cross-sell-badge">${badge}</span>
+                  <div class="cross-sell-vertical-card" onclick="if(typeof openProductDetailModal === 'function') openProductDetailModal('${item.id}')" title="Ver detalles de ${item.name}">
+                    <div class="cross-sell-v-img-wrap">
+                      <img src="${imgUrl}" alt="${item.name}" class="cross-sell-v-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
+                      <span class="cross-sell-v-badge">${badge}</span>
                     </div>
-                    <div class="cross-sell-info">
-                      <h5 class="cross-sell-item-name">${item.name}</h5>
-                      <div class="cross-sell-bottom-row">
-                        <span class="cross-sell-price">S/ ${priceFormatted}</span>
-                        <button class="cross-sell-add-btn" type="button" onclick="event.stopPropagation(); BuchisapaCart.addCrossSellItem('${item.id}', event)" title="Agregar ${item.name} al carrito">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                          <span>Agregar</span>
-                        </button>
+                    <div class="cross-sell-v-info">
+                      <div class="cross-sell-v-title-row">
+                        <h5 class="cross-sell-v-name">${item.name}</h5>
+                        <span class="cross-sell-v-price">S/ ${priceFormatted}</span>
                       </div>
+                      <p class="cross-sell-v-desc">${desc}</p>
                     </div>
+                    <button class="cross-sell-v-add-btn" type="button" onclick="event.stopPropagation(); BuchisapaCart.addCrossSellItem('${item.id}', event)" title="Agregar ${item.name} al carrito">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                      <span>+ Agregar</span>
+                    </button>
                   </div>
                 `;
               }).join('')}
@@ -879,13 +795,13 @@ const BuchisapaCart = {
           <!-- LISTA DE TARJETAS DE PLATOS -->
           <div class="cart-dish-items-list">
             ${this.items.map((item, idx) => {
-              const saucesText = Array.isArray(item.selectedSauces) && item.selectedSauces.length > 0
-                ? item.selectedSauces.join(', ')
-                : 'Mayonesa Casera, Tártara Especial, Ají de Pollería';
+              const isDrinkItem = this.isDrinkOrNoSauceItem(item);
+              const hasSauces = !isDrinkItem && Array.isArray(item.selectedSauces) && item.selectedSauces.length > 0;
+              const saucesText = hasSauces ? item.selectedSauces.join(', ') : '';
               const priceFormatted = (parseFloat(item.price) || 0).toFixed(2);
-              const categoryBadge = item.categoryBadge || 'PROMOCIONES';
-              const optionText = item.option || 'Opción: Combo Completo';
-              const accompanimentsText = item.accompaniments || 'Con todos sus acompañamientos (1/4 Pollo Broaster (Pecho o Pierna), Papas Fritas artesanales, Ensalada del día, Refresco Chicha Morada 500ml)';
+              const categoryBadge = item.categoryBadge || (isDrinkItem ? 'BEBIDAS' : 'PROMOCIONES');
+              const optionText = item.option || (isDrinkItem ? 'Opción: Bebida Individual Helada' : 'Opción: Combo Completo');
+              const accompanimentsText = item.accompaniments || this.getDefaultAccompaniments(item);
               const itemFallback = (typeof window.getCategoryBannerFallback === 'function') 
                 ? window.getCategoryBannerFallback(item.category_id || item.category || categoryBadge) 
                 : '/imagenes/portada/Portada1E.webp';
@@ -939,16 +855,16 @@ const BuchisapaCart = {
                     <span class="acc-symbol">⊙</span> ${accompanimentsText}
                   </div>
 
-                  <!-- FILA DE CREMAS -->
-                  ${(Array.isArray(item.selectedSauces) && item.selectedSauces.length > 0) ? `
+                  <!-- FILA DE CREMAS (SOLO SI APLICA Y NO ES BEBIDA) -->
+                  ${hasSauces ? `
                   <div class="dish-card-cremas-text">
                     <strong>Cremas:</strong> ${saucesText}${item.notes ? ` (${item.notes})` : ''}
                   </div>
                   ` : (item.notes ? `<div class="dish-card-cremas-text"><strong>Notas:</strong> ${item.notes}</div>` : '')}
 
-                  <!-- FILA DE CANTIDAD A PREPARAR Y STEPPER -->
+                  <!-- FILA DE CANTIDAD Y STEPPER -->
                   <div class="dish-card-quantity-row">
-                    <span class="qty-label">Cantidad a preparar:</span>
+                    <span class="qty-label">Cantidad:</span>
                     <div class="qty-stepper-pill">
                       <button class="stepper-action-btn minus" type="button" onclick="BuchisapaCart.updateQuantity(${idx}, -1)" aria-label="Disminuir cantidad">−</button>
                       <span class="stepper-num">${item.quantity}</span>
