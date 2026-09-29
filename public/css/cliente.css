@@ -677,7 +677,13 @@
   display: none;
 }
 
-/* MODO PROMOCIONES EXACTO COMO EN LA CAPTURA DE REFERENCIA */
+/* MODO PROMOCIONES EXACTO COMO EN LA CAPTURA DE REFERENCIA (4 COLUMNAS EN TABLET, ESCRITORIO Y PANTALLA GRANDE) */
+.search-view-section.promociones-mode {
+  max-width: 1440px !important;
+  width: 100% !important;
+  padding: 16px 20px 60px !important;
+}
+
 .search-view-section.promociones-mode .search-view-title {
   display: block;
   text-align: center;
@@ -692,22 +698,41 @@
 .search-view-section.promociones-mode .buchisapa-cards-list,
 .buchisapa-cards-list.promo-grid-4col {
   display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 22px !important;
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+  width: 100% !important;
 }
 
-@media (max-width: 1024px) {
+@media (min-width: 480px) and (max-width: 767px) {
   .search-view-section.promociones-mode .buchisapa-cards-list,
   .buchisapa-cards-list.promo-grid-4col {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 18px !important;
+    gap: 16px !important;
   }
 }
 
-@media (max-width: 580px) {
+/* TABLET (desde 768px), ESCRITORIO (desde 1024px) Y PANTALLA GRANDE: 4 COLUMNAS */
+@media (min-width: 768px) {
   .search-view-section.promociones-mode .buchisapa-cards-list,
   .buchisapa-cards-list.promo-grid-4col {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  .search-view-section.promociones-mode .buchisapa-cards-list,
+  .buchisapa-cards-list.promo-grid-4col {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 22px !important;
+  }
+}
+
+@media (min-width: 1366px) {
+  .search-view-section.promociones-mode .buchisapa-cards-list,
+  .buchisapa-cards-list.promo-grid-4col {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 26px !important;
   }
 }
 

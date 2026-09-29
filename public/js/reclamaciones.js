@@ -12,7 +12,19 @@ let lastSubmittedClaim = null;
 document.addEventListener('DOMContentLoaded', () => {
   initRegistrationDate();
   initDateLimits();
+  initClaimLocalSelect();
+  initUbigeoSelectors();
 });
+
+function initClaimLocalSelect() {
+  const claimLocal = document.getElementById('claim-local');
+  if (claimLocal) {
+    claimLocal.style.color = claimLocal.value ? '#0f172a' : '#94a3b8';
+    claimLocal.addEventListener('change', () => {
+      claimLocal.style.color = claimLocal.value ? '#0f172a' : '#94a3b8';
+    });
+  }
+}
 
 function initRegistrationDate() {
   const dateEl = document.getElementById('claim-current-date');
@@ -77,84 +89,66 @@ function toggleTutorFields(isMinor) {
   if (tutorDoc) tutorDoc.required = isMinor;
 }
 
-// Ubicación geográfica: Provincias según Departamento
-const PROVINCIAS_MAP = {
-  Lima: ['Lima', 'Barranca', 'Cajatambo', 'Canta', 'Cañete', 'Huaral', 'Huarochirí', 'Huaura', 'Oyón', 'Yauyos'],
-  Callao: ['Callao'],
-  Arequipa: ['Arequipa', 'Camaná', 'Caravelí', 'Castilla', 'Caylloma', 'Condesuyos', 'Islay', 'La Unión'],
-  Cusco: ['Cusco', 'Acomayo', 'Anta', 'Calca', 'Canas', 'Canchis', 'Chumbivilcas', 'Espinar', 'La Convención', 'Paruro', 'Paucartambo', 'Quispicanchi', 'Urubamba'],
-  Ucayali: ['Coronel Portillo (Pucallpa)', 'Atalaya', 'Padre Abad', 'Purús'],
-  Loreto: ['Maynas (Iquitos)', 'Alto Amazonas', 'Datem del Marañón', 'Loreto', 'Mariscal Ramón Castilla', 'Requena', 'Ucayali'],
-  'San Martín': ['Moyobamba', 'Bellavista', 'El Dorado', 'Huallaga', 'Lamas', 'Mariscal Cáceres', 'Picota', 'Rioja', 'San Martín (Tarapoto)', 'Tocache'],
-  'La Libertad': ['Trujillo', 'Ascope', 'Bolívar', 'Chepén', 'Julcán', 'Otuzco', 'Pacasmayo', 'Pataz', 'Sánchez Carrión', 'Santiago de Chuco', 'Virú'],
-  Piura: ['Piura', 'Ayabaca', 'Huancabamba', 'Morropón', 'Paita', 'Sullana', 'Talara', 'Sechura'],
-  Lambayeque: ['Chiclayo', 'Ferreñafe', 'Lambayeque'],
-  Junín: ['Huancayo', 'Chanchamayo', 'Chupaca', 'Concepción', 'Jauja', 'Junín', 'Satipo', 'Tarma', 'Yauli'],
-  Ica: ['Ica', 'Chincha', 'Nazca', 'Palpa', 'Pisco'],
-  Ancash: ['Huaraz', 'Santa (Chimbote)', 'Carhuaz', 'Huari', 'Huaylas', 'Yungay'],
-  Tacna: ['Tacna', 'Candarave', 'Jorge Basadre', 'Tarata']
-};
+// Ubicación geográfica: Provincias y Distritos según Departamento (UBIGEO)
+function initUbigeoSelectors() {
+  const deptSelect = document.getElementById('claim-department');
+  if (!deptSelect) return;
 
-const DISTRITOS_LIMA = [
-  'Ate (Santa Clara / Vitarte)',
-  'Santa Anita',
-  'La Molina',
-  'Chosica (Lurigancho)',
-  'Chaclacayo',
-  'San Juan de Lurigancho',
-  'El Agustino',
-  'Santiago de Surco',
-  'San Borja',
-  'San Isidro',
-  'Miraflores',
-  'Lima Cercado',
-  'Breña',
-  'Jesús María',
-  'Lince',
-  'Magdalena del Mar',
-  'Pueblo Libre',
-  'San Miguel',
-  'Surquillo',
-  'Barranco',
-  'Chorrillos',
-  'San Juan de Miraflores',
-  'Villa María del Triunfo',
-  'Villa El Salvador',
-  'Comas',
-  'Los Olivos',
-  'Independencia',
-  'San Martín de Porres',
-  'Rímac',
-  'Carabayllo',
-  'Puente Piedra',
-  'Ancón',
-  'Santa Rosa',
-  'Otro distrito'
-];
+  const currentUbigeo = typeof window !== 'undefined' && window.UBIGEO_PERU ? window.UBIGEO_PERU : null;
+  if (!currentUbigeo) return;
+
+  const depts = Object.keys(currentUbigeo);
+  if (depts.length > 0) {
+    deptSelect.innerHTML = depts.map(d => `<option value="${d}" ${d === 'Lima' ? 'selected' : ''}>${d}</option>`).join('');
+  }
+
+  onDepartmentChanged(deptSelect.value || 'Lima');
+}
 
 function onDepartmentChanged(dept) {
   const provSelect = document.getElementById('claim-province');
   if (!provSelect) return;
 
-  const provList = PROVINCIAS_MAP[dept] || ['Capital'];
-  provSelect.innerHTML = provList.map((p, idx) => `<option value="${p}" ${idx === 0 ? 'selected' : ''}>${p}</option>`).join('');
+  const currentUbigeo = typeof window !== 'undefined' && window.UBIGEO_PERU ? window.UBIGEO_PERU : null;
+  const deptData = currentUbigeo && currentUbigeo[dept] ? currentUbigeo[dept] : null;
 
-  onProvinceChanged(provList[0]);
+  let provList = [];
+  if (deptData) {
+    provList = Object.keys(deptData);
+  } else if (typeof PROVINCIAS_MAP !== 'undefined' && PROVINCIAS_MAP[dept]) {
+    provList = PROVINCIAS_MAP[dept];
+  } else {
+    provList = [dept, 'Capital'];
+  }
+
+  provSelect.innerHTML = provList.map((p, idx) => `<option value="${p}" ${idx === 0 || (dept === 'Lima' && p === 'Lima') ? 'selected' : ''}>${p}</option>`).join('');
+
+  const defaultProv = (dept === 'Lima' && provList.includes('Lima')) ? 'Lima' : provList[0];
+  onProvinceChanged(defaultProv, dept);
 }
 
-function onProvinceChanged(prov) {
+function onProvinceChanged(prov, selectedDept) {
   const distSelect = document.getElementById('claim-district');
+  const deptSelect = document.getElementById('claim-department');
   if (!distSelect) return;
 
-  if (prov === 'Lima') {
-    distSelect.innerHTML = DISTRITOS_LIMA.map((d, idx) => `<option value="${d}" ${idx === 0 ? 'selected' : ''}>${d}</option>`).join('');
+  const dept = selectedDept || (deptSelect ? deptSelect.value : 'Lima');
+  const currentUbigeo = typeof window !== 'undefined' && window.UBIGEO_PERU ? window.UBIGEO_PERU : null;
+
+  let distList = [];
+  if (currentUbigeo && currentUbigeo[dept] && currentUbigeo[dept][prov]) {
+    distList = currentUbigeo[dept][prov];
+  } else if (prov === 'Lima' && typeof DISTRITOS_LIMA !== 'undefined') {
+    distList = DISTRITOS_LIMA;
   } else {
-    distSelect.innerHTML = `
-      <option value="${prov} (Centro)" selected>${prov} (Centro)</option>
-      <option value="${prov} (Distrito 1)">${prov} (Distrito 1)</option>
-      <option value="Otro">Otro distrito</option>
-    `;
+    distList = [`${prov} (Centro)`, 'Otro distrito'];
   }
+
+  distSelect.innerHTML = distList.map((d, idx) => {
+    // Si estamos en Lima / Lima, seleccionamos por defecto Ate donde está la sede principal de Buchisapa
+    const isSelected = (dept === 'Lima' && prov === 'Lima' && d.includes('Ate')) || ((dept !== 'Lima' || prov !== 'Lima') && idx === 0);
+    return `<option value="${d}" ${isSelected ? 'selected' : ''}>${d}</option>`;
+  }).join('');
 }
 
 // Manejo de Dropzone y Carga de Archivo Adjunto
@@ -251,7 +245,7 @@ async function handleClaimSubmit(e) {
   }
 
   // Recopilar datos
-  const branch = document.getElementById('claim-local')?.value || 'BuchiSapa - Sede Central (Santa Clara, Ate)';
+  const branch = document.getElementById('claim-local')?.value || 'BuchiSapa - Sede Central: Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima)';
   const firstName = document.getElementById('claim-firstname')?.value?.trim() || '';
   const lastname1 = document.getElementById('claim-lastname1')?.value?.trim() || '';
   const lastname2 = document.getElementById('claim-lastname2')?.value?.trim() || '';
