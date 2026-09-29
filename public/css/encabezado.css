@@ -6,19 +6,15 @@
    Lupa oscura, Bolsa de pedido y Drawer Mobile 100% Responsivo.
    ========================================================= */
 
-/* Header estilo BuchiSapa Oficial */
+/* Header estilo BuchiSapa Oficial (No fijo / Non-sticky) */
 .site-header {
   background: #ffffff;
   border-bottom: 1px solid #f1f5f9;
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 10005 !important;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
   width: 100%;
   transition: background 0.2s ease, box-shadow 0.2s ease;
-  will-change: transform;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
 }
 
 .header-nav {
@@ -874,11 +870,11 @@
   height: 64px;
   min-height: 64px;
   background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 0 20px;
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -886,48 +882,45 @@
 .mobile-menu-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .mobile-drawer-logo {
-  height: 38px;
-  width: 38px;
+  height: 40px;
+  width: 40px;
   border-radius: 50%;
   object-fit: contain;
 }
 
 .mobile-drawer-brand-title {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 900;
   color: #0f172a;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.1px;
+  text-transform: uppercase;
 }
 
 .mobile-drawer-close-btn {
-  background: #fee2e2;
+  background: transparent;
   border: none;
   cursor: pointer;
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   touch-action: manipulation;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 .mobile-drawer-close-btn:hover {
-  background: #fecaca;
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .mobile-drawer-close-btn:active {
-  transform: scale(0.94);
+  transform: scale(0.9);
 }
 
 /* Cuerpo con Scroll del Menú */
@@ -935,10 +928,11 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 16px 16px 24px;
+  padding: 18px 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  background: #f8fafc;
   box-sizing: border-box;
 }
 
@@ -946,22 +940,22 @@
 .mobile-nav-cards-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
 .mobile-nav-card {
   background: #ffffff;
-  border: 1.5px solid #f1f5f9;
-  border-radius: 16px;
-  padding: 14px 18px;
+  border: 1px solid #f1f5f9;
+  border-radius: 18px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   box-sizing: border-box;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   text-align: left;
   transition: all 0.18s ease;
@@ -970,9 +964,8 @@
 
 .mobile-nav-card:hover {
   border-color: #fca5a5;
-  background: #fffafa;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.06);
 }
 
 .mobile-nav-card:active {
@@ -982,7 +975,7 @@
 .nav-card-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
@@ -992,16 +985,44 @@
 }
 
 .nav-card-text {
-  font-size: 14.5px;
+  font-size: 15px;
   font-weight: 800;
   color: #0f172a;
-  letter-spacing: -0.2px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
 }
 
 .nav-card-chevron {
   flex-shrink: 0;
-  stroke: #64748b;
+  stroke: #475569;
   transition: transform 0.25s ease, stroke 0.2s ease;
+}
+
+/* Badge Contador Carrito en Drawer */
+.drawer-cart-count {
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+}
+
+/* Badge "EN VIVO" */
+.drawer-live-badge {
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  letter-spacing: 0.3px;
 }
 
 /* Acordeón / Collapsible */
@@ -1026,13 +1047,13 @@
   display: none;
   flex-direction: column;
   gap: 2px;
-  padding: 6px 12px 12px;
+  padding: 8px 12px 14px;
   background: #ffffff;
-  border: 1.5px solid #f1f5f9;
+  border: 1px solid #f1f5f9;
   border-top: none;
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
 }
 
 .mobile-nav-collapsible.open .nav-collapsible-content {
@@ -1059,27 +1080,12 @@
   padding-left: 18px;
 }
 
-/* Badge Contador Carrito en Drawer */
-.drawer-cart-count {
-  background: #dc2626;
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 900;
-  min-width: 22px;
-  height: 22px;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6px;
-}
-
 /* Botones de Acción en Drawer */
 .mobile-drawer-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .drawer-btn-red {
@@ -1088,24 +1094,24 @@
   justify-content: center;
   gap: 10px;
   width: 100%;
-  height: 50px;
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  height: 52px;
+  background: #dc2626;
   color: #ffffff;
   border: none;
-  border-radius: 14px;
-  font-size: 15px;
+  border-radius: 18px;
+  font-size: 16px;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.32);
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.22);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   transition: all 0.18s ease;
   touch-action: manipulation;
 }
 
 .drawer-btn-red:hover {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.45);
-  transform: translateY(-1px);
+  background: #b91c1c;
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
 }
 
 .drawer-btn-red:active {
@@ -1118,15 +1124,14 @@
   justify-content: center;
   gap: 10px;
   width: 100%;
-  height: 50px;
-  background: #25d366;
-  color: #ffffff;
-  border: none;
-  border-radius: 14px;
-  font-size: 15px;
-  font-weight: 800;
+  height: 52px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #059669;
+  border-radius: 18px;
+  font-size: 16px;
+  font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   transition: all 0.18s ease;
   touch-action: manipulation;
@@ -1134,9 +1139,8 @@
 }
 
 .drawer-btn-whatsapp:hover {
-  background: #20ba5a;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.42);
+  background: #d1fae5;
+  border-color: #6ee7b7;
 }
 
 .drawer-btn-whatsapp:active {
@@ -1145,10 +1149,10 @@
 
 /* Footer Slogan del Drawer */
 .mobile-drawer-footer {
-  height: 48px;
-  min-height: 48px;
+  height: 54px;
+  min-height: 54px;
   background: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1158,9 +1162,10 @@
 
 .drawer-slogan {
   margin: 0;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 900;
-  letter-spacing: 2.5px;
-  color: #94a3b8;
+  letter-spacing: 1.5px;
+  color: #0f172a;
   text-transform: uppercase;
 }
+
