@@ -372,8 +372,8 @@
   transition: transform 0.2s ease;
 }
 
-.desktop-dropdown-wrap:hover .nav-chevron-svg,
-.desktop-dropdown-wrap:focus-within .nav-chevron-svg {
+.desktop-dropdown-wrap.is-open .nav-chevron-svg,
+.desktop-dropdown-wrap:hover .nav-chevron-svg {
   transform: rotate(180deg);
 }
 
@@ -400,8 +400,8 @@
   animation: slideDownNav 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.desktop-dropdown-wrap:hover .desktop-dropdown-menu,
-.desktop-dropdown-wrap:focus-within .desktop-dropdown-menu {
+.desktop-dropdown-wrap.is-open > .desktop-dropdown-menu,
+.desktop-dropdown-wrap:hover > .desktop-dropdown-menu {
   display: flex;
 }
 

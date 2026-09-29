@@ -1956,5 +1956,24 @@
     }
   };
 
+  // Limpiar estrictamente "Otro distrito" y ordenar alfabéticamente distritos en español (A - Z)
+  for (var deptKey in UBIGEO) {
+    if (Object.prototype.hasOwnProperty.call(UBIGEO, deptKey)) {
+      var deptObj = UBIGEO[deptKey];
+      for (var provKey in deptObj) {
+        if (Object.prototype.hasOwnProperty.call(deptObj, provKey) && Array.isArray(deptObj[provKey])) {
+          deptObj[provKey] = deptObj[provKey]
+            .filter(function (dist) {
+              var s = (dist || '').trim().toLowerCase();
+              return s !== 'otro distrito' && s !== 'otro' && s !== 'otros distritos';
+            })
+            .sort(function (a, b) {
+              return a.localeCompare(b, 'es', { sensitivity: 'base' });
+            });
+        }
+      }
+    }
+  }
+
   return UBIGEO;
 });

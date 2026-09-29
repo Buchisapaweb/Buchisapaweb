@@ -92,22 +92,41 @@ function toggleTutorFields(isMinor) {
 // Ubicación geográfica: Provincias y Distritos según Departamento (UBIGEO)
 function initUbigeoSelectors() {
   const deptSelect = document.getElementById('claim-department');
+  const provSelect = document.getElementById('claim-province');
+  const distSelect = document.getElementById('claim-district');
   if (!deptSelect) return;
 
   const currentUbigeo = typeof window !== 'undefined' && window.UBIGEO_PERU ? window.UBIGEO_PERU : null;
   if (!currentUbigeo) return;
 
-  const depts = Object.keys(currentUbigeo);
+  // Ordenar departamentos alfabéticamente en español (A - Z)
+  const depts = Object.keys(currentUbigeo).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
   if (depts.length > 0) {
-    deptSelect.innerHTML = depts.map(d => `<option value="${d}" ${d === 'Lima' ? 'selected' : ''}>${d}</option>`).join('');
+    deptSelect.innerHTML = '<option value="" selected disabled>Seleccione departamento</option>' +
+      depts.map(d => `<option value="${d}">${d}</option>`).join('');
   }
 
-  onDepartmentChanged(deptSelect.value || 'Lima');
+  // Inicialmente provincia y distrito se muestran con su opción de placeholder
+  if (provSelect) {
+    provSelect.innerHTML = '<option value="" selected disabled>Seleccione provincia</option>';
+  }
+  if (distSelect) {
+    distSelect.innerHTML = '<option value="" selected disabled>Seleccione distrito</option>';
+  }
 }
 
 function onDepartmentChanged(dept) {
   const provSelect = document.getElementById('claim-province');
+  const distSelect = document.getElementById('claim-district');
   if (!provSelect) return;
+
+  if (!dept) {
+    provSelect.innerHTML = '<option value="" selected disabled>Seleccione provincia</option>';
+    if (distSelect) {
+      distSelect.innerHTML = '<option value="" selected disabled>Seleccione distrito</option>';
+    }
+    return;
+  }
 
   const currentUbigeo = typeof window !== 'undefined' && window.UBIGEO_PERU ? window.UBIGEO_PERU : null;
   const deptData = currentUbigeo && currentUbigeo[dept] ? currentUbigeo[dept] : null;
@@ -121,10 +140,15 @@ function onDepartmentChanged(dept) {
     provList = [dept, 'Capital'];
   }
 
-  provSelect.innerHTML = provList.map((p, idx) => `<option value="${p}" ${idx === 0 || (dept === 'Lima' && p === 'Lima') ? 'selected' : ''}>${p}</option>`).join('');
+  // Ordenar provincias alfabéticamente (A - Z)
+  provList.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
 
-  const defaultProv = (dept === 'Lima' && provList.includes('Lima')) ? 'Lima' : provList[0];
-  onProvinceChanged(defaultProv, dept);
+  provSelect.innerHTML = '<option value="" selected disabled>Seleccione provincia</option>' +
+    provList.map(p => `<option value="${p}">${p}</option>`).join('');
+
+  if (distSelect) {
+    distSelect.innerHTML = '<option value="" selected disabled>Seleccione distrito</option>';
+  }
 }
 
 function onProvinceChanged(prov, selectedDept) {
@@ -132,23 +156,34 @@ function onProvinceChanged(prov, selectedDept) {
   const deptSelect = document.getElementById('claim-department');
   if (!distSelect) return;
 
-  const dept = selectedDept || (deptSelect ? deptSelect.value : 'Lima');
+  if (!prov) {
+    distSelect.innerHTML = '<option value="" selected disabled>Seleccione distrito</option>';
+    return;
+  }
+
+  const dept = selectedDept || (deptSelect ? deptSelect.value : '');
   const currentUbigeo = typeof window !== 'undefined' && window.UBIGEO_PERU ? window.UBIGEO_PERU : null;
 
   let distList = [];
   if (currentUbigeo && currentUbigeo[dept] && currentUbigeo[dept][prov]) {
-    distList = currentUbigeo[dept][prov];
+    distList = [...currentUbigeo[dept][prov]];
   } else if (prov === 'Lima' && typeof DISTRITOS_LIMA !== 'undefined') {
-    distList = DISTRITOS_LIMA;
+    distList = [...DISTRITOS_LIMA];
   } else {
-    distList = [`${prov} (Centro)`, 'Otro distrito'];
+    distList = [`${prov} (Centro)`];
   }
 
-  distSelect.innerHTML = distList.map((d, idx) => {
-    // Si estamos en Lima / Lima, seleccionamos por defecto Ate donde está la sede principal de Buchisapa
-    const isSelected = (dept === 'Lima' && prov === 'Lima' && d.includes('Ate')) || ((dept !== 'Lima' || prov !== 'Lima') && idx === 0);
-    return `<option value="${d}" ${isSelected ? 'selected' : ''}>${d}</option>`;
-  }).join('');
+  // Filtrar estrictamente para que NUNCA aparezca "Otro distrito" u "Otro"
+  distList = distList.filter(d => {
+    const s = (d || '').trim().toLowerCase();
+    return s !== 'otro distrito' && s !== 'otro' && s !== 'otros distritos';
+  });
+
+  // Ordenar distritos alfabéticamente (A - Z)
+  distList.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+
+  distSelect.innerHTML = '<option value="" selected disabled>Seleccione distrito</option>' +
+    distList.map(d => `<option value="${d}">${d}</option>`).join('');
 }
 
 // Manejo de Dropzone y Carga de Archivo Adjunto
@@ -256,10 +291,19 @@ async function handleClaimSubmit(e) {
   const email = document.getElementById('claim-email')?.value?.trim() || '';
   const phone = document.getElementById('claim-phone')?.value?.trim() || '';
 
-  const department = document.getElementById('claim-department')?.value || 'Lima';
-  const province = document.getElementById('claim-province')?.value || 'Lima';
-  const district = document.getElementById('claim-district')?.value || 'Ate';
+  const department = document.getElementById('claim-department')?.value || '';
+  const province = document.getElementById('claim-province')?.value || '';
+  const district = document.getElementById('claim-district')?.value || '';
   const address = document.getElementById('claim-address')?.value?.trim() || '';
+
+  if (!department || !province || !district) {
+    alert('Por favor seleccione Departamento, Provincia y Distrito.');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'ENVIAR RECLAMO';
+    }
+    return;
+  }
 
   const ageOption = document.querySelector('input[name="claim-age"]:checked')?.value || 'mayor';
   const isMinor = ageOption === 'menor';

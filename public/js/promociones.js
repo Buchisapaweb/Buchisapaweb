@@ -107,8 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPromocionesGrid();
 });
 
-function renderPromocionesGrid() {
-  const container = document.getElementById('promociones-cards-container');
+function renderPromocionesGrid(customContainer) {
+  const container = customContainer || document.getElementById('promociones-cards-container');
   if (!container) return;
 
   container.innerHTML = OFFICIAL_PROMOTIONS.map((promo, idx) => {
@@ -248,3 +248,5 @@ window.OFFICIAL_PROMOTIONS = OFFICIAL_PROMOTIONS;
 window.addPromoDirectlyToCart = addPromoDirectlyToCart;
 window.openPromoModal = openPromoModal;
 window.closePromoModal = closePromoModal;
+window.escapeHtml = escapeHtml;
+window.renderPromocionesGrid = renderPromocionesGrid;

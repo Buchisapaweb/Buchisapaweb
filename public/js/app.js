@@ -19,6 +19,19 @@ function getAllProducts() {
   return [];
 }
 
+function escapeHtml(text) {
+  if (text === null || text === undefined) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+if (typeof window !== 'undefined') {
+  window.escapeHtml = escapeHtml;
+}
+
 // Variables globales de ubicación y geolocalización (inicializadas al inicio para evitar TDZ)
 let locMap = null;
 let locMarker = null;
@@ -60,6 +73,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                              window.location.hash.includes('ubicacion');
     if (isUbicacionRoute) {
       setTimeout(() => openLocationModal(), 150);
+    }
+  } catch (e) {}
+
+  // Si la URL incluye #promociones o parámetro promociones, abrir automáticamente
+  try {
+    const isPromoRoute = window.location.hash.toLowerCase().includes('promo') || 
+                         new URLSearchParams(window.location.search).has('promociones') ||
+                         window.location.search.toLowerCase().includes('cat=promo');
+    if (isPromoRoute) {
+      setTimeout(() => goToPromociones(), 100);
     }
   } catch (e) {}
 
@@ -3765,7 +3788,9 @@ function openCategoryView(catId, catTitle) {
   if (titleWrap) titleWrap.style.display = 'none';
   if (closeBtn) closeBtn.style.display = 'block';
 
-  const isPromo = (catId || catTitle || '').toLowerCase().includes('promo');
+  const normCatId = (catId || '').toLowerCase().trim();
+  const normCatTitle = (catTitle || '').toLowerCase().trim();
+  const isPromo = normCatId.includes('promo') || normCatTitle.includes('promo') || normCatId.includes('combo') || normCatTitle.includes('combo');
 
   if (backBtn) {
     backBtn.innerHTML = `
@@ -3775,11 +3800,21 @@ function openCategoryView(catId, catTitle) {
   }
 
   if (isPromo) {
-    if (searchSec) searchSec.classList.add('promociones-mode');
-    if (container) container.classList.add('promo-grid-4col');
+    if (searchSec) {
+      searchSec.classList.add('promociones-mode');
+      searchSec.style.display = 'block';
+      searchSec.classList.remove('is-hidden');
+    }
+    if (container) {
+      container.classList.add('promo-grid-4col');
+      container.classList.remove('buchisapa-cards-list');
+    }
   } else {
     if (searchSec) searchSec.classList.remove('promociones-mode');
-    if (container) container.classList.remove('promo-grid-4col');
+    if (container) {
+      container.classList.remove('promo-grid-4col');
+      container.classList.add('buchisapa-cards-list');
+    }
   }
 
   // Sincronizar active state en quick category pills
@@ -3804,7 +3839,7 @@ function openCategoryView(catId, catTitle) {
     }
   });
 
-  const displayTitle = (catTitle || catId || 'PLATOS').toUpperCase();
+  const displayTitle = isPromo ? 'PROMOCIONES' : (catTitle || catId || 'PLATOS').toUpperCase();
   if (titleEl) titleEl.textContent = displayTitle;
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3830,7 +3865,7 @@ function openCategoryView(catId, catTitle) {
     if (rawTarget.includes('promo') || rawTarget.includes('combo')) {
       return pCatId.includes('promo') || pCatName.includes('promo') || 
              pCatId.includes('combo') || pCatName.includes('combo') ||
-             p.is_promo === true || p.popular === true || (typeof p.discount === 'number' && p.discount > 0);
+             p.is_promo === true || (typeof p.discount === 'number' && p.discount > 0);
     }
 
     // Platos Amazónicos / Selva
@@ -3900,14 +3935,20 @@ function openCategoryView(catId, catTitle) {
 }
 
 function renderOfficialPromotionsInApp(container) {
+  if (!container) {
+    container = document.getElementById('search-view-list');
+  }
   if (!container) return;
 
-  const promos = [
+  const promos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
+    ? window.OFFICIAL_PROMOTIONS
+    : [
     {
       id: 'promo-1',
       name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.',
       price: 90.90,
       shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoció...',
+      fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.',
       image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80',
       fallbackImg: '/imagenes/portada/Portada2E.webp'
     },
@@ -3916,6 +3957,7 @@ function renderOfficialPromotionsInApp(container) {
       name: 'Promoción Tu Chicha 1.5 LT.',
       price: 95.50,
       shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción in...',
+      fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.',
       image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80',
       fallbackImg: '/imagenes/portada/Portada1E.webp'
     },
@@ -3924,6 +3966,7 @@ function renderOfficialPromotionsInApp(container) {
       name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.',
       price: 95.50,
       shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoci...',
+      fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.',
       image: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80',
       fallbackImg: '/imagenes/portada/Portada3E.webp'
     },
@@ -3932,6 +3975,7 @@ function renderOfficialPromotionsInApp(container) {
       name: 'Promoción Para 2',
       price: 57.90,
       shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción in...',
+      fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.',
       image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80',
       fallbackImg: '/imagenes/portada/Portada4E.webp'
     },
@@ -3940,6 +3984,7 @@ function renderOfficialPromotionsInApp(container) {
       name: 'Promoción Brasa Para Mí',
       price: 35.90,
       shortDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal. Esta Pro...',
+      fullDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal helada.',
       image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
       fallbackImg: '/imagenes/categorias/broaster/banner.webp'
     },
@@ -3948,6 +3993,7 @@ function renderOfficialPromotionsInApp(container) {
       name: 'Parrillero Original Para Mí',
       price: 38.50,
       shortDesc: '1/4 Pardos Parrillero original con papas fritas y guarnición de ensalada Pardos + bebida per...',
+      fullDesc: '1/4 Pardos Parrillero original a la brasa con papas fritas crocantes, ensalada y bebida personal.',
       image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80',
       fallbackImg: '/imagenes/categorias/hamburguesas/banner.webp'
     },
@@ -3956,6 +4002,7 @@ function renderOfficialPromotionsInApp(container) {
       name: 'Promoción Chicharrón Para Mí',
       price: 38.50,
       shortDesc: '5 unidades de chicharrón + papas fritas o doradas + guarnición de ensalada Pardos + bebida p...',
+      fullDesc: '5 unidades de chicharrón crujiente + papas fritas o doradas + ensalada y bebida personal.',
       image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80',
       fallbackImg: '/imagenes/categorias/alitas/banner.webp'
     },
@@ -3964,35 +4011,40 @@ function renderOfficialPromotionsInApp(container) {
       name: 'Parrillero BBQ Para Mí',
       price: 39.50,
       shortDesc: '1/4 Pardos Parrillero bbq con papas fritas y guarnición de ensalada Pardos + bebida personal...',
+      fullDesc: '1/4 Pardos Parrillero bañado en salsa BBQ ahumada con papas fritas, ensalada y bebida personal.',
       image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
       fallbackImg: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp'
     }
   ];
 
+  const escapeFn = typeof window !== 'undefined' && typeof window.escapeHtml === 'function'
+    ? window.escapeHtml
+    : (s) => (s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '');
+
   container.innerHTML = promos.map((p, idx) => `
-    <article class="promo-item-card" onclick="openProductDetailModal('${p.id}')" style="cursor: pointer;">
+    <article class="promo-item-card" onclick="openPromoOrProductModal('${p.id}')" style="cursor: pointer;">
       <div class="promo-item-img-box">
         <img 
           src="${p.image}" 
-          alt="${escapeHtml(p.name)}" 
+          alt="${escapeFn(p.name)}" 
           class="promo-item-img"
           loading="${idx < 4 ? 'eager' : 'lazy'}"
           onerror="this.onerror=null; this.src='${p.fallbackImg}';"
         >
       </div>
       <div class="promo-item-body">
-        <h3 class="promo-item-title">${escapeHtml(p.name)}</h3>
+        <h3 class="promo-item-title">${escapeFn(p.name)}</h3>
         <p class="promo-item-desc">
-          ${escapeHtml(p.shortDesc)}
-          <button type="button" class="promo-ver-mas-inline" onclick="event.stopPropagation(); openProductDetailModal('${p.id}')">VER MÁS</button>
+          ${escapeFn(p.shortDesc)}
+          <button type="button" class="promo-ver-mas-inline" onclick="event.stopPropagation(); openPromoOrProductModal('${p.id}')">VER MÁS</button>
         </p>
         <div class="promo-item-footer">
           <span class="promo-item-price">S/ ${p.price.toFixed(2)}</span>
           <button 
             type="button" 
             class="promo-btn-agregar" 
-            onclick="event.stopPropagation(); if(window.BuchisapaCart) { window.BuchisapaCart.addItem({id:'${p.id}', name:'${escapeHtml(p.name)}', price:${p.price}, image:'${p.image}', includes_sauces:true}, 1); window.BuchisapaCart.openDrawer(); }"
-            aria-label="Agregar ${escapeHtml(p.name)} al pedido"
+            onclick="event.stopPropagation(); addPromoToCartFromApp('${p.id}')"
+            aria-label="Agregar ${escapeFn(p.name)} al pedido"
           >
             <svg class="promo-basket-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
@@ -4006,6 +4058,72 @@ function renderOfficialPromotionsInApp(container) {
     </article>
   `).join('');
 }
+
+function openPromoOrProductModal(promoId) {
+  const promos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
+    ? window.OFFICIAL_PROMOTIONS
+    : [
+      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoció...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.', image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/portada/Portada2E.webp' },
+      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción in...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.', image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/portada/Portada1E.webp' },
+      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoci...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.', image: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/portada/Portada3E.webp' },
+      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción in...', fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.', image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/portada/Portada4E.webp' },
+      { id: 'promo-5', name: 'Promoción Brasa Para Mí', price: 35.90, shortDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal. Esta Pro...', fullDesc: '1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal helada.', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/categorias/broaster/banner.webp' },
+      { id: 'promo-6', name: 'Parrillero Original Para Mí', price: 38.50, shortDesc: '1/4 Pardos Parrillero original con papas fritas y guarnición de ensalada Pardos + bebida per...', fullDesc: '1/4 Pardos Parrillero original a la brasa con papas fritas crocantes, ensalada y bebida personal.', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/categorias/hamburguesas/banner.webp' },
+      { id: 'promo-7', name: 'Promoción Chicharrón Para Mí', price: 38.50, shortDesc: '5 unidades de chicharrón + papas fritas o doradas + guarnición de ensalada Pardos + bebida p...', fullDesc: '5 unidades de chicharrón crujiente + papas fritas o doradas + ensalada y bebida personal.', image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/categorias/alitas/banner.webp' },
+      { id: 'promo-8', name: 'Parrillero BBQ Para Mí', price: 39.50, shortDesc: '1/4 Pardos Parrillero bbq con papas fritas y guarnición de ensalada Pardos + bebida personal...', fullDesc: '1/4 Pardos Parrillero bañado en salsa BBQ ahumada con papas fritas, ensalada y bebida personal.', image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80', fallbackImg: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp' }
+    ];
+
+  const promo = promos.find(p => p.id === promoId);
+  if (!promo) return;
+
+  if (typeof window.openProductDetailModal === 'function') {
+    window.openProductDetailModal({
+      id: promo.id,
+      name: promo.name,
+      price: promo.price,
+      description: promo.fullDesc || promo.shortDesc,
+      image: promo.image,
+      category: 'promociones',
+      category_id: 'promociones',
+      includes_sauces: true
+    });
+  }
+}
+window.openPromoOrProductModal = openPromoOrProductModal;
+
+function addPromoToCartFromApp(promoId) {
+  const promos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
+    ? window.OFFICIAL_PROMOTIONS
+    : [
+      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, image: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-5', name: 'Promoción Brasa Para Mí', price: 35.90, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-6', name: 'Parrillero Original Para Mí', price: 38.50, image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-7', name: 'Promoción Chicharrón Para Mí', price: 38.50, image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80' },
+      { id: 'promo-8', name: 'Parrillero BBQ Para Mí', price: 39.50, image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80' }
+    ];
+
+  const p = promos.find(item => item.id === promoId);
+  if (!p) return;
+
+  if (window.BuchisapaCart && typeof window.BuchisapaCart.addItem === 'function') {
+    window.BuchisapaCart.addItem({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      image: p.image,
+      category: 'PROMOCIONES',
+      category_id: 'promociones',
+      includes_sauces: true
+    }, 1);
+    if (typeof window.BuchisapaCart.openDrawer === 'function') {
+      window.BuchisapaCart.openDrawer();
+    }
+  }
+}
+window.addPromoToCartFromApp = addPromoToCartFromApp;
 
 function renderSearchResultsList(normQuery, sectionLabel) {
   const container = document.getElementById('search-view-list');
@@ -4546,6 +4664,102 @@ async function submitOrder(e) {
    ========================================================= */
 function getFallbackProducts() {
   return [
+    {
+      id: "promo-1",
+      name: "Promoción Tú Eliges con Gaseosa 1.5 LT.",
+      category_id: "promociones",
+      category: "promociones",
+      price: 90.90,
+      description: "1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.",
+      popular: true,
+      is_promo: true,
+      image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80",
+      fallbackImg: "/imagenes/portada/Portada2E.webp"
+    },
+    {
+      id: "promo-2",
+      name: "Promoción Tu Chicha 1.5 LT.",
+      category_id: "promociones",
+      category: "promociones",
+      price: 95.50,
+      description: "1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.",
+      popular: true,
+      is_promo: true,
+      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+      fallbackImg: "/imagenes/portada/Portada1E.webp"
+    },
+    {
+      id: "promo-3",
+      name: "Promoción Tú Eliges con Gaseosa 2.25 LT.",
+      category_id: "promociones",
+      category: "promociones",
+      price: 95.50,
+      description: "1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.",
+      popular: true,
+      is_promo: true,
+      image: "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80",
+      fallbackImg: "/imagenes/portada/Portada3E.webp"
+    },
+    {
+      id: "promo-4",
+      name: "Promoción Para 2",
+      category_id: "promociones",
+      category: "promociones",
+      price: 57.90,
+      description: "1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Incluye cremas caseras.",
+      popular: true,
+      is_promo: true,
+      image: "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
+      fallbackImg: "/imagenes/portada/Portada4E.webp"
+    },
+    {
+      id: "promo-5",
+      name: "Promoción Brasa Para Mí",
+      category_id: "promociones",
+      category: "promociones",
+      price: 35.90,
+      description: "1/4 Pardos Brasa + papas fritas + guarnición de ensalada Pardos + bebida personal helada.",
+      popular: true,
+      is_promo: true,
+      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80",
+      fallbackImg: "/imagenes/categorias/broaster/banner.webp"
+    },
+    {
+      id: "promo-6",
+      name: "Parrillero Original Para Mí",
+      category_id: "promociones",
+      category: "promociones",
+      price: 38.50,
+      description: "1/4 Pardos Parrillero original a la brasa con papas fritas crocantes, ensalada y bebida personal.",
+      popular: true,
+      is_promo: true,
+      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80",
+      fallbackImg: "/imagenes/categorias/hamburguesas/banner.webp"
+    },
+    {
+      id: "promo-7",
+      name: "Promoción Chicharrón Para Mí",
+      category_id: "promociones",
+      category: "promociones",
+      price: 38.50,
+      description: "5 unidades de chicharrón crujiente + papas fritas o doradas + ensalada y bebida personal.",
+      popular: true,
+      is_promo: true,
+      image: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80",
+      fallbackImg: "/imagenes/categorias/alitas/banner.webp"
+    },
+    {
+      id: "promo-8",
+      name: "Parrillero BBQ Para Mí",
+      category_id: "promociones",
+      category: "promociones",
+      price: 39.50,
+      description: "1/4 Pardos Parrillero bañado en salsa BBQ ahumada con papas fritas, ensalada y bebida personal.",
+      popular: true,
+      is_promo: true,
+      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+      fallbackImg: "/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp"
+    },
     {
       id: "ama-1",
       name: "Patacones con Chorizo",

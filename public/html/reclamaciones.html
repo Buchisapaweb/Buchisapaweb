@@ -141,14 +141,14 @@
             <div class="claim-form-group">
               <label for="claim-department" class="claim-form-label">Departamento*</label>
               <select id="claim-department" class="claim-form-input claim-select" required onchange="onDepartmentChanged(this.value)">
-                <option value="Lima" selected>Lima</option>
-                <option value="Callao">Callao</option>
+                <option value="" selected disabled>Seleccione departamento</option>
                 <option value="Amazonas">Amazonas</option>
                 <option value="Áncash">Áncash</option>
                 <option value="Apurímac">Apurímac</option>
                 <option value="Arequipa">Arequipa</option>
                 <option value="Ayacucho">Ayacucho</option>
                 <option value="Cajamarca">Cajamarca</option>
+                <option value="Callao">Callao</option>
                 <option value="Cusco">Cusco</option>
                 <option value="Huancavelica">Huancavelica</option>
                 <option value="Huánuco">Huánuco</option>
@@ -156,6 +156,7 @@
                 <option value="Junín">Junín</option>
                 <option value="La Libertad">La Libertad</option>
                 <option value="Lambayeque">Lambayeque</option>
+                <option value="Lima">Lima</option>
                 <option value="Loreto">Loreto</option>
                 <option value="Madre de Dios">Madre de Dios</option>
                 <option value="Moquegua">Moquegua</option>
@@ -171,7 +172,7 @@
             <div class="claim-form-group">
               <label for="claim-province" class="claim-form-label">Provincia*</label>
               <select id="claim-province" class="claim-form-input claim-select" required onchange="onProvinceChanged(this.value)">
-                <option value="Lima" selected>Lima</option>
+                <option value="" selected disabled>Seleccione provincia</option>
                 <option value="Barranca">Barranca</option>
                 <option value="Cajatambo">Cajatambo</option>
                 <option value="Canta">Canta</option>
@@ -179,6 +180,7 @@
                 <option value="Huaral">Huaral</option>
                 <option value="Huarochirí">Huarochirí</option>
                 <option value="Huaura">Huaura</option>
+                <option value="Lima">Lima</option>
                 <option value="Oyón">Oyón</option>
                 <option value="Yauyos">Yauyos</option>
               </select>
@@ -186,31 +188,28 @@
             <div class="claim-form-group">
               <label for="claim-district" class="claim-form-label">Distrito*</label>
               <select id="claim-district" class="claim-form-input claim-select" required>
-                <option value="Ate (Santa Clara / Vitarte)" selected>Ate (Santa Clara / Vitarte)</option>
-                <option value="Santa Anita">Santa Anita</option>
-                <option value="La Molina">La Molina</option>
-                <option value="Chosica (Lurigancho)">Chosica (Lurigancho)</option>
-                <option value="Chaclacayo">Chaclacayo</option>
-                <option value="San Juan de Lurigancho">San Juan de Lurigancho</option>
-                <option value="El Agustino">El Agustino</option>
-                <option value="Santiago de Surco">Santiago de Surco</option>
-                <option value="San Borja">San Borja</option>
-                <option value="San Isidro">San Isidro</option>
-                <option value="Miraflores">Miraflores</option>
-                <option value="Lima Cercado">Lima Cercado</option>
+                <option value="" selected disabled>Seleccione distrito</option>
+                <option value="Ancón">Ancón</option>
+                <option value="Ate (Santa Clara / Vitarte)">Ate (Santa Clara / Vitarte)</option>
                 <option value="Barranco">Barranco</option>
                 <option value="Breña">Breña</option>
                 <option value="Carabayllo">Carabayllo</option>
+                <option value="Chaclacayo">Chaclacayo</option>
                 <option value="Chorrillos">Chorrillos</option>
+                <option value="Chosica (Lurigancho)">Chosica (Lurigancho)</option>
                 <option value="Cieneguilla">Cieneguilla</option>
                 <option value="Comas">Comas</option>
+                <option value="El Agustino">El Agustino</option>
                 <option value="Independencia">Independencia</option>
                 <option value="Jesús María">Jesús María</option>
+                <option value="La Molina">La Molina</option>
                 <option value="La Victoria">La Victoria</option>
+                <option value="Lima Cercado">Lima Cercado</option>
                 <option value="Lince">Lince</option>
                 <option value="Los Olivos">Los Olivos</option>
                 <option value="Lurín">Lurín</option>
                 <option value="Magdalena del Mar">Magdalena del Mar</option>
+                <option value="Miraflores">Miraflores</option>
                 <option value="Pachacámac">Pachacámac</option>
                 <option value="Pucusana">Pucusana</option>
                 <option value="Pueblo Libre">Pueblo Libre</option>
@@ -219,17 +218,20 @@
                 <option value="Punta Negra">Punta Negra</option>
                 <option value="Rímac">Rímac</option>
                 <option value="San Bartolo">San Bartolo</option>
+                <option value="San Borja">San Borja</option>
+                <option value="San Isidro">San Isidro</option>
+                <option value="San Juan de Lurigancho">San Juan de Lurigancho</option>
                 <option value="San Juan de Miraflores">San Juan de Miraflores</option>
                 <option value="San Luis">San Luis</option>
                 <option value="San Martín de Porres">San Martín de Porres</option>
                 <option value="San Miguel">San Miguel</option>
+                <option value="Santa Anita">Santa Anita</option>
                 <option value="Santa María del Mar">Santa María del Mar</option>
                 <option value="Santa Rosa">Santa Rosa</option>
+                <option value="Santiago de Surco">Santiago de Surco</option>
                 <option value="Surquillo">Surquillo</option>
                 <option value="Villa El Salvador">Villa El Salvador</option>
                 <option value="Villa María del Triunfo">Villa María del Triunfo</option>
-                <option value="Ancón">Ancón</option>
-                <option value="Otro distrito">Otro distrito</option>
               </select>
             </div>
           </div>

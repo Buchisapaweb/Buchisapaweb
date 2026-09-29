@@ -65,7 +65,7 @@ function goToPromociones() {
   if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
   if (typeof window.exitSearchMode === 'function') window.exitSearchMode();
   if (typeof window.openCategoryView === 'function') {
-    window.openCategoryView('promociones', 'PROMOCIONES & COMBOS');
+    window.openCategoryView('promociones', 'PROMOCIONES');
   } else {
     const carousel = document.querySelector('.hero-carousel-container');
     if (carousel) {
@@ -142,8 +142,94 @@ document.addEventListener('keydown', (e) => {
     if (backdrop && (backdrop.classList.contains('active') || backdrop.classList.contains('open'))) {
       closeMobileDrawer();
     }
+    if (typeof closeAllDesktopDropdowns === 'function') {
+      closeAllDesktopDropdowns();
+    }
   }
 });
+
+// GESTIÓN EXCLUSIVA DE DROPDOWNS DE ESCRITORIO (CATEGORÍAS Y CARTA SALÓN)
+// Garantiza que NUNCA se abran ni superpongan dos menús simultáneamente
+function closeAllDesktopDropdowns() {
+  const wraps = document.querySelectorAll('.desktop-dropdown-wrap');
+  wraps.forEach(wrap => {
+    wrap.classList.remove('is-open');
+    const btn = wrap.querySelector('.dropdown-trigger');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    if (document.activeElement && wrap.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
+  });
+}
+
+function initDesktopDropdowns() {
+  const wraps = document.querySelectorAll('.desktop-dropdown-wrap');
+  if (!wraps.length) return;
+
+  wraps.forEach(wrap => {
+    const trigger = wrap.querySelector('.dropdown-trigger');
+    const menu = wrap.querySelector('.desktop-dropdown-menu');
+
+    // Al entrar con el ratón a un dropdown, cerrar INMEDIATAMENTE todos los demás
+    wrap.addEventListener('mouseenter', () => {
+      wraps.forEach(other => {
+        if (other !== wrap) {
+          other.classList.remove('is-open');
+          const otherBtn = other.querySelector('.dropdown-trigger');
+          if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+          if (document.activeElement && other.contains(document.activeElement)) {
+            document.activeElement.blur();
+          }
+        }
+      });
+      wrap.classList.add('is-open');
+      if (trigger) trigger.setAttribute('aria-expanded', 'true');
+    });
+
+    // Al salir con el ratón, cerrar este dropdown
+    wrap.addEventListener('mouseleave', () => {
+      wrap.classList.remove('is-open');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      if (document.activeElement && wrap.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
+    });
+
+    // Al hacer clic en el trigger: alternar y cerrar otros
+    if (trigger) {
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = wrap.classList.contains('is-open');
+        closeAllDesktopDropdowns();
+        if (!wasOpen) {
+          wrap.classList.add('is-open');
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+
+    // Al hacer clic en cualquier opción dentro del menú, cerrar todo
+    if (menu) {
+      menu.addEventListener('click', () => {
+        closeAllDesktopDropdowns();
+      });
+    }
+  });
+
+  // Cerrar al hacer clic en cualquier parte fuera de los menús
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.desktop-dropdown-wrap')) {
+      closeAllDesktopDropdowns();
+    }
+  });
+}
+
+// Inicializar al cargar el DOM o si ya está listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDesktopDropdowns);
+} else {
+  initDesktopDropdowns();
+}
 
 // Exponer funciones en window para invocación desde HTML onclick
 window.toggleMobileMenu = toggleMobileMenu;
@@ -156,3 +242,5 @@ window.openCartFromDrawer = openCartFromDrawer;
 window.toggleSearchBar = toggleSearchBar;
 window.onSearchInputChanged = onSearchInputChanged;
 window.clearSearchInput = clearSearchInput;
+window.initDesktopDropdowns = initDesktopDropdowns;
+window.closeAllDesktopDropdowns = closeAllDesktopDropdowns;
