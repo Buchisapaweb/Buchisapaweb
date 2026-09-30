@@ -13,15 +13,22 @@
       </a>
     </div>
 
-    <a href="/recojo" class="location-picker-inline" title="Recojo en Santa Clara">
-      <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <a href="/recojo" class="location-picker-inline" id="header-location-picker" title="Seleccionar dirección o método de entrega">
+      <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-        <circle cx="12" cy="10" r="3.2"/>
+        <circle cx="12" cy="10" r="3"/>
       </svg>
-      <span class="location-text-red" id="selected-location-label">Recojo en Santa Clara</span>
+      <span class="location-text-red" id="selected-location-label">Entregar a Lima</span>
+      <svg class="location-chevron-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m6 9 6 6 6-6"/>
+      </svg>
     </a>
 
     <nav class="desktop-main-nav">
+      <a href="javascript:void(0)" onclick="openCategoryView('promociones', 'PROMOCIONES')" class="desktop-nav-link desktop-nav-promo" title="Ver Promociones">
+        <span>PROMOCIONES</span>
+      </a>
+
       <div class="desktop-dropdown-wrap" id="nav-dropdown-categorias">
         <button class="desktop-nav-link dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">
           <span>CATEGORÍAS</span>
@@ -58,7 +65,7 @@
 
     <div class="desktop-search-pill-wrap">
       <div class="desktop-search-input-box">
-        <svg class="search-box-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="search-box-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/>
           <path d="m21 21-4.35-4.35"/>
         </svg>
@@ -83,13 +90,21 @@
       </button>
 
       <button class="desktop-cart-link-btn" aria-label="Mi Pedido" onclick="BuchisapaCart.openDrawer()" type="button" title="Ver mi pedido">
-        <svg class="cart-bag-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="cart-bag-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 3h12l3 5v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8l3-5Z"/>
           <path d="M3 8h18"/>
           <path d="M16 11.5c0 2.2-1.79 4-4 4s-4-1.8-4-4"/>
         </svg>
         <span class="desktop-cart-text">MI PEDIDO</span>
         <span class="cart-count-badge" id="cart-count-badge">0</span>
+      </button>
+
+      <button class="desktop-user-auth-btn" id="desktop-user-auth-btn" type="button" onclick="openLoginModal('login')" aria-label="Ingresar a mi cuenta" title="Ingresar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>INGRESAR</span>
       </button>
     </div>
   </div>
