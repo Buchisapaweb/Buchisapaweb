@@ -89,7 +89,7 @@
     storeMarker.bindPopup('<strong>🍗 BuchiSapa Santa Clara</strong><br>Av. La Estrella con Calle 28 de Julio<br><em>Atención 6:00 PM - 5:00 AM</em>').openPopup();
   }
 
-  // 3. MAPA DE DELIVERY INTERACTIVO CON PIN ARRASTRABLE
+  // 3. MAPA DE DELIVERY INTERACTIVO CON PIN ARRASTRABLE Y CLICK
   function initDeliveryMap() {
     const mapContainer = document.getElementById('delivery-leaflet-map');
     if (!mapContainer || typeof L === 'undefined' || deliveryMap) return;
@@ -112,42 +112,94 @@
       const position = e.target.getLatLng();
       reverseGeocodeCoord(position.lat, position.lng);
     });
+
+    deliveryMap.on('click', function(e) {
+      if (deliveryMarker) {
+        deliveryMarker.setLatLng(e.latlng);
+        reverseGeocodeCoord(e.latlng.lat, e.latlng.lng);
+      }
+    });
   }
 
-  // 4. DETECCIÓN GPS
-  function detectClientCurrentLocation() {
+  // 4. DETECCIÓN GPS EN TIEMPO REAL
+  let isDetectingGps = false;
+
+  async function detectClientCurrentLocation() {
+    if (isDetectingGps) return;
     const label = document.getElementById('gps-button-label');
+    const btn = document.querySelector('.btn-use-gps');
+
     if (!navigator.geolocation) {
       showToast('⚠️ Tu navegador no soporta geolocalización', '⚠️');
       return;
     }
 
-    if (label) label.textContent = 'Detectando ubicación GPS...';
+    isDetectingGps = true;
+    if (btn) btn.classList.add('detecting');
+    if (label) label.textContent = '⏳ Accediendo a tu ubicación en tiempo real...';
+
+    const handlePos = async (pos) => {
+      isDetectingGps = false;
+      if (btn) btn.classList.remove('detecting');
+
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const accuracy = Math.round(pos.coords.accuracy || 15);
+
+      if (!deliveryMap) initDeliveryMap();
+
+      if (deliveryMap && deliveryMarker) {
+        deliveryMap.flyTo([lat, lng], 17, { duration: 0.8 });
+        deliveryMarker.setLatLng([lat, lng]);
+      }
+
+      await reverseGeocodeCoord(lat, lng);
+
+      if (label) label.textContent = `✓ Ubicación detectada (±${accuracy}m)`;
+      showToast('📍 Ubicación en tiempo real fijada con éxito', '✓');
+    };
+
+    const handleErr = (err) => {
+      console.warn('GPS alta precisión falló, intentando modo estándar...', err);
+      // Fallback a geolocalización estándar por red
+      navigator.geolocation.getCurrentPosition(
+        handlePos,
+        (err2) => {
+          isDetectingGps = false;
+          if (btn) btn.classList.remove('detecting');
+          if (label) label.textContent = 'Usa tu ubicación actual';
+          showToast('⚠️ Activa el GPS de tu dispositivo para detectar tu ubicación.', '⚠️');
+        },
+        { enableHighAccuracy: false, timeout: 12000, maximumAge: 30000 }
+      );
+    };
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-
-        if (deliveryMap && deliveryMarker) {
-          deliveryMap.setView([lat, lng], 17);
-          deliveryMarker.setLatLng([lat, lng]);
-        }
-
-        reverseGeocodeCoord(lat, lng);
-        if (label) label.textContent = '📍 Ubicación GPS encontrada';
-        showToast('📍 Ubicación detectada en el mapa', '📍');
-      },
-      (err) => {
-        if (label) label.textContent = 'Usa tu ubicación actual';
-        showToast('⚠️ No se pudo acceder a tu GPS. Por favor escribe tu dirección.', '⚠️');
-      },
-      { enableHighAccuracy: true, timeout: 8000 }
+      handlePos,
+      handleErr,
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }
 
   async function reverseGeocodeCoord(lat, lng) {
     const input = document.getElementById('delivery-address-search');
+    const streetNumInput = document.getElementById('street-number-input');
+
+    // 1. Intento primario: Endpoint propio del servidor (rápido y sin CORS)
+    try {
+      const res = await fetch(`/api/geocode/reverse?lat=${lat}&lng=${lng}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && data.address) {
+          if (input) input.value = data.address;
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Error en /api/geocode/reverse:', e);
+    }
+
+    // 2. Fallback a Nominatim OpenStreetMap
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
       if (res.ok) {
@@ -156,11 +208,13 @@
           const parts = data.display_name.split(',');
           const simplified = parts.slice(0, 3).join(',').trim();
           input.value = simplified || data.display_name;
+
+          if (data.address && data.address.house_number && streetNumInput && (!streetNumInput.value || streetNumInput.value === 'S/N')) {
+            streetNumInput.value = data.address.house_number;
+          }
         }
       }
-    } catch (e) {
-      // Ignorar error de reverse geocoding
-    }
+    } catch (e) {}
   }
 
   function clearDeliveryInput() {

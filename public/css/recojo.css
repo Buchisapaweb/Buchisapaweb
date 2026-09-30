@@ -153,25 +153,31 @@ body.recojo-page-body {
 
 /* 3. TABS SEGMENTADOS (ESTILO PREMIUM PARDOS / RAPPI) */
 .delivery-tabs-pill-wrap {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 6px;
   background: #f1f5f9;
   padding: 5px;
   border-radius: var(--radius-pill);
-  margin-bottom: 24px;
+  margin: 0 auto 24px auto;
+  max-width: 480px;
+  width: 100%;
   border: 1px solid #e2e8f0;
+  box-sizing: border-box;
 }
 
 .delivery-tab-pill {
+  flex: 1 1 50%;
+  width: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 14px;
+  gap: 7px;
+  padding: 11px 12px;
   border-radius: var(--radius-pill);
   border: none;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   background: transparent;
@@ -180,12 +186,20 @@ body.recojo-page-body {
   white-space: nowrap;
   font-family: inherit;
   letter-spacing: 0.2px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 @media (min-width: 420px) {
   .delivery-tab-pill {
-    font-size: 13px;
+    font-size: 12.5px;
+    padding: 12px 14px;
+    gap: 8px;
   }
+}
+
+.delivery-tab-pill svg {
+  flex-shrink: 0;
 }
 
 .delivery-tab-pill.active {
