@@ -59,8 +59,8 @@
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  position: sticky;
-  top: 0;
+  position: relative;
+  top: auto;
   background: #ffffff;
   z-index: 10;
 }
@@ -499,12 +499,13 @@ body.search-open {
   }
 
   .cart-drawer-header,
+  .cart-subbar-wrap,
   .auth-window-topbar,
   .modal-header,
   .google-dark-topbar,
   .otp-modal-header {
-    position: sticky !important;
-    top: 0 !important;
+    position: relative !important;
+    top: auto !important;
     flex-shrink: 0 !important;
     background: #ffffff !important;
     z-index: 100 !important;

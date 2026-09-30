@@ -2810,16 +2810,22 @@ img.lazy-img.loaded {
 .auth-logo-center-wrap {
   display: flex;
   justify-content: center;
-  margin-top: 4px;
-  margin-bottom: 14px;
+  align-items: center;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  width: 100%;
 }
 
 .auth-logo-img {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  width: auto;
+  max-width: 180px;
+  max-height: 120px;
+  height: auto;
+  border-radius: 0 !important;
+  object-fit: contain;
+  box-shadow: none !important;
+  background: transparent !important;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.06));
 }
 
 .auth-welcome-title {
@@ -4562,7 +4568,9 @@ img.lazy-img.loaded {
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
-  position: relative;
+  position: relative !important;
+  top: auto !important;
+  flex-shrink: 0 !important;
   z-index: 10;
 }
 
@@ -4637,6 +4645,10 @@ img.lazy-img.loaded {
   justify-content: space-between;
   background: #ffffff;
   border-bottom: 1px solid #f1f5f9;
+  position: relative !important;
+  top: auto !important;
+  flex-shrink: 0 !important;
+  z-index: 9;
 }
 
 .cart-subbar-count {
