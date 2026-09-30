@@ -773,62 +773,6 @@ const initialProducts: Product[] = [
     stock: 50,
     image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80',
     includes_sauces: true
-  },
-  {
-    id: 'promo-5',
-    name: 'Promoción Brasa Para Mí',
-    category_id: 'promociones',
-    price: 35.90,
-    original_price: 42.00,
-    description: '1/4 BuchiSapa Brasa + papas fritas + guarnición de ensalada BuchiSapa + bebida personal. Esta Promoción incluye cremas de la casa.',
-    badge: 'PROMO',
-    popular: true,
-    available: true,
-    stock: 50,
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-  {
-    id: 'promo-6',
-    name: 'Parrillero Original Para Mí',
-    category_id: 'promociones',
-    price: 38.50,
-    original_price: 45.00,
-    description: '1/4 BuchiSapa Parrillero original con papas fritas y guarnición de ensalada BuchiSapa + bebida personal.',
-    badge: 'PARRILLA',
-    popular: true,
-    available: true,
-    stock: 50,
-    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-  {
-    id: 'promo-7',
-    name: 'Promoción Chicharrón Para Mí',
-    category_id: 'promociones',
-    price: 38.50,
-    original_price: 45.00,
-    description: '5 unidades de chicharrón + papas fritas o doradas + guarnición de ensalada BuchiSapa + bebida personal.',
-    badge: 'CHICHARRÓN',
-    popular: true,
-    available: true,
-    stock: 50,
-    image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
-  },
-  {
-    id: 'promo-8',
-    name: 'Parrillero BBQ Para Mí',
-    category_id: 'promociones',
-    price: 39.50,
-    original_price: 46.00,
-    description: '1/4 BuchiSapa Parrillero bbq con papas fritas y guarnición de ensalada BuchiSapa + bebida personal.',
-    badge: 'PARRILLA',
-    popular: true,
-    available: true,
-    stock: 50,
-    image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
-    includes_sauces: true
   }
 ];
 
