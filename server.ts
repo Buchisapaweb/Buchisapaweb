@@ -5,8 +5,7 @@ import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/au
 
 function getCompiledIndexHtml(): string {
   const partials: Record<string, string> = {
-    'ENCABEZADO': 'public/html/encabezado.html',
-    'MENU_MOVIL': 'public/html/menu-movil.html',
+    'HEADER': 'public/html/header.html',
     'CARRUSEL_PORTADA': 'public/html/carrusel-portada.html',
     'PANEL_CARRITO': 'public/html/panel-carrito.html',
     'VENTANA_UBICACION': 'public/html/ventana-ubicacion.html',

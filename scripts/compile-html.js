@@ -13,8 +13,7 @@ export function compileHtml() {
 
   // 1. Compilar index.html con todos sus partials
   const partials = {
-    'ENCABEZADO': 'public/html/encabezado.html',
-    'MENU_MOVIL': 'public/html/menu-movil.html',
+    'HEADER': 'public/html/header.html',
     'CARRUSEL_PORTADA': 'public/html/carrusel-portada.html',
     'PANEL_CARRITO': 'public/html/panel-carrito.html',
     'VENTANA_UBICACION': 'public/html/ventana-ubicacion.html',
