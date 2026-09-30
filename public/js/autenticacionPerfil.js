@@ -1,0 +1,99 @@
+/**
+ * RESTAURANTE BUCHISAPA - Lógica de Autenticación y Perfil de Clientes
+ * Archivo: /js/autenticacionPerfil.js
+ */
+
+let authCurrentView = 'login';
+let otpCountdownInterval = null;
+let otpTimeRemaining = 45;
+
+function openLoginModal(view = 'login') {
+  const modal = document.getElementById('login-modal');
+  if (!modal) return;
+
+  modal.style.display = 'flex';
+  void modal.offsetWidth;
+  modal.classList.add('open', 'active');
+  document.body.classList.add('modal-open');
+
+  switchAuthView(view);
+}
+
+function closeLoginModal(event) {
+  if (event && event.target && event.target.id !== 'login-modal') return;
+
+  const modal = document.getElementById('login-modal');
+  if (modal) {
+    modal.classList.remove('open', 'active');
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+  }
+}
+
+function switchAuthView(view) {
+  authCurrentView = view;
+  const loginView = document.getElementById('auth-view-login');
+  const registerView = document.getElementById('auth-view-register');
+  const recoveryView = document.getElementById('auth-view-recovery');
+  const profileView = document.getElementById('auth-view-profile');
+  const topbarTitle = document.getElementById('auth-topbar-title');
+  const backBtn = document.getElementById('auth-global-back-btn');
+
+  if (loginView) loginView.style.display = (view === 'login') ? 'block' : 'none';
+  if (registerView) registerView.style.display = (view === 'register') ? 'block' : 'none';
+  if (recoveryView) recoveryView.style.display = (view === 'recovery') ? 'block' : 'none';
+  if (profileView) profileView.style.display = (view === 'profile') ? 'block' : 'none';
+
+  if (topbarTitle) {
+    if (view === 'profile') {
+      topbarTitle.textContent = 'Mi Perfil';
+      topbarTitle.style.display = 'inline-block';
+    } else {
+      topbarTitle.style.display = 'none';
+    }
+  }
+
+  if (backBtn) {
+    backBtn.style.display = (view === 'login') ? 'none' : 'flex';
+  }
+}
+
+function handleAuthBackNav() {
+  if (authCurrentView === 'register' || authCurrentView === 'recovery' || authCurrentView === 'profile') {
+    switchAuthView('login');
+  } else {
+    closeLoginModal();
+  }
+}
+
+function continueAsGuest() {
+  closeLoginModal();
+  if (window.BuchisapaPush) {
+    window.BuchisapaPush.showToast({
+      title: 'Modo Invitado',
+      message: 'Puedes armar tu pedido y finalizarlo sin registrarte.',
+      stage: 'info',
+      icon: '🛍️'
+    });
+  }
+}
+
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (btn) btn.classList.add('active');
+  } else {
+    input.type = 'password';
+    if (btn) btn.classList.remove('active');
+  }
+}
+
+// Exponer en window
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.switchAuthView = switchAuthView;
+window.handleAuthBackNav = handleAuthBackNav;
+window.continueAsGuest = continueAsGuest;
+window.togglePasswordVisibility = togglePasswordVisibility;

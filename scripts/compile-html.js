@@ -23,8 +23,10 @@ export function compileHtml() {
     'PANEL_CARRITO': 'public/html/carrito.html',
     'RECOJO': 'public/html/recojo.html',
     'VENTANA_UBICACION': 'public/html/recojo.html',
-    'VENTANA_CARTA_COMPLETA': 'public/html/ventana-carta-completa.html',
-    'VENTANA_AUTENTICACION': 'public/html/ventana-autenticacion.html',
+    'CHECKOUT': 'public/html/Checkout.html',
+    'VENTANA_CARTA_COMPLETA': 'public/html/Checkout.html',
+    'AUTENTICACION_PERFIL': 'public/html/autenticacionPerfil.html',
+    'VENTANA_AUTENTICACION': 'public/html/autenticacionPerfil.html',
     'FOOTER': 'public/html/footer.html',
     'PIE_PAGINA': 'public/html/footer.html'
   };

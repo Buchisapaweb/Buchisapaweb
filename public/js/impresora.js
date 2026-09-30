@@ -315,7 +315,16 @@ TOTAL                                  S/ ${d.total}
 <head>
   <meta charset="UTF-8">
   <title>Ticket #${extractOrderDetails(order).orderNum}</title>
-  <link rel="stylesheet" href="/css/impresora.css">
+  <style>
+    @page { size: 80mm auto; margin: 0; }
+    body { font-family: 'Courier New', monospace; width: 72mm; margin: 0 auto; padding: 4mm 2mm; color: #000; font-size: 12px; }
+    .ticket-header { text-align: center; margin-bottom: 8px; }
+    .ticket-title { font-size: 16px; font-weight: bold; margin: 0; }
+    .ticket-divider { border-top: 1px dashed #000; margin: 6px 0; }
+    .ticket-row { display: flex; justify-content: space-between; margin: 3px 0; }
+    .ticket-total { font-size: 14px; font-weight: bold; }
+    .ticket-footer { text-align: center; margin-top: 10px; font-size: 10px; }
+  </style>
 </head>
 <body class="print-ticket-body">
   ${ticketHtml}
@@ -354,7 +363,14 @@ TOTAL                                  S/ ${d.total}
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ticket de Venta #${extractOrderDetails(order).orderNum} - Buchisapa</title>
-  <link rel="stylesheet" href="/css/impresora.css">
+  <style>
+    @page { size: 80mm auto; margin: 0; }
+    body { font-family: 'Courier New', monospace; width: 72mm; margin: 0 auto; padding: 10px; color: #000; }
+    .actions-bar { margin-top: 15px; display: flex; gap: 10px; justify-content: center; }
+    .btn-act { padding: 8px 14px; border-radius: 6px; cursor: pointer; border: none; font-weight: bold; }
+    .btn-print { background: #dc2626; color: #fff; }
+    .btn-close { background: #e2e8f0; color: #334155; }
+  </style>
 </head>
 <body class="preview-ticket-body">
   <div class="ticket-wrapper">
