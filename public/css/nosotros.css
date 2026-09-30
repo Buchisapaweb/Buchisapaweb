@@ -1,5 +1,5 @@
 /* =========================================================
-   BUCHISAPA - PÁGINA INDEPENDIENTE: NOSOTROS (CSS)
+   BUCHISAPA - ESTILOS INSTITUCIONALES (FONDO BLANCO / LIGHT THEME)
    ========================================================= */
 
 body.nosotros-page-body {
@@ -8,148 +8,273 @@ body.nosotros-page-body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
 }
 
 /* NAVBAR */
-.nosotros-navbar {
+.subpage-navbar {
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.nosotros-nav-wrap {
+.subpage-nav-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 64px;
 }
 
-.nosotros-brand {
+.subpage-brand {
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
 }
 
-.nosotros-brand-logo {
-  height: 42px;
-  width: auto;
-  object-fit: contain;
+.subpage-brand-logo {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ea580c;
 }
 
-.nosotros-brand-title {
+.subpage-brand-title {
   font-weight: 900;
-  font-size: 16px;
+  font-size: 18px;
+  letter-spacing: -0.5px;
   color: #0f172a;
 }
 
-.nosotros-brand-sub {
-  font-size: 10px;
-  color: #ea580c;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.nosotros-back-btn {
+.clean-back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 8px 16px;
-  background-color: #ea580c;
-  color: #ffffff;
-  border-radius: 10px;
+  background: #ffffff;
+  color: #dc2626;
+  border: 1.5px solid #fee2e2;
+  border-radius: 12px;
   text-decoration: none;
   font-size: 13px;
-  font-weight: 700;
-  transition: background-color 0.2s;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
 }
 
-.nosotros-back-btn:hover {
-  background-color: #c2410c;
+.clean-back-btn:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+  transform: translateY(-1px);
 }
 
 /* HERO SECTION */
 .nosotros-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #ffffff;
-  padding: 40px 0;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 44px 20px 36px;
   text-align: center;
 }
 
 .nosotros-hero-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  background: rgba(234, 88, 12, 0.2);
-  color: #fb923c;
-  border: 1px solid rgba(234, 88, 12, 0.4);
-  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #ffedd5;
+  border-radius: 30px;
   font-size: 12px;
   font-weight: 800;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .nosotros-hero-title {
-  font-size: 30px;
+  font-size: clamp(28px, 4vw, 38px);
   font-weight: 900;
-  margin-bottom: 10px;
+  letter-spacing: -1px;
+  color: #0f172a;
+  margin: 0 0 10px;
+  line-height: 1.15;
+}
+
+.nosotros-hero-title span.accent-text {
+  color: #ea580c;
 }
 
 .nosotros-hero-sub {
   font-size: 15px;
-  color: #94a3b8;
-  max-width: 600px;
-  margin: 0 auto;
+  color: #64748b;
+  max-width: 620px;
+  margin: 0 auto 20px;
+  line-height: 1.6;
 }
 
-/* CONTENEDOR DE 1 SOLA COLUMNA LIMPIA */
+/* SUBNAV TABS */
+.nosotros-tabs-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.nosotros-tab-pill {
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.nosotros-tab-pill:hover {
+  color: #0f172a;
+  background: #e2e8f0;
+}
+
+.nosotros-tab-pill.active {
+  color: #ffffff;
+  background: #ea580c;
+  border-color: #ea580c;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+}
+
+/* MAIN CONTENT CONTAINER */
 .nosotros-single-column {
-  max-width: 800px;
-  margin: 32px auto 60px auto;
-  padding: 0 16px;
+  max-width: 860px;
+  margin: 32px auto 60px;
+  padding: 0 20px;
   width: 100%;
+  box-sizing: border-box;
 }
 
-/* SECCIONES DE CONTENIDO */
+/* CARD BLOCKS */
 .nosotros-section-block {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
   padding: 32px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .nosotros-section-block {
-    padding: 20px;
+    padding: 22px 18px;
   }
 }
 
 .nosotros-section-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: #0f172a;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.nosotros-section-title .title-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #fff7ed;
+  border: 1px solid #ffedd5;
+  font-size: 18px;
 }
 
 .nosotros-section-p {
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.75;
   color: #334155;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
 }
 
+.nosotros-section-p strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* TIMELINE COMPONENT */
+.timeline-container {
+  position: relative;
+  margin: 24px 0 8px;
+  padding-left: 24px;
+  border-left: 2px solid #fdba74;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -31px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ea580c;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.25);
+}
+
+.timeline-year {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ea580c;
+  background: #fff7ed;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+
+.timeline-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.timeline-desc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* GRID DE PILARES Y VALORES */
 .nosotros-values-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
   margin-top: 20px;
 }
@@ -157,34 +282,77 @@ body.nosotros-page-body {
 .nosotros-value-card {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 22px;
+  transition: all 0.2s ease;
+}
+
+.nosotros-value-card:hover {
+  transform: translateY(-2px);
+  border-color: #fdba74;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.08);
 }
 
 .nosotros-value-icon {
   font-size: 28px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .nosotros-value-title {
   font-weight: 800;
   font-size: 16px;
   color: #0f172a;
-  margin-bottom: 6px;
+  margin: 0 0 6px;
 }
 
 .nosotros-value-desc {
-  font-size: 13px;
+  font-size: 13.5px;
   color: #64748b;
-  line-height: 1.5;
+  line-height: 1.55;
+  margin: 0;
 }
 
-/* FOOTER */
+/* STATS BAR */
+.nosotros-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.nosotros-stat-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.nosotros-stat-num {
+  font-size: 30px;
+  font-weight: 900;
+  color: #ea580c;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.nosotros-stat-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* FOOTER INSTITUCIONAL */
 .nosotros-footer {
   margin-top: auto;
-  background: #0f172a;
-  color: #94a3b8;
-  padding: 24px 0;
+  background: #ffffff;
+  color: #64748b;
+  border-top: 1px solid #e2e8f0;
+  padding: 24px 20px;
   font-size: 13px;
   text-align: center;
 }

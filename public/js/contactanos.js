@@ -1,34 +1,11 @@
-/* =========================================================
-   BUCHISAPA - PÁGINA INDEPENDIENTE: CONTÁCTANOS (JS)
-   ========================================================= */
-
-document.addEventListener('DOMContentLoaded', () => {
-  const hash = window.location.hash;
-  if (hash) {
-    const target = document.querySelector(hash);
-    if (target) {
-      setTimeout(() => {
-        target.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
+(function() {
+  function sendQuickWhatsApp() {
+    const textEl = document.getElementById('quick-msg-input');
+    const msg = (textEl?.value || '').trim();
+    const finalMsg = msg ? msg : 'Hola BuchiSapa, quisiera hacer una consulta sobre la carta y delivery';
+    const url = `https://wa.me/51943312024?text=${encodeURIComponent(finalMsg)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        document.querySelectorAll('.contactanos-menu-item').forEach(link => {
-          if (link.getAttribute('href') === `#${id}`) {
-            link.classList.add('active');
-          } else {
-            link.classList.remove('active');
-          }
-        });
-      }
-    });
-  }, { threshold: 0.3 });
-
-  document.querySelectorAll('.contactanos-section-block').forEach(sec => {
-    observer.observe(sec);
-  });
-});
+  window.sendQuickWhatsApp = sendQuickWhatsApp;
+})();

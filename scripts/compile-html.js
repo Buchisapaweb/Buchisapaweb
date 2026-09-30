@@ -25,7 +25,6 @@ export function compileHtml() {
     'VENTANA_UBICACION': 'public/html/recojo.html',
     'VENTANA_CARTA_COMPLETA': 'public/html/ventana-carta-completa.html',
     'VENTANA_AUTENTICACION': 'public/html/ventana-autenticacion.html',
-    'VENTANA_RASTREO_PEDIDO': 'public/html/ventana-rastreo-pedido.html',
     'FOOTER': 'public/html/footer.html',
     'PIE_PAGINA': 'public/html/footer.html'
   };
@@ -109,31 +108,14 @@ export function compileHtml() {
   const directPages = [
     { src: 'public/html/cocina.html', outName: 'cocina' },
     { src: 'public/html/cocina.html', outName: 'kitchen' },
-    { src: 'public/html/ubicacion.html', outName: 'ubicacion' },
-    { src: 'public/html/estado-pedido.html', outName: 'estado-pedido' },
-    { src: 'public/html/estado-pedido.html', outName: 'order-status' },
-    { src: 'public/html/estado-pedido.html', outName: 'rastreo' },
     { src: 'public/html/reclamaciones.html', outName: 'reclamaciones' },
-    { src: 'public/html/informacion.html', outName: 'informacion' },
     { src: 'public/html/nosotros.html', outName: 'nosotros' },
-    { src: 'public/html/servicios.html', outName: 'servicios' },
-    { src: 'public/html/politicas.html', outName: 'politicas' },
     { src: 'public/html/contactanos.html', outName: 'contactanos' },
     { src: 'public/html/historia.html', outName: 'historia' },
     { src: 'public/html/vision.html', outName: 'vision' },
-    { src: 'public/html/valores.html', outName: 'valores' },
-    { src: 'public/html/restaurantes.html', outName: 'restaurantes' },
-    { src: 'public/html/reservas.html', outName: 'reservas' },
-    { src: 'public/html/catering.html', outName: 'catering' },
-    { src: 'public/html/fiestas.html', outName: 'fiestas' },
-    { src: 'public/html/giftcards.html', outName: 'giftcards' },
-    { src: 'public/html/valores-nutricionales.html', outName: 'valores-nutricionales' },
-    { src: 'public/html/cartilla-alergenos.html', outName: 'cartilla-alergenos' },
+    { src: 'public/html/mision.html', outName: 'mision' },
     { src: 'public/html/politicas-privacidad.html', outName: 'politicas-privacidad' },
-    { src: 'public/html/terminos.html', outName: 'terminos' },
-    { src: 'public/html/promociones.html', outName: 'promociones' },
-    { src: 'public/html/trabaja.html', outName: 'trabaja' },
-    { src: 'public/html/proveedores.html', outName: 'proveedores' }
+    { src: 'public/html/terminos.html', outName: 'terminos' }
   ];
 
   for (const page of directPages) {

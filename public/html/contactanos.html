@@ -3,85 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contáctanos | BuchiSapa Restaurante</title>
-  <meta name="description" content="Ponte en contacto con BuchiSapa. Atención al cliente por WhatsApp, correo, ofertas de trabajo y portal de proveedores.">
+  <title>Escríbenos | BuchiSapa Restaurante</title>
+  <meta name="description" content="Ponte en contacto directo con BuchiSapa por WhatsApp o llamada. Atención al cliente de 6:00 PM a 5:00 AM.">
   <link rel="icon" type="image/png" href="/imagenes/logo/logo-buchisapa.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/comun.css">
+  <link rel="stylesheet" href="/css/nosotros.css">
   <link rel="stylesheet" href="/css/contactanos.css">
 </head>
 <body class="contactanos-page-body">
 
-    <!-- NAVBAR DE PÁGINA SECUNDARIA (VOLVER A LA DERECHA, SIN CUADRADO) -->
   <header class="subpage-navbar">
     <div class="subpage-nav-wrap">
       <a href="/" class="subpage-brand" title="BuchiSapa - Inicio">
         <img src="/imagenes/logo/logo-buchisapa.webp" alt="BuchiSapa Logo" class="subpage-brand-logo">
         <span class="subpage-brand-title">BUCHISAPA</span>
       </a>
-      <a href="/" class="clean-back-btn" title="Volver a la página principal">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-        <span>Volver</span>
+      <a href="/" class="clean-back-btn" title="Volver al menú principal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        <span>Volver al Menú</span>
       </a>
     </div>
   </header>
 
   <section class="contactanos-hero">
     <div class="container">
-      <span class="contactanos-hero-badge">ESTAMOS PARA ATENDERTE</span>
-      <h1 class="contactanos-hero-title">Canales de Contacto</h1>
-      <p class="contactanos-hero-sub">Escríbenos para consultas sobre pedidos, reservas, empleo o propuestas comerciales.</p>
+      <span class="contactanos-hero-badge">ATENCIÓN DIRECTA</span>
+      <h1 class="contactanos-hero-title">Escríbenos y <span class="accent-text">Contáctanos</span></h1>
+      <p class="contactanos-hero-sub">Estamos listos para atender tus pedidos, dudas o consultas de lunes a domingo de 6:00 PM a 5:00 AM.</p>
     </div>
   </section>
 
   <main class="contactanos-single-column">
-    
-    <!-- 1. ATENCIÓN DIRECTA -->
-    <section id="atencion" class="contactanos-section-block">
+    <section class="contactanos-section-block">
       <h2 class="contactanos-section-title">
-        <span>💬</span>
-        <span>Atención Directa y Central Delivery</span>
+        <span class="contact-icon-badge">💬</span>
+        <span>Canales de Contacto Directo</span>
       </h2>
       <p class="contactanos-section-p">
-        Atendemos tus dudas, pedidos de la carta y consultas sobre tu delivery de lunes a domingo de 6:00 PM a 5:00 AM.
+        Elige tu canal preferido para comunicarte al instante con nuestro equipo de atención y despacho:
       </p>
 
-      <a href="https://wa.me/51943312024?text=Hola%20BuchiSapa,%20quisiera%20hacer%20una%20consulta" target="_blank" class="contactanos-card-link" style="display: flex; align-items: center; gap: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-decoration: none; color: inherit; margin-bottom: 12px;">
-        <span style="font-size: 28px;">📱</span>
-        <div>
-          <div style="font-size: 16px; font-weight: 800; color: #0f172a;">WhatsApp Oficial</div>
-          <div style="font-size: 13px; color: #64748b;">+51 943 312 024 (Respuesta inmediata)</div>
-        </div>
-      </a>
+      <div class="contact-cards-grid">
+        <a href="https://wa.me/51943312024?text=Hola%20BuchiSapa,%20quisiera%20hacer%20una%20consulta" target="_blank" rel="noopener" class="contact-channel-card card-whatsapp">
+          <div class="contact-card-icon icon-whatsapp-bg">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff">
+              <path d="M12.031 2c-5.514 0-9.986 4.473-9.986 9.986 0 2.133.67 4.108 1.815 5.727l-1.86 5.309 5.485-1.782c1.558.981 3.411 1.545 5.399 1.545 5.513 0 9.987-4.473 9.987-9.986 0-5.513-4.474-9.986-9.986-9.986zm5.834 14.167c-.244.685-1.42 1.309-1.968 1.365-.503.052-1.139.243-3.79-.851-2.92-1.206-4.789-4.225-4.935-4.419-.146-.194-1.187-1.579-1.187-3.01 0-1.431.752-2.135 1.021-2.427.269-.292.585-.365.78-.365.195 0 .389.002.559.01.182.008.427-.069.668.51.244.584.828 2.019.901 2.165.073.146.122.316.024.511-.097.195-.146.316-.292.487-.146.171-.307.382-.438.513-.146.146-.298.305-.128.597.17.292.754 1.245 1.62 2.018 1.115.993 2.057 1.302 2.349 1.448.292.146.463.122.633-.073.17-.195.731-.852.926-1.144.195-.292.389-.243.658-.146.269.097 1.706.804 2.001.95.292.146.487.243.559.365.073.122.073.706-.171 1.391z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-card-title">WhatsApp Oficial</div>
+            <div class="contact-card-desc">+51 943 312 024 (Respuesta inmediata)</div>
+          </div>
+        </a>
 
-      <a href="tel:+51943312024" class="contactanos-card-link" style="display: flex; align-items: center; gap: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-decoration: none; color: inherit;">
-        <span style="font-size: 28px;">📞</span>
-        <div>
-          <div style="font-size: 16px; font-weight: 800; color: #0f172a;">Llamadas Directas</div>
-          <div style="font-size: 13px; color: #64748b;">Central Telefónica Santa Clara</div>
-        </div>
-      </a>
+        <a href="tel:+51943312024" class="contact-channel-card">
+          <div class="contact-card-icon icon-phone-bg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff">
+              <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-card-title">Llamada Telefónica</div>
+            <div class="contact-card-desc">Central Telefónica Santa Clara</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="quick-message-box">
+        <label for="quick-msg-input" class="quick-msg-label">Envía un mensaje rápido a nuestro WhatsApp:</label>
+        <textarea id="quick-msg-input" class="quick-msg-textarea" placeholder="Escribe aquí tu consulta o pedido... (ej: Hola, deseo consultar el estado de mi pedido o consultar la carta)"></textarea>
+        <button type="button" class="quick-msg-send-btn" onclick="sendQuickWhatsApp()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+          <span>Abrir chat de WhatsApp</span>
+        </button>
+      </div>
     </section>
 
-    <!-- 2. UBICACIÓN -->
-    <section id="ubicacion-contacto" class="contactanos-section-block">
+    <section class="contactanos-section-block">
       <h2 class="contactanos-section-title">
-        <span>📍</span>
-        <span>Dirección de Nuestra Sede</span>
+        <span class="contact-icon-badge">📍</span>
+        <span>Ubicación de Nuestra Sede</span>
       </h2>
       <p class="contactanos-section-p">
         <strong>Sede Santa Clara:</strong> Av. La Estrella con Calle 28 de Julio (Esquina de la Posta de Santa Clara, a 1 cuadra del Real Plaza Santa Clara, Ate, Lima).
       </p>
+      <p class="contactanos-section-p">
+        <strong>Horario:</strong> Lunes a Domingo de 6:00 PM a 5:00 AM (Atención continua en salón, recojo y delivery).
+      </p>
     </section>
-
   </main>
 
   <footer class="contactanos-footer">
-    <div class="container">
-      © 2026 Restaurante BuchiSapa. Todos los derechos reservados.
-    </div>
+    © 2026, Restaurante Buchisapa. Todos los derechos reservados
   </footer>
 
   <script src="/js/contactanos.js"></script>

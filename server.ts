@@ -2601,50 +2601,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'public/html/mision.html'));
   });
 
-  app.get(['/valores', '/valores.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/valores.html'));
-  });
-
-  app.get(['/restaurantes', '/restaurantes.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/restaurantes.html'));
-  });
-
-  app.get(['/servicios', '/servicios.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/servicios.html'));
-  });
-
-  app.get(['/reservas', '/reservas.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/reservas.html'));
-  });
-
-  app.get(['/catering', '/catering.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/catering.html'));
-  });
-
-  app.get(['/fiestas', '/fiestas.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/fiestas.html'));
-  });
-
-  app.get(['/giftcards', '/giftcards.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/giftcards.html'));
-  });
-
-  app.get(['/informacion', '/informacion.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/informacion.html'));
-  });
-
-  app.get(['/valores-nutricionales', '/valores-nutricionales.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/valores-nutricionales.html'));
-  });
-
-  app.get(['/cartilla-alergenos', '/cartilla-alergenos.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/cartilla-alergenos.html'));
-  });
-
-  app.get(['/politicas', '/politicas.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/politicas.html'));
-  });
-
   app.get(['/politicas-privacidad', '/politicas-privacidad.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'public/html/politicas-privacidad.html'));
   });
@@ -2653,28 +2609,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'public/html/terminos.html'));
   });
 
-  app.get(['/promociones', '/promociones.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/promociones.html'));
-  });
-
   app.get(['/contactanos', '/contactanos.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'public/html/contactanos.html'));
-  });
-
-  app.get(['/trabaja', '/trabaja.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/trabaja.html'));
-  });
-
-  app.get(['/proveedores', '/proveedores.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/proveedores.html'));
-  });
-
-  app.get(['/ubicacion', '/ubicacion.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/ubicacion.html'));
-  });
-
-  app.get(['/order-status', '/order-status.html', '/estado-pedido', '/estado-pedido.html', '/rastreo', '/rastreo.html', '/seguimiento'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/estado-pedido.html'));
   });
 
   // 3. Página de Inicio (HTML5 con parciales compilados)
