@@ -347,8 +347,7 @@ body.search-open {
   .modal-backdrop,
   .search-modal-backdrop,
   .google-dark-backdrop,
-  #email-verification-modal,
-  #login-modal.modal-backdrop {
+  #email-verification-modal {
     z-index: 2000000 !important;
     position: fixed !important;
     inset: 0 !important;
@@ -363,7 +362,6 @@ body.search-open {
     background: #ffffff !important;
   }
 
-  .buchisapa-auth-modal-box,
   .modal-box,
   .google-dark-sheet-box,
   .otp-modal-box {

@@ -111,6 +111,16 @@ function togglePasswordVisibility(inputId, btn) {
   }
 }
 
+// Cerrar con tecla Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('login-modal');
+    if (modal && (modal.classList.contains('open') || modal.classList.contains('active'))) {
+      closeLoginModal();
+    }
+  }
+});
+
 // Exponer en window
 window.openLoginModal = openLoginModal;
 window.closeLoginModal = closeLoginModal;
