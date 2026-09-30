@@ -163,7 +163,6 @@
   }
 }
 
-/* 2. SELECTOR DE UBICACIÓN */
 .location-picker-inline {
   display: inline-flex;
   align-items: center;
@@ -184,6 +183,50 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+@media (max-width: 767px) {
+  .header-nav {
+    position: relative;
+    justify-content: space-between;
+  }
+
+  .header-left {
+    z-index: 2;
+  }
+
+  .location-picker-inline {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    max-width: calc(100% - 175px);
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .location-picker-inline:hover {
+    transform: translate(-50%, calc(-50% - 1px));
+  }
+
+  .location-picker-inline:active {
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+
+  .location-text-red {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .header-actions {
+    margin-left: auto;
+    z-index: 2;
+  }
+}
+
 @media (min-width: 380px) {
   .location-picker-inline {
     padding: 7px 12px;
@@ -200,11 +243,16 @@
 
 @media (min-width: 768px) {
   .location-picker-inline {
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
     background: transparent;
     border: none;
     padding: 6px 6px;
     gap: 6px;
     border-radius: 8px;
+    max-width: none;
   }
 }
 
@@ -221,6 +269,12 @@
   transform: translateY(-1px);
 }
 
+@media (max-width: 767px) {
+  .location-picker-inline:hover {
+    transform: translate(-50%, calc(-50% - 1px));
+  }
+}
+
 @media (min-width: 768px) {
   .location-picker-inline:hover {
     background: #fef2f2;
@@ -233,6 +287,12 @@
 .location-picker-inline:active {
   transform: scale(0.97);
   background: #fecaca;
+}
+
+@media (max-width: 767px) {
+  .location-picker-inline:active {
+    transform: translate(-50%, -50%) scale(0.97);
+  }
 }
 
 .location-pin-icon {
