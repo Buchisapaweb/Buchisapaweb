@@ -1,7 +1,7 @@
 /* =========================================================
    BUCHISAPA - PÁGINA OFICIAL DE MÉTODO DE ENTREGA Y RECOJO
    Archivo: /css/recojo.css
-   Estilo fiel a las capturas de entrega / recojo tipo Pardos Chicken
+   Diseño premium, limpio y profesional (tipo top delivery apps)
    ========================================================= */
 
 :root {
@@ -13,10 +13,10 @@
   --color-border: #e2e8f0;
   --color-bg-page: #f8fafc;
   --color-surface: #ffffff;
-  --radius-lg: 18px;
-  --radius-md: 12px;
+  --radius-lg: 22px;
+  --radius-md: 14px;
   --radius-pill: 9999px;
-  --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 20px 45px -15px rgba(15, 23, 42, 0.08), 0 0 1px rgba(15, 23, 42, 0.08);
 }
 
 body.recojo-page-body {
@@ -38,7 +38,7 @@ body.recojo-page-body {
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }
 
 .recojo-header-container {
@@ -75,44 +75,45 @@ body.recojo-page-body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f1f5f9;
+  background: #f8fafc;
   color: #334155;
-  border: 1px solid #cbd5e1;
+  border: 1.5px solid #e2e8f0;
   border-radius: var(--radius-pill);
-  padding: 7px 14px;
+  padding: 8px 16px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .recojo-back-btn:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
   transform: translateY(-1px);
 }
 
 /* 2. CONTENIDO PRINCIPAL */
 .recojo-main-wrap {
   flex: 1;
-  padding: 20px 16px 40px;
+  padding: 24px 16px 48px;
   display: flex;
   justify-content: center;
 }
 
 .recojo-content-box {
   width: 100%;
-  max-width: 640px;
+  max-width: 620px;
   background: var(--color-surface);
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(226, 232, 240, 0.9);
   border-radius: var(--radius-lg);
-  padding: 24px 20px;
+  padding: 28px 24px;
   box-shadow: var(--shadow-card);
 }
 
 @media (min-width: 640px) {
   .recojo-content-box {
-    padding: 32px 28px;
+    padding: 34px 32px;
   }
 }
 
@@ -129,11 +130,12 @@ body.recojo-page-body {
 }
 
 .recojo-main-heading {
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 900;
   color: #0f172a;
   margin: 0;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.6px;
+  line-height: 1.25;
 }
 
 @media (min-width: 480px) {
@@ -142,39 +144,20 @@ body.recojo-page-body {
   }
 }
 
-.recojo-close-cross {
-  font-size: 18px;
-  color: #94a3b8;
-  text-decoration: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
-  transition: all 0.2s ease;
-}
-
-.recojo-close-cross:hover {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
 .recojo-subtitle {
   font-size: 14px;
   color: var(--color-text-muted);
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
-/* 3. TABS SEGMENTADOS (ESTILO PARDOS CHICKEN) */
+/* 3. TABS SEGMENTADOS (ESTILO PREMIUM PARDOS / RAPPI) */
 .delivery-tabs-pill-wrap {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
   background: #f1f5f9;
-  padding: 6px;
+  padding: 5px;
   border-radius: var(--radius-pill);
   margin-bottom: 24px;
   border: 1px solid #e2e8f0;
@@ -188,23 +171,31 @@ body.recojo-page-body {
   padding: 12px 14px;
   border-radius: var(--radius-pill);
   border: none;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
   cursor: pointer;
   background: transparent;
   color: #64748b;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+}
+
+@media (min-width: 420px) {
+  .delivery-tab-pill {
+    font-size: 13px;
+  }
 }
 
 .delivery-tab-pill.active {
   background: #dc2626;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.32);
 }
 
 .delivery-tab-pill:not(.active):hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.85);
   color: #0f172a;
 }
 
@@ -213,17 +204,18 @@ body.recojo-page-body {
   background: #ffffff;
   border: 1.5px solid #fee2e2;
   border-radius: var(--radius-md);
-  padding: 20px 18px;
-  background: linear-gradient(180deg, #fffcfc 0%, #ffffff 100%);
+  padding: 22px 20px;
+  background: linear-gradient(180deg, #fffefe 0%, #ffffff 100%);
+  box-shadow: 0 4px 18px rgba(220, 38, 38, 0.03);
 }
 
 .pickup-card-header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 18px;
   border-bottom: 1px dashed #fecaca;
-  padding-bottom: 14px;
+  padding-bottom: 16px;
 }
 
 @media (min-width: 480px) {
@@ -236,20 +228,21 @@ body.recojo-page-body {
 
 .pickup-badge-active {
   display: inline-block;
-  background: #dcfce7;
-  color: #15803d;
+  background: #ecfdf5;
+  color: #047857;
   font-size: 11px;
   font-weight: 800;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
-  letter-spacing: 0.4px;
-  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+  border: 1px solid #a7f3d0;
 }
 
 .pickup-store-name {
   font-size: 18px;
   font-weight: 900;
-  color: #1e293b;
+  color: #0f172a;
   margin: 0;
   line-height: 1.3;
 }
@@ -258,9 +251,9 @@ body.recojo-page-body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #16a34a;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
   font-size: 11.5px;
   font-weight: 800;
   padding: 6px 12px;
@@ -279,13 +272,13 @@ body.recojo-page-body {
 .pickup-detail-row {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 14px;
 }
 
 .pickup-detail-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,7 +286,7 @@ body.recojo-page-body {
 }
 
 .pickup-detail-icon.red-icon { background: #fef2f2; color: #dc2626; }
-.pickup-detail-icon.green-icon { background: #f0fdf4; color: #16a34a; }
+.pickup-detail-icon.green-icon { background: #ecfdf5; color: #047857; }
 .pickup-detail-icon.orange-icon { background: #fff7ed; color: #ea580c; }
 
 .pickup-detail-text {
@@ -301,11 +294,11 @@ body.recojo-page-body {
 }
 
 .pickup-detail-label {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
   color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   display: block;
   margin-bottom: 3px;
 }
@@ -314,42 +307,44 @@ body.recojo-page-body {
   font-size: 14px;
   font-weight: 700;
   color: #0f172a;
-  margin: 0 0 2px 0;
-  line-height: 1.4;
+  margin: 0 0 3px 0;
+  line-height: 1.45;
 }
 
 .pickup-detail-sub {
   font-size: 12px;
   color: #64748b;
   display: block;
+  line-height: 1.4;
 }
 
 .status-live-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #dcfce7;
-  color: #15803d;
+  background: #ecfdf5;
+  color: #047857;
   font-size: 11.5px;
-  font-weight: 700;
-  padding: 3px 8px;
+  font-weight: 800;
+  padding: 3px 9px;
   border-radius: var(--radius-pill);
   margin-top: 4px;
+  border: 1px solid #a7f3d0;
 }
 
 .live-indicator-dot {
   width: 7px;
   height: 7px;
-  background-color: #22c55e;
+  background-color: #10b981;
   border-radius: 50%;
-  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
   animation: pulseLive 2s infinite;
 }
 
 @keyframes pulseLive {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
 /* SECCIÓN DEL MAPA */
@@ -386,19 +381,21 @@ body.recojo-page-body {
   color: #2563eb;
   text-decoration: none;
   background: #eff6ff;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.2s;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+  transition: all 0.2s ease;
 }
 
 .google-maps-ext-btn:hover {
   background: #dbeafe;
+  color: #1d4ed8;
 }
 
 .recojo-leaflet-box {
   width: 100%;
   height: 220px;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid #cbd5e1;
   z-index: 10;
@@ -410,27 +407,28 @@ body.recojo-page-body {
 }
 
 .btn-confirm-pickup {
-  background: #dc2626;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-md);
   padding: 16px 24px;
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 15.5px;
+  font-weight: 900;
   width: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.4);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
 }
 
 .btn-confirm-pickup:hover {
-  background: #b91c1c;
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.45);
+  box-shadow: 0 10px 28px -4px rgba(220, 38, 38, 0.5);
 }
 
 .btn-confirm-pickup:active {
@@ -438,9 +436,10 @@ body.recojo-page-body {
 }
 
 .pickup-helper-note {
-  font-size: 12px;
+  font-size: 12.5px;
   color: #64748b;
   margin: 10px 0 0 0;
+  line-height: 1.4;
 }
 
 /* 5. VISTA: DELIVERY A DOMICILIO */
@@ -453,20 +452,22 @@ body.recojo-page-body {
   background: #ffffff;
   border: 1.5px solid #fecaca;
   color: #dc2626;
-  padding: 12px 16px;
+  padding: 13px 18px;
   border-radius: var(--radius-pill);
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
   margin-bottom: 18px;
-  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.08);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.06);
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .btn-use-gps:hover {
   background: #fef2f2;
   border-color: #dc2626;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
 }
 
 .delivery-search-wrapper {
@@ -483,9 +484,9 @@ body.recojo-page-body {
   width: 100%;
   border: 1.5px solid #cbd5e1;
   border-radius: var(--radius-md);
-  padding: 14px 40px 14px 16px;
+  padding: 13px 42px 13px 16px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #0f172a;
   background: #ffffff;
   outline: none;
@@ -495,18 +496,29 @@ body.recojo-page-body {
 
 .delivery-field-input:focus {
   border-color: #dc2626;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
 }
 
 .input-clear-btn {
   position: absolute;
-  right: 12px;
-  background: none;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f1f5f9;
   border: none;
-  color: #94a3b8;
-  font-size: 14px;
+  color: #64748b;
   cursor: pointer;
-  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.input-clear-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 /* FORMULARIO DELIVERY */
@@ -531,6 +543,7 @@ body.recojo-page-body {
   font-weight: 800;
   color: #334155;
   margin-bottom: 6px;
+  letter-spacing: -0.2px;
 }
 
 .required-star {
@@ -540,25 +553,26 @@ body.recojo-page-body {
 .optional-tag {
   font-size: 11px;
   color: #94a3b8;
-  font-weight: normal;
+  font-weight: 600;
 }
 
 .form-control {
   width: 100%;
   border: 1.5px solid #cbd5e1;
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-radius: 12px;
+  padding: 11px 14px;
   font-size: 13.5px;
+  font-weight: 600;
   color: #0f172a;
   outline: none;
   font-family: inherit;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
 }
 
 .form-control:focus {
   border-color: #dc2626;
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
 }
 
 .address-tags-row {
@@ -568,26 +582,34 @@ body.recojo-page-body {
 }
 
 .tag-pill {
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
   color: #475569;
-  padding: 6px 14px;
+  padding: 7px 16px;
   border-radius: var(--radius-pill);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tag-pill:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
 .tag-pill.active {
-  background: #fee2e2;
+  background: #fef2f2;
   border-color: #dc2626;
   color: #dc2626;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
 }
 
 .delivery-map-container {
   position: relative;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .delivery-leaflet-box {
@@ -602,11 +624,13 @@ body.recojo-page-body {
   bottom: 8px;
   left: 8px;
   right: 8px;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(4px);
   color: #ffffff;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
   font-size: 11.5px;
+  font-weight: 600;
   text-align: center;
   z-index: 20;
   pointer-events: none;
@@ -617,10 +641,10 @@ body.recojo-page-body {
   align-items: center;
   justify-content: space-between;
   background: #fff7ed;
-  border: 1px solid #fed7aa;
-  padding: 12px 16px;
+  border: 1.5px solid #fed7aa;
+  padding: 13px 18px;
   border-radius: var(--radius-md);
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .fee-badge-left {
@@ -628,37 +652,47 @@ body.recojo-page-body {
   align-items: center;
   gap: 8px;
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 800;
   color: #9a3412;
 }
 
 .fee-amount {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
   color: #c2410c;
 }
 
+.delivery-actions-footer {
+  text-align: center;
+}
+
 .btn-confirm-delivery {
-  background: #dc2626;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-md);
   padding: 16px 24px;
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 15.5px;
+  font-weight: 900;
   width: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.4);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
 }
 
 .btn-confirm-delivery:hover {
-  background: #b91c1c;
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
   transform: translateY(-2px);
+  box-shadow: 0 10px 28px -4px rgba(220, 38, 38, 0.5);
+}
+
+.btn-confirm-delivery:active {
+  transform: translateY(0);
 }
 
 /* 6. TOAST INLINE */
@@ -667,15 +701,16 @@ body.recojo-page-body {
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: #1e293b;
+  background: #0f172a;
   color: #ffffff;
   padding: 12px 24px;
   border-radius: var(--radius-pill);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
   z-index: 1000;
 }
+
