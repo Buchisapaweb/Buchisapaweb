@@ -10,7 +10,6 @@
 
     init: function () {
       this.ensureToastContainer();
-      this.initOrderTrackerListener();
     },
 
     getAudioContext: function () {
@@ -160,43 +159,6 @@
           toast.parentNode.removeChild(toast);
         }
       }, 300);
-    },
-
-    initOrderTrackerListener: function () {
-      // Si el cliente tiene un pedido activo, escuchar cambios por SSE si está disponible
-      try {
-        const lastOrder = localStorage.getItem('buchisapa_last_order');
-        if (lastOrder) {
-          const parsed = JSON.parse(lastOrder);
-          if (parsed && parsed.id) {
-            this.connectSSE(parsed.id);
-          }
-        }
-      } catch (e) {}
-    },
-
-    connectSSE: function (orderId) {
-      if (typeof EventSource === 'undefined') return;
-      try {
-        const es = new EventSource('/api/events');
-        es.addEventListener('order_update', (e) => {
-          try {
-            const data = JSON.parse(e.data);
-            if (data && (data.orderId === orderId || data.id === orderId)) {
-              this.playChime('order');
-              this.showToast({
-                title: '¡Actualización de tu Pedido!',
-                message: `Tu pedido #${orderId} cambió a estado: "${data.status || 'En preparación'}"`,
-                icon: '🛵',
-                actionText: 'Ver Rastreo',
-                onAction: () => {
-                  window.location.href = `/order-status.html?id=${orderId}`;
-                }
-              });
-            }
-          } catch (err) {}
-        });
-      } catch (e) {}
     },
 
     dismissBanner: function () {

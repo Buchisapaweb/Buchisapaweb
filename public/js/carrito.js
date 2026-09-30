@@ -19,33 +19,37 @@ var BuchisapaCart = window.BuchisapaCart = {
     const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
     const name = String(product.name || '').toLowerCase();
 
-    // Las promociones, combos y packs NUNCA son bebidas puras (siempre incluyen cremas y salsas de la casa)
-    if (
-      product.is_promotion || product.isPromotion || 
-      cat.includes('promo') || name.includes('promo') || name.includes('combo') || name.includes('pack')
-    ) {
-      return false;
-    }
+    // RECHAZO TOTAL DE CUALQUIER COMIDA / PLATO / HAMBURGUESA / POLLO / ETC.
+    const foodCategories = ['hamburguesa', 'broaster', 'alita', 'salchipapa', 'amazonico', 'caldo', 'promo', 'combo', 'pack', 'plato', 'chaufa', 'tacacho'];
+    if (foodCategories.some(fc => cat.includes(fc))) return false;
+
+    const foodKeywords = ['pollo', 'filete', 'carne', 'chaufa', 'tacacho', 'cecina', 'chorizo', 'hamburguesa', 'salchipapa', 'alita', 'pecho', 'pierna', 'ala', 'papas', 'arroz', 'juane', 'patacon', 'patacones'];
+    if (foodKeywords.some(fw => name.includes(fw))) return false;
+
+    if (product.is_promotion || product.isPromotion) return false;
 
     if (product.includes_sauces === false) return true;
 
     if (
       catBadge.includes('bebida') || catBadge.includes('infusion') || catBadge.includes('refresco') ||
+      cat === 'bebidas' || cat === 'refrescos' || cat === 'infusiones' ||
       cat.includes('bebida') || cat.includes('refresco') || cat.includes('infusion') ||
-      cat.includes('postre') || cat.includes('licor') || cat.includes('trago') ||
-      cat.includes('cafe') || cat.includes('jugo')
+      cat.includes('postre') || cat.includes('licor') || cat.includes('trago')
     ) {
       return true;
     }
 
     const drinkKeywords = [
-      'agua', 'cielo', 'san mateo', 'san luis', 'inca', 'coca', 'fanta', 'sprite', 'pepsi', 
-      '7up', 'gaseosa', 'refresco', 'cocona', 'camu', 'aguajina', 'maracuyá', 'maracuya', 
-      'chicha', 'limonada', 'jugo', 'infusión', 'infusion', 'café', 'cafe', 'té', 'te', 
+      'agua cielo', 'agua mineral', 'san mateo', 'san luis', 'inca kola', 'inca cola', 'coca cola', 'fanta', 'sprite', 'pepsi', 
+      '7up', 'gaseosa', 'refresco', 'cocona', 'camu camu', 'aguajina', 'maracuyá', 'maracuya', 
+      'chicha morada', 'chicha', 'limonada', 'jugo', 'infusión', 'infusion', 
       'anís', 'anis', 'manzanilla', 'hierba luisa', 'cerveza', 'pilsen', 'cusqueña', 'cristal', 'corona', 'heineken'
     ];
 
-    return drinkKeywords.some(kw => name.includes(kw));
+    if (drinkKeywords.some(kw => name.includes(kw))) return true;
+    if (/\b(té|te|café|cafe)\b/i.test(name)) return true;
+
+    return false;
   },
 
   init() {
@@ -229,7 +233,61 @@ var BuchisapaCart = window.BuchisapaCart = {
     const inCartIds = new Set(currentItems.map(it => String(it.id || '').toLowerCase()));
     const inCartNames = new Set(currentItems.map(it => (it.name || '').toLowerCase().trim()));
 
-    // Filtrar catálogo ÚNICAMENTE para bebidas/refrescos/infusiones disponibles que no estén ya en el carrito
+    // Identificador preciso de categoría entre las 3 requeridas: Bebidas, Infusiones y Refrescos
+    const getDrinkSubCategory = (p) => {
+      if (!p) return null;
+      const cat = String(p.category_id || p.category || p.categoryPill || '').toLowerCase().trim();
+      const name = String(p.name || '').toLowerCase().trim();
+
+      // RECHAZO TOTAL INMEDIATO DE CUALQUIER COMIDA / PLATO / HAMBURGUESA / POLLO / ETC.
+      const foodCategories = ['hamburguesa', 'broaster', 'alita', 'salchipapa', 'amazonico', 'caldo', 'promo', 'combo', 'pack', 'plato', 'chaufa', 'tacacho'];
+      if (foodCategories.some(fc => cat.includes(fc))) return null;
+
+      const foodKeywords = ['pollo', 'filete', 'carne', 'chaufa', 'tacacho', 'cecina', 'chorizo', 'hamburguesa', 'salchipapa', 'alita', 'pecho', 'pierna', 'ala', 'papas', 'arroz', 'juane', 'patacon', 'patacones', 'costilla', 'chicharron', 'chicharrón'];
+      if (foodKeywords.some(fw => name.includes(fw))) return null;
+
+      if (p.is_promotion || p.isPromotion) return null;
+
+      // 1. INFUSIONES (Bebidas calientes: Anís, Té, Manzanilla, Café)
+      if (
+        cat === 'infusiones' || cat === 'infusion' ||
+        cat.includes('infusion') ||
+        name === 'anís' || name === 'anis' || name === 'té' || name === 'te' || name === 'manzanilla' || name === 'hierba luisa' ||
+        name.startsWith('infusión') || name.startsWith('infusion') ||
+        /\b(anís|anis|manzanilla|hierba luisa)\b/i.test(name) ||
+        /\b(té|te|café|cafe)\b/i.test(name)
+      ) {
+        return 'INFUSIONES';
+      }
+
+      // 2. REFRESCOS (Refrescos naturales de la selva y fruta)
+      if (
+        cat === 'refrescos' || cat === 'refresco' ||
+        cat.includes('refresco') || 
+        name.includes('cocona') || name.includes('camu') || 
+        name.includes('aguajina') || name.includes('chicha') || 
+        name.includes('maracuy') || name.includes('limonada')
+      ) {
+        return 'REFRESCOS';
+      }
+
+      // 3. BEBIDAS (Gaseosas, aguas embotelladas, cervezas)
+      if (
+        cat === 'bebidas' || cat === 'bebida' ||
+        cat.includes('bebida') || cat.includes('gaseosa') ||
+        name.includes('inca') || name.includes('coca') || name.includes('fanta') || 
+        name.includes('sprite') || name.includes('pepsi') || name.includes('7up') || 
+        name.includes('gaseosa') || name.includes('agua cielo') || name.includes('agua mineral') || 
+        name.includes('san mateo') || name.includes('san luis') || name.includes('cerveza') || 
+        name.includes('pilsen') || name.includes('cusqueña') || name.includes('cristal')
+      ) {
+        return 'BEBIDAS';
+      }
+
+      return null;
+    };
+
+    // Filtrar catálogo ÚNICAMENTE para productos de las 3 categorías
     const availableDrinks = catalog.filter(p => {
       if (!p) return false;
       const pid = String(p.id || '').toLowerCase();
@@ -238,46 +296,38 @@ var BuchisapaCart = window.BuchisapaCart = {
       if (p.available === false) return false;
       const stockStatus = this.stockStatusMap[p.id] || this.stockStatusMap[pname];
       if (stockStatus && stockStatus.hasStock === false) return false;
-      return this.isDrinkOrNoSauceItem(p);
+      
+      const subCat = getDrinkSubCategory(p);
+      return subCat !== null;
     });
 
     if (availableDrinks.length === 0) {
       return { title: '', subtitle: '', items: [] };
     }
 
-    const reasonTitle = '🥤 ¡No olvides tu bebida helada!';
-    const reasonSubtitle = 'Elige un refresco natural de la selva o tu gaseosa favorita para acompañar';
+    const reasonTitle = '¡No olvides tu bebida helada!';
+    const reasonSubtitle = 'Acompaña tu pedido con nuestros refrescos naturales, bebidas o infusiones';
 
-    // Asignar badges personalizados según la bebida
+    // Agrupar por cada una de las 3 categorías
+    const refrescos = availableDrinks.filter(p => getDrinkSubCategory(p) === 'REFRESCOS');
+    const infusiones = availableDrinks.filter(p => getDrinkSubCategory(p) === 'INFUSIONES');
+    const bebidas = availableDrinks.filter(p => getDrinkSubCategory(p) === 'BEBIDAS');
+
+    // Construir lista combinada equilibrada
+    const orderedList = [];
+    const maxLen = Math.max(refrescos.length, bebidas.length, infusiones.length);
+    for (let i = 0; i < maxLen; i++) {
+      if (refrescos[i]) orderedList.push(refrescos[i]);
+      if (bebidas[i]) orderedList.push(bebidas[i]);
+      if (infusiones[i]) orderedList.push(infusiones[i]);
+    }
+
     const suggestions = [];
-    const getDrinkBadge = (p) => {
-      const n = (p.name || '').toLowerCase();
-      if (n.includes('cocona')) return '🥤 De la Selva';
-      if (n.includes('camu')) return '⭐ Vitamina C';
-      if (n.includes('chicha')) return '🍇 Tradicional';
-      if (n.includes('aguajina')) return '🌴 Exótico';
-      if (n.includes('maracuy')) return '🍹 Refrescante';
-      if (n.includes('inca') || n.includes('coca') || n.includes('gaseosa')) return '❄️ Bien Helada';
-      if (n.includes('agua') || n.includes('cielo')) return '💧 Heladita';
-      if (n.includes('café') || n.includes('cafe') || n.includes('té') || n.includes('te') || n.includes('anís')) return '☕ Calientito';
-      return '🥤 Refresco Natural';
-    };
-
-    // Priorizar refrescos naturales de la selva
-    const naturalDrinks = availableDrinks.filter(p => {
-      const n = (p.name || '').toLowerCase();
-      return n.includes('cocona') || n.includes('camu') || n.includes('chicha') || n.includes('aguajina') || n.includes('maracuy') || n.includes('limonada');
-    });
-
-    // Luego gaseosas/aguas/infusiones
-    const otherDrinks = availableDrinks.filter(p => !naturalDrinks.includes(p));
-
-    const orderedList = [...naturalDrinks, ...otherDrinks];
-
     for (const d of orderedList) {
+      const categoryType = getDrinkSubCategory(d);
       suggestions.push({
         ...d,
-        badge: getDrinkBadge(d)
+        badge: categoryType || 'BEBIDAS'
       });
       if (suggestions.length >= 4) break;
     }
@@ -409,14 +459,13 @@ var BuchisapaCart = window.BuchisapaCart = {
     return this.lastStockValid;
   },
 
-  // Flujo protegido de Checkout: Valida stock antes de abrir checkout
-  async proceedToCheckout() {
+  // Flujo de Checkout: Redirige a la página de Checkout
+  proceedToCheckout() {
     if (!this.items || this.items.length === 0) {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.showToast({
-          title: 'Tu Pedido Está Vacío',
+          title: '🛒 Carrito Vacío',
           message: 'Agrega al menos un plato a tu carrito para continuar.',
-          stage: 'info',
           icon: '🛒'
         });
       } else {
@@ -425,36 +474,11 @@ var BuchisapaCart = window.BuchisapaCart = {
       return;
     }
 
-    // Feedback visual en el botón mientras valida
-    const checkoutBtn = document.querySelector('.cart-checkout-main-btn');
-    if (checkoutBtn) {
-      checkoutBtn.innerHTML = `
-        <svg style="animation: spin 1s linear infinite;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
-        <span>Verificando stock en cocina...</span>
-      `;
-      checkoutBtn.disabled = true;
-    }
+    // Guardar estado actual del carrito antes de redirigir
+    this.save();
 
-    const isValid = await this.checkRealtimeStock(false);
-
-    if (!isValid) {
-      if (window.BuchisapaPush) {
-        window.BuchisapaPush.playChime();
-        window.BuchisapaPush.showToast({
-          title: '🚫 Pedido Bloqueado por Stock',
-          message: 'Uno o más platos de tu pedido ya no están disponibles en cocina. Revisa los items marcados en rojo.',
-          stage: 'cancelado',
-          icon: '⚠️'
-        });
-      }
-      this.openDrawer();
-      return;
-    }
-
-    // Stock verificado con éxito -> continuar al checkout modal
-    if (typeof window.openCheckoutModal === 'function') {
-      window.openCheckoutModal();
-    }
+    // Redirigir a la siguiente página de Checkout
+    window.location.href = '/checkout';
   },
 
   // Quitar todos los platos sin stock con 1 solo clic
@@ -688,7 +712,7 @@ var BuchisapaCart = window.BuchisapaCart = {
             <h3 class="cart-empty-title">Tu pedido está vacío</h3>
             <p class="cart-empty-desc">Aún no has seleccionado ningún plato. Explora nuestras hamburguesas artesanales, broaster crocante, caldos y platos amazónicos.</p>
             
-            <button class="cart-empty-action-btn" type="button" onclick="BuchisapaCart.closeDrawer(); window.scrollTo({ top: 0, behavior: 'smooth' });">
+            <button class="cart-empty-action-btn" type="button" onclick="BuchisapaCart.goToMenuOrIndex()">
               <span>Explora nuestra carta</span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
@@ -707,14 +731,22 @@ var BuchisapaCart = window.BuchisapaCart = {
 
       if (crossSell && Array.isArray(crossSell.items) && crossSell.items.length > 0) {
         crossSellHtml = `
-          <!-- SECCIÓN DE RECOMENDACIONES CROSS-SELLING (VERTICAL SUCESIVO) -->
+          <!-- SECCIÓN DE RECOMENDACIONES CROSS-SELLING (PROFESIONAL Y ELEGANTE) -->
           <div class="cart-cross-sell-section">
             <div class="cross-sell-header">
               <div class="cross-sell-header-left">
-                <div class="cross-sell-icon-box">🥤</div>
+                <div class="cross-sell-icon-box">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 8h1a4 4 0 1 1 0 8h-1"/>
+                    <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
+                    <line x1="6" x2="6" y1="2" y2="4"/>
+                    <line x1="10" x2="10" y1="2" y2="4"/>
+                    <line x1="14" x2="14" y1="2" y2="4"/>
+                  </svg>
+                </div>
                 <div>
-                  <h4 class="cross-sell-title">🥤 ¡No olvides tu bebida helada!</h4>
-                  <p class="cross-sell-subtitle">${crossSell.subtitle}</p>
+                  <h4 class="cross-sell-title">¡No olvides tu bebida helada!</h4>
+                  <p class="cross-sell-subtitle">${crossSell.subtitle || 'Elige un refresco natural de la selva o tu gaseosa favorita para acompañar'}</p>
                 </div>
               </div>
               <span class="cross-sell-count-pill">${crossSell.items.length} sugerencias</span>
@@ -723,28 +755,30 @@ var BuchisapaCart = window.BuchisapaCart = {
             <div class="cross-sell-vertical-list">
               ${crossSell.items.map(item => {
                 const priceFormatted = (parseFloat(item.price) || 0).toFixed(2);
-                const badge = item.badge || 'RECOMENDADO';
+                const badge = item.badge || 'Natural';
                 const catFallback = (typeof window.getCategoryBannerFallback === 'function') 
                   ? window.getCategoryBannerFallback(item.category_id || item.category) 
                   : '/imagenes/portada/Portada1E.webp';
                 const imgUrl = item.image || catFallback;
-                const desc = item.description || 'Refresco helado y delicioso para acompañar tu plato';
+                const desc = item.description || 'Refresco helado y delicioso preparado al momento';
 
                 return `
                   <div class="cross-sell-vertical-card" onclick="if(typeof openProductDetailModal === 'function') openProductDetailModal('${item.id}')" title="Ver detalles de ${item.name}">
                     <div class="cross-sell-v-img-wrap">
                       <img src="${imgUrl}" alt="${item.name}" class="cross-sell-v-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
-                      <span class="cross-sell-v-badge">${badge}</span>
                     </div>
                     <div class="cross-sell-v-info">
                       <div class="cross-sell-v-title-row">
-                        <h5 class="cross-sell-v-name">${item.name}</h5>
+                        <div class="cross-sell-v-name-badge-group">
+                          <h5 class="cross-sell-v-name">${item.name}</h5>
+                          <span class="cross-sell-mini-tag">${badge}</span>
+                        </div>
                         <span class="cross-sell-v-price">S/ ${priceFormatted}</span>
                       </div>
                       <p class="cross-sell-v-desc">${desc}</p>
                     </div>
                     <button class="cross-sell-v-add-btn" type="button" onclick="event.stopPropagation(); BuchisapaCart.addCrossSellItem('${item.id}', event)" title="Agregar ${item.name} al carrito">
-                      <span>+ + Agregar</span>
+                      <span>+ Agregar</span>
                     </button>
                   </div>
                 `;
@@ -865,8 +899,8 @@ var BuchisapaCart = window.BuchisapaCart = {
             }).join('')}
           </div>
 
-          <!-- BOTÓN AGREGAR MÁS PLATOS DE LA CARTA -->
-          <button class="cart-add-more-btn" type="button" onclick="BuchisapaCart.closeDrawer(); window.scrollTo({ top: 0, behavior: 'smooth' });">
+          <!-- BOTÓN AGREGAR MÁS PLATOS DE LA CARTA (REDIRIGE A INDEX / CARTA) -->
+          <button class="cart-add-more-btn" type="button" onclick="BuchisapaCart.goToMenuOrIndex()" title="Ir a la carta principal">
             <span class="plus-sign">+</span>
             <span>Agregar más platos de la carta</span>
           </button>
@@ -876,17 +910,6 @@ var BuchisapaCart = window.BuchisapaCart = {
 
           <!-- TARJETA: RESUMEN DEL PEDIDO -->
           <div class="cart-order-summary-card">
-            <!-- INDICADOR DE SINCRONIZACIÓN EN TIEMPO REAL -->
-            <div class="cart-stock-sync-indicator">
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <span class="cart-stock-sync-dot"></span>
-                <span>Stock de cocina verificado en vivo</span>
-              </div>
-              <button class="cart-stock-test-btn" type="button" onclick="BuchisapaCart.toggleTestStock()" title="Simula que un plato se queda sin stock en cocina">
-                🧪 Probar Agotado
-              </button>
-            </div>
-
             <div class="summary-card-header">
               <h3 class="summary-card-title">Resumen del Pedido</h3>
               <span class="summary-item-badge" id="cart-summary-item-count">${count === 1 ? '1 item' : `${count} items`}</span>
@@ -1044,6 +1067,28 @@ var BuchisapaCart = window.BuchisapaCart = {
           this.updateFloatingCartBar();
         }
       }, 300);
+    }
+  },
+
+  goToMenuOrIndex() {
+    this.closeDrawer();
+    const currentPath = window.location.pathname || '';
+    const isHomePage = currentPath === '/' || currentPath === '/index.html' || currentPath === '' || currentPath.endsWith('/index.html');
+
+    if (!isHomePage) {
+      window.location.href = '/#menu-categories';
+    } else {
+      setTimeout(() => {
+        const target = document.getElementById('menu-categories') 
+          || document.querySelector('.category-carousel-section') 
+          || document.querySelector('.category-banners-section') 
+          || document.querySelector('.portada-section');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 150);
     }
   },
 

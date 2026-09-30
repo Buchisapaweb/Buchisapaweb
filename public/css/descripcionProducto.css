@@ -1,4 +1,5 @@
 .customizer-backdrop {
+  display: none !important;
   z-index: 10000;
 }
 

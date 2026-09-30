@@ -1,42 +1,147 @@
-<!-- MODAL DE CHECKOUT -->
-<div class="modal-backdrop" id="checkout-modal" style="display: none;">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h3 class="modal-title">Completar Datos de Entrega</h3>
-      <button class="modal-close" onclick="closeCheckoutModal()">&times;</button>
-    </div>
-    <form onsubmit="submitOrder(event)">
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Tu Nombre Completo *</label>
-          <input type="text" id="cust-name" class="form-input" required placeholder="Ej: Carlos Silva">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Celular / WhatsApp *</label>
-          <input type="tel" id="cust-phone" class="form-input" required placeholder="Ej: 927486448">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Dirección de Entrega</label>
-          <input type="text" id="cust-address" class="form-input" placeholder="Jr. San Martín 450, Tarapoto">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Método de Pago</label>
-          <select id="cust-payment" class="form-select">
-            <option value="yape">Yape / Plin (943 312 024)</option>
-            <option value="efectivo">Efectivo contraentrega</option>
-            <option value="tarjeta">Tarjeta POS Visa/Mastercard</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Notas para cocina / salsas extras</label>
-          <textarea id="cust-notes" class="form-textarea" rows="2" placeholder="Ej: Enviar ají extra, pollo parte pierna"></textarea>
-        </div>
+<!-- PÁGINA / VISTA DE CHECKOUT (PASO 2: COMPLETAR DATOS) -->
+<div class="cart-drawer-backdrop checkout-page-backdrop" id="checkout-modal" onclick="closeCheckoutModal()">
+  <div class="cart-drawer checkout-page-drawer" onclick="event.stopPropagation()">
+    
+    <!-- HEADER SUPERIOR ESTILO BUCHISAPA -->
+    <div class="cart-drawer-header checkout-page-header">
+      <div class="cart-drawer-brand">
+        <img src="/imagenes/logo/logo-buchisapa.webp" alt="BuchiSapa Logo" class="cart-brand-logo">
+        <span class="cart-brand-title">BUCHISAPA</span>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeCheckoutModal()">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
+
+      <button class="cart-nav-back-btn" type="button" onclick="closeCheckoutModalAndOpenCart()" aria-label="Volver al Carrito">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+        <span>Volver</span>
+      </button>
+    </div>
+
+    <!-- CUERPO DE LA PÁGINA DE CHECKOUT -->
+    <form onsubmit="submitOrder(event)" class="checkout-page-form" id="checkout-order-form">
+      <div class="cart-drawer-body checkout-page-body">
+        
+        <!-- TÍTULO DE LA PÁGINA -->
+        <div class="checkout-heading-section">
+          <h2 class="checkout-main-title">Completar Datos de Entrega</h2>
+          <p class="checkout-main-subtitle">Ingresa tus datos para registrar y enviar tu comanda a cocina</p>
+        </div>
+
+        <!-- TARJETA DINÁMICA DE MODALIDAD -->
+        <div class="checkout-modality-card" id="checkout-modality-banner">
+          <div class="modality-card-left">
+            <span class="modality-card-icon" id="checkout-modality-icon">🏪</span>
+            <div>
+              <span class="modality-card-label">Modalidad seleccionada:</span>
+              <strong class="modality-card-title" id="checkout-modality-name">Recojo en Tienda (Santa Clara)</strong>
+            </div>
+          </div>
+          <span class="modality-card-fee" id="checkout-modality-fee">Gratis (S/ 0.00)</span>
+        </div>
+
+        <!-- DETALLE DE TIENDA (SOLO PARA RECOJO) -->
+        <div class="checkout-store-card" id="checkout-store-info-box" style="display: none;">
+          <div class="store-card-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div class="store-card-text">
+              <strong>Local de Recojo:</strong>
+              <span>Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪</span>
+            </div>
+          </div>
+          <div class="store-card-row" style="margin-top: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div class="store-card-text">
+              <strong>Horario de Atención:</strong>
+              <span>Lunes a Domingo, de 6:00 PM a 5:00 AM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRUPO: DIRECCIÓN DE ENTREGA (SOLO PARA DELIVERY) -->
+        <div class="form-group checkout-form-group" id="checkout-delivery-address-group" style="display: none;">
+          <label class="checkout-form-label" for="cust-address">
+            <span>Dirección de Entrega</span>
+            <span class="label-req">*</span>
+          </label>
+          <div class="input-with-icon">
+            <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input type="text" id="cust-address" class="checkout-form-input" placeholder="Ej: Jr. San Martín 450, Urb. Santa Clara, Ate">
+          </div>
+        </div>
+
+        <!-- GRUPO: NOMBRE DEL CLIENTE -->
+        <div class="form-group checkout-form-group">
+          <label class="checkout-form-label" for="cust-name">
+            <span>Tu Nombre Completo</span>
+            <span class="label-req">*</span>
+          </label>
+          <div class="input-with-icon">
+            <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="cust-name" class="checkout-form-input" required placeholder="Ej: Jean Silva">
+          </div>
+        </div>
+
+        <!-- GRUPO: CELULAR / WHATSAPP -->
+        <div class="form-group checkout-form-group">
+          <label class="checkout-form-label" for="cust-phone">
+            <span>Celular / WhatsApp</span>
+            <span class="label-req">*</span>
+          </label>
+          <div class="input-with-icon">
+            <div class="phone-prefix-tag">🇵🇪 +51</div>
+            <input type="tel" id="cust-phone" class="checkout-form-input phone-input" required placeholder="Ej: 922886724" maxlength="9" pattern="[0-9]{9}">
+          </div>
+        </div>
+
+        <!-- GRUPO: MÉTODO DE PAGO -->
+        <div class="form-group checkout-form-group">
+          <label class="checkout-form-label" for="cust-payment">
+            <span>Método de Pago</span>
+            <span class="label-req">*</span>
+          </label>
+          <div class="input-with-icon">
+            <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            <select id="cust-payment" class="checkout-form-select">
+              <option value="yape">📱 Yape / Plin (943 312 024)</option>
+              <option value="tarjeta">💳 Tarjeta POS (Visa / Mastercard)</option>
+              <option value="efectivo">💵 Efectivo contraentrega</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- GRUPO: NOTAS PARA COCINA -->
+        <div class="form-group checkout-form-group">
+          <label class="checkout-form-label" for="cust-notes">
+            <span>Notas para cocina / salsas extras</span>
+            <span class="label-opt">(Opcional)</span>
+          </label>
+          <textarea id="cust-notes" class="checkout-form-textarea" rows="2" placeholder="Ej: Enviar ají extra, pollo parte pierna, sin mayonesa"></textarea>
+        </div>
+
+        <!-- RESUMEN FINAL DESTACADO DE TOTAL -->
+        <div class="checkout-total-banner">
+          <div class="checkout-total-details">
+            <span class="checkout-total-label">Total a Pagar (IGV inc.):</span>
+            <span class="checkout-total-items-badge" id="checkout-modal-item-count">2 platos</span>
+          </div>
+          <strong class="checkout-total-amount" id="checkout-modal-total">S/ 0.00</strong>
+        </div>
+
+      </div>
+
+      <!-- BOTÓN FIJO EN EL PIE DE PÁGINA -->
+      <div class="checkout-page-footer">
+        <button type="button" class="checkout-back-link-btn" onclick="closeCheckoutModalAndOpenCart()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+          <span>Volver al Carrito</span>
+        </button>
+        <button type="submit" class="checkout-confirm-btn" id="btn-submit-order">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+          <span>Confirmar Pedido</span>
+        </button>
       </div>
     </form>
+
   </div>
 </div>
 

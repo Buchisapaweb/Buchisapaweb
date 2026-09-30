@@ -448,33 +448,37 @@
     const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
     const name = String(product.name || '').toLowerCase();
 
-    // Las promociones, combos y packs NUNCA son bebidas puras (siempre incluyen cremas y salsas de la casa)
-    if (
-      product.is_promotion || product.isPromotion || 
-      cat.includes('promo') || name.includes('promo') || name.includes('combo') || name.includes('pack')
-    ) {
-      return false;
-    }
+    // RECHAZO TOTAL DE CUALQUIER COMIDA / PLATO / HAMBURGUESA / POLLO / ETC.
+    const foodCategories = ['hamburguesa', 'broaster', 'alita', 'salchipapa', 'amazonico', 'caldo', 'promo', 'combo', 'pack', 'plato', 'chaufa', 'tacacho'];
+    if (foodCategories.some(fc => cat.includes(fc))) return false;
+
+    const foodKeywords = ['pollo', 'filete', 'carne', 'chaufa', 'tacacho', 'cecina', 'chorizo', 'hamburguesa', 'salchipapa', 'alita', 'pecho', 'pierna', 'ala', 'papas', 'arroz', 'juane', 'patacon', 'patacones', 'costilla', 'chicharron', 'chicharrón'];
+    if (foodKeywords.some(fw => name.includes(fw))) return false;
+
+    if (product.is_promotion || product.isPromotion) return false;
 
     if (product.includes_sauces === false) return true;
 
     if (
       catBadge.includes('bebida') || catBadge.includes('infusion') || catBadge.includes('refresco') ||
+      cat === 'bebidas' || cat === 'refrescos' || cat === 'infusiones' ||
       cat.includes('bebida') || cat.includes('refresco') || cat.includes('infusion') ||
-      cat.includes('postre') || cat.includes('licor') || cat.includes('trago') ||
-      cat.includes('cafe') || cat.includes('jugo')
+      cat.includes('postre') || cat.includes('licor') || cat.includes('trago')
     ) {
       return true;
     }
 
     const drinkKeywords = [
-      'agua', 'cielo', 'san mateo', 'san luis', 'inca', 'coca', 'fanta', 'sprite', 'pepsi', 
-      '7up', 'gaseosa', 'refresco', 'cocona', 'camu', 'aguajina', 'maracuyá', 'maracuya', 
-      'chicha', 'limonada', 'jugo', 'infusión', 'infusion', 'café', 'cafe', 'té', 'te', 
+      'agua cielo', 'agua mineral', 'san mateo', 'san luis', 'inca kola', 'inca cola', 'coca cola', 'fanta', 'sprite', 'pepsi', 
+      '7up', 'gaseosa', 'refresco', 'cocona', 'camu camu', 'aguajina', 'maracuyá', 'maracuya', 
+      'chicha morada', 'chicha', 'limonada', 'jugo', 'infusión', 'infusion', 
       'anís', 'anis', 'manzanilla', 'hierba luisa', 'cerveza', 'pilsen', 'cusqueña', 'cristal', 'corona', 'heineken'
     ];
 
-    return drinkKeywords.some(kw => name.includes(kw));
+    if (drinkKeywords.some(kw => name.includes(kw))) return true;
+    if (/\b(té|te|café|cafe)\b/i.test(name)) return true;
+
+    return false;
   }
 
   /**

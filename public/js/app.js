@@ -95,9 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 8. Inicializar Gestos Táctiles (Swipe) en Carrusel Móvil
   initCarouselTouchGestures();
 
-  // 10. Inicializar Banner de Pedido Activo si existe
-  initActiveOrderTrackerBanner();
-
   // 11. Registrar Service Worker para PWA
   registerServiceWorker();
 });
@@ -360,39 +357,11 @@ function initCarouselTouchGestures() {
 }
 
 
-/**
- * BANNER FLOTANTE DE PEDIDO EN CURSO
- */
 function initActiveOrderTrackerBanner() {
+  // Rastreo flotante y notificaciones desactivadas a petición
   try {
-    const saved = localStorage.getItem('buchisapa_last_order');
-    if (!saved) return;
-    const order = JSON.parse(saved);
-    if (!order || !order.id) return;
-
-    // Verificar que sea de las últimas 3 horas
-    const orderTime = new Date(order.createdAt || order.timestamp || Date.now()).getTime();
-    if (Date.now() - orderTime > 3 * 3600000) return;
-
-    let banner = document.getElementById('active-order-floating-bar');
-    if (!banner) {
-      banner = document.createElement('div');
-      banner.id = 'active-order-floating-bar';
-      banner.className = 'active-order-floating-bar';
-      document.body.appendChild(banner);
-    }
-
-    banner.innerHTML = `
-      <div class="active-order-content">
-        <div class="active-order-pulse">🛵</div>
-        <div class="active-order-info">
-          <span class="active-order-title">Pedido #${order.id} en curso</span>
-          <span class="active-order-meta">Estado: ${order.status || 'En preparación'}</span>
-        </div>
-        <a href="/order-status.html?id=${order.id}" class="active-order-btn">Rastrear GPS</a>
-      </div>
-    `;
-    banner.style.display = 'block';
+    const banner = document.getElementById('active-order-floating-bar');
+    if (banner) banner.remove();
   } catch (e) {}
 }
 
@@ -4505,19 +4474,27 @@ async function submitOrder(e) {
   }
 
   const isPickup = (localStorage.getItem('buchisapa_order_type') === 'pickup');
-  const name = document.getElementById('cust-name')?.value;
-  const phone = document.getElementById('cust-phone')?.value;
-  let address = document.getElementById('cust-address')?.value || '';
+  const name = document.getElementById('cust-name')?.value?.trim() || 'Cliente';
+  const phone = document.getElementById('cust-phone')?.value?.trim() || '';
+  let addressInput = document.getElementById('cust-address')?.value?.trim() || '';
   const payment = document.getElementById('cust-payment')?.value || 'yape';
-  const notes = document.getElementById('cust-notes')?.value || '';
+  const notes = document.getElementById('cust-notes')?.value?.trim() || '';
+
+  // Limpiar dirección si contiene JSON residual
+  if (addressInput.startsWith('{') && addressInput.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(addressInput);
+      if (parsed && parsed.address) {
+        addressInput = parsed.address + (parsed.streetNumber ? ` ${parsed.streetNumber}` : '');
+      }
+    } catch (e) {}
+  }
 
   const STORE_FULL_ADDRESS = 'Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪';
   const STORE_GPS_URL = 'https://maps.google.com/?q=-12.01635,-76.88455';
   const STORE_HOURS = 'Lunes a Domingo, de 6:00 PM a 5:00 AM';
 
-  if (isPickup) {
-    address = STORE_FULL_ADDRESS;
-  }
+  const finalAddress = isPickup ? STORE_FULL_ADDRESS : (addressInput || 'Santa Clara, Ate');
 
   let loggedCustomer = null;
   try {
@@ -4534,7 +4511,7 @@ async function submitOrder(e) {
     customerPhone: phone,
     customerEmail: loggedCustomer?.email || undefined,
     userId: loggedCustomer?.id || undefined,
-    deliveryAddress: address,
+    deliveryAddress: finalAddress,
     orderType: isPickup ? 'pickup' : 'delivery',
     paymentMethod: payment,
     notes: notes,
@@ -4596,14 +4573,22 @@ async function submitOrder(e) {
       };
     }
 
-    // Guardar para persistencia y seguimiento en tiempo real
-    localStorage.setItem('buchisapa_last_order', JSON.stringify(createdOrder));
+    // Guardar teléfono para próximos pedidos
+    if (phone) localStorage.setItem('buchisapa_delivery_phone', phone);
 
-    // Mensaje estructurado de WhatsApp
+    // Código de orden limpio (ej: #669)
+    const orderCode = createdOrder.orderNumber ? `#${createdOrder.orderNumber}` : `#${Math.floor(100 + Math.random() * 900)}`;
+
+    // Mapeo amigable de método de pago
+    let paymentLabel = 'YAPE / PLIN (943 312 024)';
+    if (payment === 'tarjeta') paymentLabel = 'TARJETA';
+    else if (payment === 'efectivo') paymentLabel = 'EFECTIVO CONTRAENTREGA';
+
+    // Construcción exacta del mensaje estructurado de WhatsApp
     let waText = `*NUEVO PEDIDO BUCHISAPA* 🍗🔥%0A`;
-    waText += `*Código:* %23${createdOrder.orderNumber || createdOrder.id}%0A`;
-    waText += `*Cliente:* ${encodeURIComponent(name || 'Cliente')}%0A`;
-    waText += `*Teléfono:* ${encodeURIComponent(phone || '')}%0A`;
+    waText += `*Código:* ${encodeURIComponent(orderCode)}%0A`;
+    waText += `*Cliente:* ${encodeURIComponent(name)}%0A`;
+    waText += `*Teléfono:* ${encodeURIComponent(phone)}%0A`;
     
     if (isPickup) {
       waText += `*Modalidad:* 🏪 RECOJO EN TIENDA (Santa Clara)%0A`;
@@ -4613,36 +4598,31 @@ async function submitOrder(e) {
       waText += `*Costo de Entrega:* S/ 0.00 (Gratis)%0A`;
     } else {
       waText += `*Modalidad:* 🛵 DELIVERY A DOMICILIO%0A`;
-      if (address) waText += `*Dirección de Entrega:* ${encodeURIComponent(address)}%0A`;
-      const gpsVal = localStorage.getItem('buchisapa_delivery_gps');
-      if (gpsVal) waText += `*GPS Entrega:* ${encodeURIComponent(gpsVal)}%0A`;
+      waText += `*Dirección de Entrega:* ${encodeURIComponent(finalAddress)}%0A`;
       waText += `*Costo de Envío:* S/ ${deliveryFee.toFixed(2)}%0A`;
     }
 
-    waText += `*Pago:* ${encodeURIComponent(payment.toUpperCase())}%0A`;
-    if (notes) waText += `*Notas:* ${encodeURIComponent(notes)}%0A%0A`;
-    waText += `*DETALLE DEL PEDIDO:*%0A`;
+    waText += `*Pago:* ${encodeURIComponent(paymentLabel)}%0A`;
+    if (notes) {
+      waText += `*Notas:* ${encodeURIComponent(notes)}%0A`;
+    }
+    waText += `%0A*DETALLE DEL PEDIDO:*%0A`;
     cartItems.forEach(it => {
       waText += `• ${it.quantity}x ${encodeURIComponent(it.name || 'Plato')} - S/ ${((parseFloat(it.price) || 0) * (parseInt(it.quantity) || 1)).toFixed(2)}%0A`;
     });
     waText += `%0A*TOTAL A PAGAR: S/ ${orderPayload.total.toFixed(2)}*`;
 
     // Limpiar carrito y cerrar modal
-    window.BuchisapaCart.clear();
+    if (window.BuchisapaCart) window.BuchisapaCart.clear();
     closeCheckoutModal();
-    if (window.BuchisapaCart.closeDrawer) window.BuchisapaCart.closeDrawer();
+    if (window.BuchisapaCart && window.BuchisapaCart.closeDrawer) window.BuchisapaCart.closeDrawer();
 
-    // Redirigir a la página completa de seguimiento en tiempo real
-    const targetOrderId = createdOrder.id || createdOrder.orderNumber || 'ORD-1001';
-    
-    // Ofrecer apertura a WhatsApp para enviar el pedido al restaurante
+    // Redirigir a WhatsApp de cocina
     setTimeout(() => {
       window.open(`https://wa.me/51943312024?text=${waText}`, '_blank');
-      window.location.href = `/order-status.html?id=${encodeURIComponent(targetOrderId)}`;
-    }, 450);
+    }, 300);
   } catch (err) {
     console.error('Error registrando pedido:', err);
-    window.location.href = '/order-status.html?id=ORD-1001';
   }
 }
 

@@ -1,10 +1,10 @@
 /* =========================================================
    BUCHISAPA - ESTILOS OFICIALES DEL CARRITO DE COMPRAS
    Archivo: /css/carrito.css
-   Diseño exacto según captura "Tu Pedido Buchisapa"
+   Diseño Premium, Deslizamiento Fluido Unificado y Responsivo
    ========================================================= */
 
-/* 1. OCULTAMIENTO TOTAL DEL HEADER PRINCIPAL Y ELEMENTOS FLOTANTES AL ABRIR EL CARRITO */
+/* 1. OCULTAMIENTO TOTAL DE ELEMENTOS EXTERNOS CUANDO EL CARRITO ESTÁ ABIERTO */
 body.cart-drawer-open {
   overflow: hidden !important;
   overscroll-behavior: none !important;
@@ -25,7 +25,7 @@ body.cart-drawer-open #mobile-menu-backdrop {
   transform: none !important;
 }
 
-/* 2. BACKDROP Y CONTENEDOR TIPO DRAWER / APP VIEW */
+/* 2. BACKDROP Y CONTENEDOR PRINCIPAL DEL CARRITO (DRAWER / FULL SCREEN APP VIEW) */
 .cart-drawer-backdrop {
   position: fixed !important;
   inset: 0 !important;
@@ -33,17 +33,17 @@ body.cart-drawer-open #mobile-menu-backdrop {
   height: 100% !important;
   height: 100vh !important;
   height: 100dvh !important;
-  background: rgba(15, 23, 42, 0.65) !important;
+  background: rgba(15, 23, 42, 0.68) !important;
   z-index: 999999 !important;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
   display: flex !important;
   justify-content: flex-end !important;
   align-items: stretch !important;
   overflow: hidden !important;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .cart-drawer-backdrop.open,
@@ -55,18 +55,18 @@ body.cart-drawer-open #mobile-menu-backdrop {
 .cart-drawer {
   position: relative !important;
   width: 100% !important;
-  max-width: 560px !important;
+  max-width: 580px !important;
   height: 100% !important;
   height: 100dvh !important;
   max-height: 100dvh !important;
-  background: #ffffff !important;
+  background: #f8fafc !important;
   z-index: 1000000 !important;
   display: flex !important;
   flex-direction: column !important;
   transform: translateX(100%) !important;
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
   will-change: transform;
-  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.22) !important;
   overflow: hidden !important;
   margin: 0 !important;
   touch-action: pan-y !important;
@@ -77,8 +77,10 @@ body.cart-drawer-open #mobile-menu-backdrop {
   transform: translateX(0) !important;
 }
 
-/* 3. HEADER FIJO DEL CARRITO (BRAND LOGO Y BOTÓN VOLVER) */
+/* 3. HEADER DEL CARRITO (STICKY, LIMPIO Y ELEGANTE COMO LA CAPTURA) */
 .cart-drawer-header {
+  position: sticky !important;
+  top: 0 !important;
   padding: 12px 18px !important;
   border-bottom: 1px solid #f1f5f9 !important;
   display: flex !important;
@@ -91,29 +93,29 @@ body.cart-drawer-open #mobile-menu-backdrop {
   max-height: 64px !important;
   flex-shrink: 0 !important;
   z-index: 100 !important;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+  box-shadow: none !important;
   box-sizing: border-box !important;
 }
 
 .cart-drawer-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   user-select: none;
 }
 
 .cart-brand-logo {
-  height: 42px;
-  width: auto;
-  max-height: 42px;
+  height: 44px;
+  width: 44px;
   object-fit: contain;
+  border-radius: 50%;
 }
 
 .cart-brand-title {
   font-weight: 900;
-  font-size: 20px;
+  font-size: 24px;
   letter-spacing: -0.5px;
-  color: #0f172a;
+  color: #0d1527;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
@@ -121,93 +123,52 @@ body.cart-drawer-open #mobile-menu-backdrop {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: transparent;
-  border: none;
-  color: #0f172a;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.2px;
+  background: transparent !important;
+  border: none !important;
+  color: #0d1527 !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.3px !important;
   cursor: pointer;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  padding: 6px 4px;
-  transition: all 0.15s ease;
+  padding: 4px 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: opacity 0.15s ease;
 }
 
 .cart-nav-back-btn svg {
-  stroke: #0f172a;
-  stroke-width: 2.8;
-  transition: transform 0.15s ease, stroke 0.15s ease;
+  stroke: #0d1527 !important;
+  stroke-width: 3.2 !important;
+  width: 22px !important;
+  height: 22px !important;
+  transition: transform 0.18s ease;
 }
 
 .cart-nav-back-btn:hover {
-  color: #dc2626;
-  background: transparent;
-  transform: translateX(-2px);
+  opacity: 0.75;
+  background: transparent !important;
+  border: none !important;
 }
 
-.cart-nav-back-btn:hover svg {
-  stroke: #dc2626;
-}
-
-.cart-header-icon-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: #fff1f2;
-  border: 1px solid #ffe4e6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.cart-header-icon {
-  stroke: #dc2626;
-}
-
-.cart-header-title {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 18px;
-  font-weight: 900;
-  color: #0f172a;
-  margin: 0;
-  letter-spacing: -0.3px;
-}
-
-.cart-drawer-close-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #0f172a;
-  border-radius: 8px;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.cart-drawer-close-btn:hover {
-  background: #f1f5f9;
-  color: #dc2626;
-}
-
-
-/* 5. CUERPO DESPLAZABLE DEL CARRITO */
+/* 4. CUERPO DESPLAZABLE UNIFICADO DEL CARRITO */
 .cart-drawer-body {
   flex: 1 1 0px !important;
   min-height: 0 !important;
   width: 100% !important;
-  overflow-y: scroll !important;
+  overflow-y: auto !important;
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   touch-action: pan-y !important;
   overscroll-behavior: contain !important;
   overscroll-behavior-y: contain !important;
   scroll-behavior: smooth !important;
-  padding: 16px 16px 160px 16px !important;
+  padding: 20px 18px 140px 18px !important;
   background: #f8fafc !important;
   box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
 }
 
 .cart-drawer-body::-webkit-scrollbar {
@@ -227,55 +188,52 @@ body.cart-drawer-open #mobile-menu-backdrop {
   background: #94a3b8;
 }
 
-
-/* ENCABEZADO "Tu Pedido Buchisapa" (CONFORME A CAPTURA) */
+/* 5. ENCABEZADO "Tu Pedido Buchisapa" */
 .cart-order-title-section {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 14px 12px 14px 12px;
+  padding: 10px 12px 6px 12px;
   background: transparent;
-  margin-bottom: 8px;
 }
 
 .cart-title-icon-badge {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   background: #fff1f2;
-  border: 1.5px solid #ffe4e6;
+  border: 1.5px solid #fecdd3;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
 }
 
 .cart-order-title-text {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 900;
   color: #0f172a;
   margin: 0;
   letter-spacing: -0.4px;
 }
 
-/* SUB-BARRA DENTRO DEL BODY CON ITEMS */
+/* 6. SUB-BARRA: PLATOS SELECCIONADOS (N) Y VACIAR */
 .cart-subbar-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 4px 14px 4px;
-  margin-bottom: 6px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 6px 4px 10px 4px;
+  border-bottom: 1.5px solid #e2e8f0;
 }
 
 .cart-subbar-count-text {
   font-size: 13.5px;
   font-weight: 900;
-  color: #0f172a;
-  letter-spacing: 0.3px;
+  color: #334155;
+  letter-spacing: 0.4px;
   text-transform: uppercase;
 }
 
@@ -289,46 +247,54 @@ body.cart-drawer-open #mobile-menu-backdrop {
   align-items: center;
   gap: 5px;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: background 0.15s ease;
+  padding: 5px 10px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
 }
 
 .cart-subbar-trash-btn:hover {
-  background: #fef2f2;
+  background: #fee2e2;
+  transform: scale(1.03);
 }
 
-/* 6. TARJETAS DE PLATOS (DISEÑO EXACTO CAPTURA) */
+/* 7. LISTA Y TARJETAS DE PLATOS */
 .cart-dish-items-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .cart-dish-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cart-dish-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
 .dish-card-main-row {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: flex-start;
 }
 
 .dish-card-thumbnail {
-  width: 76px;
-  height: 76px;
-  border-radius: 12px;
+  width: 82px;
+  height: 82px;
+  border-radius: 14px;
   object-fit: cover;
   flex-shrink: 0;
   background: #f1f5f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .dish-card-info-col {
@@ -336,7 +302,7 @@ body.cart-drawer-open #mobile-menu-backdrop {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .dish-card-top-badge-row {
@@ -348,12 +314,12 @@ body.cart-drawer-open #mobile-menu-backdrop {
 
 .dish-card-cat-badge {
   display: inline-block;
-  background: #fef9c3;
-  color: #854d0e;
-  font-size: 10.5px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 11px;
   font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 2.5px 8.5px;
+  border-radius: 7px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
@@ -362,20 +328,22 @@ body.cart-drawer-open #mobile-menu-backdrop {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 5px;
   color: #94a3b8;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s ease;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 }
 
 .dish-card-trash-btn:hover {
   color: #dc2626;
+  background: #fee2e2;
 }
 
 .dish-card-name {
-  font-size: 16px;
+  font-size: 16.5px;
   font-weight: 900;
   color: #0f172a;
   margin: 0;
@@ -383,15 +351,17 @@ body.cart-drawer-open #mobile-menu-backdrop {
 }
 
 .dish-card-price-red {
-  font-size: 15.5px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 900;
   color: #dc2626;
+  letter-spacing: -0.2px;
 }
 
 .dish-card-option-subtitle {
-  font-size: 12px;
+  font-size: 12.5px;
   color: #64748b;
   line-height: 1.35;
+  font-weight: 600;
 }
 
 /* CAJA VERDE DE ACOMPAÑAMIENTOS */
@@ -399,27 +369,28 @@ body.cart-drawer-open #mobile-menu-backdrop {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   color: #15803d;
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-size: 12px;
+  border-radius: 12px;
+  padding: 9px 13px;
+  font-size: 12.5px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
   display: flex;
   align-items: flex-start;
-  gap: 6px;
+  gap: 7px;
 }
 
 .acc-symbol {
-  font-size: 11px;
+  font-size: 12px;
   flex-shrink: 0;
   margin-top: 1px;
+  color: #16a34a;
 }
 
 /* CREMAS */
 .dish-card-cremas-text {
-  font-size: 12px;
+  font-size: 12.5px;
   color: #334155;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .dish-card-cremas-text strong {
@@ -433,12 +404,12 @@ body.cart-drawer-open #mobile-menu-backdrop {
   align-items: center;
   justify-content: space-between;
   margin-top: 4px;
-  padding-top: 8px;
-  border-top: 1px dashed #f1f5f9;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
 }
 
 .qty-label {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 800;
   color: #1e293b;
 }
@@ -446,18 +417,18 @@ body.cart-drawer-open #mobile-menu-backdrop {
 .qty-stepper-pill {
   display: inline-flex;
   align-items: center;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 2px 4px;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 3px 5px;
   gap: 12px;
 }
 
 .stepper-action-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  font-size: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 17px;
   font-weight: 800;
   cursor: pointer;
   border: none;
@@ -468,126 +439,125 @@ body.cart-drawer-open #mobile-menu-backdrop {
 }
 
 .stepper-action-btn.minus {
-  background: #f1f5f9;
-  color: #475569;
+  background: #e2e8f0;
+  color: #334155;
 }
 
 .stepper-action-btn.minus:hover {
-  background: #e2e8f0;
+  background: #cbd5e1;
   color: #0f172a;
 }
 
 .stepper-action-btn.plus {
   background: #dc2626;
   color: #ffffff;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
 }
 
 .stepper-action-btn.plus:hover {
   background: #b91c1c;
+  transform: scale(1.05);
 }
 
 .stepper-num {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
   color: #0f172a;
-  min-width: 16px;
+  min-width: 18px;
   text-align: center;
 }
 
-/* 7. BOTÓN AGREGAR MÁS PLATOS DE LA CARTA */
+/* 8. BOTÓN AGREGAR MÁS PLATOS DE LA CARTA */
 .cart-add-more-btn {
   width: 100%;
   border: 1.5px dashed #cbd5e1;
   background: #ffffff;
   color: #1e293b;
-  border-radius: 12px;
-  padding: 13px 18px;
-  font-size: 14px;
+  border-radius: 16px;
+  padding: 14px 18px;
+  font-size: 14.5px;
   font-weight: 800;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 14px;
-  margin-bottom: 18px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: all 0.18s ease;
 }
 
 .cart-add-more-btn:hover {
   background: #f8fafc;
   border-color: #94a3b8;
   color: #0f172a;
+  transform: translateY(-1px);
 }
 
 .cart-add-more-btn .plus-sign {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 900;
   color: #2563eb;
 }
 
-/* 8. SECCIÓN CROSS-SELLING (BEBIDAS) */
+/* 9. SECCIÓN CROSS-SELLING (BEBIDAS HELADAS) */
 .cart-cross-sell-section {
   background: #ffffff;
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
-  padding: 14px 16px;
-  margin-bottom: 18px;
+  border: 1.5px solid #f1f5f9;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .cross-sell-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 12px;
   gap: 8px;
 }
 
 .cross-sell-header-left {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
 }
 
 .cross-sell-icon-box {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
   background: #fff1f2;
   border: 1px solid #ffe4e6;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.cross-sell-sparkle {
-  font-size: 24px;
+  font-size: 22px;
   flex-shrink: 0;
 }
 
 .cross-sell-title {
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 900;
   color: #0f172a;
-  margin: 0 0 2px 0;
+  margin: 0 0 3px 0;
+  letter-spacing: -0.2px;
 }
 
 .cross-sell-subtitle {
   font-size: 12px;
   color: #64748b;
   margin: 0;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .cross-sell-count-pill {
   background: #f1f5f9;
   color: #475569;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 10px;
   border-radius: 999px;
   white-space: nowrap;
 }
@@ -604,75 +574,99 @@ body.cart-drawer-open #mobile-menu-backdrop {
   gap: 12px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 10px 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s ease;
 }
 
 .cross-sell-vertical-card:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: #ffffff;
+  border-color: #fca5a5;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
+  transform: translateY(-1px);
 }
 
 .cross-sell-v-img-wrap {
   position: relative;
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #e2e8f0;
 }
 
 .cross-sell-v-img {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
   object-fit: cover;
+  transition: transform 0.2s ease;
 }
 
-.cross-sell-v-badge {
-  position: absolute;
-  bottom: 2px;
-  left: 2px;
-  background: rgba(15, 23, 42, 0.85);
-  color: #ffffff;
-  font-size: 8.5px;
-  font-weight: 800;
-  padding: 1px 4px;
-  border-radius: 4px;
+.cross-sell-vertical-card:hover .cross-sell-v-img {
+  transform: scale(1.08);
 }
 
 .cross-sell-v-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .cross-sell-v-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2px;
+  gap: 8px;
+}
+
+.cross-sell-v-name-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .cross-sell-v-name {
-  font-size: 13.5px;
-  font-weight: 800;
+  font-size: 14.5px;
+  font-weight: 900;
   color: #0f172a;
   margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.cross-sell-mini-tag {
+  display: inline-block;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 1.5px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 .cross-sell-v-price {
-  font-size: 13.5px;
-  font-weight: 800;
+  font-size: 14.5px;
+  font-weight: 900;
   color: #dc2626;
+  white-space: nowrap;
 }
 
 .cross-sell-v-desc {
-  font-size: 11.5px;
+  font-size: 12px;
   color: #64748b;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.35;
 }
 
 .cross-sell-v-add-btn {
@@ -680,114 +674,372 @@ body.cart-drawer-open #mobile-menu-backdrop {
   color: #ffffff;
   border: none;
   border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 11.5px;
+  padding: 8px 16px;
+  font-size: 12.5px;
   font-weight: 800;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  box-shadow: 0 3px 10px rgba(220, 38, 38, 0.28);
+  transition: all 0.16s ease;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .cross-sell-v-add-btn:hover {
   background: #b91c1c;
   transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.38);
 }
 
-/* 9. RESUMEN Y CHECKOUT */
-.cart-summary-box {
+.cross-sell-v-add-btn:active {
+  transform: scale(0.96);
+}
+
+/* 10. TARJETA RESUMEN DEL PEDIDO (DISEÑO PROFESIONAL Y COMPLETO) */
+.cart-order-summary-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 16px;
-  margin-top: 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Indicador de stock en vivo */
+.cart-stock-sync-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.cart-stock-sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+  display: inline-block;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(1); box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3); }
+  50% { transform: scale(1.15); box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3); }
+}
+
+.cart-stock-test-btn {
+  display: none; /* Oculto para clientes en producción */
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.summary-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4px;
+}
+
+.summary-card-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.summary-item-badge {
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 8px;
+}
+
+.summary-lines-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.cart-summary-row {
+.cart-summary-line {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14.5px;
   color: #475569;
 }
 
-.cart-summary-total {
-  font-size: 17px;
-  font-weight: 900;
-  color: #0f172a;
-  border-top: 1px dashed #e2e8f0;
-  padding-top: 10px;
+.summary-line-label {
+  color: #475569;
+  font-weight: 600;
 }
 
-.cart-checkout-btn,
+.summary-line-val {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.modality-tag {
+  background: #ecfdf5;
+  color: #059669;
+  font-size: 12.5px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1fae5;
+}
+
+/* Caja de Cupón de Descuento */
+.cart-coupon-box {
+  margin: 4px 0 6px 0;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 14px;
+}
+
+.cart-coupon-box input {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cart-coupon-box input:focus {
+  outline: none;
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.summary-total-divider {
+  height: 1.5px;
+  background: #f1f5f9;
+  margin: 4px 0;
+}
+
+.cart-summary-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0 4px 0;
+}
+
+.summary-total-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-total-main-label {
+  font-size: 18px;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+
+.summary-igv-sublabel {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.summary-total-main-val {
+  font-size: 26px;
+  font-weight: 900;
+  color: #dc2626;
+  letter-spacing: -0.5px;
+}
+
+.summary-total-main-val .currency-prefix {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+/* Botón Principal Checkout */
 .cart-checkout-main-btn {
+  width: 100%;
+  height: 54px;
   background: #dc2626;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: #ffffff;
   border: none;
-  border-radius: 14px;
-  padding: 15px 20px;
-  font-size: 15.5px;
-  font-weight: 800;
-  cursor: pointer;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
-  margin-top: 14px;
-  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.38);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  margin-top: 4px;
+}
+
+.cart-checkout-main-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.48);
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+}
+
+.cart-checkout-main-btn:active {
+  transform: translateY(0);
+}
+
+.cart-checkout-main-btn.disabled-stock {
+  background: #94a3b8 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Caja de garantía / WhatsApp */
+.cart-assurance-box {
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.assurance-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assurance-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.assurance-text {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Banner de platos agotados */
+.cart-stock-alert-banner {
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cart-stock-alert-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.cart-stock-alert-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.cart-stock-alert-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #991b1b;
+  margin: 0 0 2px 0;
+}
+
+.cart-stock-alert-desc {
+  font-size: 12px;
+  color: #b91c1c;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.cart-remove-unavailable-btn {
+  background: #ffffff;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
   transition: all 0.15s ease;
 }
 
-.cart-checkout-btn:hover,
-.cart-checkout-main-btn:hover {
-  background: #b91c1c;
-  transform: translateY(-1px);
+.cart-remove-unavailable-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
 }
 
-/* 10. ESTADO VACÍO ELEGANTE Y MODERNO */
+/* 11. ESTADO VACÍO ELEGANTE */
 .cart-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 50px 24px;
+  padding: 50px 20px;
   min-height: calc(100vh - 140px);
   box-sizing: border-box;
 }
 
 .cart-empty-icon-card {
   position: relative;
-  width: 92px;
-  height: 92px;
-  border-radius: 26px;
+  width: 96px;
+  height: 96px;
+  border-radius: 28px;
   background: linear-gradient(135deg, #fff1f2 0%, #fee2e2 100%);
   border: 1.5px solid #fecaca;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 22px;
-  box-shadow: 0 10px 28px -6px rgba(220, 38, 38, 0.18);
-  transition: transform 0.3s ease;
-}
-
-.cart-empty-icon-card:hover {
-  transform: scale(1.05);
+  margin-bottom: 24px;
+  box-shadow: 0 12px 30px -6px rgba(220, 38, 38, 0.2);
 }
 
 .empty-icon-glow {
   position: absolute;
   inset: -6px;
-  background: radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%);
-  border-radius: 30px;
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.18) 0%, transparent 70%);
+  border-radius: 32px;
   pointer-events: none;
-  z-index: 0;
 }
 
 .cart-empty-icon-card svg {
@@ -796,45 +1048,72 @@ body.cart-drawer-open #mobile-menu-backdrop {
 }
 
 .cart-empty-title {
-  font-size: 22px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
   font-weight: 900;
   color: #0f172a;
   margin: 0 0 10px 0;
-  letter-spacing: -0.5px;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.4px;
 }
 
 .cart-empty-desc {
-  font-size: 14px;
+  font-size: 14.5px;
   color: #64748b;
-  margin: 0 0 26px 0;
-  max-width: 330px;
+  margin: 0 0 28px 0;
+  max-width: 340px;
   line-height: 1.55;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .cart-empty-action-btn {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: #ffffff;
   border: none;
-  border-radius: 14px;
-  padding: 15px 28px;
-  font-size: 15px;
+  border-radius: 16px;
+  padding: 16px 32px;
+  font-size: 15.5px;
   font-weight: 800;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.4);
+  box-shadow: 0 8px 26px -4px rgba(220, 38, 38, 0.4);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .cart-empty-action-btn:hover {
-  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px -4px rgba(220, 38, 38, 0.5);
+  box-shadow: 0 12px 30px -4px rgba(220, 38, 38, 0.5);
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
 }
 
 .cart-empty-action-btn:active {
   transform: translateY(0);
+}
+
+/* 12. AJUSTES RESPONSIVOS MÓVILES */
+@media (max-width: 480px) {
+  .cart-drawer-header {
+    padding: 10px 14px !important;
+  }
+  .cart-brand-title {
+    font-size: 18px;
+  }
+  .cart-drawer-body {
+    padding: 14px 12px 140px 12px !important;
+    gap: 14px !important;
+  }
+  .cart-dish-card {
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+  .dish-card-thumbnail {
+    width: 74px;
+    height: 74px;
+  }
+  .cart-order-summary-card {
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
 }

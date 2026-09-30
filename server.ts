@@ -2638,6 +2638,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'public/html/recojo.html'));
   });
 
+  app.get(['/checkout', '/checkout.html'], (_req: Request, res: Response) => {
+    res.sendFile(path.join(process.cwd(), 'public/html/checkout.html'));
+  });
+
   // 3. Página de Inicio (HTML5 con parciales compilados)
   app.get(['/', '/index.html'], (_req: Request, res: Response) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');

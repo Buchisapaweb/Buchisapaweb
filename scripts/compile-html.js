@@ -107,6 +107,7 @@ export function compileHtml() {
 
   // 4. Asegurar rutas directas para Vercel y hosts estáticos
   const directPages = [
+    { src: 'public/html/checkout.html', outName: 'checkout' },
     { src: 'public/html/recojo.html', outName: 'recojo' },
     { src: 'public/html/reclamaciones.html', outName: 'reclamaciones' },
     { src: 'public/html/nosotros.html', outName: 'nosotros' },
