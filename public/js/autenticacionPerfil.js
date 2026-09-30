@@ -8,25 +8,46 @@ let otpCountdownInterval = null;
 let otpTimeRemaining = 45;
 
 function openLoginModal(view = 'login') {
+  if (typeof toggleMobileMenu === 'function') {
+    toggleMobileMenu(false);
+  } else if (typeof closeMobileMenu === 'function') {
+    closeMobileMenu();
+  }
+
   const modal = document.getElementById('login-modal');
   if (!modal) return;
+
+  document.body.classList.add('login-modal-open', 'modal-open');
+  document.documentElement.classList.add('login-modal-open', 'modal-open');
+
+  const header = document.querySelector('.site-header');
+  if (header) header.style.setProperty('display', 'none', 'important');
+  const wa = document.querySelector('.floating-whatsapp-btn');
+  if (wa) wa.style.setProperty('display', 'none', 'important');
 
   modal.style.display = 'flex';
   void modal.offsetWidth;
   modal.classList.add('open', 'active');
-  document.body.classList.add('modal-open');
 
   switchAuthView(view);
 }
 
 function closeLoginModal(event) {
-  if (event && event.target && event.target.id !== 'login-modal') return;
+  if (event && event.target && event.target.id !== 'login-modal' && !event.target.closest('.auth-close-btn-top') && !event.target.closest('.auth-window-back-btn')) {
+    return;
+  }
 
   const modal = document.getElementById('login-modal');
   if (modal) {
     modal.classList.remove('open', 'active');
     modal.style.display = 'none';
-    document.body.classList.remove('modal-open');
+    document.body.classList.remove('login-modal-open', 'modal-open');
+    document.documentElement.classList.remove('login-modal-open', 'modal-open');
+
+    const header = document.querySelector('.site-header');
+    if (header) header.style.removeProperty('display');
+    const wa = document.querySelector('.floating-whatsapp-btn');
+    if (wa) wa.style.removeProperty('display');
   }
 }
 

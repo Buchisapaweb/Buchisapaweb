@@ -461,9 +461,22 @@ function openCartFromDrawer() {
 }
 
 function openLoginModal(viewName = 'login') {
-  closeMobileMenu();
+  if (typeof toggleMobileMenu === 'function') {
+    toggleMobileMenu(false);
+  } else if (typeof closeMobileMenu === 'function') {
+    closeMobileMenu();
+  }
+
   const modal = document.getElementById('login-modal');
   if (modal) {
+    document.body.classList.add('login-modal-open', 'modal-open');
+    document.documentElement.classList.add('login-modal-open', 'modal-open');
+
+    const header = document.querySelector('.site-header');
+    if (header) header.style.setProperty('display', 'none', 'important');
+    const wa = document.querySelector('.floating-whatsapp-btn');
+    if (wa) wa.style.setProperty('display', 'none', 'important');
+
     switchAuthView(viewName);
     modal.style.display = 'flex';
     void modal.offsetWidth;
@@ -478,7 +491,7 @@ function openLoginModal(viewName = 'login') {
         const emailInput = document.getElementById('auth-login-email');
         if (emailInput && data.email) {
           emailInput.value = data.email;
-          checkAuthFormReady('login');
+          if (typeof checkAuthFormReady === 'function') checkAuthFormReady('login');
         }
       } catch (e) {}
     }
@@ -497,7 +510,14 @@ function closeLoginModal(e) {
   if (modal) {
     modal.classList.remove('active', 'open');
     modal.style.display = 'none';
+    document.body.classList.remove('login-modal-open', 'modal-open');
+    document.documentElement.classList.remove('login-modal-open', 'modal-open');
     document.body.style.overflow = '';
+
+    const header = document.querySelector('.site-header');
+    if (header) header.style.removeProperty('display');
+    const wa = document.querySelector('.floating-whatsapp-btn');
+    if (wa) wa.style.removeProperty('display');
   }
 }
 

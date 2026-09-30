@@ -349,7 +349,7 @@ body.search-open {
   .google-dark-backdrop,
   #email-verification-modal,
   #login-modal.modal-backdrop {
-    z-index: 99999 !important;
+    z-index: 2000000 !important;
     position: fixed !important;
     inset: 0 !important;
     width: 100vw !important;
