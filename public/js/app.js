@@ -3848,45 +3848,63 @@ function openCategoryView(catId, catTitle) {
 
   // Renderizar los productos correspondientes a la categoría elegida
   if (isPromo) {
-    const rawPromos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
-      ? window.OFFICIAL_PROMOTIONS
-      : [
-        { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.', image: '/imagenes/portada/Portada2E.webp' },
-        { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.', image: '/imagenes/portada/Portada1M.webp' },
-        { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.', image: '/imagenes/portada/Portada3E.webp' },
-        { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.', image: '/imagenes/portada/Portada4E.webp' }
-      ];
-
-    const catalogPromos = getAllProducts().filter(p => {
-      const pCatId = normalizeText(p.category_id || '');
-      const pCatName = normalizeText(p.category || '');
-      return pCatId.includes('promo') || pCatName.includes('promo') || pCatId.includes('combo') || pCatName.includes('combo') || p.is_promo === true;
-    });
-
-    const promoList = [
-      ...rawPromos.map(p => ({
-        id: p.id,
-        name: p.name || p.nombre,
-        description: p.fullDesc || p.shortDesc || p.descripcion,
-        price: p.price || p.precio,
-        image: p.image || p.imagen,
+    const rawPromos = [
+      {
+        id: 'promo-1',
+        name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.',
+        price: 90.90,
+        shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT.',
+        fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.',
+        description: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.',
+        image: '/imagenes/portada/Portada2E.webp',
         category: 'promociones',
         category_id: 'promociones',
-        categoryLabel: 'PROMOCIONES'
-      })),
-      ...catalogPromos
+        categoryLabel: 'PROMOCIONES',
+        includes_sauces: true
+      },
+      {
+        id: 'promo-2',
+        name: 'Promoción Tu Chicha 1.5 LT.',
+        price: 95.50,
+        shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT.',
+        fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.',
+        description: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.',
+        image: '/imagenes/portada/Portada1M.webp',
+        category: 'promociones',
+        category_id: 'promociones',
+        categoryLabel: 'PROMOCIONES',
+        includes_sauces: true
+      },
+      {
+        id: 'promo-3',
+        name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.',
+        price: 95.50,
+        shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT.',
+        fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.',
+        description: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.',
+        image: '/imagenes/portada/Portada3E.webp',
+        category: 'promociones',
+        category_id: 'promociones',
+        categoryLabel: 'PROMOCIONES',
+        includes_sauces: true
+      },
+      {
+        id: 'promo-4',
+        name: 'Promoción Para 2',
+        price: 57.90,
+        shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales.',
+        fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.',
+        description: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.',
+        image: '/imagenes/portada/Portada4E.webp',
+        category: 'promociones',
+        category_id: 'promociones',
+        categoryLabel: 'PROMOCIONES',
+        includes_sauces: true
+      }
     ];
 
-    const uniquePromos = [];
-    const seenIds = new Set();
-    for (const item of promoList) {
-      if (!seenIds.has(item.id)) {
-        seenIds.add(item.id);
-        uniquePromos.push(item);
-      }
-    }
-
-    renderCardsInContainer(uniquePromos, container);
+    window.OFFICIAL_PROMOTIONS = rawPromos;
+    renderCardsInContainer(rawPromos, container);
   } else {
     const items = getAllProducts();
     const rawTarget = normalizeText(catId || catTitle || '');
