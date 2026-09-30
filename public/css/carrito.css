@@ -68,22 +68,43 @@ body.cart-drawer-open #mobile-menu-backdrop {
   margin: 0 auto !important;
 }
 
-/* 3. HEADER FIJO DEL CARRITO (TÍTULO Y BOTÓN VOLVER) */
+/* 3. HEADER FIJO DEL CARRITO (BRAND LOGO Y BOTÓN VOLVER) */
 .cart-drawer-header {
-  padding: 14px 18px !important;
+  padding: 12px 18px !important;
   border-bottom: 1px solid #f1f5f9 !important;
-  display: grid !important;
-  grid-template-columns: auto 1fr !important;
+  display: flex !important;
   align-items: center !important;
-  gap: 12px !important;
+  justify-content: space-between !important;
   background: #ffffff !important;
   position: sticky !important;
   top: 0 !important;
   flex-shrink: 0 !important;
   z-index: 100 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
-  height: 56px !important;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+  height: 64px !important;
   box-sizing: border-box !important;
+}
+
+.cart-drawer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+
+.cart-brand-logo {
+  height: 42px;
+  width: auto;
+  max-height: 42px;
+  object-fit: contain;
+}
+
+.cart-brand-title {
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  color: #0f172a;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .cart-nav-back-btn {
@@ -93,23 +114,29 @@ body.cart-drawer-open #mobile-menu-backdrop {
   background: transparent;
   border: none;
   color: #0f172a;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
+  letter-spacing: -0.2px;
   cursor: pointer;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  padding: 4px;
-  transition: color 0.15s ease;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  padding: 6px 4px;
+  transition: all 0.15s ease;
+}
+
+.cart-nav-back-btn svg {
+  stroke: #0f172a;
+  stroke-width: 2.8;
+  transition: transform 0.15s ease, stroke 0.15s ease;
 }
 
 .cart-nav-back-btn:hover {
   color: #dc2626;
+  background: transparent;
+  transform: translateX(-2px);
 }
 
-.cart-header-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
+.cart-nav-back-btn:hover svg {
+  stroke: #dc2626;
 }
 
 .cart-header-icon-badge {

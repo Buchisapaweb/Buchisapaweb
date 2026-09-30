@@ -15,68 +15,82 @@ body.nosotros-page-body {
 }
 
 /* NAVBAR */
+/* NAVBAR UNIFICADO OFICIAL */
 .subpage-navbar {
   background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #f1f5f9;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }
 
 .subpage-nav-wrap {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 12px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 64px;
+  box-sizing: border-box;
 }
 
 .subpage-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   text-decoration: none;
 }
 
 .subpage-brand-logo {
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ea580c;
+  height: 42px;
+  width: auto;
+  max-height: 42px;
+  object-fit: contain;
+  border-radius: 0;
+  border: none;
 }
 
 .subpage-brand-title {
   font-weight: 900;
-  font-size: 18px;
+  font-size: 20px;
   letter-spacing: -0.5px;
   color: #0f172a;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .clean-back-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  background: #ffffff;
-  color: #dc2626;
-  border: 1.5px solid #fee2e2;
-  border-radius: 12px;
+  padding: 6px 4px;
+  background: transparent;
+  color: #0f172a;
+  border: none;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
-  letter-spacing: 0.2px;
-  transition: all 0.2s ease;
+  letter-spacing: -0.2px;
+  transition: all 0.15s ease;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+.clean-back-btn svg {
+  stroke: #0f172a;
+  stroke-width: 2.8;
+  transition: transform 0.15s ease, stroke 0.15s ease;
 }
 
 .clean-back-btn:hover {
-  background: #fef2f2;
-  border-color: #fca5a5;
-  color: #b91c1c;
-  transform: translateY(-1px);
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  transform: translateX(-2px);
+}
+
+.clean-back-btn:hover svg {
+  stroke: #dc2626;
 }
 
 /* HERO SECTION */
