@@ -674,8 +674,6 @@ var BuchisapaCart = window.BuchisapaCart = {
       drawerBadge.textContent = count;
     }
 
-    const subbarWrap = document.getElementById('cart-subbar-wrap');
-    const subbarCount = document.getElementById('cart-subbar-count');
     const itemsContainer = document.getElementById('cart-items-container');
     const subtotalEl = document.getElementById('cart-subtotal');
     const deliveryLabel = document.getElementById('cart-delivery-label');
@@ -708,9 +706,7 @@ var BuchisapaCart = window.BuchisapaCart = {
     }
 
     if (count === 0) {
-      // ESTADO VACÍO (DISEÑO EXACTO SEGÚN CAPTURA)
-      if (subbarWrap) subbarWrap.style.display = 'none';
-
+      // ESTADO VACÍO (DISEÑO LIMPIO Y ELEGANTE)
       if (itemsContainer) {
         itemsContainer.innerHTML = `
           <div class="cart-empty-state">
@@ -727,43 +723,16 @@ var BuchisapaCart = window.BuchisapaCart = {
             <p class="cart-empty-desc">Aún no has seleccionado ningún plato. Explora nuestras hamburguesas artesanales, broaster crocante, caldos y platos amazónicos.</p>
             
             <button class="cart-empty-action-btn" type="button" onclick="BuchisapaCart.closeDrawer(); window.scrollTo({ top: 0, behavior: 'smooth' });">
-              <span>Explorar la Carta y Pedir</span>
+              <span>Explora nuestra carta</span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
               </svg>
             </button>
-
-            <!-- ACCESOS RÁPIDOS A CATEGORÍAS -->
-            <div class="empty-shortcuts-wrap">
-              <span class="empty-shortcuts-label">¿Qué se te antoja hoy?</span>
-              <div class="empty-shortcuts-chips">
-                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('broaster'); else window.location.href='/?cat=broaster';">
-                  🍗 Broaster
-                </button>
-                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('hamburguesas'); else window.location.href='/?cat=hamburguesas';">
-                  🍔 Burgers
-                </button>
-                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('amazonicos'); else window.location.href='/?cat=amazonicos';">
-                  🌴 Selva
-                </button>
-                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('caldos'); else window.location.href='/?cat=caldos';">
-                  🥣 Caldos
-                </button>
-                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('bebidas'); else window.location.href='/?cat=bebidas';">
-                  🥤 Bebidas
-                </button>
-              </div>
-            </div>
           </div>
         `;
       }
     } else {
       // ESTADO CON PLATOS (DISEÑO EXACTO NUEVA ACTUALIZACIÓN)
-      if (subbarWrap) subbarWrap.style.display = 'flex';
-      if (subbarCount) {
-        subbarCount.textContent = `PLATOS SELECCIONADOS (${count})`;
-      }
-
       const subtotalFormatted = this.getSubtotal().toFixed(2);
       const totalFormatted = this.getTotal().toFixed(2);
 
@@ -776,9 +745,9 @@ var BuchisapaCart = window.BuchisapaCart = {
           <div class="cart-cross-sell-section">
             <div class="cross-sell-header">
               <div class="cross-sell-header-left">
-                <span class="cross-sell-sparkle">🥤</span>
+                <div class="cross-sell-icon-box">🥤</div>
                 <div>
-                  <h4 class="cross-sell-title">${crossSell.title}</h4>
+                  <h4 class="cross-sell-title">🥤 ¡No olvides tu bebida helada!</h4>
                   <p class="cross-sell-subtitle">${crossSell.subtitle}</p>
                 </div>
               </div>
@@ -809,8 +778,7 @@ var BuchisapaCart = window.BuchisapaCart = {
                       <p class="cross-sell-v-desc">${desc}</p>
                     </div>
                     <button class="cross-sell-v-add-btn" type="button" onclick="event.stopPropagation(); BuchisapaCart.addCrossSellItem('${item.id}', event)" title="Agregar ${item.name} al carrito">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                      <span>+ Agregar</span>
+                      <span>+ + Agregar</span>
                     </button>
                   </div>
                 `;
@@ -822,6 +790,31 @@ var BuchisapaCart = window.BuchisapaCart = {
 
       if (itemsContainer) {
         itemsContainer.innerHTML = `
+          <!-- ENCABEZADO "Tu Pedido Buchisapa" (CONFORME A CAPTURA) -->
+          <div class="cart-order-title-section">
+            <div class="cart-title-icon-badge">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+            </div>
+            <h2 class="cart-order-title-text">Tu Pedido Buchisapa</h2>
+          </div>
+
+          <!-- SUB-BARRA: PLATOS SELECCIONADOS (N) Y VACIAR -->
+          <div class="cart-subbar-row">
+            <span class="cart-subbar-count-text">PLATOS SELECCIONADOS (${count})</span>
+            <button class="cart-subbar-trash-btn" type="button" onclick="BuchisapaCart.clear()" aria-label="Vaciar carrito">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+              </svg>
+              <span>Vaciar</span>
+            </button>
+          </div>
+
           <!-- LISTA DE TARJETAS DE PLATOS -->
           <div class="cart-dish-items-list">
             ${this.items.map((item, idx) => {

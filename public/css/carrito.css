@@ -182,47 +182,6 @@ body.cart-drawer-open #mobile-menu-backdrop {
   color: #dc2626;
 }
 
-/* 4. SUB-BARRA FIJA: PLATOS SELECCIONADOS & VACIAR */
-.cart-subbar-wrap {
-  padding: 10px 18px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  background: #ffffff !important;
-  border-bottom: 1px solid #f1f5f9 !important;
-  position: sticky !important;
-  top: 56px !important;
-  flex-shrink: 0 !important;
-  z-index: 90 !important;
-  box-sizing: border-box !important;
-}
-
-.cart-subbar-count {
-  font-size: 12.5px;
-  font-weight: 900;
-  color: #1e293b;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.cart-subbar-empty-btn {
-  background: transparent;
-  border: none;
-  color: #dc2626;
-  font-size: 12.5px;
-  font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 6px;
-  transition: background 0.15s ease;
-}
-
-.cart-subbar-empty-btn:hover {
-  background: #fef2f2;
-}
 
 /* 5. CUERPO DESPLAZABLE DEL CARRITO */
 .cart-drawer-body {
@@ -233,6 +192,76 @@ body.cart-drawer-open #mobile-menu-backdrop {
   overscroll-behavior-y: contain !important;
   padding: 14px 16px 120px !important;
   background: #f8fafc !important;
+}
+
+/* ENCABEZADO "Tu Pedido Buchisapa" (CONFORME A CAPTURA) */
+.cart-order-title-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 12px 14px 12px;
+  background: transparent;
+  margin-bottom: 8px;
+}
+
+.cart-title-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #fff1f2;
+  border: 1.5px solid #ffe4e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);
+}
+
+.cart-order-title-text {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.4px;
+}
+
+/* SUB-BARRA DENTRO DEL BODY CON ITEMS */
+.cart-subbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 14px 4px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.cart-subbar-count-text {
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.cart-subbar-trash-btn {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.cart-subbar-trash-btn:hover {
+  background: #fef2f2;
 }
 
 /* 6. TARJETAS DE PLATOS (DISEÑO EXACTO CAPTURA) */
@@ -434,12 +463,12 @@ body.cart-drawer-open #mobile-menu-backdrop {
 /* 7. BOTÓN AGREGAR MÁS PLATOS DE LA CARTA */
 .cart-add-more-btn {
   width: 100%;
-  border: 1.5px dashed #93c5fd;
-  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  background: #ffffff;
   color: #1e293b;
   border-radius: 12px;
   padding: 13px 18px;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 800;
   cursor: pointer;
   display: flex;
@@ -448,13 +477,14 @@ body.cart-drawer-open #mobile-menu-backdrop {
   gap: 8px;
   margin-top: 14px;
   margin-bottom: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   transition: all 0.15s ease;
 }
 
 .cart-add-more-btn:hover {
-  background: #eff6ff;
-  border-color: #3b82f6;
-  color: #1d4ed8;
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
 }
 
 .cart-add-more-btn .plus-sign {
@@ -484,6 +514,19 @@ body.cart-drawer-open #mobile-menu-backdrop {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+}
+
+.cross-sell-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #fff1f2;
+  border: 1px solid #ffe4e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
 }
 
 .cross-sell-sparkle {
@@ -760,50 +803,4 @@ body.cart-drawer-open #mobile-menu-backdrop {
 
 .cart-empty-action-btn:active {
   transform: translateY(0);
-}
-
-/* ACCESOS RÁPIDOS EN CARRITO VACÍO */
-.empty-shortcuts-wrap {
-  margin-top: 36px;
-  width: 100%;
-  max-width: 360px;
-  border-top: 1px dashed #e2e8f0;
-  padding-top: 22px;
-}
-
-.empty-shortcuts-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #94a3b8;
-  margin-bottom: 12px;
-}
-
-.empty-shortcuts-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
-.empty-chip {
-  background: #f8fafc;
-  color: #334155;
-  border: 1px solid #e2e8f0;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-}
-
-.empty-chip:hover {
-  background: #fef2f2;
-  border-color: #fca5a5;
-  color: #dc2626;
-  transform: translateY(-1px);
 }
