@@ -5,8 +5,7 @@
    ========================================================= */
 
 /* 1. OCULTAMIENTO TOTAL DEL HEADER PRINCIPAL Y ELEMENTOS FLOTANTES AL ABRIR EL CARRITO */
-body.cart-drawer-open,
-html.cart-drawer-open {
+body.cart-drawer-open {
   overflow: hidden !important;
   overscroll-behavior: none !important;
 }
@@ -30,20 +29,21 @@ body.cart-drawer-open #mobile-menu-backdrop {
 .cart-drawer-backdrop {
   position: fixed !important;
   inset: 0 !important;
-  width: 100vw !important;
+  width: 100% !important;
+  height: 100% !important;
   height: 100vh !important;
   height: 100dvh !important;
   background: rgba(15, 23, 42, 0.65) !important;
   z-index: 999999 !important;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   display: flex !important;
-  justify-content: center !important;
+  justify-content: flex-end !important;
   align-items: stretch !important;
   overflow: hidden !important;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .cart-drawer-backdrop.open,
@@ -53,19 +53,28 @@ body.cart-drawer-open #mobile-menu-backdrop {
 }
 
 .cart-drawer {
+  position: relative !important;
   width: 100% !important;
-  max-width: 640px !important;
+  max-width: 560px !important;
   height: 100% !important;
   height: 100dvh !important;
+  max-height: 100dvh !important;
   background: #ffffff !important;
   z-index: 1000000 !important;
   display: flex !important;
   flex-direction: column !important;
-  transform: none !important;
-  transition: none !important;
-  box-shadow: 0 0 35px rgba(0, 0, 0, 0.15) !important;
+  transform: translateX(100%) !important;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform;
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.2) !important;
   overflow: hidden !important;
-  margin: 0 auto !important;
+  margin: 0 !important;
+  touch-action: pan-y !important;
+}
+
+.cart-drawer-backdrop.open .cart-drawer,
+.cart-drawer-backdrop.active .cart-drawer {
+  transform: translateX(0) !important;
 }
 
 /* 3. HEADER FIJO DEL CARRITO (BRAND LOGO Y BOTÓN VOLVER) */
@@ -76,12 +85,13 @@ body.cart-drawer-open #mobile-menu-backdrop {
   align-items: center !important;
   justify-content: space-between !important;
   background: #ffffff !important;
-  position: sticky !important;
-  top: 0 !important;
+  flex: 0 0 64px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
   flex-shrink: 0 !important;
   z-index: 100 !important;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
-  height: 64px !important;
   box-sizing: border-box !important;
 }
 
@@ -185,14 +195,38 @@ body.cart-drawer-open #mobile-menu-backdrop {
 
 /* 5. CUERPO DESPLAZABLE DEL CARRITO */
 .cart-drawer-body {
-  flex: 1 1 auto !important;
-  overflow-y: auto !important;
+  flex: 1 1 0px !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   touch-action: pan-y !important;
+  overscroll-behavior: contain !important;
   overscroll-behavior-y: contain !important;
-  padding: 14px 16px 120px !important;
+  scroll-behavior: smooth !important;
+  padding: 16px 16px 160px 16px !important;
   background: #f8fafc !important;
+  box-sizing: border-box !important;
 }
+
+.cart-drawer-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cart-drawer-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cart-drawer-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.cart-drawer-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 
 /* ENCABEZADO "Tu Pedido Buchisapa" (CONFORME A CAPTURA) */
 .cart-order-title-section {

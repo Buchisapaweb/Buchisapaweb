@@ -614,44 +614,10 @@ var BuchisapaCart = window.BuchisapaCart = {
   },
 
   updateFloatingCartBar() {
-    let bar = document.getElementById('floating-sticky-cart-bar');
-    const count = this.getCount();
-    const total = this.getTotal();
-
-    // Si el carrito está vacío o estamos en páginas internas de gestión (admin o kitchen), no mostrar
-    if (count <= 0 || window.location.pathname.includes('/kitchen') || window.location.pathname.includes('/admin')) {
-      if (bar) bar.remove();
-      return;
+    const bar = document.getElementById('floating-sticky-cart-bar');
+    if (bar) {
+      bar.remove();
     }
-
-    if (!bar) {
-      bar = document.createElement('div');
-      bar.id = 'floating-sticky-cart-bar';
-      bar.className = 'floating-sticky-cart-bar';
-      bar.onclick = () => this.openDrawer();
-      document.body.appendChild(bar);
-    }
-
-    bar.innerHTML = `
-      <div class="floating-cart-left">
-        <div class="floating-cart-icon-wrap">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          <span class="floating-cart-count-badge">${count}</span>
-        </div>
-        <div class="floating-cart-info">
-          <span class="floating-cart-title">Tu Pedido: S/ ${total.toFixed(2)}</span>
-          <span class="floating-cart-sub">${count} ${count === 1 ? 'plato seleccionado' : 'platos seleccionados'} • Toca para enviar</span>
-        </div>
-      </div>
-      <button type="button" class="floating-cart-btn" onclick="event.stopPropagation(); BuchisapaCart.openDrawer();">
-        <span>Ver Pedido</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
-    `;
-
-    bar.classList.remove('cart-bump');
-    void bar.offsetWidth; // Forzar reflow para reiniciar la animación
-    bar.classList.add('cart-bump');
   },
 
   updateUI() {
@@ -1037,9 +1003,13 @@ var BuchisapaCart = window.BuchisapaCart = {
       if (wa) wa.style.setProperty('display', 'none', 'important');
       
       drawer.style.display = 'flex';
+      // Reflow para activar transición de entrada
       void drawer.offsetWidth;
-      drawer.classList.add('open');
-      drawer.classList.add('active');
+      requestAnimationFrame(() => {
+        drawer.classList.add('open');
+        drawer.classList.add('active');
+      });
+
       document.body.style.overflow = 'hidden';
       const bar = document.getElementById('floating-sticky-cart-bar');
       if (bar) {
@@ -1055,19 +1025,25 @@ var BuchisapaCart = window.BuchisapaCart = {
   closeDrawer() {
     const drawer = document.getElementById('cart-drawer-modal');
     if (drawer) {
-      document.body.classList.remove('cart-drawer-open');
-      document.documentElement.classList.remove('cart-drawer-open');
-      
-      const header = document.querySelector('.site-header');
-      if (header) header.style.removeProperty('display');
-      const wa = document.querySelector('.floating-whatsapp-btn');
-      if (wa) wa.style.removeProperty('display');
-      
       drawer.classList.remove('open');
       drawer.classList.remove('active');
-      drawer.style.display = 'none';
-      document.body.style.overflow = '';
-      this.updateFloatingCartBar();
+      
+      // Esperar que termine la animación de deslizamiento (300ms) antes de ocultar
+      setTimeout(() => {
+        if (!drawer.classList.contains('open')) {
+          drawer.style.display = 'none';
+          document.body.classList.remove('cart-drawer-open');
+          document.documentElement.classList.remove('cart-drawer-open');
+          document.body.style.overflow = '';
+          
+          const header = document.querySelector('.site-header');
+          if (header) header.style.removeProperty('display');
+          const wa = document.querySelector('.floating-whatsapp-btn');
+          if (wa) wa.style.removeProperty('display');
+          
+          this.updateFloatingCartBar();
+        }
+      }, 300);
     }
   },
 
