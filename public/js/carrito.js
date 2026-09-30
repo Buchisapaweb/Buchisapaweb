@@ -1008,6 +1008,13 @@ var BuchisapaCart = window.BuchisapaCart = {
     const drawer = document.getElementById('cart-drawer-modal');
     if (drawer) {
       document.body.classList.add('cart-drawer-open');
+      document.documentElement.classList.add('cart-drawer-open');
+      
+      const header = document.querySelector('.site-header');
+      if (header) header.style.setProperty('display', 'none', 'important');
+      const wa = document.querySelector('.floating-whatsapp-btn');
+      if (wa) wa.style.setProperty('display', 'none', 'important');
+      
       drawer.style.display = 'flex';
       void drawer.offsetWidth;
       drawer.classList.add('open');
@@ -1028,6 +1035,13 @@ var BuchisapaCart = window.BuchisapaCart = {
     const drawer = document.getElementById('cart-drawer-modal');
     if (drawer) {
       document.body.classList.remove('cart-drawer-open');
+      document.documentElement.classList.remove('cart-drawer-open');
+      
+      const header = document.querySelector('.site-header');
+      if (header) header.style.removeProperty('display');
+      const wa = document.querySelector('.floating-whatsapp-btn');
+      if (wa) wa.style.removeProperty('display');
+      
       drawer.classList.remove('open');
       drawer.classList.remove('active');
       drawer.style.display = 'none';

@@ -456,7 +456,6 @@ body.search-open {
 
 @media (max-width: 768px) {
   .modal-backdrop,
-  .cart-drawer-backdrop,
   .search-modal-backdrop,
   .google-dark-backdrop,
   #email-verification-modal,
@@ -475,7 +474,6 @@ body.search-open {
     background: #ffffff !important;
   }
 
-  .cart-drawer,
   .buchisapa-auth-modal-box,
   .modal-box,
   .google-dark-sheet-box,
@@ -498,8 +496,6 @@ body.search-open {
     background: #ffffff !important;
   }
 
-  .cart-drawer-header,
-  .cart-subbar-wrap,
   .auth-window-topbar,
   .modal-header,
   .google-dark-topbar,
@@ -511,8 +507,6 @@ body.search-open {
     z-index: 100 !important;
   }
 
-  .cart-drawer-body,
-  #cart-items-container,
   .modal-body,
   .google-dark-body,
   .otp-modal-body,

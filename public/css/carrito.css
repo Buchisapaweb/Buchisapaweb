@@ -1,63 +1,98 @@
+/* =========================================================
+   BUCHISAPA - ESTILOS OFICIALES DEL CARRITO DE COMPRAS
+   Archivo: /css/carrito.css
+   Diseño exacto según captura "Tu Pedido Buchisapa"
+   ========================================================= */
+
+/* 1. OCULTAMIENTO TOTAL DEL HEADER PRINCIPAL Y ELEMENTOS FLOTANTES AL ABRIR EL CARRITO */
+body.cart-drawer-open,
+html.cart-drawer-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+body.cart-drawer-open .site-header,
+body.cart-drawer-open header.site-header,
+body.cart-drawer-open .desktop-header-wrap,
+body.cart-drawer-open .floating-whatsapp-btn,
+body.cart-drawer-open #floating-sticky-cart-bar,
+body.cart-drawer-open .floating-sticky-cart-bar,
+body.cart-drawer-open .mobile-bottom-bar,
+body.cart-drawer-open #mobile-menu-backdrop {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: none !important;
+}
+
+/* 2. BACKDROP Y CONTENEDOR TIPO DRAWER / APP VIEW */
 .cart-drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  background: #f8fafc;
-  z-index: 250;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+  z-index: 999999 !important;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.22s ease;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  touch-action: pan-y !important;
-  overscroll-behavior-y: contain !important;
-  backdrop-filter: none;
+  transition: opacity 0.2s ease;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 .cart-drawer-backdrop.open,
 .cart-drawer-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .cart-drawer {
-  width: 100%;
-  max-width: 640px;
-  min-height: 100%;
-  height: auto;
-  background: #ffffff;
-  z-index: 260;
-  display: flex;
-  flex-direction: column;
-  transform: none;
-  transition: none;
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
-  overflow: visible;
+  width: 100% !important;
+  max-width: 640px !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  background: #ffffff !important;
+  z-index: 1000000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transform: none !important;
+  transition: none !important;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden !important;
+  margin: 0 auto !important;
 }
 
+/* 3. HEADER FIJO DEL CARRITO (TÍTULO Y BOTÓN VOLVER) */
 .cart-drawer-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  position: relative !important;
-  top: auto !important;
+  padding: 14px 18px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: #ffffff !important;
+  position: sticky !important;
+  top: 0 !important;
   flex-shrink: 0 !important;
-  z-index: 10;
+  z-index: 100 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  height: 56px !important;
+  box-sizing: border-box !important;
 }
 
 .cart-nav-back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: transparent;
   border: none;
   color: #0f172a;
-  font-size: 15.5px;
+  font-size: 15px;
   font-weight: 800;
   cursor: pointer;
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -72,26 +107,32 @@
 .cart-header-title-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .cart-header-icon-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
   background: #fff1f2;
   border: 1px solid #ffe4e6;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.cart-header-icon {
+  stroke: #dc2626;
 }
 
 .cart-header-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 900;
   color: #0f172a;
   margin: 0;
+  letter-spacing: -0.3px;
 }
 
 .cart-drawer-close-btn {
@@ -102,34 +143,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: #0f172a;
   border-radius: 8px;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .cart-drawer-close-btn:hover {
   background: #f1f5f9;
-  color: #0f172a;
+  color: #dc2626;
 }
 
+/* 4. SUB-BARRA FIJA: PLATOS SELECCIONADOS & VACIAR */
 .cart-subbar-wrap {
-  padding: 12px 18px;
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  border-bottom: 1px solid #f1f5f9;
-  position: relative !important;
-  top: auto !important;
+  padding: 10px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  position: sticky !important;
+  top: 56px !important;
   flex-shrink: 0 !important;
-  z-index: 9;
+  z-index: 90 !important;
+  box-sizing: border-box !important;
 }
 
 .cart-subbar-count {
-  font-size: 13.5px;
-  font-weight: 800;
+  font-size: 12.5px;
+  font-weight: 900;
   color: #1e293b;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 
@@ -137,41 +180,45 @@
   background: transparent;
   border: none;
   color: #dc2626;
-  font-size: 13.5px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 6px;
+  transition: background 0.15s ease;
 }
 
 .cart-subbar-empty-btn:hover {
   background: #fef2f2;
 }
 
+/* 5. CUERPO DESPLAZABLE DEL CARRITO */
 .cart-drawer-body {
-  flex: 1 0 auto;
-  overflow: visible !important;
-  padding: 16px 18px 60px;
-  display: flex;
-  flex-direction: column;
-  background: #fafbfc;
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+  overscroll-behavior-y: contain !important;
+  padding: 14px 16px 120px !important;
+  background: #f8fafc !important;
 }
 
+/* 6. TARJETAS DE PLATOS (DISEÑO EXACTO CAPTURA) */
 .cart-dish-items-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .cart-dish-card {
   background: #ffffff;
-  border: 1.5px solid #f1f5f9;
-  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
   padding: 14px 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -184,12 +231,12 @@
 }
 
 .dish-card-thumbnail {
-  width: 74px;
-  height: 74px;
-  border-radius: 14px;
+  width: 76px;
+  height: 76px;
+  border-radius: 12px;
   object-fit: cover;
   flex-shrink: 0;
-  background: #f8fafc;
+  background: #f1f5f9;
 }
 
 .dish-card-info-col {
@@ -197,55 +244,388 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
-.dish-card-title {
-  font-size: 15px;
+.dish-card-top-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.dish-card-cat-badge {
+  display: inline-block;
+  background: #fef9c3;
+  color: #854d0e;
+  font-size: 10.5px;
   font-weight: 800;
-  color: #0f172a;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-.dish-card-price {
-  font-size: 15px;
+.dish-card-trash-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.dish-card-trash-btn:hover {
+  color: #dc2626;
+}
+
+.dish-card-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.dish-card-price-red {
+  font-size: 15.5px;
   font-weight: 800;
   color: #dc2626;
 }
 
-.cart-summary-box {
+.dish-card-option-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+/* CAJA VERDE DE ACOMPAÑAMIENTOS */
+.dish-card-accompaniments-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.acc-symbol {
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* CREMAS */
+.dish-card-cremas-text {
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.dish-card-cremas-text strong {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* CANTIDAD Y STEPPER */
+.dish-card-quantity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed #f1f5f9;
+}
+
+.qty-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.qty-stepper-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2px 4px;
+  gap: 12px;
+}
+
+.stepper-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.stepper-action-btn.minus {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.stepper-action-btn.minus:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.stepper-action-btn.plus {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.stepper-action-btn.plus:hover {
+  background: #b91c1c;
+}
+
+.stepper-num {
+  font-size: 14px;
+  font-weight: 900;
+  color: #0f172a;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* 7. BOTÓN AGREGAR MÁS PLATOS DE LA CARTA */
+.cart-add-more-btn {
+  width: 100%;
+  border: 1.5px dashed #93c5fd;
+  background: #f8fafc;
+  color: #1e293b;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  margin-bottom: 18px;
+  transition: all 0.15s ease;
+}
+
+.cart-add-more-btn:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.cart-add-more-btn .plus-sign {
+  font-size: 16px;
+  font-weight: 900;
+  color: #2563eb;
+}
+
+/* 8. SECCIÓN CROSS-SELLING (BEBIDAS) */
+.cart-cross-sell-section {
   background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 18px;
-  padding: 18px;
-  margin-top: 20px;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.cross-sell-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.cross-sell-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cross-sell-sparkle {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.cross-sell-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+}
+
+.cross-sell-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.cross-sell-count-pill {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.cross-sell-vertical-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.cross-sell-vertical-card {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cross-sell-vertical-card:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.cross-sell-v-img-wrap {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+}
+
+.cross-sell-v-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.cross-sell-v-badge {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.cross-sell-v-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cross-sell-v-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.cross-sell-v-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.cross-sell-v-price {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #dc2626;
+}
+
+.cross-sell-v-desc {
+  font-size: 11.5px;
+  color: #64748b;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cross-sell-v-add-btn {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.cross-sell-v-add-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* 9. RESUMEN Y CHECKOUT */
+.cart-summary-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .cart-summary-row {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
   color: #475569;
 }
 
 .cart-summary-total {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 900;
   color: #0f172a;
   border-top: 1px dashed #e2e8f0;
-  padding-top: 12px;
+  padding-top: 10px;
 }
 
-.cart-checkout-btn {
+.cart-checkout-btn,
+.cart-checkout-main-btn {
   background: #dc2626;
   color: #ffffff;
   border: none;
-  border-radius: 16px;
-  padding: 16px 20px;
-  font-size: 16px;
+  border-radius: 14px;
+  padding: 15px 20px;
+  font-size: 15.5px;
   font-weight: 800;
   cursor: pointer;
   display: flex;
@@ -253,11 +633,65 @@
   justify-content: center;
   gap: 10px;
   box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
-  margin-top: 16px;
+  margin-top: 14px;
+  width: 100%;
   transition: all 0.15s ease;
 }
 
-.cart-checkout-btn:hover {
+.cart-checkout-btn:hover,
+.cart-checkout-main-btn:hover {
   background: #b91c1c;
   transform: translateY(-1px);
+}
+
+/* 10. ESTADO VACÍO */
+.cart-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.cart-empty-icon-card {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: #fee2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.cart-empty-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.cart-empty-desc {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0 0 24px 0;
+  max-width: 320px;
+  line-height: 1.45;
+}
+
+.cart-empty-action-btn {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 22px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cart-empty-action-btn:hover {
+  background: #b91c1c;
 }
