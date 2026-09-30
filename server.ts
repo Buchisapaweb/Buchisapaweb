@@ -6,13 +6,20 @@ import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/au
 function getCompiledIndexHtml(): string {
   const partials: Record<string, string> = {
     'HEADER': 'public/html/header.html',
-    'CARRUSEL_PORTADA': 'public/html/carrusel-portada.html',
-    'PANEL_CARRITO': 'public/html/panel-carrito.html',
-    'VENTANA_UBICACION': 'public/html/ventana-ubicacion.html',
+    'PORTADA': 'public/html/portada.html',
+    'CARRUSEL_PORTADA': 'public/html/portada.html',
+    'CATEGORIA': 'public/html/categoria.html',
+    'PRODUCTO': 'public/html/producto.html',
+    'DESCRIPCION_PRODUCTO': 'public/html/descripcionProducto.html',
+    'CARRITO': 'public/html/carrito.html',
+    'PANEL_CARRITO': 'public/html/carrito.html',
+    'RECOJO': 'public/html/recojo.html',
+    'VENTANA_UBICACION': 'public/html/recojo.html',
     'VENTANA_CARTA_COMPLETA': 'public/html/ventana-carta-completa.html',
     'VENTANA_AUTENTICACION': 'public/html/ventana-autenticacion.html',
     'VENTANA_RASTREO_PEDIDO': 'public/html/ventana-rastreo-pedido.html',
-    'PIE_PAGINA': 'public/html/pie-pagina.html'
+    'FOOTER': 'public/html/footer.html',
+    'PIE_PAGINA': 'public/html/footer.html'
   };
 
   let template = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');

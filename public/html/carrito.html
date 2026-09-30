@@ -1,7 +1,5 @@
-<!-- VENTANA / PÁGINA COMPLETA DE TU PEDIDO BUCHISAPA (SIN DESLIZAMIENTOS) -->
-<div class="cart-drawer-backdrop" id="cart-drawer-modal" style="display: none;" onclick="BuchisapaCart.handleBackdropClick(event)">
+<div class="cart-drawer-backdrop" id="cart-drawer-modal" onclick="BuchisapaCart.handleBackdropClick(event)">
   <div class="cart-drawer" onclick="event.stopPropagation()">
-    <!-- HEADER CON BOTÓN VOLVER, BADGE CENTRADO Y BOTÓN CERRAR -->
     <div class="cart-drawer-header">
       <button class="cart-nav-back-btn" type="button" onclick="BuchisapaCart.closeDrawer()" aria-label="Volver a la carta">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -28,8 +26,7 @@
       </button>
     </div>
 
-    <!-- BARRA DE CONTEO Y BOTÓN VACIAR -->
-    <div class="cart-subbar-wrap" id="cart-subbar-wrap" style="display: none;">
+    <div class="cart-subbar-wrap" id="cart-subbar-wrap">
       <span class="cart-subbar-count" id="cart-subbar-count">PLATOS SELECCIONADOS (1)</span>
       <button class="cart-subbar-empty-btn" type="button" onclick="BuchisapaCart.clear()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,7 +38,6 @@
       </button>
     </div>
 
-    <!-- CONTENEDOR DINÁMICO DE ITEMS Y RESUMEN / ESTADO VACÍO -->
     <div class="cart-drawer-body" id="cart-items-container"></div>
   </div>
 </div>
