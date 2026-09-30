@@ -8,8 +8,9 @@
 
   const AdminConfig = {
     schedule: 'Lunes a Domingo de 6:00 PM a 5:00 AM (Lima UTC-5)',
-    deliveryFee: 5.00,
-    whatsappNumber: '+51 984 123 456',
+    deliveryFee: 4.00,
+    whatsappNumber: '+51 943 312 024',
+    storeAddress: 'Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima)',
 
     isWithinBusinessHours() {
       // Cálculo horario Lima (UTC-5)

@@ -2577,10 +2577,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   // 4. Panel de Administración Oficial BuchiSapa (Archivos estáticos CSS, JS, imágenes)
   app.use('/admin', express.static(path.join(process.cwd(), 'admin'), { ...staticOptions, index: false }));
 
-  app.get(['/kitchen', '/cocina', '/cocina.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/cocina.html'));
-  });
-
   app.get(['/reclamaciones', '/reclamaciones.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'public/html/reclamaciones.html'));
   });

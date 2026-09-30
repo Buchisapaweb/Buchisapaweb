@@ -75,6 +75,7 @@ export function compileHtml() {
     'TOPBAR': 'admin/partials/topbar.html',
     'VIEW_DASHBOARD': 'admin/views/dashboard.html',
     'VIEW_PRODUCTOS': 'admin/views/productos.html',
+    'VIEW_CATEGORIAS': 'admin/views/categorias.html',
     'VIEW_PEDIDOS': 'admin/views/pedidos.html',
     'VIEW_VENTAS': 'admin/views/ventas.html',
     'VIEW_CAJA': 'admin/views/caja.html',
@@ -106,8 +107,6 @@ export function compileHtml() {
 
   // 4. Asegurar rutas directas para Vercel y hosts estáticos
   const directPages = [
-    { src: 'public/html/cocina.html', outName: 'cocina' },
-    { src: 'public/html/cocina.html', outName: 'kitchen' },
     { src: 'public/html/reclamaciones.html', outName: 'reclamaciones' },
     { src: 'public/html/nosotros.html', outName: 'nosotros' },
     { src: 'public/html/contactanos.html', outName: 'contactanos' },
