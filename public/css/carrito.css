@@ -72,9 +72,10 @@ body.cart-drawer-open #mobile-menu-backdrop {
 .cart-drawer-header {
   padding: 14px 18px !important;
   border-bottom: 1px solid #f1f5f9 !important;
-  display: flex !important;
+  display: grid !important;
+  grid-template-columns: auto 1fr !important;
   align-items: center !important;
-  justify-content: space-between !important;
+  gap: 12px !important;
   background: #ffffff !important;
   position: sticky !important;
   top: 0 !important;
@@ -108,6 +109,7 @@ body.cart-drawer-open #mobile-menu-backdrop {
   display: flex;
   align-items: center;
   gap: 8px;
+  justify-content: center;
 }
 
 .cart-header-icon-badge {
