@@ -72,7 +72,8 @@ import {
   registerCustomer,
   googleAuthCustomer,
   getAllUsers,
-  getUserByEmail
+  getUserByEmail,
+  verifyUserPassword
 } from './src/db/users.ts';
 import {
   getCategories,
@@ -1144,20 +1145,26 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  // User Login endpoint (Autenticación integrada con Supabase Auth + Fallback Local)
+  // User Login endpoint (Autenticación estricta con Supabase Auth + Verificación de Contraseña Local)
   app.post(['/api/auth/login', '/auth/login', '/api/login', '/login'], async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
-      if (!email) {
-        return res.status(400).json({ success: false, error: 'Correo requerido' });
+      if (!email || !password) {
+        return res.status(400).json({ success: false, error: 'Por favor, ingresa correo electrónico y contraseña' });
       }
 
       const emailLower = (email || '').toLowerCase().trim();
       const passClean = (password || '').trim();
 
-      // 1. Intentar autenticar primero contra el servicio oficial de Supabase Auth
+      if (!passClean) {
+        return res.status(400).json({ success: false, error: 'Por favor, ingresa tu contraseña' });
+      }
+
+      // 1. Intentar autenticar contra el servicio de Supabase Auth
       let supabaseUser: any = null;
       let supabaseToken: string | null = null;
+      let supabaseRejectedCredentials = false;
+
       try {
         const sbRes = await fetch('https://ckgvgfpcxeqyilfphnsu.supabase.co/auth/v1/token?grant_type=password', {
           method: 'POST',
@@ -1167,30 +1174,40 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
           },
           body: JSON.stringify({ email: emailLower, password: passClean })
         });
-        if (sbRes.ok) {
-          const sbData = await sbRes.json();
+        const sbData = await sbRes.json().catch(() => ({}));
+
+        if (sbRes.ok && sbData.access_token) {
           supabaseUser = sbData.user;
           supabaseToken = sbData.access_token;
+        } else if (
+          sbRes.status === 400 && 
+          (sbData.error === 'invalid_grant' || (sbData.error_description && sbData.error_description.toLowerCase().includes('invalid login credentials')))
+        ) {
+          // Supabase verificó y rechazó explícitamente las credenciales por contraseña incorrecta
+          supabaseRejectedCredentials = true;
         }
       } catch (sbErr) {
         console.warn('Advertencia al consultar Supabase Auth:', sbErr);
       }
 
+      // Si Supabase Auth validó la contraseña con éxito
       if (supabaseUser) {
         const meta = supabaseUser.user_metadata || {};
         const appMeta = supabaseUser.app_metadata || {};
+        const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
         const isAdminUser = Boolean(
           meta.isAdmin === true ||
           meta.role === 'admin' ||
           appMeta.role === 'admin' ||
-          supabaseUser.role === 'admin'
+          supabaseUser.role === 'admin' ||
+          ADMIN_EMAILS.includes(emailLower)
         );
 
         const verifiedUser = {
           id: supabaseUser.id,
           uid: supabaseUser.id,
           email: supabaseUser.email || emailLower,
-          name: meta.name || meta.full_name || 'Administrador BuchiSapa',
+          name: meta.name || meta.full_name || 'Usuario BuchiSapa',
           firstName: meta.firstName || (meta.name ? meta.name.split(' ')[0] : 'Admin'),
           lastName: meta.lastName || (meta.name ? meta.name.split(' ').slice(1).join(' ') : 'BuchiSapa'),
           phone: meta.phone || supabaseUser.phone || '',
@@ -1199,11 +1216,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
           role: isAdminUser ? 'admin' : (meta.role || 'customer'),
           isAdmin: isAdminUser,
           emailVerified: true,
+          password: passClean,
           createdAt: supabaseUser.created_at || new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
 
-        // Guardar/sincronizar en el almacén en memoria
+        // Sincronizar en el almacén
         await registerCustomer(verifiedUser);
 
         return res.json({
@@ -1216,36 +1234,44 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         });
       }
 
-      // 2. Fallback de usuarios locales si Supabase Auth está offline
-      let user = await getUserByEmail(emailLower);
-      if (!user) {
-        user = await registerCustomer({
-          email: emailLower,
-          firstName: emailLower.split('@')[0],
-          lastName: '',
-          password: passClean,
+      // 2. Verificación de usuarios locales en base de datos
+      const localUser = await getUserByEmail(emailLower);
+      if (!localUser) {
+        // El usuario no existe ni en Supabase ni en la base local
+        return res.status(401).json({
+          success: false,
+          error: 'El correo electrónico o la contraseña ingresados no son correctos.'
+        });
+      }
+
+      // Si el usuario existe localmente, VERIFICAR OBLIGATORIAMENTE SU CONTRASEÑA
+      const passwordMatches = verifyUserPassword(localUser, passClean);
+      if (!passwordMatches) {
+        return res.status(401).json({
+          success: false,
+          error: 'La contraseña ingresada es incorrecta. Por favor, verifica tus datos.'
         });
       }
 
       const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
       const isAdminUser = Boolean(
-        user.role === 'admin' ||
-        user.isAdmin === true ||
+        localUser.role === 'admin' ||
+        localUser.isAdmin === true ||
         ADMIN_EMAILS.includes(emailLower) ||
-        user.id === '9b1fabb3-25d9-4c0a-921a-8d5a460e8a91' ||
-        user.uid === '9b1fabb3-25d9-4c0a-921a-8d5a460e8a91' ||
-        user.id === 'admin-buchisapaweb-id'
+        localUser.id === '9b1fabb3-25d9-4c0a-921a-8d5a460e8a91' ||
+        localUser.uid === '9b1fabb3-25d9-4c0a-921a-8d5a460e8a91' ||
+        localUser.id === 'admin-buchisapaweb-id'
       );
 
       const token = `user-token-${Date.now()}`;
       const verifiedUser = {
-        ...user,
-        role: isAdminUser ? 'admin' : (user.role || 'customer'),
+        ...localUser,
+        role: isAdminUser ? 'admin' : (localUser.role || 'customer'),
         isAdmin: isAdminUser,
         emailVerified: true
       };
 
-      res.json({
+      return res.json({
         success: true,
         user: verifiedUser,
         data: verifiedUser,
@@ -1255,7 +1281,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       });
     } catch (error: any) {
       console.error('Error in login:', error);
-      res.status(400).json({ success: false, error: error.message || 'Error al iniciar sesión' });
+      res.status(401).json({ success: false, error: error.message || 'Error al iniciar sesión' });
     }
   });
 
