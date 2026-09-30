@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from 'express';
 import path from 'path';
 import fs from 'fs';
-import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/auth.ts';
+import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/auth';
 
 function getCompiledIndexHtml(): string {
   const partials: Record<string, string> = {
@@ -65,7 +65,7 @@ function getCompiledAdminHtml(): string {
   }
   return template;
 }
-import { sendVerificationEmail, verifyCode } from './src/services/emailVerification.ts';
+import { sendVerificationEmail, verifyCode } from './src/services/emailVerification';
 import {
   getOrCreateUser,
   getUserByUid,
@@ -74,7 +74,7 @@ import {
   getAllUsers,
   getUserByEmail,
   verifyUserPassword
-} from './src/db/users.ts';
+} from './src/db/users';
 import {
   getCategories,
   getProducts,
@@ -115,7 +115,7 @@ import {
   deletePortada,
   reorderPortadas,
   savePortadaImageBase64,
-} from './src/db/queries.ts';
+} from './src/db/queries';
 
 export const app = express();
 const PORT = 3000;

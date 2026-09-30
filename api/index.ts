@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import app from '../server.ts';
+import app from '../server';
 
 export default function handler(req: Request, res: Response) {
   // Extract original requested path from Vercel headers if available
