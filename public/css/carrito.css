@@ -673,54 +673,137 @@ body.cart-drawer-open #mobile-menu-backdrop {
   transform: translateY(-1px);
 }
 
-/* 10. ESTADO VACÍO */
+/* 10. ESTADO VACÍO ELEGANTE Y MODERNO */
 .cart-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 20px;
+  padding: 50px 24px;
+  min-height: calc(100vh - 140px);
+  box-sizing: border-box;
 }
 
 .cart-empty-icon-card {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  background: #fee2e2;
+  position: relative;
+  width: 92px;
+  height: 92px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, #fff1f2 0%, #fee2e2 100%);
+  border: 1.5px solid #fecaca;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 22px;
+  box-shadow: 0 10px 28px -6px rgba(220, 38, 38, 0.18);
+  transition: transform 0.3s ease;
+}
+
+.cart-empty-icon-card:hover {
+  transform: scale(1.05);
+}
+
+.empty-icon-glow {
+  position: absolute;
+  inset: -6px;
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%);
+  border-radius: 30px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cart-empty-icon-card svg {
+  position: relative;
+  z-index: 1;
 }
 
 .cart-empty-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 900;
   color: #0f172a;
-  margin: 0 0 8px 0;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.5px;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .cart-empty-desc {
-  font-size: 13.5px;
+  font-size: 14px;
   color: #64748b;
-  margin: 0 0 24px 0;
-  max-width: 320px;
-  line-height: 1.45;
+  margin: 0 0 26px 0;
+  max-width: 330px;
+  line-height: 1.55;
 }
 
 .cart-empty-action-btn {
-  background: #dc2626;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: #ffffff;
   border: none;
-  border-radius: 12px;
-  padding: 14px 22px;
-  font-size: 14px;
+  border-radius: 14px;
+  padding: 15px 28px;
+  font-size: 15px;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .cart-empty-action-btn:hover {
-  background: #b91c1c;
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(220, 38, 38, 0.5);
+}
+
+.cart-empty-action-btn:active {
+  transform: translateY(0);
+}
+
+/* ACCESOS RÁPIDOS EN CARRITO VACÍO */
+.empty-shortcuts-wrap {
+  margin-top: 36px;
+  width: 100%;
+  max-width: 360px;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 22px;
+}
+
+.empty-shortcuts-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.empty-shortcuts-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.empty-chip {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.empty-chip:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+  transform: translateY(-1px);
 }

@@ -715,17 +715,45 @@ var BuchisapaCart = window.BuchisapaCart = {
         itemsContainer.innerHTML = `
           <div class="cart-empty-state">
             <div class="cart-empty-icon-card">
-              <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <div class="empty-icon-glow"></div>
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
                 <path d="M3 6h18"/>
                 <path d="M16 10a4 4 0 0 1-8 0"/>
               </svg>
             </div>
+            
             <h3 class="cart-empty-title">Tu pedido está vacío</h3>
             <p class="cart-empty-desc">Aún no has seleccionado ningún plato. Explora nuestras hamburguesas artesanales, broaster crocante, caldos y platos amazónicos.</p>
+            
             <button class="cart-empty-action-btn" type="button" onclick="BuchisapaCart.closeDrawer(); window.scrollTo({ top: 0, behavior: 'smooth' });">
-              Explorar la Carta y Pedir
+              <span>Explorar la Carta y Pedir</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
             </button>
+
+            <!-- ACCESOS RÁPIDOS A CATEGORÍAS -->
+            <div class="empty-shortcuts-wrap">
+              <span class="empty-shortcuts-label">¿Qué se te antoja hoy?</span>
+              <div class="empty-shortcuts-chips">
+                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('broaster'); else window.location.href='/?cat=broaster';">
+                  🍗 Broaster
+                </button>
+                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('hamburguesas'); else window.location.href='/?cat=hamburguesas';">
+                  🍔 Burgers
+                </button>
+                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('amazonicos'); else window.location.href='/?cat=amazonicos';">
+                  🌴 Selva
+                </button>
+                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('caldos'); else window.location.href='/?cat=caldos';">
+                  🥣 Caldos
+                </button>
+                <button type="button" class="empty-chip" onclick="BuchisapaCart.closeDrawer(); if(window.filterByCategory) window.filterByCategory('bebidas'); else window.location.href='/?cat=bebidas';">
+                  🥤 Bebidas
+                </button>
+              </div>
+            </div>
           </div>
         `;
       }
