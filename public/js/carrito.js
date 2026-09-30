@@ -3,7 +3,7 @@
  * Manejo de items, personalización de salsas, cálculo de subtotales, estado vacío y diseño "Tu Pedido Buchisapa"
  */
 
-const BuchisapaCart = {
+var BuchisapaCart = window.BuchisapaCart = {
   items: [],
   deliveryFee: 4.00,
   orderType: 'delivery', // 'delivery', 'pickup', 'table'

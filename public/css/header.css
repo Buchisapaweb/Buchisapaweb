@@ -175,6 +175,7 @@
   background: #fdf2f2;
   border: 1px solid #fee2e2;
   user-select: none;
+  text-decoration: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
   max-width: none;

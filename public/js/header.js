@@ -6,6 +6,19 @@
  */
 
 (function() {
+  if (!window.BuchisapaCart) {
+    window.BuchisapaCart = {
+      openDrawer: function() {},
+      closeDrawer: function() {},
+      clear: function() {},
+      handleBackdropClick: function() {},
+      addItem: function() {},
+      getCount: function() { return 0; },
+      getItemsCount: function() { return 0; }
+    };
+  }
+  window.BuchisapaCart = window.BuchisapaCart;
+
   // 1. CONTROL DEL MENÚ LATERAL MÓVIL (DRAWER)
   function toggleMobileMenu(forceState) {
     const backdrop = document.getElementById('mobile-menu-backdrop');

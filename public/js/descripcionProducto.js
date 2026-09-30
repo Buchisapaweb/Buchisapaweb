@@ -10,6 +10,26 @@
     if (!product && typeof window.allMenuProducts !== 'undefined') {
       product = window.allMenuProducts.find(p => String(p.id) === String(productOrId));
     }
+    if (!product && typeof window.getAllProducts === 'function') {
+      product = window.getAllProducts().find(p => String(p.id) === String(productOrId));
+    }
+    if (!product && typeof window.OFFICIAL_PROMOTIONS !== 'undefined') {
+      const p = window.OFFICIAL_PROMOTIONS.find(p => String(p.id) === String(productOrId));
+      if (p) {
+        product = {
+          id: p.id,
+          nombre: p.name || p.nombre,
+          name: p.name || p.nombre,
+          precio: p.price || p.precio,
+          price: p.price || p.precio,
+          descripcion: p.fullDesc || p.shortDesc || p.descripcion,
+          description: p.fullDesc || p.shortDesc || p.descripcion,
+          imagen_url: p.image || p.imagen,
+          category: 'promociones',
+          category_id: 'promociones'
+        };
+      }
+    }
 
     if (!product) return;
     currentProductDetail = product;

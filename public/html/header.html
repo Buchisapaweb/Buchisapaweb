@@ -13,22 +13,15 @@
       </a>
     </div>
 
-    <div class="location-picker-inline" onclick="openLocationModal()" title="Cambiar dirección o modo de entrega">
+    <a href="/recojo" class="location-picker-inline" title="Recojo en Santa Clara">
       <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
         <circle cx="12" cy="10" r="3.2"/>
       </svg>
-      <span class="location-text-red" id="selected-location-label">Entregar a Santa Clara</span>
-      <svg class="location-arrow-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m6 9 6 6 6-6"/>
-      </svg>
-    </div>
+      <span class="location-text-red" id="selected-location-label">Recojo en Santa Clara</span>
+    </a>
 
     <nav class="desktop-main-nav">
-      <button class="desktop-nav-link" type="button" onclick="goToPromociones()">
-        <span>PROMOCIONES</span>
-      </button>
-
       <div class="desktop-dropdown-wrap" id="nav-dropdown-categorias">
         <button class="desktop-nav-link dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">
           <span>CATEGORÍAS</span>
@@ -37,6 +30,7 @@
           </svg>
         </button>
         <div class="desktop-dropdown-menu">
+          <button class="dropdown-item dropdown-item-highlight" type="button" onclick="openCategoryView('promociones', 'PROMOCIONES')">⭐ PROMOCIONES</button>
           <button class="dropdown-item" type="button" onclick="openCategoryView('alitas', 'ALITAS')">ALITAS</button>
           <button class="dropdown-item" type="button" onclick="openCategoryView('bebidas', 'BEBIDAS')">BEBIDAS</button>
           <button class="dropdown-item" type="button" onclick="openCategoryView('broaster', 'BROASTER')">BROASTER</button>
@@ -148,15 +142,6 @@
 
     <div class="mobile-drawer-body">
       <div class="mobile-nav-cards-list">
-        <button class="mobile-nav-card" type="button" onclick="goToPromociones()">
-          <div class="nav-card-left">
-            <svg class="nav-card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-            <span class="nav-card-text">PROMOCIONES</span>
-          </div>
-        </button>
-
         <div class="mobile-nav-collapsible" id="categories-collapsible">
           <button class="mobile-nav-card" type="button" onclick="toggleNavCollapsible('categories-collapsible')">
             <div class="nav-card-left">
@@ -170,6 +155,7 @@
             </svg>
           </button>
           <div class="nav-collapsible-content">
+            <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('promociones', 'PROMOCIONES')" class="sub-nav-link sub-nav-link-highlight">⭐ PROMOCIONES</a>
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('alitas', 'ALITAS')" class="sub-nav-link">ALITAS</a>
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('bebidas', 'BEBIDAS')" class="sub-nav-link">BEBIDAS</a>
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('broaster', 'BROASTER')" class="sub-nav-link">BROASTER</a>

@@ -2669,23 +2669,6 @@ function closeLocationModal() {
 function updateSelectedLocationHeader() {
   const label = document.getElementById('selected-location-label');
   if (!label) return;
-  
-  try {
-    const fulfillment = localStorage.getItem('buchisapa_active_fulfillment');
-    if (fulfillment === 'delivery') {
-      const storedDelivery = localStorage.getItem('buchisapa_delivery_address');
-      if (storedDelivery) {
-        const parsed = JSON.parse(storedDelivery);
-        const tag = parsed.tag || 'Delivery';
-        const shortAddr = (parsed.address || '').split(',')[0].trim();
-        label.textContent = shortAddr ? `🛵 ${shortAddr}` : `🛵 ${tag}`;
-        return;
-      }
-      label.textContent = '🛵 Delivery a Domicilio';
-      return;
-    }
-  } catch (e) {}
-
   label.textContent = 'Recojo en Santa Clara';
 }
 
@@ -3829,13 +3812,13 @@ function openCategoryView(catId, catTitle) {
   }
 
   if (searchSec) {
-    searchSec.classList.add('promociones-mode');
+    searchSec.classList.remove('promociones-mode');
     searchSec.style.display = 'block';
     searchSec.classList.remove('is-hidden');
   }
   if (container) {
-    container.classList.add('promo-grid-4col');
-    container.classList.remove('buchisapa-cards-list');
+    container.classList.remove('promo-grid-4col');
+    container.classList.add('buchisapa-cards-list');
   }
 
   // Sincronizar active state en quick category pills
@@ -3865,7 +3848,45 @@ function openCategoryView(catId, catTitle) {
 
   // Renderizar los productos correspondientes a la categoría elegida
   if (isPromo) {
-    renderOfficialPromotionsInApp(container);
+    const rawPromos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
+      ? window.OFFICIAL_PROMOTIONS
+      : [
+        { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.', image: '/imagenes/portada/Portada2E.webp' },
+        { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.', image: '/imagenes/portada/Portada1M.webp' },
+        { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.', image: '/imagenes/portada/Portada3E.webp' },
+        { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.', image: '/imagenes/portada/Portada4E.webp' }
+      ];
+
+    const catalogPromos = getAllProducts().filter(p => {
+      const pCatId = normalizeText(p.category_id || '');
+      const pCatName = normalizeText(p.category || '');
+      return pCatId.includes('promo') || pCatName.includes('promo') || pCatId.includes('combo') || pCatName.includes('combo') || p.is_promo === true;
+    });
+
+    const promoList = [
+      ...rawPromos.map(p => ({
+        id: p.id,
+        name: p.name || p.nombre,
+        description: p.fullDesc || p.shortDesc || p.descripcion,
+        price: p.price || p.precio,
+        image: p.image || p.imagen,
+        category: 'promociones',
+        category_id: 'promociones',
+        categoryLabel: 'PROMOCIONES'
+      })),
+      ...catalogPromos
+    ];
+
+    const uniquePromos = [];
+    const seenIds = new Set();
+    for (const item of promoList) {
+      if (!seenIds.has(item.id)) {
+        seenIds.add(item.id);
+        uniquePromos.push(item);
+      }
+    }
+
+    renderCardsInContainer(uniquePromos, container);
   } else {
     const items = getAllProducts();
     const rawTarget = normalizeText(catId || catTitle || '');
@@ -3970,88 +3991,26 @@ function renderOfficialPromotionsInApp(container) {
   }
   if (!container) return;
 
-  const promos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
+  const rawPromos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
     ? window.OFFICIAL_PROMOTIONS
     : [
-    {
-      id: 'promo-1',
-      name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.',
-      price: 90.90,
-      shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoció...',
-      fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.',
-      image: '/imagenes/portada/Portada2E.webp',
-      fallbackImg: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80'
-    },
-    {
-      id: 'promo-2',
-      name: 'Promoción Tu Chicha 1.5 LT.',
-      price: 95.50,
-      shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción in...',
-      fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.',
-      image: '/imagenes/portada/Portada1M.webp',
-      fallbackImg: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80'
-    },
-    {
-      id: 'promo-3',
-      name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.',
-      price: 95.50,
-      shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoci...',
-      fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.',
-      image: '/imagenes/portada/Portada3E.webp',
-      fallbackImg: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80'
-    },
-    {
-      id: 'promo-4',
-      name: 'Promoción Para 2',
-      price: 57.90,
-      shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción in...',
-      fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.',
-      image: '/imagenes/portada/Portada4E.webp',
-      fallbackImg: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80'
-    }
-  ];
+      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.', image: '/imagenes/portada/Portada2E.webp' },
+      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.', image: '/imagenes/portada/Portada1M.webp' },
+      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.', image: '/imagenes/portada/Portada3E.webp' },
+      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.', image: '/imagenes/portada/Portada4E.webp' }
+    ];
 
-  const escapeFn = typeof window !== 'undefined' && typeof window.escapeHtml === 'function'
-    ? window.escapeHtml
-    : (s) => (s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '');
+  const promoProducts = rawPromos.map(p => ({
+    id: p.id,
+    name: p.name || p.nombre,
+    description: p.fullDesc || p.shortDesc || p.descripcion,
+    price: Number(p.price || p.precio || 0),
+    image: p.image || p.imagen,
+    category_id: 'promociones',
+    categoryLabel: 'PROMOCIONES'
+  }));
 
-  container.innerHTML = promos.map((p, idx) => `
-    <article class="promo-item-card buchisapa-dish-card" onclick="openPromoOrProductModal('${p.id}')" style="cursor: pointer;">
-      <div class="promo-item-img-box dish-card-img-wrap">
-        <img 
-          src="${p.image}" 
-          alt="${escapeFn(p.name)}" 
-          class="promo-item-img dish-card-img"
-          loading="${idx < 4 ? 'eager' : 'lazy'}"
-          onerror="this.onerror=null; this.src='${p.fallbackImg}';"
-        >
-      </div>
-      <div class="promo-item-body dish-card-content">
-        <span class="dish-card-cat-label">PROMOCIONES</span>
-        <h3 class="promo-item-title dish-card-title">${escapeFn(p.name)}</h3>
-        <p class="promo-item-desc dish-card-desc">
-          ${escapeFn(p.shortDesc)}
-          <button type="button" class="promo-ver-mas-inline" onclick="event.stopPropagation(); openPromoOrProductModal('${p.id}')">VER MÁS</button>
-        </p>
-        <div class="promo-item-footer dish-card-footer">
-          <span class="promo-item-price dish-card-price">S/${p.price.toFixed(2)}</span>
-          <button 
-            type="button" 
-            class="promo-btn-agregar dish-card-add-btn" 
-            onclick="event.stopPropagation(); addPromoToCartFromApp('${p.id}')"
-            aria-label="Agregar ${escapeFn(p.name)} al pedido"
-          >
-            <svg class="promo-basket-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
-              <path d="M3 6h18"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
-            </svg>
-            <span>Agregar</span>
-          </button>
-        </div>
-      </div>
-    </article>
-  `).join('');
+  renderCardsInContainer(promoProducts, container);
 }
 
 function openPromoOrProductModal(promoId) {

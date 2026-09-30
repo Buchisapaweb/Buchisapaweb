@@ -13,8 +13,8 @@ function getCompiledIndexHtml(): string {
     'DESCRIPCION_PRODUCTO': 'public/html/descripcionProducto.html',
     'CARRITO': 'public/html/carrito.html',
     'PANEL_CARRITO': 'public/html/carrito.html',
-    'RECOJO': 'public/html/recojo.html',
-    'VENTANA_UBICACION': 'public/html/recojo.html',
+    'RECOJO': 'public/html/recojo-modal.html',
+    'VENTANA_UBICACION': 'public/html/recojo-modal.html',
     'CHECKOUT': 'public/html/Checkout.html',
     'VENTANA_CARTA_COMPLETA': 'public/html/Checkout.html',
     'AUTENTICACION_PERFIL': 'public/html/autenticacionPerfil.html',
@@ -46,11 +46,9 @@ function getCompiledAdminHtml(): string {
     'VIEW_CAJA': 'admin/views/caja.html',
     'VIEW_TICKET': 'admin/views/ticket.html',
     'VIEW_PORTADA': 'admin/views/portada.html',
-    'VIEW_PROMOCIONES': 'admin/views/promociones.html',
     'VIEW_INSUMOS': 'admin/views/insumos.html',
     'VIEW_UTENSILIOS': 'admin/views/utensilios.html',
     'VIEW_DELIVERY': 'admin/views/delivery.html',
-    'VIEW_RECOJO': 'admin/views/recojo.html',
     'VIEW_UBICACION': 'admin/views/ubicacion.html',
     'VIEW_REPORTES': 'admin/views/reportes.html',
     'VIEW_CONFIGURACION': 'admin/views/configuracion.html',
@@ -2608,6 +2606,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   app.get(['/contactanos', '/contactanos.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'public/html/contactanos.html'));
+  });
+
+  app.get(['/recojo', '/recojo.html'], (_req: Request, res: Response) => {
+    res.sendFile(path.join(process.cwd(), 'public/html/recojo.html'));
   });
 
   // 3. Página de Inicio (HTML5 con parciales compilados)

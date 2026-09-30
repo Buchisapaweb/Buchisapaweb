@@ -42,11 +42,6 @@
       desc: 'Gestión de diapositivas del carrusel de la tienda web',
       button: { text: '+ Nueva Portada', action: () => window.openCreatePortadaPage() }
     },
-    'promociones': {
-      title: 'Promociones y Ofertas',
-      desc: 'Combos con descuento y promociones especiales para clientes',
-      button: { text: '+ Nueva Promoción', action: () => window.openCreatePromotionModal() }
-    },
     'insumos': {
       title: 'Insumos de Cocina',
       desc: 'Control de inventario de materia prima y stock crítico',
@@ -60,11 +55,6 @@
     'delivery': {
       title: 'Despachos y Delivery',
       desc: 'Pedidos asignados a repartidores y seguimiento en ruta',
-      button: null
-    },
-    'recojo': {
-      title: 'Recojo en Mostrador',
-      desc: 'Órdenes para retirar directamente en el restaurante',
       button: null
     },
     'ubicacion': {
