@@ -2597,6 +2597,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'public/html/vision.html'));
   });
 
+  app.get(['/mision', '/mision.html'], (_req: Request, res: Response) => {
+    res.sendFile(path.join(process.cwd(), 'public/html/mision.html'));
+  });
+
   app.get(['/valores', '/valores.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'public/html/valores.html'));
   });
