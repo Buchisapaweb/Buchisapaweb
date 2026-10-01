@@ -245,18 +245,19 @@
       }
 
       if (!Array.isArray(cartItems) || cartItems.length === 0) {
-        document.getElementById('checkout-items-list').innerHTML = `
-          <div class="empty-checkout-card">
-            <span style="font-size: 38px;">🛒</span>
-            <h3>Tu carrito está vacío</h3>
-            <p>Agrega los mejores platos de nuestra carta antes de proceder.</p>
-            <a href="/" class="btn-goto-menu">Ver Carta</a>
-          </div>
-        `;
-        const financeBox = document.querySelector('.summary-finance-box');
-        if (financeBox) financeBox.style.display = 'none';
-        const submitBtn = document.querySelector('.checkout-primary-cta-btn');
-        if (submitBtn) submitBtn.style.display = 'none';
+        const grid = document.querySelector('.checkout-split-grid') || document.querySelector('.standalone-checkout-wrapper');
+        if (grid) {
+          grid.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; text-align: center; padding: 40px 20px; max-width: 480px; margin: 0 auto; grid-column: 1 / -1;">
+              <span style="font-size: 56px; margin-bottom: 16px;">🛒</span>
+              <h2 style="font-size: 22px; font-weight: 900; color: #0f172a; margin-bottom: 8px;">Tu carrito está vacío</h2>
+              <p style="color: #64748b; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Agrega los mejores platos de nuestra carta antes de proceder al checkout.</p>
+              <a href="/" style="background: #dc2626; color: #ffffff; padding: 14px 28px; border-radius: 9999px; font-weight: 800; font-size: 15px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);">
+                <span>← Volver a la Carta</span>
+              </a>
+            </div>
+          `;
+        }
         const mobileBar = document.querySelector('.mobile-checkout-sticky-footer');
         if (mobileBar) mobileBar.style.display = 'none';
         return;
