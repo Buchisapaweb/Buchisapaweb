@@ -541,21 +541,12 @@
   padding: 24px 0 60px 0;
 }
 
-.checkout-grid-container {
-  max-width: 1200px;
+.checkout-grid-container,
+.checkout-split-grid {
+  max-width: 640px;
   margin: 0 auto;
   padding: 0 16px;
-  display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 28px;
-  align-items: start;
-}
-
-@media (max-width: 991px) {
-  .checkout-grid-container {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
+  display: block;
 }
 
 .checkout-card-box {

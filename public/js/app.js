@@ -4601,7 +4601,8 @@ async function submitOrder(e) {
 
     // Mapeo amigable de método de pago
     let paymentLabel = 'YAPE / PLIN (943 312 024)';
-    if (payment === 'tarjeta') paymentLabel = 'TARJETA';
+    if (payment === 'culqi') paymentLabel = 'CULQI ONLINE (Tarjeta / Yape)';
+    else if (payment === 'tarjeta') paymentLabel = 'TARJETA';
     else if (payment === 'efectivo') paymentLabel = 'EFECTIVO CONTRAENTREGA';
 
     // Construcción exacta del mensaje estructurado de WhatsApp
@@ -4631,6 +4632,33 @@ async function submitOrder(e) {
       waText += `• ${it.quantity}x ${encodeURIComponent(it.name || 'Plato')} - S/ ${((parseFloat(it.price) || 0) * (parseInt(it.quantity) || 1)).toFixed(2)}%0A`;
     });
     waText += `%0A*TOTAL A PAGAR: S/ ${orderPayload.total.toFixed(2)}*`;
+
+    // Si el método seleccionado es Culqi Online
+    if (payment === 'culqi' && window.BuchisapaCulqi) {
+      window.BuchisapaCulqi.openCheckout({
+        amount: total,
+        orderNumber: createdOrder.orderNumber || 101,
+        customerEmail: loggedCustomer?.email || 'cliente@buchisapa.pe',
+        customerName: name,
+        orderPayload: orderPayload,
+        onSuccess: (resData) => {
+          if (window.BuchisapaCart) window.BuchisapaCart.clear();
+          closeCheckoutModal();
+          const chargeId = resData.chargeId || `chr_${Date.now()}`;
+          const culqiWaText = waText.replace(
+            `*Pago:* ${encodeURIComponent(paymentLabel)}`,
+            `*Pago:* ✅ PAGADO ONLINE CON CULQI (ID: ${encodeURIComponent(chargeId)})`
+          );
+          setTimeout(() => {
+            window.open(`https://wa.me/51943312024?text=${culqiWaText}`, '_blank');
+          }, 300);
+        },
+        onError: (err) => {
+          console.warn('Culqi error:', err);
+        }
+      });
+      return;
+    }
 
     // Limpiar carrito y cerrar modal
     if (window.BuchisapaCart) window.BuchisapaCart.clear();

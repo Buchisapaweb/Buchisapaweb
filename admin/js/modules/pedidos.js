@@ -311,19 +311,31 @@
             </div>
             ${(order.deliveryAddress || order.customer?.address) ? `<div class="customer-address-line">📍 ${window.AdminUtils.escapeHtml(order.deliveryAddress || order.customer.address)}</div>` : ''}
             <div class="customer-payment-line">💳 Pago: ${order.payment_method || order.paymentMethod || 'Efectivo'}</div>
+            ${order.notes ? `<div class="customer-notes-line" style="margin-top: 4px; font-size: 0.85rem; color: #fbbf24;">📝 Nota: ${window.AdminUtils.escapeHtml(order.notes)}</div>` : ''}
           </div>
 
           <div class="order-items-summary">
             <div class="order-items-header">📋 Platos del Pedido:</div>
-            ${parsedItems.map(item => `
-              <div class="order-item-row">
-                <div class="order-item-detail">
-                  <span class="order-item-qty">${item.quantity || 1}x</span>
-                  <span class="order-item-name">${window.AdminUtils.escapeHtml(item.name || item.title || 'Plato')}</span>
+            ${parsedItems.map(item => {
+              const name = item.name || item.title || (item.item && item.item.name) || 'Plato';
+              const price = parseFloat(item.price || (item.item && item.item.price) || 0);
+              const qty = parseInt(item.quantity || 1);
+              const saucesList = item.selectedSauces || item.sauces || [];
+              const saucesStr = Array.isArray(saucesList) ? saucesList.join(', ') : '';
+              return `
+                <div class="order-item-row">
+                  <div class="order-item-detail">
+                    <span class="order-item-qty">${qty}x</span>
+                    <div>
+                      <span class="order-item-name">${window.AdminUtils.escapeHtml(name)}</span>
+                      ${saucesStr ? `<div style="font-size: 0.78rem; color: #94a3b8;">Cremas: ${window.AdminUtils.escapeHtml(saucesStr)}</div>` : ''}
+                      ${item.notes ? `<div style="font-size: 0.78rem; color: #cbd5e1;">Nota: ${window.AdminUtils.escapeHtml(item.notes)}</div>` : ''}
+                    </div>
+                  </div>
+                  <span class="order-item-price">${window.AdminUtils.formatSoles(price * qty)}</span>
                 </div>
-                <span class="order-item-price">${window.AdminUtils.formatSoles((item.price || 0) * (item.quantity || 1))}</span>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
 
           <div class="order-card-footer">
