@@ -54,5 +54,19 @@
     "name": "SALCHIPAPAS Y SALCHIBROASTERS",
     "icon": "Flame",
     "description": "Papas crocantes, salchichas, chorizos y combinaciones broaster."
+  },
+  {
+    "id": "promociones",
+    "code": "1009",
+    "name": "PROMOCIONES",
+    "icon": "BadgePercent",
+    "description": "Combos especiales, ofertas de la semana y paquetes familiares."
+  },
+  {
+    "id": "adicional",
+    "code": "1010",
+    "name": "ADICIONAL",
+    "icon": "PlusCircle",
+    "description": "Porciones extra, salsas especiales, cremas adicionales y guarniciones."
   }
 ]

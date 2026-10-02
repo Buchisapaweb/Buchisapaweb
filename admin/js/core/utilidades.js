@@ -45,6 +45,8 @@
       '1006': 'PLATOS AMAZÓNICOS',
       '1007': 'REFRESCOS',
       '1008': 'SALCHIPAPAS Y SALCHIBROASTERS',
+      '1009': 'PROMOCIONES',
+      '1010': 'ADICIONAL',
       'alitas': 'ALITAS',
       'bebidas': 'BEBIDAS',
       'broaster': 'BROASTER',
@@ -52,7 +54,9 @@
       'infusiones': 'INFUSIONES',
       'platos-amazonicos': 'PLATOS AMAZÓNICOS',
       'refrescos': 'REFRESCOS',
-      'salchipapas': 'SALCHIPAPAS Y SALCHIBROASTERS'
+      'salchipapas': 'SALCHIPAPAS Y SALCHIBROASTERS',
+      'promociones': 'PROMOCIONES',
+      'adicional': 'ADICIONAL'
     };
     const key = (cat || '').toLowerCase().trim();
     if (map[key]) return map[key];

@@ -106,7 +106,9 @@ const initialCategories: Category[] = [
   { id: 'infusiones', code: '1005', name: 'INFUSIONES', icon: 'CupSoda', description: 'Infusiones calientes y café aromático pasado.' },
   { id: 'platos-amazonicos', code: '1006', name: 'PLATOS AMAZÓNICOS', icon: 'Flame', description: 'Auténticos sabores de la selva peruana: tacacho, cecina, juanes y patacones.' },
   { id: 'refrescos', code: '1007', name: 'REFRESCOS', icon: 'GlassWater', description: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
-  { id: 'salchipapas', code: '1008', name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'Flame', description: 'Papas crocantes, salchichas, chorizos y combinaciones broaster.' }
+  { id: 'salchipapas', code: '1008', name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'Flame', description: 'Papas crocantes, salchichas, chorizos y combinaciones broaster.' },
+  { id: 'promociones', code: '1009', name: 'PROMOCIONES', icon: 'BadgePercent', description: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
+  { id: 'adicional', code: '1010', name: 'ADICIONAL', icon: 'PlusCircle', description: 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.' }
 ];
 
 // 2. SALSAS DE LA CASA

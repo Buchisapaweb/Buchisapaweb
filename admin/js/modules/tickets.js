@@ -1048,7 +1048,9 @@
     { id: 'infusiones', code: '1005', name: 'INFUSIONES' },
     { id: 'platos-amazonicos', code: '1006', name: 'PLATOS AMAZÓNICOS' },
     { id: 'refrescos', code: '1007', name: 'REFRESCOS' },
-    { id: 'salchipapas', code: '1008', name: 'SALCHIPAPAS Y SALCHIBROASTERS' }
+    { id: 'salchipapas', code: '1008', name: 'SALCHIPAPAS Y SALCHIBROASTERS' },
+    { id: 'promociones', code: '1009', name: 'PROMOCIONES' },
+    { id: 'adicional', code: '1010', name: 'ADICIONAL' }
   ];
 
   // Salsas oficiales traídas de la página de clientes (personalizador.js)

@@ -216,7 +216,9 @@
     { id: 'infusiones', code: '1005', slug: 'infusiones', name: 'INFUSIONES' },
     { id: 'platos-amazonicos', code: '1006', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS' },
     { id: 'refrescos', code: '1007', slug: 'refrescos', name: 'REFRESCOS' },
-    { id: 'salchipapas', code: '1008', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS' }
+    { id: 'salchipapas', code: '1008', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS' },
+    { id: 'promociones', code: '1009', slug: 'promociones', name: 'PROMOCIONES' },
+    { id: 'adicional', code: '1010', slug: 'adicional', name: 'ADICIONAL' }
   ];
 
   function getCategoryCode(catId) {

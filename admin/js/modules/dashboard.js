@@ -390,8 +390,9 @@
     if (currentCircularMode === 'categorias') {
       centerSubtitle = 'Categorías';
 
-      // 8 Categorías Oficiales BuchiSapa
+      // 10 Categorías Oficiales BuchiSapa
       const CATEGORIES_DEF = [
+        { key: 'promociones', label: 'Promociones', color: '#f59e0b' },
         { key: 'broaster', label: 'Broaster', color: '#ff6b00' },
         { key: 'hamburguesas', label: 'Hamburguesas', color: '#00e5ff' },
         { key: 'platos-amazonicos', label: 'Amazónicos', color: '#00ff88' },
@@ -399,16 +400,17 @@
         { key: 'salchipapas', label: 'Salchipapas', color: '#ffcc00' },
         { key: 'bebidas', label: 'Bebidas', color: '#38bdf8' },
         { key: 'refrescos', label: 'Refrescos', color: '#e040fb' },
-        { key: 'infusiones', label: 'Infusiones', color: '#a855f7' }
+        { key: 'infusiones', label: 'Infusiones', color: '#a855f7' },
+        { key: 'adicional', label: 'Adicional', color: '#10b981' }
       ];
 
       const catSoles = {
-        'broaster': 0, 'hamburguesas': 0, 'platos-amazonicos': 0, 'alitas': 0,
-        'salchipapas': 0, 'bebidas': 0, 'refrescos': 0, 'infusiones': 0
+        'promociones': 0, 'broaster': 0, 'hamburguesas': 0, 'platos-amazonicos': 0, 'alitas': 0,
+        'salchipapas': 0, 'bebidas': 0, 'refrescos': 0, 'infusiones': 0, 'adicional': 0
       };
       const catCount = {
-        'broaster': 0, 'hamburguesas': 0, 'platos-amazonicos': 0, 'alitas': 0,
-        'salchipapas': 0, 'bebidas': 0, 'refrescos': 0, 'infusiones': 0
+        'promociones': 0, 'broaster': 0, 'hamburguesas': 0, 'platos-amazonicos': 0, 'alitas': 0,
+        'salchipapas': 0, 'bebidas': 0, 'refrescos': 0, 'infusiones': 0, 'adicional': 0
       };
 
       const allProds = (products && products.length > 0) ? products : (window.AdminState?.allProducts || []);
@@ -435,7 +437,9 @@
           const fullCat = itemCat || String(matchedProd.category_id || matchedProd.category || '').toLowerCase();
 
           let key = 'broaster';
-          if (fullCat === 'hamburguesas' || itemName.includes('burger') || itemName.includes('hamburguesa') || itemName.includes('royal')) key = 'hamburguesas';
+          if (fullCat === 'promociones' || fullCat === 'promocion' || itemName.includes('promo') || itemName.includes('combo') || itemName.includes('duo') || itemName.includes('familiar')) key = 'promociones';
+          else if (fullCat === 'adicional' || fullCat === 'adicionales' || itemName.includes('adicional') || itemName.includes('extra') || itemName.includes('crema') || itemName.includes('porcion') || itemName.includes('salsa')) key = 'adicional';
+          else if (fullCat === 'hamburguesas' || itemName.includes('burger') || itemName.includes('hamburguesa') || itemName.includes('royal')) key = 'hamburguesas';
           else if (fullCat === 'platos-amazonicos' || fullCat.includes('amazon') || itemName.includes('juane') || itemName.includes('tacacho') || itemName.includes('cecina') || itemName.includes('chorizo') || itemName.includes('patacon') || itemName.includes('chaufa regional')) key = 'platos-amazonicos';
           else if (fullCat === 'alitas' || itemName.includes('alita') || itemName.includes('wings') || itemName.includes('bbq') || itemName.includes('acevichada')) key = 'alitas';
           else if (fullCat.includes('salchipapa') || itemName.includes('salchipapa') || itemName.includes('salchibroaster') || itemName.includes('salchiqueso')) key = 'salchipapas';
@@ -474,9 +478,9 @@
         // Enlace proporcional al catálogo oficial de platos cuando no hay ventas
         const catalogCounts = {
           'hamburguesas': 12, 'salchipapas': 7, 'platos-amazonicos': 7,
-          'refrescos': 5, 'bebidas': 5, 'broaster': 4, 'infusiones': 3, 'alitas': 2
+          'refrescos': 5, 'adicional': 5, 'bebidas': 5, 'promociones': 4, 'broaster': 4, 'infusiones': 3, 'alitas': 2
         };
-        const totalCatalogProds = 49;
+        const totalCatalogProds = 54;
         chartData = CATEGORIES_DEF.map(cat => {
           const catProds = catalogCounts[cat.key] || 3;
           const pct = Math.round((catProds / totalCatalogProds) * 100);
