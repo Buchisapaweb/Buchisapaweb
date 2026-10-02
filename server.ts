@@ -77,6 +77,9 @@ import {
 } from './src/db/users';
 import {
   getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
   getProducts,
   getProductById,
   getSauces,
@@ -278,6 +281,44 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
+  // Create category
+  app.post('/api/categories', async (req: Request, res: Response) => {
+    try {
+      const newCategory = await createCategory(req.body);
+      res.status(201).json({ success: true, data: newCategory });
+    } catch (error: any) {
+      console.error('Error creating category:', error);
+      res.status(500).json({ success: false, error: error.message || 'Error creating category' });
+    }
+  });
+
+  // Update category
+  app.put('/api/categories/:id', async (req: Request, res: Response) => {
+    try {
+      const categoryId = req.params.id as string;
+      const updated = await updateCategory(categoryId, req.body);
+      if (!updated) {
+        return res.status(404).json({ success: false, error: 'Categoría no encontrada' });
+      }
+      res.json({ success: true, data: updated });
+    } catch (error: any) {
+      console.error('Error updating category:', error);
+      res.status(500).json({ success: false, error: error.message || 'Error updating category' });
+    }
+  });
+
+  // Delete category
+  app.delete('/api/categories/:id', async (req: Request, res: Response) => {
+    try {
+      const categoryId = req.params.id as string;
+      const deleted = await deleteCategory(categoryId);
+      res.json({ success: deleted });
+    } catch (error: any) {
+      console.error('Error deleting category:', error);
+      res.status(500).json({ success: false, error: error.message || 'Error deleting category' });
+    }
+  });
+
   // Get products
   app.get('/api/products', async (req: Request, res: Response) => {
     try {
@@ -410,6 +451,33 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       const note = notes || notas;
       const result = await cerrarCaja({ efectivoReal: cash, notas: note, responsable });
       res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Admin general sales metrics
+  app.get('/api/admin/metrics', async (_req: Request, res: Response) => {
+    try {
+      const orders = await getOrders();
+      const validOrders = orders.filter((o: any) => String(o.status || '').toLowerCase() !== 'cancelado');
+      const totalSales = validOrders.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0);
+      const totalOrders = validOrders.length;
+      const averageTicket = totalOrders > 0 ? totalSales / totalOrders : 0;
+      
+      const deliveryOrders = validOrders.filter((o: any) => String(o.orderType || o.type || '').toLowerCase() === 'delivery');
+      const salonOrders = validOrders.filter((o: any) => String(o.orderType || o.type || '').toLowerCase() !== 'delivery');
+
+      res.json({
+        success: true,
+        data: {
+          totalSales,
+          totalOrders,
+          averageTicket,
+          deliveryOrdersCount: deliveryOrders.length,
+          salonOrdersCount: salonOrders.length
+        }
+      });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }

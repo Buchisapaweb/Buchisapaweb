@@ -1,5 +1,5 @@
 <!-- ====================================================================
-     VISTA DE GESTIÓN DE CATEGORÍAS (NUEVA PÁGINA COMPLETA PROFESIONAL)
+     VISTA DE GESTIÓN DE CATEGORÍAS (EXECUTIVE LUXURY THEME)
      ==================================================================== -->
 <section class="admin-view" id="view-categorias">
   
@@ -12,60 +12,76 @@
       </button>
       <div class="form-page-badge">
         <span class="pulse-dot"></span>
-        <span>MÓDULO DE CARTA DIGITAL</span>
+        <span>SISTEMA DE CARTA DIGITAL</span>
       </div>
     </div>
 
     <div class="category-page-title-box">
       <h2 class="category-page-main-title">📁 Gestión de Categorías de la Carta</h2>
-      <p class="category-page-sub-title">Añade nuevas categorías personalizadas o elimina de forma rápida las que ya no requieras en tu menú web.</p>
+      <p class="category-page-sub-title">Crea, edita o elimina las categorías del menú web. Todas las modificaciones se sincronizan automáticamente en tiempo real con la tienda de clientes.</p>
     </div>
   </div>
 
   <!-- DISPOSICIÓN PRINCIPAL DE PÁGINA EN 2 COLUMNAS AMPLIAS -->
   <div class="category-page-body-grid">
     
-    <!-- SECCIÓN IZQUIERDA: CREAR CATEGORÍA -->
+    <!-- SECCIÓN IZQUIERDA: CREAR / EDITAR CATEGORÍA -->
     <div class="category-form-section">
       <div class="section-title-wrap">
-        <div class="squircle-icon-badge squircle-cyan">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+        <div class="squircle-icon-badge" style="background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
         </div>
         <div>
-          <h3 class="section-title-text">Crear Nueva Categoría</h3>
-          <p class="section-subtitle-text">Se activará inmediatamente para filtrar y asociar platos</p>
+          <h3 class="section-title-text" id="cat-form-title">Crear Nueva Categoría</h3>
+          <p class="section-subtitle-text" id="cat-form-subtitle">Se activará inmediatamente para agrupar y filtrar platos en la tienda</p>
         </div>
       </div>
 
       <form id="new-category-page-form" onsubmit="window.handleCreateCategorySubmit(event)" class="category-flat-form">
+        <input type="hidden" id="form-cat-page-edit-id" value="">
+        
         <div class="cat-form-grid">
           <div class="form-group form-group-code">
-            <label class="form-label" for="form-cat-page-code">Código (4 Dígitos)</label>
-            <input type="text" class="form-input form-input-lg form-input-code" id="form-cat-page-code" readonly placeholder="1011">
+            <label class="form-label" for="form-cat-page-code">Código Único (4 Dígitos)</label>
+            <input type="text" class="form-input form-input-lg form-input-code" id="form-cat-page-code" readonly placeholder="1009" style="background: rgba(239, 68, 68, 0.08); color: #f87171; font-weight: 800; text-align: center; letter-spacing: 2px; border-color: rgba(239, 68, 68, 0.3);">
           </div>
+          
           <div class="form-group form-group-name">
             <label class="form-label" for="form-cat-page-name">Nombre de la Categoría *</label>
-            <input type="text" class="form-input form-input-lg" id="form-cat-page-name" required placeholder="Ej. Parrillas & Carnes, Postres, Tragos">
+            <input type="text" class="form-input form-input-lg" id="form-cat-page-name" required placeholder="Ej. PARRILLAS & CARNES, POSTRES, COCTELES" autocomplete="off">
           </div>
         </div>
 
-        <button type="submit" class="btn-save-category-hero">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-          <span>Guardar Categoría</span>
-        </button>
+        <div class="form-group" style="margin-top: 14px;">
+          <label class="form-label" for="form-cat-page-desc">Descripción (Opcional)</label>
+          <input type="text" class="form-input" id="form-cat-page-desc" placeholder="Breve detalle de los platos de esta categoría..." autocomplete="off">
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button type="button" id="btn-cancel-edit-category" class="btn btn-secondary" style="display: none; height: 48px; border-radius: 12px; font-weight: 700; padding: 0 20px;" onclick="window.cancelEditCategory()">
+            <span>Cancelar</span>
+          </button>
+          <button type="submit" class="btn-save-category-hero" id="btn-save-category-hero" style="flex: 1; height: 48px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; cursor: pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+            <span id="btn-save-category-text">Guardar Categoría</span>
+          </button>
+        </div>
       </form>
     </div>
 
-    <!-- SECCIÓN DERECHA: LISTADO Y ELIMINACIÓN -->
+    <!-- SECCIÓN DERECHA: LISTADO Y ACCIONES -->
     <div class="category-list-section">
-      <div class="section-title-wrap">
-        <div class="squircle-icon-badge squircle-purple">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      <div class="section-title-wrap" style="justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="squircle-icon-badge" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          </div>
+          <div>
+            <h3 class="section-title-text">Categorías Oficiales</h3>
+            <p class="section-subtitle-text">Edita los nombres o elimina categorías de tu menú</p>
+          </div>
         </div>
-        <div>
-          <h3 class="section-title-text">Categorías Disponibles</h3>
-          <p class="section-subtitle-text">Haz clic en 'Eliminar Categoría' para borrar cualquiera del menú</p>
-        </div>
+        <span class="badge badge-gray" id="categories-total-count" style="font-weight: 800; font-size: 0.8rem; padding: 6px 14px;">8 Categorías</span>
       </div>
 
       <div class="categories-list-container" id="categories-full-list-container">

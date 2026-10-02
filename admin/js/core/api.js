@@ -132,17 +132,60 @@
       return await res.json();
     },
 
+    // CATEGORIES (SINCRONIZACIÓN CON BACKEND)
+    async getCategories(forceRefresh = false) {
+      if (!forceRefresh) {
+        const cached = getCachedData('categories');
+        if (cached && Array.isArray(cached) && cached.length > 0) return cached;
+      }
+      try {
+        const res = await fetch('/api/categories');
+        if (res.ok) {
+          const json = await res.json();
+          const list = Array.isArray(json) ? json : (json && Array.isArray(json.data) ? json.data : []);
+          if (Array.isArray(list) && list.length > 0) {
+            setCachedData('categories', list);
+            return list;
+          }
+        }
+      } catch (e) {
+        console.warn('Error fetching /api/categories:', e);
+      }
+      return [];
+    },
+
+    async saveCategory(categoryData, isEdit = false, id = null) {
+      const url = isEdit ? `/api/categories/${id}` : '/api/categories';
+      const method = isEdit ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(categoryData)
+      });
+      if (!res.ok) throw new Error('Error al guardar categoría');
+      apiCache.delete('categories');
+      return await res.json();
+    },
+
+    async deleteCategory(id) {
+      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al eliminar categoría');
+      apiCache.delete('categories');
+      return await res.json();
+    },
+
     // ORDERS
     async getOrders(forceRefresh = false) {
       if (!forceRefresh) {
         const cached = getCachedData('orders');
-        if (cached) return cached;
+        if (cached && Array.isArray(cached)) return cached;
       }
       const res = await fetch('/api/orders');
       if (!res.ok) throw new Error('Error al cargar pedidos');
-      const data = await res.json();
-      setCachedData('orders', data);
-      return data;
+      const json = await res.json();
+      const list = Array.isArray(json) ? json : (json && Array.isArray(json.data) ? json.data : []);
+      setCachedData('orders', list);
+      return list;
     },
 
     async updateOrderStatus(id, status) {

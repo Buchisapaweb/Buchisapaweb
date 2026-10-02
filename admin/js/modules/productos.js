@@ -13,29 +13,12 @@
       : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []);
 
     try {
-      const rawData = await window.AdminApi.getProducts();
+      const rawData = await window.AdminApi.getProducts(true);
       const list = Array.isArray(rawData) ? rawData : (rawData && Array.isArray(rawData.data) ? rawData.data : []);
-      const activeList = (list && list.length > 0) ? list : fallbackList;
-
-      const validCats = getAllCategories();
-      const validCatKeys = new Set(validCats.flatMap(c => [c.id, c.code, c.slug].filter(Boolean)));
-
-      let filtered = activeList.filter(p => {
-        const cat = (p.category_id || p.category || '').toLowerCase().trim();
-        const code = getCategoryCode(cat);
-        return validCatKeys.size === 0 || validCatKeys.has(cat) || validCatKeys.has(code);
-      });
-
-      if (!filtered || filtered.length === 0) {
-        filtered = activeList;
-      }
-
-      state.allProducts = (filtered && filtered.length > 0) ? filtered : fallbackList;
+      state.allProducts = (list && list.length > 0) ? list : fallbackList;
     } catch (e) {
-      console.warn('Usando catálogo local de contingencia en Admin:', e);
-      state.allProducts = (state.defaultSignatureProducts && state.defaultSignatureProducts.length > 0)
-        ? state.defaultSignatureProducts
-        : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []);
+      console.warn('Usando catálogo de contingencia en Admin:', e);
+      state.allProducts = fallbackList;
     }
 
     if (!state.allProducts || state.allProducts.length === 0) {
@@ -129,11 +112,11 @@
             <div class="product-card ${!isAvail ? 'unavailable' : ''}">
               <div class="product-card-img-wrap">
                 <img src="${imgUrl}" alt="${window.AdminUtils.escapeHtml(prod.name)}" class="product-card-img" loading="lazy">
-                <span class="product-badge-pill" style="left: 12px; right: auto; background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(0,240,255,0.4); color: #00f0ff; font-weight: 800; letter-spacing: 0.5px;">ID: ${prodCode}</span>
+                <span class="product-badge-pill" style="left: 12px; right: auto; background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(239,68,68,0.4); color: #f87171; font-weight: 800; letter-spacing: 0.5px;">ID: ${prodCode}</span>
               </div>
               <div class="product-card-body">
                 <span class="product-card-category" style="display: flex; align-items: center; gap: 6px;">
-                  <span style="font-family: monospace; font-weight: 800; color: #00f0ff; background: rgba(0, 240, 255, 0.1); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(0, 240, 255, 0.25); font-size: 0.72rem;">[${catCode}]</span>
+                  <span style="font-family: monospace; font-weight: 800; color: #f87171; background: rgba(239, 68, 68, 0.1); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.25); font-size: 0.72rem;">[${catCode}]</span>
                   <span>${catName}</span>
                 </span>
                 <h4 class="product-card-title">${window.AdminUtils.escapeHtml(prod.name)}</h4>
@@ -168,7 +151,7 @@
         return `
           <tr>
             <td>
-              <span style="font-family: monospace; font-weight: 800; color: #00f0ff; background: rgba(0, 240, 255, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0, 240, 255, 0.25); font-size: 0.85rem; letter-spacing: 0.5px;">${prodCode}</span>
+              <span style="font-family: monospace; font-weight: 800; color: #f87171; background: rgba(239, 68, 68, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.25); font-size: 0.85rem; letter-spacing: 0.5px;">${prodCode}</span>
             </td>
             <td>
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -290,29 +273,32 @@
     return String(max + 1).padStart(6, '0');
   }
 
-  function getCustomCategories() {
-    try {
-      const stored = localStorage.getItem('buchisapa_custom_categories');
-      return stored ? JSON.parse(stored) : [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  function getDeletedCategoryIds() {
-    try {
-      const stored = localStorage.getItem('buchisapa_deleted_categories');
-      return stored ? JSON.parse(stored) : [];
-    } catch (e) {
-      return [];
-    }
-  }
-
   function getAllCategories() {
-    const custom = getCustomCategories();
-    const deleted = new Set(getDeletedCategoryIds());
-    const combined = [...DEFAULT_CATEGORIES, ...custom];
-    return combined.filter(c => !deleted.has(c.id) && !deleted.has(c.code));
+    const state = window.AdminState = window.AdminState || {};
+    if (Array.isArray(state.allCategories) && state.allCategories.length > 0) {
+      return state.allCategories;
+    }
+    return DEFAULT_CATEGORIES;
+  }
+
+  async function fetchCategories() {
+    const state = window.AdminState = window.AdminState || {};
+    try {
+      if (window.AdminApi && typeof window.AdminApi.getCategories === 'function') {
+        const list = await window.AdminApi.getCategories(true);
+        if (Array.isArray(list) && list.length > 0) {
+          state.allCategories = list;
+        }
+      }
+    } catch (e) {
+      console.warn('Error al cargar categorías desde API:', e);
+    }
+    if (!state.allCategories || state.allCategories.length === 0) {
+      state.allCategories = [...DEFAULT_CATEGORIES];
+    }
+    renderCategoryChips();
+    renderCategoryDropdownOptions();
+    renderCategoryListInManager();
   }
 
   function renderCategoryDropdownOptions() {
@@ -334,18 +320,18 @@
 
     const allCats = getAllCategories();
     const hiddenInput = document.getElementById('form-product-category');
-    const currentVal = hiddenInput ? hiddenInput.value : (allCats[0]?.id || '1001');
+    const currentVal = hiddenInput ? hiddenInput.value : (allCats[0]?.id || 'alitas');
 
     if (countEl) countEl.textContent = `${allCats.length} activas`;
 
     container.innerHTML = allCats.map(c => {
       const catCode = c.code || c.id;
-      const isSelected = currentVal === c.id || currentVal === c.code;
+      const isSelected = currentVal === c.id || currentVal === c.code || currentVal === c.slug;
       return `
         <div class="custom-cat-item ${isSelected ? 'selected' : ''}" onclick="window.selectCategoryOption('${c.id}')">
           <div class="cat-item-left">
             <span class="cat-item-badge">ID: ${catCode}</span>
-            <span class="cat-item-title">${window.AdminUtils.escapeHtml(c.name)}</span>
+            <span class="cat-item-title">${window.AdminUtils ? window.AdminUtils.escapeHtml(c.name) : c.name}</span>
           </div>
           ${isSelected ? '<span class="cat-item-check">✓</span>' : ''}
         </div>
@@ -355,14 +341,13 @@
 
   function selectCategoryOption(catId) {
     const hiddenInput = document.getElementById('form-product-category');
-    if (hiddenInput) {
-      hiddenInput.value = catId;
-    }
-
     const allCats = getAllCategories();
     const selectedCat = allCats.find(c => c.id === catId || c.code === catId || c.slug === catId) || allCats[0];
 
     if (selectedCat) {
+      if (hiddenInput) {
+        hiddenInput.value = selectedCat.id;
+      }
       const codeLabel = selectedCat.code || selectedCat.id;
       const badgePreview = document.getElementById('cat-badge-preview');
       const namePreview = document.getElementById('cat-name-preview');
@@ -513,39 +498,148 @@
     if (containers.length === 0) return;
 
     const allCats = getAllCategories();
+    const countEl = document.getElementById('categories-total-count');
+    if (countEl) countEl.textContent = `${allCats.length} Categorías`;
+
+    const prods = window.AdminState?.allProducts || [];
 
     const htmlContent = allCats.length === 0 ? `
-      <p style="color: #94a3b8; font-size: 0.85rem; padding: 16px; text-align: center;">No hay categorías activas en el menú.</p>
-    ` : allCats.map(c => `
-      <div class="category-item-card">
-        <div class="cat-card-header">
-          <div class="cat-card-badges">
-            <span class="cat-card-code-pill">ID: ${c.code || c.id}</span>
-            <span class="cat-card-status-pill"><span class="dot"></span> Activa en Carta</span>
-          </div>
-        </div>
-        <div class="cat-card-body">
-          <div class="cat-card-left">
-            <div class="cat-card-text">
-              <h4 class="cat-card-title">${window.AdminUtils.escapeHtml(c.name)}</h4>
+      <p style="color: #94a3b8; font-size: 0.85rem; padding: 24px; text-align: center;">No hay categorías activas en el menú.</p>
+    ` : allCats.map(c => {
+      const prodCount = prods.filter(p => {
+        const cat = String(p.category_id || p.category || '').toLowerCase().trim();
+        const code = String(c.code || c.id).toLowerCase().trim();
+        const cId = String(c.id).toLowerCase().trim();
+        return cat === cId || cat === code;
+      }).length;
+
+      return `
+        <div class="category-item-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px; transition: all 0.2s ease;">
+          <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+            <span class="cat-card-code-pill" style="font-family: monospace; font-weight: 800; font-size: 0.8rem; color: #f87171; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); padding: 3px 8px; border-radius: 6px;">ID: ${c.code || c.id}</span>
+            <div style="min-width: 0;">
+              <h4 style="margin: 0; font-size: 0.98rem; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${window.AdminUtils ? window.AdminUtils.escapeHtml(c.name) : c.name}</h4>
+              <span style="font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 2px;">${prodCount} ${prodCount === 1 ? 'plato en carta' : 'platos en carta'}</span>
             </div>
           </div>
-          <div class="cat-card-right">
-            <button type="button" class="btn-delete-category-sleek" onclick="window.deleteCategory('${c.id}', this)" title="Eliminar categoría">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+            <button type="button" class="btn-edit-category-sleek" onclick="window.editCategory('${c.id}')" title="Editar categoría" style="padding: 7px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.14); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+              <span>Editar</span>
+            </button>
+            <button type="button" class="btn-delete-category-sleek" onclick="window.deleteCategory('${c.id}', this)" title="Eliminar categoría" style="padding: 7px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               <span>Eliminar</span>
             </button>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     containers.forEach(container => {
       container.innerHTML = htmlContent;
     });
   }
 
-  function deleteCategory(catId, btnEl = null) {
+  function editCategory(catId) {
+    const all = getAllCategories();
+    const target = all.find(c => c.id === catId || c.code === catId);
+    if (!target) return;
+
+    const editIdInput = document.getElementById('form-cat-page-edit-id');
+    const codeInput = document.getElementById('form-cat-page-code');
+    const nameInput = document.getElementById('form-cat-page-name');
+    const descInput = document.getElementById('form-cat-page-desc');
+    const titleEl = document.getElementById('cat-form-title');
+    const subtitleEl = document.getElementById('cat-form-subtitle');
+    const btnText = document.getElementById('btn-save-category-text');
+    const cancelBtn = document.getElementById('btn-cancel-edit-category');
+
+    if (editIdInput) editIdInput.value = target.id;
+    if (codeInput) codeInput.value = target.code || target.id;
+    if (nameInput) {
+      nameInput.value = target.name;
+      setTimeout(() => nameInput.focus(), 100);
+    }
+    if (descInput) descInput.value = target.description || '';
+    if (titleEl) titleEl.textContent = 'Editar Categoría';
+    if (subtitleEl) subtitleEl.textContent = `Modificando categoría "${target.name}"`;
+    if (btnText) btnText.textContent = 'Actualizar Categoría';
+    if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelEditCategory() {
+    const editIdInput = document.getElementById('form-cat-page-edit-id');
+    const codeInput = document.getElementById('form-cat-page-code');
+    const nameInput = document.getElementById('form-cat-page-name');
+    const descInput = document.getElementById('form-cat-page-desc');
+    const titleEl = document.getElementById('cat-form-title');
+    const subtitleEl = document.getElementById('cat-form-subtitle');
+    const btnText = document.getElementById('btn-save-category-text');
+    const cancelBtn = document.getElementById('btn-cancel-edit-category');
+
+    if (editIdInput) editIdInput.value = '';
+    if (nameInput) nameInput.value = '';
+    if (descInput) descInput.value = '';
+    if (codeInput) codeInput.value = getNextCategoryCode();
+    if (titleEl) titleEl.textContent = 'Crear Nueva Categoría';
+    if (subtitleEl) subtitleEl.textContent = 'Se activará inmediatamente para agrupar y filtrar platos en la tienda';
+    if (btnText) btnText.textContent = 'Guardar Categoría';
+    if (cancelBtn) cancelBtn.style.display = 'none';
+  }
+
+  async function handleCreateCategorySubmit(e) {
+    e.preventDefault();
+    const editIdInput = document.getElementById('form-cat-page-edit-id');
+    const pageNameInput = document.getElementById('form-cat-page-name');
+    const pageCodeInput = document.getElementById('form-cat-page-code');
+    const pageDescInput = document.getElementById('form-cat-page-desc');
+
+    const editId = editIdInput ? editIdInput.value.trim() : '';
+    const name = pageNameInput ? pageNameInput.value.trim().toUpperCase() : '';
+    const code = pageCodeInput ? pageCodeInput.value.trim() : getNextCategoryCode();
+    const description = pageDescInput ? pageDescInput.value.trim() : '';
+
+    if (!name) return;
+
+    const isEdit = Boolean(editId);
+
+    try {
+      if (isEdit) {
+        if (window.AdminApi && typeof window.AdminApi.saveCategory === 'function') {
+          await window.AdminApi.saveCategory({ id: editId, code, name, description }, true, editId);
+        } else {
+          await fetch(`/api/categories/${editId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, name, description })
+          });
+        }
+        window.showToast(`✓ Categoría "${name}" actualizada con éxito`, 'success');
+      } else {
+        if (window.AdminApi && typeof window.AdminApi.saveCategory === 'function') {
+          await window.AdminApi.saveCategory({ code, name, description }, false);
+        } else {
+          await fetch('/api/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, name, description })
+          });
+        }
+        window.showToast(`✓ Categoría "${name}" creada con éxito`, 'success');
+      }
+    } catch (err) {
+      console.warn('Error al guardar categoría en API:', err);
+      window.showToast(isEdit ? 'Categoría actualizada localmente' : 'Categoría creada localmente', 'info');
+    }
+
+    cancelEditCategory();
+    await fetchCategories();
+  }
+
+  async function deleteCategory(catId, btnEl = null) {
     const all = getAllCategories();
     const target = all.find(c => c.id === catId || c.code === catId);
     const catName = target ? target.name : 'esta categoría';
@@ -558,7 +652,7 @@
       btnEl.style.color = '#ffffff';
       btnEl.innerHTML = `
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>¿Confirmar Borrar?</span>
+        <span>¿Confirmar?</span>
       `;
       setTimeout(() => {
         if (btnEl && btnEl.classList.contains('confirming')) {
@@ -568,82 +662,25 @@
           btnEl.style.color = '';
           btnEl.innerHTML = `
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            <span>Eliminar Categoría</span>
+            <span>Eliminar</span>
           `;
         }
       }, 4000);
       return;
     }
 
-    // 2. Registrar en lista de borradas
-    const deleted = getDeletedCategoryIds();
-    if (!deleted.includes(catId)) {
-      deleted.push(catId);
-      try {
-        localStorage.setItem('buchisapa_deleted_categories', JSON.stringify(deleted));
-      } catch (err) {
-        console.warn('Error guardando categorías eliminadas:', err);
+    try {
+      if (window.AdminApi && typeof window.AdminApi.deleteCategory === 'function') {
+        await window.AdminApi.deleteCategory(catId);
+      } else {
+        await fetch(`/api/categories/${catId}`, { method: 'DELETE' });
       }
-    }
-
-    // 3. Remover de categorías personalizadas si existía allí
-    let custom = getCustomCategories().filter(c => c.id !== catId && c.code !== catId);
-    try {
-      localStorage.setItem('buchisapa_custom_categories', JSON.stringify(custom));
+      window.showToast(`✓ Categoría "${catName}" eliminada con éxito`, 'success');
+      await fetchCategories();
     } catch (err) {
-      console.warn('Error en custom categories:', err);
+      console.warn('Error al eliminar categoría:', err);
+      window.showToast('Error al eliminar categoría', 'error');
     }
-
-    if (window.AdminState) window.AdminState.customCategories = custom;
-
-    // 4. Re-renderizar selects, chips y lista
-    renderCategoryDropdownOptions();
-    renderCategoryChips();
-    renderCategoryListInManager();
-
-    // 5. Notificar al usuario con toast
-    window.showToast(`✓ Categoría "${catName}" eliminada con éxito`, 'success');
-  }
-
-  function handleCreateCategorySubmit(e) {
-    e.preventDefault();
-    const pageNameInput = document.getElementById('form-cat-page-name');
-
-    const name = pageNameInput ? pageNameInput.value.trim() : '';
-    if (!name) return;
-
-    // Generar código único de 4 dígitos
-    const code = getNextCategoryCode();
-
-    const custom = getCustomCategories();
-    const newCategory = { id: code, code: code, slug: code, name };
-    custom.push(newCategory);
-    try {
-      localStorage.setItem('buchisapa_custom_categories', JSON.stringify(custom));
-    } catch (err) {
-      console.warn('Error guardando categoría:', err);
-    }
-
-    if (window.AdminState) window.AdminState.customCategories = custom;
-
-    renderCategoryDropdownOptions();
-    renderCategoryChips();
-    renderCategoryListInManager();
-
-    if (pageNameInput) pageNameInput.value = '';
-
-    // Actualizar input de código para la siguiente categoría
-    const codeInput = document.getElementById('form-cat-page-code');
-    if (codeInput) codeInput.value = getNextCategoryCode();
-
-    // Seleccionar automáticamente la nueva categoría en el selector del formulario
-    const formCatSelect = document.getElementById('form-product-category');
-    if (formCatSelect) {
-      formCatSelect.value = code;
-      updateProductFormLivePreview();
-    }
-
-    window.showToast(`✓ Categoría "${name}" (ID: ${code}) creada con éxito`, 'success');
   }
 
   // WebP Image File Upload Handler
@@ -700,7 +737,8 @@
       if (form) form.reset();
       document.getElementById('form-product-id').value = '';
       if (codeInput) codeInput.value = getNextProductCode();
-      selectCategoryOption('1001');
+      const firstCat = getAllCategories()[0]?.id || 'alitas';
+      selectCategoryOption(firstCat);
       document.getElementById('form-product-available').checked = true;
     }
 
@@ -856,12 +894,14 @@
 
   // Auto-init category chips on load
   document.addEventListener('DOMContentLoaded', () => {
+    fetchCategories();
     renderCategoryChips();
     renderCategoryDropdownOptions();
   });
 
   // Bindings
   window.fetchProducts = fetchProducts;
+  window.fetchCategories = fetchCategories;
   window.applyProductFilters = applyProductFilters;
   window.renderProducts = renderProducts;
   window.openProductModal = openProductModal;
@@ -873,6 +913,8 @@
   window.openCategoryManagerView = openCategoryManagerView;
   window.closeCategoryManagerView = closeCategoryManagerView;
   window.renderCategoryListInManager = renderCategoryListInManager;
+  window.editCategory = editCategory;
+  window.cancelEditCategory = cancelEditCategory;
   window.deleteCategory = deleteCategory;
   window.handleCreateCategorySubmit = handleCreateCategorySubmit;
   window.handleProductImageFileUpload = handleProductImageFileUpload;

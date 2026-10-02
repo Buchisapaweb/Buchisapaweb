@@ -1034,17 +1034,106 @@ function saveOrdersToDisk(data?: Order[]) {
   }
 }
 
-// IN-MEMORY STORES
-const categoriesStore = [...initialCategories];
-let productsStore = [...initialProducts];
+// PERSISTENCIA DE PRODUCTOS Y CATEGORÍAS EN DISCO (SINCRONIZACIÓN TIENDA <-> ADMIN)
+const PRODUCTS_FILE = path.join(process.cwd(), 'data', 'products.json');
+const CATEGORIES_FILE = path.join(process.cwd(), 'data', 'categories.json');
+
+function loadCategoriesFromDisk(): Category[] {
+  try {
+    if (fs.existsSync(CATEGORIES_FILE)) {
+      const raw = fs.readFileSync(CATEGORIES_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    console.error('Error al cargar categorías desde disco:', err);
+  }
+  saveCategoriesToDisk(initialCategories);
+  return [...initialCategories];
+}
+
+function saveCategoriesToDisk(data?: Category[]) {
+  try {
+    const list = data || categoriesStore;
+    const dir = path.dirname(CATEGORIES_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error al guardar categorías en disco:', err);
+  }
+}
+
+function loadProductsFromDisk(): Product[] {
+  try {
+    if (fs.existsSync(PRODUCTS_FILE)) {
+      const raw = fs.readFileSync(PRODUCTS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    console.error('Error al cargar productos desde disco:', err);
+  }
+  saveProductsToDisk(initialProducts);
+  return [...initialProducts];
+}
+
+function saveProductsToDisk(data?: Product[]) {
+  try {
+    const list = data || productsStore;
+    const dir = path.dirname(PRODUCTS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error al guardar productos en disco:', err);
+  }
+}
+
+// IN-MEMORY STORES CON PERSISTENCIA
+const categoriesStore: Category[] = loadCategoriesFromDisk();
+let productsStore: Product[] = loadProductsFromDisk();
 const saucesStore = [...initialSauces];
 let promotionsStore: Promotion[] = loadPromotionsFromDisk();
 const ordersStore: Order[] = loadOrdersFromDisk();
 const claimsStore: Claim[] = [];
 
-// QUERIES
+// CATEGORÍAS CRUD
 export async function getCategories(): Promise<Category[]> {
   return [...categoriesStore].sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+}
+
+export async function createCategory(data: Partial<Category>): Promise<Category> {
+  const code = data.code || String(1000 + categoriesStore.length + 1);
+  const newCat: Category = {
+    id: data.id || data.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || `cat-${Date.now()}`,
+    code: code,
+    name: (data.name || 'NUEVA CATEGORÍA').toUpperCase().trim(),
+    icon: data.icon || 'Utensils',
+    description: data.description || `Especialidades de ${data.name || 'la casa'}`
+  };
+  categoriesStore.push(newCat);
+  saveCategoriesToDisk();
+  return newCat;
+}
+
+export async function updateCategory(id: string, data: Partial<Category>): Promise<Category | null> {
+  const index = categoriesStore.findIndex(c => c.id === id || c.code === id);
+  if (index === -1) return null;
+  categoriesStore[index] = {
+    ...categoriesStore[index],
+    ...data,
+    name: data.name ? data.name.toUpperCase().trim() : categoriesStore[index].name
+  };
+  saveCategoriesToDisk();
+  return categoriesStore[index];
+}
+
+export async function deleteCategory(id: string): Promise<boolean> {
+  const initialLen = categoriesStore.length;
+  const filtered = categoriesStore.filter(c => c.id !== id && c.code !== id);
+  categoriesStore.length = 0;
+  categoriesStore.push(...filtered);
+  saveCategoriesToDisk();
+  return categoriesStore.length < initialLen;
 }
 
 export async function getProducts(categoryId?: string): Promise<Product[]> {
@@ -1280,6 +1369,7 @@ export async function deductCartStock(checkItems: { id: string; quantity: number
       }
     }
   }
+  saveProductsToDisk();
 }
 
 export async function updateProductStock(id: string, available: boolean, stock?: number): Promise<Product | null> {
@@ -1292,12 +1382,14 @@ export async function updateProductStock(id: string, available: boolean, stock?:
       product.available = false;
     }
   }
+  saveProductsToDisk();
   return product;
 }
 
 export async function createProduct(data: Partial<Product>): Promise<Product> {
   const newProduct: Product = {
     id: data.id || `prod-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    code: data.code || String(100000 + productsStore.length + 1),
     name: data.name || 'Nuevo Producto',
     category_id: data.category_id || 'hamburguesas',
     price: Number(data.price) || 10,
@@ -1306,15 +1398,16 @@ export async function createProduct(data: Partial<Product>): Promise<Product> {
     popular: Boolean(data.popular),
     available: data.available !== false,
     stock: typeof data.stock === 'number' ? data.stock : 25,
-    image: data.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80',
+    image: data.image || '/imagenes/portada/Portada1E.webp',
     includes_sauces: Boolean(data.includes_sauces)
   };
   productsStore.unshift(newProduct);
+  saveProductsToDisk();
   return newProduct;
 }
 
 export async function updateProduct(id: string, data: Partial<Product>): Promise<Product | null> {
-  const index = productsStore.findIndex(p => p.id === id);
+  const index = productsStore.findIndex(p => p.id === id || p.code === id);
   if (index === -1) return null;
   
   productsStore[index] = {
@@ -1323,12 +1416,14 @@ export async function updateProduct(id: string, data: Partial<Product>): Promise
     price: data.price !== undefined ? Number(data.price) : productsStore[index].price,
     stock: data.stock !== undefined ? Number(data.stock) : productsStore[index].stock
   };
+  saveProductsToDisk();
   return productsStore[index];
 }
 
 export async function deleteProduct(id: string): Promise<boolean> {
   const initialLen = productsStore.length;
-  productsStore = productsStore.filter(p => p.id !== id);
+  productsStore = productsStore.filter(p => p.id !== id && p.code !== id);
+  saveProductsToDisk();
   return productsStore.length < initialLen;
 }
 

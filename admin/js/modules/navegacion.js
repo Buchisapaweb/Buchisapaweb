@@ -142,18 +142,25 @@
   }
 
   function triggerViewDataRefresh(viewId) {
-    setTimeout(() => {
+    setTimeout(async () => {
       if (viewId === 'pedidos' && typeof window.fetchOrders === 'function') {
-        window.fetchOrders();
+        await window.fetchOrders();
       } else if (viewId === 'productos' && typeof window.fetchProducts === 'function') {
-        window.fetchProducts();
-      } else if (viewId === 'categorias' && typeof window.renderCategoryListInManager === 'function') {
-        window.renderCategoryListInManager();
+        await window.fetchProducts();
+      } else if (viewId === 'categorias') {
+        if (typeof window.fetchCategories === 'function') await window.fetchCategories();
+        if (typeof window.renderCategoryListInManager === 'function') window.renderCategoryListInManager();
       } else if (viewId === 'ventas') {
-        window.renderVentasView?.();
-      } else if (viewId === 'ticket' && typeof window.fetchTickets === 'function') {
-        window.fetchTickets();
+        if (typeof window.fetchOrders === 'function') await window.fetchOrders();
+        if (typeof window.renderVentasView === 'function') window.renderVentasView();
+      } else if (viewId === 'delivery') {
+        if (typeof window.fetchOrders === 'function') await window.fetchOrders();
+        if (typeof window.renderDeliveryOrders === 'function') window.renderDeliveryOrders();
+      } else if (viewId === 'ticket') {
+        if (typeof window.fetchTickets === 'function') await window.fetchTickets();
+        if (typeof window.fetchOrders === 'function') await window.fetchOrders();
       } else if (viewId === 'dashboard') {
+        if (typeof window.fetchOrders === 'function') await window.fetchOrders();
         window.updateDashboardMetrics?.();
       }
     }, 10);

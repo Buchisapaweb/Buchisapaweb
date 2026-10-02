@@ -405,15 +405,26 @@
     const rawNum = order.orderNumber || (order.id ? order.id.replace('ord-', '') : '00001');
     const orderNumFormatted = formatTicketNumber(rawNum);
 
+    let rawItems = [];
+    if (Array.isArray(order.items)) {
+      rawItems = order.items;
+    } else if (typeof order.items === 'string') {
+      try {
+        rawItems = JSON.parse(order.items);
+      } catch (e) {
+        rawItems = [];
+      }
+    }
+
     const ticketLike = {
       id: order.id,
       number: orderNumFormatted,
       orderNumber: rawNum,
-      created_at: order.created_at || new Date().toISOString(),
+      created_at: order.created_at || order.createdAt || new Date().toISOString(),
       customer: order.customerName || order.customer?.name || order.clientName || 'Cliente',
-      type: order.type || 'delivery',
-      payment: order.payment_method || 'Efectivo',
-      items: (order.items || []).map(i => ({ 
+      type: order.orderType || order.type || 'delivery',
+      payment: order.paymentMethod || order.payment_method || 'Efectivo',
+      items: rawItems.map(i => ({ 
         name: i.name, 
         qty: i.quantity || i.qty || 1, 
         price: i.price || 0,
@@ -421,7 +432,7 @@
         sauces: i.sauces || [],
         notes: i.notes || ''
       })),
-      subtotal: (order.items || []).reduce((acc, cur) => acc + (cur.price || 0) * (cur.quantity || 1), 0),
+      subtotal: rawItems.reduce((acc, cur) => acc + (cur.price || 0) * (cur.quantity || 1), 0),
       deliveryFee: order.deliveryFee || 0,
       total: order.total,
       notes: order.notes || ''

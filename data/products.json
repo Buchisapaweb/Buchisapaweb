@@ -1,12 +1,4 @@
-/**
- * BUCHISAPA ADMIN - CORE STATE MANAGEMENT
- * Layer: /admin/js/core/state.js
- * Sincronizado 100% con el catálogo oficial de la carta del cliente
- */
-(function () {
-  'use strict';
-
-  const defaultSignatureProducts = [
+[
   {
     "id": "ama-1",
     "name": "Patacones con Chorizo",
@@ -644,40 +636,4 @@
     "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
     "includes_sauces": true
   }
-];
-
-  window.AdminState = Object.assign({
-    allProducts: defaultSignatureProducts,
-    filteredProducts: [],
-    allCategories: [],
-    currentCategory: 'todos',
-    searchQuery: '',
-    currentSort: 'recent',
-    viewMode: 'grid',
-    currentPage: 1,
-    itemsPerPage: 12,
-    allSupplies: [],
-    allUtensils: [],
-    allOrders: [],
-    allUsers: [],
-    cajaData: null,
-    allTickets: [],
-    filteredTickets: [],
-    activePreviewTicket: null,
-    allPortadas: [],
-    currentPortadaSlide: 0,
-    portadaPreviewInterval: null,
-    currentPortadaFilter: 'all',
-    allPromociones: [],
-    currentPromocionesFilter: 'all',
-    defaultSignatureProducts: defaultSignatureProducts
-  }, window.AdminState || {});
-
-  if (!window.AdminState.allProducts || window.AdminState.allProducts.length === 0) {
-    window.AdminState.allProducts = defaultSignatureProducts;
-  }
-
-  window.getFallbackProducts = function () {
-    return defaultSignatureProducts;
-  };
-})();
+]
