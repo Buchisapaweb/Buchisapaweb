@@ -102,7 +102,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
-        <button type="button" class="btn btn-outline-danger" id="btn-confirm-delete" class="bg-btn-danger">
+        <button type="button" class="btn btn-outline-danger bg-btn-danger" id="btn-confirm-delete">
           Eliminar
         </button>
       </div>
@@ -124,15 +124,15 @@
         </button>
       </div>
 
-      <div class="modal-body" class="modal-body modal-body-padded">
+      <div class="modal-body modal-body-padded">
         <div class="thermal-ticket-container" id="thermal-receipt-render-target">
           <!-- Renderizado dinámico vía scripts -->
         </div>
       </div>
 
-      <div class="modal-footer" class="modal-footer modal-footer-space-between">
+      <div class="modal-footer modal-footer-space-between">
         <button type="button" class="btn btn-secondary modal-close-trigger">Cerrar</button>
-        <button type="button" class="btn btn-primary" id="btn-print-active-ticket" class="btn-flex-gap">
+        <button type="button" class="btn btn-primary btn-flex-gap" id="btn-print-active-ticket">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           <span>Imprimir en Térmica (80mm)</span>
         </button>
@@ -322,9 +322,9 @@
             </div>
           </div>
 
-          <div class="form-group" class="form-group mt-12">
+          <div class="form-group mt-12">
             <label class="form-label" for="modal-close-real-cash">Monto Físico Real Contado en Gaveta (S/) *</label>
-            <input type="number" step="0.5" class="form-input" id="modal-close-real-cash" required class="form-input-lg-bold">
+            <input type="number" step="0.5" class="form-input form-input-lg-bold" id="modal-close-real-cash" required>
           </div>
 
           <div class="form-group">
@@ -335,7 +335,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
-          <button type="submit" class="btn btn-primary" class="bg-btn-warning">
+          <button type="submit" class="btn btn-primary bg-btn-warning">
             Confirmar y Cerrar Turno
           </button>
         </div>
@@ -362,7 +362,7 @@
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label" for="modal-open-initial-cash">Fondo Inicial de Sencillo en Caja (S/) *</label>
-            <input type="number" step="0.5" class="form-input" id="modal-open-initial-cash" value="250.00" required class="form-input-lg-bold">
+            <input type="number" step="0.5" class="form-input form-input-lg-bold" id="modal-open-initial-cash" value="250.00" required>
             <span class="text-muted-xs">Monto para vuelto y sencillo al comenzar el turno.</span>
           </div>
 
@@ -374,7 +374,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
-          <button type="submit" class="btn btn-primary" class="bg-btn-success">
+          <button type="submit" class="btn btn-primary bg-btn-success">
             Abrir Caja Ahora
           </button>
         </div>
