@@ -1524,17 +1524,15 @@ function autoFillOtpCode(customCode) {
   }
 }
 
-function openEmailVerificationModal(email, payload = null, quickCode = '123456') {
+function openEmailVerificationModal(email, payload = null) {
   const modal = document.getElementById('email-verification-modal');
   const emailDisplay = document.getElementById('otp-target-email-display');
   const alertEl = document.getElementById('otp-alert-message');
-  const quickCodeEl = document.getElementById('otp-quick-code-value');
   
   if (!modal) return;
 
   pendingOtpState.email = email.trim().toLowerCase();
   pendingOtpState.payload = payload;
-  pendingOtpState.quickCode = quickCode || '123456';
 
   if (emailDisplay) {
     emailDisplay.textContent = pendingOtpState.email;
@@ -1543,10 +1541,6 @@ function openEmailVerificationModal(email, payload = null, quickCode = '123456')
   const emailNoticeEl = document.getElementById('otp-target-email-notice');
   if (emailNoticeEl) {
     emailNoticeEl.textContent = pendingOtpState.email;
-  }
-
-  if (quickCodeEl) {
-    quickCodeEl.textContent = pendingOtpState.quickCode;
   }
 
   if (alertEl) {
@@ -1722,7 +1716,7 @@ async function requestOtpVerificationAndOpenModal(email, payload = {}) {
     closeGoogleAuthModal();
 
     // Abrir modal de verificación con los 6 casilleros
-    openEmailVerificationModal(email, payload, result.debugCode || '123456');
+    openEmailVerificationModal(email, payload);
 
   } catch (err) {
     console.error('Error requesting OTP:', err);
@@ -1734,7 +1728,7 @@ async function requestOtpVerificationAndOpenModal(email, payload = {}) {
       if (typeof window.showToast === 'function') {
         window.showToast('Código enviado a tu correo', 'info');
       }
-      openEmailVerificationModal(email, payload, '123456');
+      openEmailVerificationModal(email, payload);
     }
   }
 }
@@ -1742,8 +1736,6 @@ async function requestOtpVerificationAndOpenModal(email, payload = {}) {
 async function handleResendOtpCode() {
   const alertEl = document.getElementById('otp-alert-message');
   const resendBtn = document.getElementById('otp-resend-btn');
-  const timerLabel = document.getElementById('otp-timer-label');
-  const quickCodeEl = document.getElementById('otp-quick-code-value');
 
   if (!pendingOtpState.email) return;
 
@@ -1761,15 +1753,11 @@ async function handleResendOtpCode() {
     const result = await res.json();
 
     if (result.success) {
-      if (result.debugCode) {
-        pendingOtpState.quickCode = result.debugCode;
-        if (quickCodeEl) quickCodeEl.textContent = result.debugCode;
-      }
       if (typeof window.showToast === 'function') {
         window.showToast('Código reenviado a tu correo', 'success');
       }
       if (alertEl) {
-        alertEl.textContent = '✓ ¡Código generado y enviado a tu correo!';
+        alertEl.textContent = '✓ ¡Código enviado a tu correo!';
         alertEl.className = 'otp-alert success';
         alertEl.style.display = 'block';
       }
