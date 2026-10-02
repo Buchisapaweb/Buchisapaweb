@@ -1707,7 +1707,7 @@ let cajaMovementsStore: CajaMovement[] = [
     monto: 20.00,
     motivo: 'Paquete de bolsas térmicas kraft para hamburguesas delivery',
     responsable: 'Admin BuchiSapa',
-    comprobante: 'TK-4821',
+    comprobante: 'TK00001',
     createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString()
   }
 ];
@@ -1900,7 +1900,7 @@ export async function getTickets(): Promise<TicketRecord[]> {
 
     return {
       id: `tk-${o.id}`,
-      ticketNumber: `TK-${formattedNum}`,
+      ticketNumber: `TK${formattedNum}`,
       orderNumber: rawNum,
       orderId: o.id,
       customerName: o.customerName || 'Cliente Mostrador',
@@ -1929,7 +1929,7 @@ export async function createQuickTicket(data: Partial<TicketRecord>): Promise<Ti
 
   const newTicket: TicketRecord = {
     id: `tk-quick-${Date.now()}`,
-    ticketNumber: `TK-${seq}`,
+    ticketNumber: `TK${seq}`,
     orderNumber: nextNumber,
     customerName: data.customerName || 'Cliente Mostrador',
     customerPhone: data.customerPhone || '',

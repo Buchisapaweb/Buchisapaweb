@@ -469,7 +469,7 @@
         const qty = parseInt(document.getElementById('ticket-form-quantity')?.value, 10) || 1;
 
         const ticketData = {
-          number: `TK-${Math.floor(1000 + Math.random() * 9000)}`,
+          number: `TK${String(Math.floor(1 + Math.random() * 999)).padStart(5, '0')}`,
           customer: document.getElementById('ticket-form-customer')?.value || 'Cliente',
           phone: document.getElementById('ticket-form-phone')?.value || '',
           type: document.getElementById('ticket-form-type')?.value || 'Mesa',

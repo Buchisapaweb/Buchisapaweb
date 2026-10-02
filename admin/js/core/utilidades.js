@@ -115,11 +115,41 @@
     return 'PC00001';
   }
 
+  function formatTicketNumber(ticketOrCode) {
+    if (!ticketOrCode) return 'TK00001';
+    if (typeof ticketOrCode === 'object') {
+      ticketOrCode = ticketOrCode.number || ticketOrCode.ticketNumber || ticketOrCode.orderNumber || ticketOrCode.id || '';
+    }
+    let str = String(ticketOrCode).trim();
+    if (str.toUpperCase().startsWith('TK')) {
+      const clean = str.replace(/^tk-?/i, '');
+      const digits = clean.replace(/\D/g, '');
+      if (digits) {
+        return `TK${digits.padStart(5, '0')}`;
+      }
+      return `TK${clean}`;
+    }
+    if (str.startsWith('#')) {
+      const clean = str.replace(/^#/, '');
+      const digits = clean.replace(/\D/g, '');
+      if (digits) {
+        return `TK${digits.padStart(5, '0')}`;
+      }
+      return `TK${clean}`;
+    }
+    const digits = str.replace(/\D/g, '');
+    if (digits) {
+      return `TK${digits.padStart(5, '0')}`;
+    }
+    return `TK${str}`;
+  }
+
   window.AdminUtils = {
     showToast,
     formatSoles,
     formatCategoryName,
     formatOrderCode,
+    formatTicketNumber,
     escapeHtml,
     openModal,
     closeModal
@@ -130,6 +160,7 @@
   window.formatSoles = formatSoles;
   window.formatCategoryName = formatCategoryName;
   window.formatOrderCode = formatOrderCode;
+  window.formatTicketNumber = formatTicketNumber;
   window.escapeHtml = escapeHtml;
 
 })();

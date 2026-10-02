@@ -7,21 +7,29 @@
   'use strict';
 
   function formatTicketNumber(numOrStr) {
-    if (!numOrStr) return 'TK-00001';
+    if (!numOrStr) return 'TK00001';
     let str = String(numOrStr).trim();
-    if (str.startsWith('TK-') || str.startsWith('tk-')) {
-      const clean = str.replace(/^tk-/i, '');
-      return `TK-${clean.padStart(5, '0')}`;
+    if (str.toUpperCase().startsWith('TK')) {
+      const clean = str.replace(/^tk-?/i, '');
+      const digits = clean.replace(/\D/g, '');
+      if (digits) {
+        return `TK${digits.padStart(5, '0')}`;
+      }
+      return `TK${clean}`;
     }
     if (str.startsWith('#')) {
       const clean = str.replace(/^#/, '');
-      return `TK-${clean.padStart(5, '0')}`;
+      const digits = clean.replace(/\D/g, '');
+      if (digits) {
+        return `TK${digits.padStart(5, '0')}`;
+      }
+      return `TK${clean}`;
     }
     const digits = str.replace(/\D/g, '');
     if (digits) {
-      return `TK-${digits.padStart(5, '0')}`;
+      return `TK${digits.padStart(5, '0')}`;
     }
-    return `TK-${str}`;
+    return `TK${str}`;
   }
 
   async function fetchTickets() {
