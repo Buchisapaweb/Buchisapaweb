@@ -335,7 +335,21 @@
     });
   }
 
-  // GRÁFICO CIRCULAR / DONUT - CATEGORÍAS O CANAL DE ENTREGA
+  function parseOrderItems(rawItems) {
+    if (!rawItems) return [];
+    if (Array.isArray(rawItems)) return rawItems;
+    if (typeof rawItems === 'string') {
+      try {
+        const parsed = JSON.parse(rawItems);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  }
+
+  // GRÁFICO CIRCULAR / DONUT - CATEGORÍAS O CANAL DE ENTREGA (ENLACE A VENTAS REALES)
   function renderDonutChart(todayOrders, products, allOrders) {
     const canvas = document.getElementById('chart-circular-categorias');
     const legendContainer = document.getElementById('chart-donut-legend');
@@ -365,121 +379,150 @@
 
     let chartData = [];
     let centerSubtitle = 'Total';
+    let totalFormattedLabel = '100%';
+
+    const ordersToProcess = (allOrders && allOrders.length > 0)
+      ? allOrders
+      : ((window.AdminState && window.AdminState.allOrders) || []);
+
+    const validOrders = ordersToProcess.filter(o => String(o.status || '').toLowerCase() !== 'cancelado');
 
     if (currentCircularMode === 'categorias') {
       centerSubtitle = 'Categorías';
 
       // 8 Categorías Oficiales BuchiSapa
       const CATEGORIES_DEF = [
-        { key: 'broaster', label: 'Broaster', color: '#ff6b00', defaultPct: 24 },
-        { key: 'hamburguesas', label: 'Hamburguesas', color: '#00e5ff', defaultPct: 20 },
-        { key: 'platos-amazonicos', label: 'Amazónicos', color: '#00ff88', defaultPct: 16 },
-        { key: 'alitas', label: 'Alitas', color: '#ff3366', defaultPct: 12 },
-        { key: 'salchipapas', label: 'Salchipapas', color: '#ffcc00', defaultPct: 10 },
-        { key: 'bebidas', label: 'Bebidas', color: '#38bdf8', defaultPct: 8 },
-        { key: 'refrescos', label: 'Refrescos', color: '#e040fb', defaultPct: 6 },
-        { key: 'infusiones', label: 'Infusiones', color: '#a855f7', defaultPct: 4 }
+        { key: 'broaster', label: 'Broaster', color: '#ff6b00' },
+        { key: 'hamburguesas', label: 'Hamburguesas', color: '#00e5ff' },
+        { key: 'platos-amazonicos', label: 'Amazónicos', color: '#00ff88' },
+        { key: 'alitas', label: 'Alitas', color: '#ff3366' },
+        { key: 'salchipapas', label: 'Salchipapas', color: '#ffcc00' },
+        { key: 'bebidas', label: 'Bebidas', color: '#38bdf8' },
+        { key: 'refrescos', label: 'Refrescos', color: '#e040fb' },
+        { key: 'infusiones', label: 'Infusiones', color: '#a855f7' }
       ];
 
+      const catSoles = {
+        'broaster': 0, 'hamburguesas': 0, 'platos-amazonicos': 0, 'alitas': 0,
+        'salchipapas': 0, 'bebidas': 0, 'refrescos': 0, 'infusiones': 0
+      };
       const catCount = {
-        'broaster': 0,
-        'hamburguesas': 0,
-        'platos-amazonicos': 0,
-        'alitas': 0,
-        'salchipapas': 0,
-        'bebidas': 0,
-        'refrescos': 0,
-        'infusiones': 0
+        'broaster': 0, 'hamburguesas': 0, 'platos-amazonicos': 0, 'alitas': 0,
+        'salchipapas': 0, 'bebidas': 0, 'refrescos': 0, 'infusiones': 0
       };
 
-      const allProds = (products && products.length > 0) ? products : (window.AdminState?.products || []);
+      const allProds = (products && products.length > 0) ? products : (window.AdminState?.allProducts || []);
       const prodLookup = {};
       allProds.forEach(p => {
         if (p.id) prodLookup[String(p.id).toLowerCase()] = p;
         if (p.name) prodLookup[String(p.name).toLowerCase()] = p;
       });
 
-      (allOrders || []).forEach(o => {
-        (o.items || []).forEach(item => {
-          const qty = parseInt(item.quantity || item.qty) || 1;
+      let totalSalesSoles = 0;
+      let totalUnitsSold = 0;
+
+      validOrders.forEach(o => {
+        const items = parseOrderItems(o.items);
+        items.forEach(item => {
+          const qty = parseInt(item.quantity || item.qty || item.cant) || 1;
+          const price = parseFloat(item.price || item.precio) || 0;
+          const lineTotal = price * qty;
+
           const itemId = String(item.id || item.product_id || '').toLowerCase();
-          const itemName = String(item.name || '').toLowerCase();
+          const itemName = String(item.name || item.nombre || '').toLowerCase();
           const itemCat = String(item.category_id || item.category || '').toLowerCase();
           const matchedProd = prodLookup[itemId] || prodLookup[itemName] || {};
           const fullCat = itemCat || String(matchedProd.category_id || matchedProd.category || '').toLowerCase();
 
-          if (fullCat === 'broaster' || itemName.includes('broaster') || itemName.includes('pollo')) {
-            catCount['broaster'] += qty;
-          } else if (fullCat === 'hamburguesas' || itemName.includes('burger') || itemName.includes('hamburguesa') || itemName.includes('royal')) {
-            catCount['hamburguesas'] += qty;
-          } else if (fullCat === 'platos-amazonicos' || fullCat.includes('amazon') || itemName.includes('juane') || itemName.includes('tacacho') || itemName.includes('cecina') || itemName.includes('chorizo') || itemName.includes('patacon') || itemName.includes('chaufa regional')) {
-            catCount['platos-amazonicos'] += qty;
-          } else if (fullCat === 'alitas' || itemName.includes('alita') || itemName.includes('wings') || itemName.includes('bbq') || itemName.includes('acevichada')) {
-            catCount['alitas'] += qty;
-          } else if (fullCat.includes('salchipapa') || itemName.includes('salchipapa') || itemName.includes('salchibroaster') || itemName.includes('salchiqueso')) {
-            catCount['salchipapas'] += qty;
-          } else if (fullCat === 'bebidas' || itemName.includes('gaseosa') || itemName.includes('inca kola') || itemName.includes('coca cola') || itemName.includes('agua') || itemName.includes('san mateo')) {
-            catCount['bebidas'] += qty;
-          } else if (fullCat === 'refrescos' || itemName.includes('refresco') || itemName.includes('cocona') || itemName.includes('aguajina') || itemName.includes('camu camu') || itemName.includes('maracuy') || itemName.includes('chicha') || itemName.includes('jugo')) {
-            catCount['refrescos'] += qty;
-          } else if (fullCat === 'infusiones' || itemName.includes('infusion') || itemName.includes('infusión') || itemName.includes('cafe') || itemName.includes('café') || itemName.includes('te') || itemName.includes('té') || itemName.includes('manzanilla') || itemName.includes('anis') || itemName.includes('anís')) {
-            catCount['infusiones'] += qty;
-          } else {
-            catCount['broaster'] += qty;
-          }
+          let key = 'broaster';
+          if (fullCat === 'hamburguesas' || itemName.includes('burger') || itemName.includes('hamburguesa') || itemName.includes('royal')) key = 'hamburguesas';
+          else if (fullCat === 'platos-amazonicos' || fullCat.includes('amazon') || itemName.includes('juane') || itemName.includes('tacacho') || itemName.includes('cecina') || itemName.includes('chorizo') || itemName.includes('patacon') || itemName.includes('chaufa regional')) key = 'platos-amazonicos';
+          else if (fullCat === 'alitas' || itemName.includes('alita') || itemName.includes('wings') || itemName.includes('bbq') || itemName.includes('acevichada')) key = 'alitas';
+          else if (fullCat.includes('salchipapa') || itemName.includes('salchipapa') || itemName.includes('salchibroaster') || itemName.includes('salchiqueso')) key = 'salchipapas';
+          else if (fullCat === 'bebidas' || itemName.includes('gaseosa') || itemName.includes('inca kola') || itemName.includes('coca cola') || itemName.includes('agua') || itemName.includes('san mateo')) key = 'bebidas';
+          else if (fullCat === 'refrescos' || itemName.includes('refresco') || itemName.includes('cocona') || itemName.includes('aguajina') || itemName.includes('camu camu') || itemName.includes('maracuy') || itemName.includes('chicha') || itemName.includes('jugo')) key = 'refrescos';
+          else if (fullCat === 'infusiones' || itemName.includes('infusion') || itemName.includes('infusión') || itemName.includes('cafe') || itemName.includes('café') || itemName.includes('te') || itemName.includes('té') || itemName.includes('manzanilla') || itemName.includes('anis') || itemName.includes('anís')) key = 'infusiones';
+
+          catSoles[key] += lineTotal;
+          catCount[key] += qty;
+          totalSalesSoles += lineTotal;
+          totalUnitsSold += qty;
         });
       });
 
-      const totalItems = Object.values(catCount).reduce((a, b) => a + b, 0);
-
-      if (totalItems > 0) {
+      if (totalSalesSoles > 0) {
         chartData = CATEGORIES_DEF.map(cat => {
+          const soles = catSoles[cat.key] || 0;
           const count = catCount[cat.key] || 0;
-          const pct = Math.round((count / totalItems) * 100);
+          const pct = Math.round((soles / totalSalesSoles) * 100);
           return {
             label: cat.label,
             value: pct,
-            color: cat.color,
-            count: count
+            soles: soles,
+            count: count,
+            color: cat.color
           };
         });
 
-        // Asegurar que sumen exactamente 100%
         const sumPct = chartData.reduce((s, i) => s + i.value, 0);
         if (sumPct > 0 && sumPct !== 100) {
           const maxItem = chartData.reduce((prev, current) => (prev.value > current.value) ? prev : current);
           maxItem.value += (100 - sumPct);
         }
+        totalFormattedLabel = `S/ ${totalSalesSoles.toFixed(0)}`;
       } else {
-        // Distribución inicial realista con las 8 categorías oficiales
-        chartData = CATEGORIES_DEF.map(cat => ({
-          label: cat.label,
-          value: cat.defaultPct,
-          color: cat.color,
-          count: 0
-        }));
+        // Enlace proporcional al catálogo oficial de platos cuando no hay ventas
+        const catalogCounts = {
+          'hamburguesas': 12, 'salchipapas': 7, 'platos-amazonicos': 7,
+          'refrescos': 5, 'bebidas': 5, 'broaster': 4, 'infusiones': 3, 'alitas': 2
+        };
+        const totalCatalogProds = 49;
+        chartData = CATEGORIES_DEF.map(cat => {
+          const catProds = catalogCounts[cat.key] || 3;
+          const pct = Math.round((catProds / totalCatalogProds) * 100);
+          return {
+            label: cat.label,
+            value: pct,
+            soles: 0,
+            count: 0,
+            color: cat.color
+          };
+        });
+        totalFormattedLabel = '100%';
       }
     } else {
       centerSubtitle = 'Canal';
-      let deliveryCount = 0;
-      let localCount = 0;
-      (allOrders || []).forEach(o => {
-        if (o.type === 'delivery' || o.deliveryType === 'delivery') deliveryCount++;
-        else localCount++;
-      });
-      const totalCanal = deliveryCount + localCount;
+      let delSoles = 0;
+      let delOrders = 0;
+      let localSoles = 0;
+      let localOrders = 0;
 
-      if (totalCanal > 0) {
-        const delPct = Math.round((deliveryCount / totalCanal) * 100);
+      validOrders.forEach(o => {
+        const type = String(o.orderType || o.type || '').toLowerCase();
+        const tot = parseFloat(o.total) || 0;
+        if (type === 'delivery' || Boolean(o.deliveryAddress)) {
+          delSoles += tot;
+          delOrders++;
+        } else {
+          localSoles += tot;
+          localOrders++;
+        }
+      });
+
+      const totalCanalSoles = delSoles + localSoles;
+      if (totalCanalSoles > 0) {
+        const delPct = Math.round((delSoles / totalCanalSoles) * 100);
         chartData = [
-          { label: '🛵 Delivery', value: delPct, color: '#00f0ff', count: deliveryCount },
-          { label: '🍽️ Local / Salón', value: 100 - delPct, color: '#00ff88', count: localCount }
+          { label: '🛵 Delivery', value: delPct, soles: delSoles, count: delOrders, color: '#00f0ff' },
+          { label: '🍽️ Local / Salón', value: 100 - delPct, soles: localSoles, count: localOrders, color: '#00ff88' }
         ];
+        totalFormattedLabel = `S/ ${totalCanalSoles.toFixed(0)}`;
       } else {
         chartData = [
-          { label: '🛵 Delivery', value: 65, color: '#00f0ff', count: 0 },
-          { label: '🍽️ Local / Salón', value: 35, color: '#00ff88', count: 0 }
+          { label: '🛵 Delivery', value: 50, soles: 0, count: 0, color: '#00f0ff' },
+          { label: '🍽️ Local / Salón', value: 50, soles: 0, count: 0, color: '#00ff88' }
         ];
+        totalFormattedLabel = '100%';
       }
     }
 
@@ -492,7 +535,7 @@
     // Disco central de fondo
     ctx.beginPath();
     ctx.arc(centerX, centerY, innerRadius - 2, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(10, 6, 22, 0.9)';
+    ctx.fillStyle = 'rgba(10, 6, 22, 0.95)';
     ctx.fill();
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
@@ -522,24 +565,35 @@
 
     // Texto Central
     ctx.fillStyle = '#ffffff';
-    ctx.font = '800 16px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.font = '800 15px "Plus Jakarta Sans", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(`${totalVal}%`, centerX, centerY - 6);
+    ctx.fillText(totalFormattedLabel, centerX, centerY - 6);
 
     ctx.fillStyle = '#94a3b8';
     ctx.font = '600 9px "Plus Jakarta Sans", system-ui, sans-serif';
     ctx.fillText(centerSubtitle, centerX, centerY + 10);
 
-    // Render Leyendas
+    // Render Leyenda Elegante Lista
     if (legendContainer) {
       legendContainer.innerHTML = chartData.map(item => `
         <div class="donut-legend-item">
-          <span class="donut-item-label">
-            <span class="donut-item-dot" style="background: ${item.color}; box-shadow: 0 0 8px ${item.color};"></span>
-            <span>${item.label}</span>
-          </span>
-          <span class="donut-item-value" style="color: ${item.color};">${item.value}%</span>
+          <div class="donut-legend-main">
+            <div class="donut-item-label-group">
+              <span class="donut-item-dot" style="background: ${item.color}; box-shadow: 0 0 10px ${item.color};"></span>
+              <span class="donut-item-name">${item.label}</span>
+            </div>
+            <div class="donut-item-stats">
+              <span class="donut-item-soles">S/ ${Number(item.soles || 0).toFixed(2)}</span>
+              <span class="donut-item-count">(${item.count || 0} ${currentCircularMode === 'categorias' ? 'un.' : 'ped.'})</span>
+            </div>
+            <span class="donut-item-badge" style="color: ${item.color}; background: ${item.color}15; border-color: ${item.color}40;">
+              ${item.value}%
+            </span>
+          </div>
+          <div class="donut-legend-bar-bg">
+            <div class="donut-legend-bar-fill" style="width: ${Math.max(item.value, item.value > 0 ? 4 : 0)}%; background: ${item.color}; box-shadow: 0 0 8px ${item.color};"></div>
+          </div>
         </div>
       `).join('');
     }
