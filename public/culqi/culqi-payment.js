@@ -1,8 +1,11 @@
 /**
  * BuchiSapa Culqi Payment Module (Frontend)
- * Carpeta: /public/culqi/
- * Implementación oficial de Custom Culqi Checkout multipago versión 1.0
- * Soporte para Tarjetas de crédito/débito, Yape, Billeteras, PagoEfectivo y Cuotéalo
+ * Archivo: /public/culqi/culqi-payment.js
+ * 
+ * Integración oficial del SDK Culqi Checkout V4:
+ * 1. Configuración de llave pública y opciones (Culqi.settings, Culqi.options)
+ * 2. Activación del checkout mediante 'Culqi.open()' en el botón de pago
+ * 3. Captura del token en la función global 'culqi()' y envío seguro al backend
  */
 (function() {
   'use strict';
@@ -36,36 +39,34 @@
   }
 
   /**
-   * Carga dinámica del SDK oficial de Custom Culqi Checkout Multipago v1.0
+   * Carga dinámica del SDK Culqi Checkout V4
    */
-  function ensureCulqiCustomScript() {
+  function ensureCulqiV4Script() {
     return new Promise((resolve) => {
-      if (typeof window.CulqiCheckout === 'function') {
+      if (window.Culqi) {
         resolve(true);
         return;
       }
-      const existing = document.querySelector('script[src*="js.culqi.com/checkout-js"]');
+      const existing = document.querySelector('script[src*="checkout.culqi.com/js/v4"]');
       if (existing) {
-        existing.addEventListener('load', () => resolve(typeof window.CulqiCheckout === 'function'));
-        setTimeout(() => resolve(typeof window.CulqiCheckout === 'function'), 800);
+        existing.addEventListener('load', () => resolve(!!window.Culqi));
+        setTimeout(() => resolve(!!window.Culqi), 800);
         return;
       }
       const script = document.createElement('script');
-      script.src = 'https://js.culqi.com/checkout-js';
+      script.src = 'https://checkout.culqi.com/js/v4';
       script.async = true;
-      script.onload = () => {
-        resolve(typeof window.CulqiCheckout === 'function');
-      };
+      script.onload = () => resolve(!!window.Culqi);
       script.onerror = () => {
-        console.warn('⚠️ No se pudo cargar js.culqi.com/checkout-js, se usará fallback clásico si está disponible');
+        console.warn('⚠️ No se pudo cargar checkout.culqi.com/js/v4 de forma remota');
         resolve(false);
       };
-      document.body.appendChild(script);
+      document.head.appendChild(script);
     });
   }
 
   /**
-   * Valida estrictamente los datos de la tarjeta antes de enviar a tokenizar
+   * Valida los datos de la tarjeta para formulario embebido o directo
    */
   function validateCardData(cardData) {
     if (!cardData) throw new Error('Debes ingresar los datos de tu tarjeta.');
@@ -98,7 +99,7 @@
 
     const email = String(cardData.email || '').trim();
     if (!email || !email.includes('@')) {
-      throw new Error('Ingresa un correo electrónico válido para tu comprobante.');
+      throw new Error('El correo electrónico no es válido.');
     }
 
     return {
@@ -111,98 +112,70 @@
   }
 
   /**
-   * Limpieza de datos locales tras cobro exitoso
-   */
-  function clearAllOrderData() {
-    try {
-      localStorage.removeItem('buchisapa_cart');
-      localStorage.removeItem('buchisapa_pending_order');
-      localStorage.removeItem('buchisapa_checkout_draft');
-      localStorage.removeItem('buchisapa_cart_coupon');
-
-      sessionStorage.removeItem('buchisapa_cart');
-      sessionStorage.removeItem('buchisapa_pending_order');
-      sessionStorage.removeItem('current_checkout_order');
-
-      if (window.BuchisapaCart) {
-        if (typeof window.BuchisapaCart.clear === 'function') {
-          window.BuchisapaCart.clear();
-        } else {
-          window.BuchisapaCart.items = [];
-          if (typeof window.BuchisapaCart.save === 'function') window.BuchisapaCart.save();
-        }
-      }
-
-      const cardNum = document.getElementById('card-number-input');
-      const cardExp = document.getElementById('card-expiry-input');
-      const cardCvv = document.getElementById('card-cvv-input');
-      const notesInput = document.getElementById('cust-notes');
-      
-      if (cardNum) cardNum.value = '';
-      if (cardExp) cardExp.value = '';
-      if (cardCvv) cardCvv.value = '';
-      if (notesInput) notesInput.value = '';
-
-      console.log('🧹 [CULQI SUCCESS] Datos de compra y carrito limpiados exitosamente.');
-    } catch (cleanErr) {
-      console.warn('Advertencia al limpiar datos del pedido:', cleanErr);
-    }
-  }
-
-  /**
-   * Tokeniza una tarjeta directamente contra el endpoint seguro del backend
+   * Tokeniza una tarjeta llamando al backend proxy seguro
    */
   async function tokenizeCard(cardData) {
-    const validCard = validateCardData(cardData);
-
+    const validated = validateCardData(cardData);
     const res = await fetch('/api/payments/culqi/tokens', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(validCard)
+      body: JSON.stringify(validated)
     });
 
     const data = await res.json();
-    if (!res.ok || !data.success || !data.id) {
-      throw new Error(data.error || 'No se pudo validar la tarjeta con Culqi.');
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Error al validar y tokenizar los datos de la tarjeta.');
     }
 
     return data.id;
   }
 
   /**
-   * Valida el token de Culqi contra el backend y genera el cargo
+   * Envía el token id generado al backend para cobrar y registrar el pedido
    */
-  async function chargeToken({ tokenId, email, amount, orderPayload }) {
-    if (!tokenId) throw new Error('Token de pago ausente.');
-    if (!amount || Number(amount) <= 0) throw new Error('Monto inválido.');
-    if (!orderPayload) throw new Error('Estructura del pedido ausente.');
+  async function chargeToken(params) {
+    if (!params.tokenId) throw new Error('El token de la tarjeta es requerido.');
+    if (!params.amount || params.amount <= 0) throw new Error('El monto de la compra debe ser mayor a 0.');
+    if (!params.orderPayload) throw new Error('No se encontraron los datos del pedido a procesar.');
 
     const res = await fetch('/api/payments/culqi/charge', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        token: tokenId,
-        email: email || orderPayload.customerEmail || 'cliente@buchisapa.pe',
-        amount: Number(amount),
-        orderPayload: orderPayload
+        token: params.tokenId,
+        email: params.email || params.orderPayload.customerEmail || 'cliente@buchisapa.pe',
+        amount: params.amount,
+        orderPayload: params.orderPayload
       })
     });
 
-    const result = await res.json();
-
-    if (!res.ok || !result.success) {
-      const errorMsg = result.error || 'El pago fue declinado por el banco emisor.';
-      throw new Error(errorMsg);
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'El banco no autorizó la transacción o hubo un error al procesar el cargo.');
     }
 
-    clearAllOrderData();
-    return result;
+    return data;
   }
 
   /**
-   * Flujo directo de pago con tarjeta (formulario inline)
+   * Limpia el carrito y los datos temporales del pedido al finalizar
    */
-  async function processCardPayment({ cardData, amount, orderPayload, onSuccess, onError }) {
+  function clearAllOrderData() {
+    try {
+      localStorage.removeItem('buchisapa_cart');
+      localStorage.removeItem('buchisapa_cart_v1');
+      sessionStorage.removeItem('buchisapa_current_order');
+      window.dispatchEvent(new Event('cartUpdated'));
+    } catch (e) {
+      console.warn('Error al limpiar almacenamiento del carrito:', e);
+    }
+  }
+
+  /**
+   * Procesa un pago con tarjeta directa
+   */
+  async function processCardPayment(options) {
+    const { cardData, amount, orderPayload, onSuccess, onError } = options;
     try {
       const tokenId = await tokenizeCard(cardData);
       const chargeResult = await chargeToken({
@@ -212,230 +185,201 @@
         orderPayload: orderPayload
       });
 
-      if (onSuccess) onSuccess(chargeResult);
+      clearAllOrderData();
+      if (typeof onSuccess === 'function') onSuccess(chargeResult);
       return chargeResult;
     } catch (err) {
-      console.error('❌ [CULQI PAYMENT ERROR]:', err);
-      if (onError) {
-        onError(err);
-      } else {
-        alert(`⚠️ Error en el pago: ${err.message}`);
-      }
+      if (typeof onError === 'function') onError(err);
+      else alert(`⚠️ Error en el pago: ${err.message}`);
       throw err;
     }
   }
 
   /**
-   * PASO 2 a 5: INTEGRACIÓN OFICIAL DEL CUSTOM CULQI CHECKOUT MULTIPAGO v1.0
-   * Soporta Menú Sidebar, SliderTop o Select, Tarjetas, Yape, Billeteras, Banca Móvil, Agente y Cuotéalo
+   * Configura y abre el checkout oficial de Culqi V4
+   * Utiliza Culqi.settings, Culqi.options y Culqi.open()
    */
-  async function openCustomCulqiCheckout({
-    amount,
-    orderNumber,
-    customerEmail,
-    customerName,
-    orderPayload,
-    orderId,
-    menuType = 'sidebar',
-    container = null,
-    onSuccess,
-    onError
-  }) {
-    const publicKey = await loadCulqiConfig();
-    const hasCustomSdk = await ensureCulqiCustomScript();
-
-    const amountInCents = Math.round(Number(amount) * 100);
-    const parsedName = (customerName || orderPayload?.customerName || 'Cliente').trim().split(' ');
-    const firstName = parsedName[0] || 'Cliente';
-    const lastName = parsedName.slice(1).join(' ') || 'BuchiSapa';
-    const email = customerEmail || orderPayload?.customerEmail || 'cliente@buchisapa.pe';
+  async function openCulqiV4Checkout(options) {
+    options = options || {};
+    const amount = Number(options.amount || 0);
+    const amountInCents = Math.round(amount * 100);
+    const orderPayload = options.orderPayload || {};
+    const email = options.email || orderPayload.customerEmail || 'cliente@buchisapa.pe';
+    const orderId = options.orderId || options.order || undefined;
 
     currentPendingOrder = {
       amount: amount,
-      orderNumber: orderNumber,
-      customerEmail: email,
-      customerName: `${firstName} ${lastName}`,
       orderPayload: orderPayload,
-      onSuccess: onSuccess,
-      onError: onError
+      customerEmail: email,
+      onSuccess: options.onSuccess,
+      onError: options.onError
     };
 
-    // Si el SDK Custom Checkout v1.0 está disponible (window.CulqiCheckout)
-    if (hasCustomSdk && typeof window.CulqiCheckout === 'function') {
-      try {
-        const settings = {
-          title: "BuchiSapa - Pollería & Parrillas",
-          currency: "PEN",
-          amount: amountInCents,
-          order: orderId || undefined
-        };
+    const publicKey = await loadCulqiConfig();
+    await ensureCulqiV4Script();
 
-        const client = {
-          email: email,
-          firstName: firstName,
-          lastName: lastName
-        };
+    if (window.Culqi) {
+      // 1. Configurar Llave Pública
+      window.Culqi.publicKey = publicKey;
 
-        const paymentMethods = {
+      // 2. Configurar Culqi.settings
+      window.Culqi.settings({
+        title: 'BuchiSapa - Pollería & Parrillas',
+        currency: 'PEN',
+        amount: amountInCents,
+        order: orderId || undefined
+      });
+
+      // 3. Personalizar con Culqi.options
+      window.Culqi.options({
+        lang: 'es',
+        modal: true,
+        installments: false,
+        paymentMethods: {
           tarjeta: true,
           yape: true,
-          billetera: true,
           bancaMovil: true,
           agente: true,
+          billetera: true,
           cuotealo: true
-        };
-
-        const options = {
-          lang: "es",
-          installments: true,
-          modal: !container,
-          container: container || undefined,
-          paymentMethods: paymentMethods,
-          paymentMethodsSort: Object.keys(paymentMethods)
-        };
-
-        const appearance = {
-          theme: "default",
-          hiddenCulqiLogo: false,
-          hiddenBannerContent: false,
-          hiddenBanner: false,
-          hiddenToolBarAmount: false,
-          hiddenEmail: false,
-          menuType: menuType, // 'sidebar' | 'sliderTop' | 'select'
-          buttonCardPayText: `Pagar S/ ${Number(amount).toFixed(2)}`,
+        },
+        style: {
           logo: `${window.location.origin}/imagenes/logo/logo-buchisapa.webp`,
-          defaultStyle: {
-            bannerColor: "#dc2626",
-            buttonBackground: "#dc2626",
-            menuColor: "#b91c1c",
-            linksColor: "#dc2626",
-            buttonTextColor: "#ffffff",
-            priceColor: "#dc2626"
-          },
-          variables: {
-            fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
-            fontWeightNormal: "600",
-            borderRadius: "12px",
-            colorBackground: "#0f172a",
-            colorPrimary: "#dc2626",
-            colorPrimaryText: "#ffffff",
-            colorText: "#ffffff",
-            colorTextSecondary: "#cbd5e1",
-            colorTextPlaceholder: "#94a3b8",
-            colorIconTab: "#ffffff",
-            colorLogo: "dark"
-          },
-          rules: {
-            ".Culqi-Main-Container": {
-              background: "#0f172a",
-              fontFamily: "var(--fontFamily)"
-            },
-            ".Culqi-ToolBanner": {
-              background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
-              fontFamily: "var(--fontFamily)",
-              color: "#ffffff"
-            },
-            ".Culqi-Toolbar-Price": {
-              color: "#f87171",
-              fontFamily: "var(--fontFamily)"
-            },
-            ".Culqi-Toolbar-Price .Culqi-Icon": {
-              color: "#dc2626"
-            },
-            ".Culqi-Main-Method": {
-              background: "#1e293b",
-              color: "#ffffff"
-            },
-            ".Culqi-Label": {
-              color: "#e2e8f0"
-            },
-            ".Culqi-Input": {
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#ffffff"
-            },
-            ".Culqi-Button": {
-              background: "#dc2626",
-              borderRadius: "10px",
-              fontWeight: "700"
-            },
-            ".Culqi-Menu": {
-              color: "#cbd5e1"
-            },
-            ".Culqi-Menu .Culqi-Icon": {
-              color: "#dc2626"
-            }
-          }
-        };
+          bannerColor: '#dc2626',
+          buttonBackground: '#dc2626',
+          menuColor: '#b91c1c',
+          linksColor: '#dc2626',
+          buttonText: `Pagar S/ ${amount.toFixed(2)}`,
+          buttonTextColor: '#ffffff',
+          priceColor: '#dc2626'
+        }
+      });
 
-        const config = {
-          settings,
-          client,
-          options,
-          appearance
-        };
-
-        const Culqi = new window.CulqiCheckout(publicKey, config);
-
-        const handleCulqiAction = async () => {
-          if (Culqi.token) {
-            const token = Culqi.token.id;
-            const tokenEmail = Culqi.token.email || currentPendingOrder?.customerEmail || email;
-            if (Culqi.close) Culqi.close();
-
-            try {
-              const result = await chargeToken({
-                tokenId: token,
-                email: tokenEmail,
-                amount: currentPendingOrder.amount,
-                orderPayload: currentPendingOrder.orderPayload
-              });
-
-              if (currentPendingOrder && currentPendingOrder.onSuccess) {
-                currentPendingOrder.onSuccess(result);
-              }
-            } catch (err) {
-              console.error('❌ Error validando token de Custom Checkout:', err);
-              if (currentPendingOrder && currentPendingOrder.onError) {
-                currentPendingOrder.onError(err);
-              } else {
-                alert(`⚠️ Error al procesar pago: ${err.message}`);
-              }
-            }
-          } else if (Culqi.order) {
-            if (Culqi.close) Culqi.close();
-            console.log('✅ Objeto Order de Culqi generado:', Culqi.order);
-            if (currentPendingOrder && currentPendingOrder.onSuccess) {
-              currentPendingOrder.onSuccess({ success: true, order: Culqi.order, isMultipagoOrder: true });
-            }
-          } else if (Culqi.error) {
-            const userMsg = Culqi.error.user_message || Culqi.error.merchant_message || 'El pago no fue autorizado.';
-            if (currentPendingOrder && currentPendingOrder.onError) {
-              currentPendingOrder.onError(new Error(userMsg));
-            } else {
-              alert(`⚠️ ${userMsg}`);
-            }
-          }
-        };
-
-        Culqi.culqi = handleCulqiAction;
-        Culqi.open();
-        return Culqi;
-      } catch (customErr) {
-        console.error('Error al inicializar Custom Culqi Checkout:', customErr);
-        const err = new Error('No se pudo inicializar el Custom Checkout de Culqi. Por favor intenta nuevamente.');
-        if (onError) onError(err);
-        else alert(err.message);
-        return;
-      }
-    } else {
-      const err = new Error('La librería Custom Culqi Checkout multipago no se encuentra disponible. Por favor recarga la página.');
-      if (onError) onError(err);
-      else alert(err.message);
+      // 4. Abrir ventana de pago
+      window.Culqi.open();
+      return true;
     }
+
+    // Si Culqi V4 no está disponible, intentar fallback con Custom Checkout si existe
+    if (typeof window.CulqiCheckout === 'function') {
+      try {
+        const Culqi = new window.CulqiCheckout(publicKey, {
+          settings: { title: 'BuchiSapa', currency: 'PEN', amount: amountInCents },
+          client: { email: email },
+          options: { lang: 'es', modal: true }
+        });
+        Culqi.culqi = window.culqi;
+        Culqi.open();
+        return true;
+      } catch (e) {
+        console.warn('Fallback Custom Checkout error:', e);
+      }
+    }
+
+    const err = new Error('No se pudo inicializar la pasarela de Culqi. Verifica tu conexión e intenta nuevamente.');
+    if (options.onError) options.onError(err);
+    else alert(err.message);
+    return false;
   }
 
-  // Exponer API global
+  /**
+   * Conecta el evento 'Culqi.open()' a cualquier botón de pago especificado
+   */
+  function bindPaymentButton(buttonSelectorOrElement, getOrderData) {
+    const btn = typeof buttonSelectorOrElement === 'string'
+      ? document.querySelector(buttonSelectorOrElement)
+      : buttonSelectorOrElement;
+
+    if (!btn) return false;
+
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const orderData = typeof getOrderData === 'function' ? getOrderData() : (getOrderData || {});
+      openCulqiV4Checkout(orderData);
+    });
+
+    return true;
+  }
+
+  /**
+   * Función global oficial 'culqi()' invocada por Culqi Checkout V4
+   * al completar la tokenización o retornar respuesta
+   */
+  window.culqi = async function culqi() {
+    if (!window.Culqi) {
+      console.warn('⚠️ Se invocó culqi() pero Culqi no está definido en window.');
+      return;
+    }
+
+    if (window.Culqi.token) {
+      // Token creado exitosamente
+      const token = window.Culqi.token.id;
+      const email = window.Culqi.token.email || currentPendingOrder?.customerEmail || 'cliente@buchisapa.pe';
+      
+      console.log('✅ Se ha creado un Token en Culqi V4:', token);
+      if (typeof window.Culqi.close === 'function') {
+        window.Culqi.close();
+      }
+
+      // Enviar el token ID hacia el servidor con fetch
+      try {
+        if (!currentPendingOrder) {
+          throw new Error('No se encontraron los datos del pedido en curso.');
+        }
+
+        const result = await chargeToken({
+          tokenId: token,
+          email: email,
+          amount: currentPendingOrder.amount,
+          orderPayload: currentPendingOrder.orderPayload
+        });
+
+        clearAllOrderData();
+
+        if (currentPendingOrder.onSuccess) {
+          currentPendingOrder.onSuccess(result);
+        } else {
+          const orderNum = currentPendingOrder.orderPayload?.orderNumber || Date.now();
+          window.location.href = `/?order_success=${orderNum}`;
+        }
+      } catch (err) {
+        console.error('❌ Error al procesar el cargo en el backend:', err);
+        if (currentPendingOrder && currentPendingOrder.onError) {
+          currentPendingOrder.onError(err);
+        } else {
+          alert(`⚠️ Error al procesar el pago: ${err.message || 'No se pudo completar la transacción con el banco.'}`);
+        }
+      }
+    } else if (window.Culqi.order) {
+      // Objeto Order creado exitosamente (para efectivo / billeteras CIP)
+      const order = window.Culqi.order;
+      console.log('✅ Se ha creado el objeto Order:', order);
+      if (typeof window.Culqi.close === 'function') {
+        window.Culqi.close();
+      }
+
+      clearAllOrderData();
+
+      if (currentPendingOrder && currentPendingOrder.onSuccess) {
+        currentPendingOrder.onSuccess({ success: true, order: order });
+      } else {
+        const orderNum = currentPendingOrder?.orderPayload?.orderNumber || Date.now();
+        window.location.href = `/?order_success=${orderNum}`;
+      }
+    } else if (window.Culqi.error) {
+      // Mostramos JSON de objeto error en consola
+      console.error('❌ Error devuelto por Culqi:', window.Culqi.error);
+      const userMsg = window.Culqi.error.user_message || window.Culqi.error.merchant_message || 'El pago no fue autorizado por la entidad bancaria.';
+
+      if (currentPendingOrder && currentPendingOrder.onError) {
+        currentPendingOrder.onError(new Error(userMsg));
+      } else {
+        alert(`⚠️ ${userMsg}`);
+      }
+    }
+  };
+
+  // Exponer API pública global
   window.BuchisapaCulqi = {
     loadConfig: loadCulqiConfig,
     validateCardData: validateCardData,
@@ -443,9 +387,32 @@
     chargeToken: chargeToken,
     clearAllOrderData: clearAllOrderData,
     processCardPayment: processCardPayment,
-    openCustomCheckout: openCustomCulqiCheckout,
-    openCheckout: openCustomCulqiCheckout
+    openCulqiV4: openCulqiV4Checkout,
+    openCheckout: openCulqiV4Checkout,
+    openCustomCheckout: openCulqiV4Checkout,
+    bindPaymentButton: bindPaymentButton
   };
 
-  console.log('💳 [BuchisapaCulqi] Módulo Custom Culqi Checkout multipago v1.0 listo.');
+  // Auto-vinculación en el DOM para botones de pago estándar
+  document.addEventListener('DOMContentLoaded', () => {
+    // Si existe el botón con id 'btn_pagar' según la documentación de Culqi
+    const btnPagar = document.getElementById('btn_pagar');
+    if (btnPagar) {
+      btnPagar.addEventListener('click', function(e) {
+        e.preventDefault();
+        openCulqiV4Checkout();
+      });
+    }
+
+    // Botón multipago en checkout.html
+    const btnMultipago = document.getElementById('btn-open-culqi-multipago');
+    if (btnMultipago && typeof window.openCulqiCustomCheckoutFromForm === 'function') {
+      btnMultipago.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.openCulqiCustomCheckoutFromForm();
+      });
+    }
+  });
+
+  console.log('💳 [BuchisapaCulqi] Módulo Culqi Checkout V4 listo y configurado.');
 })();
