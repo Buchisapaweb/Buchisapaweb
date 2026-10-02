@@ -1690,25 +1690,41 @@ function startOtpCountdownTimer(seconds = 45) {
 
 async function requestOtpVerificationAndOpenModal(email, payload = {}) {
   const alertEl = document.getElementById('auth-login-alert') || document.getElementById('auth-register-alert');
-  const nombres = payload.name || `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || email.split('@')[0];
+  const cleanEmail = email.trim().toLowerCase();
+  const password = payload.password;
 
   try {
-    const res = await fetch('/api/cliente/send-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        nombres
-      })
-    });
-    const result = await res.json();
+    const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
 
-    if (!result.success) {
-      throw new Error(result.error || 'No se pudo enviar el código de verificación');
+    if (!client) {
+      throw new Error('Cliente Supabase no disponible.');
     }
 
+    // Para enviar: await supabase.auth.signUp({ email, password })
+    const { data, error } = await client.auth.signUp({
+      email: cleanEmail,
+      password: password || 'BuchiSapa2026!',
+      options: {
+        data: {
+          firstName: payload.firstName || '',
+          lastName: payload.lastName || '',
+          name: payload.name || `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || cleanEmail.split('@')[0],
+          docType: payload.docType || 'DNI',
+          docNumber: payload.docNumber || '',
+          phone: payload.phone || '',
+          birthDate: payload.birthDate || ''
+        }
+      }
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Error al solicitar código de registro con Supabase');
+    }
+
+    console.log("⚡ [SUPABASE SIGNUP SUCCESS]:", data);
+
     if (typeof window.showToast === 'function') {
-      window.showToast('Código enviado a tu correo', 'success');
+      window.showToast('Código enviado a tu correo desde buchisapaweb@gmail.com', 'success');
     }
 
     // Cerrar modal de login si estaba abierto
@@ -1716,19 +1732,19 @@ async function requestOtpVerificationAndOpenModal(email, payload = {}) {
     closeGoogleAuthModal();
 
     // Abrir modal de verificación con los 6 casilleros
-    openEmailVerificationModal(email, payload);
+    openEmailVerificationModal(cleanEmail, payload);
 
   } catch (err) {
-    console.error('Error requesting OTP:', err);
+    console.error('Error requesting OTP via Supabase signUp:', err);
     if (alertEl) {
       alertEl.textContent = err.message || 'Error al enviar código de verificación al correo';
       alertEl.className = 'auth-status-alert error';
       alertEl.style.display = 'block';
     } else {
       if (typeof window.showToast === 'function') {
-        window.showToast('Código enviado a tu correo', 'info');
+        window.showToast('Error al enviar código. Inténtalo de nuevo.', 'error');
       }
-      openEmailVerificationModal(email, payload);
+      openEmailVerificationModal(cleanEmail, payload);
     }
   }
 }
@@ -1742,38 +1758,29 @@ async function handleResendOtpCode() {
   if (resendBtn) resendBtn.disabled = true;
 
   try {
-    const res = await fetch('/api/cliente/send-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: pendingOtpState.email,
-        nombres: pendingOtpState.payload?.name || pendingOtpState.email.split('@')[0]
-      })
-    });
-    const result = await res.json();
+    const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
 
-    if (result.success) {
-      if (typeof window.showToast === 'function') {
-        window.showToast('Código reenviado a tu correo', 'success');
-      }
-      if (alertEl) {
-        alertEl.textContent = '✓ ¡Código enviado a tu correo!';
-        alertEl.className = 'otp-alert success';
-        alertEl.style.display = 'block';
-      }
-      startOtpCountdownTimer(45);
-    } else {
-      if (alertEl) {
-        alertEl.textContent = result.error || 'Error al reenviar código';
-        alertEl.className = 'otp-alert error';
-        alertEl.style.display = 'block';
-      }
-      if (resendBtn) resendBtn.disabled = false;
+    if (client) {
+      const { error } = await client.auth.resend({
+        type: 'signup',
+        email: pendingOtpState.email
+      });
+      if (error) throw error;
     }
+
+    if (typeof window.showToast === 'function') {
+      window.showToast('Código reenviado desde buchisapaweb@gmail.com', 'success');
+    }
+    if (alertEl) {
+      alertEl.textContent = '✓ ¡Código reenviado a tu correo desde buchisapaweb@gmail.com!';
+      alertEl.className = 'otp-alert success';
+      alertEl.style.display = 'block';
+    }
+    startOtpCountdownTimer(45);
   } catch (err) {
     if (alertEl) {
-      alertEl.textContent = 'Revisa tu bandeja de entrada o spam en Gmail.';
-      alertEl.className = 'otp-alert success';
+      alertEl.textContent = err.message || 'Error al reenviar código. Revisa tu bandeja de Gmail.';
+      alertEl.className = 'otp-alert error';
       alertEl.style.display = 'block';
     }
     if (resendBtn) resendBtn.disabled = false;
@@ -1795,41 +1802,83 @@ async function submitOtpVerification() {
 
   if (code.length < 6) {
     if (alertEl) {
-      alertEl.textContent = 'Por favor ingresa los 6 dígitos del código enviado a tu correo.';
+      alertEl.textContent = 'Por favor ingresa los 6 dígitos del código enviado a tu correo desde buchisapaweb@gmail.com.';
       alertEl.className = 'otp-alert error';
       alertEl.style.display = 'block';
     }
     return;
   }
 
+  const email = pendingOtpState.email;
+
   try {
     if (submitBtn) submitBtn.disabled = true;
     if (btnText) btnText.style.display = 'none';
     if (btnSpinner) btnSpinner.style.display = 'inline-block';
 
-    // TAREA FASE 1: Solo console.log del código ingresado, sin verificar ni guardar
-    console.log("⚡ [FASE 1 CLIENTE OTP] Código ingresado por el usuario:", code);
-    console.log("⚡ [FASE 1 CLIENTE OTP] Correo electrónico objetivo:", pendingOtpState.email);
+    const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
+
+    if (!client) {
+      throw new Error('Cliente Supabase no inicializado.');
+    }
+
+    // Para verificar: await supabase.auth.verifyOtp({ email, token: codigo, type: 'signup' })
+    const { data, error } = await client.auth.verifyOtp({
+      email,
+      token: code,
+      type: 'signup'
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Código de verificación inválido o expirado.');
+    }
+
+    console.log("⚡ [SUPABASE VERIFY OTP SUCCESS]:", data);
+
+    const sbUser = data?.user || {};
+    const meta = sbUser.user_metadata || pendingOtpState.payload || {};
+
+    const customer = {
+      id: sbUser.id || `USR-${Date.now()}`,
+      name: meta.name || `${meta.firstName || ''} ${meta.lastName || ''}`.trim() || email.split('@')[0],
+      firstName: meta.firstName || 'Cliente',
+      lastName: meta.lastName || '',
+      email: sbUser.email || email,
+      phone: meta.phone || '',
+      docType: meta.docType || 'DNI',
+      docNumber: meta.docNumber || '',
+      authProvider: 'local',
+      role: 'customer',
+      isAdmin: false,
+      emailVerified: true,
+      updatedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem('buchisapa_customer', JSON.stringify(customer));
+    if (typeof updateNavbarUserAuth === 'function') updateNavbarUserAuth();
 
     if (alertEl) {
-      alertEl.textContent = `✓ Código ${code} recibido e impreso en consola.`;
+      alertEl.textContent = '✓ ¡Correo verificado exitosamente! Tu cuenta ha sido creada.';
       alertEl.className = 'otp-alert success';
       alertEl.style.display = 'block';
     }
 
     if (typeof window.showToast === 'function') {
-      window.showToast(`Código ${code} recibido correctamente`, 'success');
+      window.showToast('¡Cuenta creada y verificada exitosamente!', 'success');
     }
 
     setTimeout(() => {
       closeEmailVerificationModal();
       clearAllAuthForms();
-    }, 1000);
+      if (typeof openUserProfileModal === 'function') {
+        openUserProfileModal('main');
+      }
+    }, 800);
 
   } catch (err) {
-    console.error('Error in submitOtpVerification:', err);
+    console.error('Error in verifyOtp with Supabase:', err);
     if (alertEl) {
-      alertEl.textContent = err.message || 'Código inválido o expirado. Inténtalo de nuevo.';
+      alertEl.textContent = err.message || 'Código inválido o expirado. Por favor verifica en tu Gmail.';
       alertEl.className = 'otp-alert error';
       alertEl.style.display = 'block';
     }

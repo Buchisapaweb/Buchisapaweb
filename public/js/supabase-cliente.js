@@ -276,3 +276,19 @@ const BuchisapaAPI = {
 };
 
 window.BuchisapaAPI = BuchisapaAPI;
+
+let _supabaseClientInstance = null;
+
+function getSupabaseClient() {
+  if (!_supabaseClientInstance) {
+    if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+      _supabaseClientInstance = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    } else if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+      _supabaseClientInstance = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    }
+  }
+  return _supabaseClientInstance;
+}
+
+window.getSupabaseClient = getSupabaseClient;
+window.SUPABASE_CONFIG = SUPABASE_CONFIG;
