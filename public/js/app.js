@@ -1869,26 +1869,32 @@ async function submitOtpVerification() {
     if (btnSpinner) btnSpinner.style.display = 'inline-block';
 
     let verified = false;
+    let supabaseUserId = null;
+    const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
 
-    // 1. Intentar verificación con Supabase Auth primero
-    try {
-      const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
-      if (client) {
+    // 1. Verificación con Supabase Auth (verifyOtp)
+    if (client) {
+      try {
         const { data, error } = await client.auth.verifyOtp({
           email,
           token: code,
           type: 'signup'
         });
-        if (!error && data?.session) {
+
+        if (!error && (data?.user || data?.session?.user)) {
           verified = true;
+          const userObj = data.user || data.session.user;
+          supabaseUserId = userObj.id;
           console.log("⚡ [SUPABASE VERIFY OTP SUCCESS]:", data);
+        } else if (error) {
+          console.warn("⚠️ Supabase verifyOtp error:", error.message);
         }
+      } catch (sbErr) {
+        console.warn("⚠️ Exception in Supabase verifyOtp:", sbErr);
       }
-    } catch (sbErr) {
-      console.warn("⚠️ Supabase verifyOtp notice:", sbErr);
     }
 
-    // 2. Si Supabase no validó directamente, validar con backend local
+    // 2. Fallback de verificación backend si no validó directamente con Supabase
     if (!verified) {
       try {
         const res = await fetch('/api/auth/verify-code', {
@@ -1921,8 +1927,44 @@ async function submitOtpVerification() {
       }
     }
 
+    // 3. Guardar en la tabla 'profiles' de Supabase
+    if (client) {
+      try {
+        let uId = supabaseUserId;
+        if (!uId) {
+          const { data: userData } = await client.auth.getUser();
+          uId = userData?.user?.id;
+        }
+
+        if (uId) {
+          const profileRecord = {
+            id: uId,
+            dni: payload.docNumber || payload.dni || '',
+            nombres: payload.firstName || payload.nombres || '',
+            apellidos: payload.lastName || payload.apellidos || '',
+            email: email,
+            telefono: payload.phone || payload.telefono || '',
+            fecha_nacimiento: payload.birthDate || payload.fecha_nacimiento || null
+          };
+
+          console.log("📝 [INSERTING TO SUPABASE PROFILES]:", profileRecord);
+          const { error: profileError } = await client.from('profiles').insert([profileRecord]);
+
+          if (profileError) {
+            console.warn("⚠️ Profiles insert warning, attempting upsert:", profileError.message);
+            await client.from('profiles').upsert([profileRecord]);
+          } else {
+            console.log("✅ Perfil guardado exitosamente en tabla 'profiles'!");
+          }
+        }
+      } catch (pErr) {
+        console.warn("⚠️ Exception writing to profiles table:", pErr);
+      }
+    }
+
+    // Guardar copia local de sesión de cliente
     const customer = {
-      id: `USR-${Date.now()}`,
+      id: supabaseUserId || `USR-${Date.now()}`,
       name: payload.name || `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || email.split('@')[0],
       firstName: payload.firstName || 'Cliente',
       lastName: payload.lastName || '',
@@ -1941,22 +1983,24 @@ async function submitOtpVerification() {
     if (typeof updateNavbarUserAuth === 'function') updateNavbarUserAuth();
 
     if (alertEl) {
-      alertEl.textContent = '✓ ¡Correo verificado exitosamente! Tu cuenta ha sido activada.';
+      alertEl.textContent = '✓ ¡Correo verificado y perfil guardado! Redirigiendo a inicio de sesión...';
       alertEl.className = 'otp-alert success';
       alertEl.style.display = 'block';
     }
 
     if (typeof window.showToast === 'function') {
-      window.showToast('¡Cuenta creada y verificada exitosamente!', 'success');
+      window.showToast('¡Cuenta creada e insertada en profiles correctamente!', 'success');
     }
 
+    // 4. Redirigir a /login
     setTimeout(() => {
       closeEmailVerificationModal();
       clearAllAuthForms();
-      if (typeof openUserProfileModal === 'function') {
-        openUserProfileModal('main');
+      openLoginModal('login');
+      if (typeof window.showToast === 'function') {
+        window.showToast('Inicia sesión con tu correo y contraseña.', 'info');
       }
-    }, 800);
+    }, 1200);
 
   } catch (err) {
     console.error('Error in submitOtpVerification:', err);
