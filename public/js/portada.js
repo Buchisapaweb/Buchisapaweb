@@ -54,32 +54,62 @@
 
     let isDragging = false;
     let startX = 0;
+    let startY = 0;
     let deltaX = 0;
+    let deltaY = 0;
+    let isHorizontalDrag = null;
 
     function onDragStart(e) {
       isDragging = true;
-      startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+      isHorizontalDrag = null;
+      const touch = e.type && e.type.includes('touch') ? e.touches[0] : e;
+      startX = touch ? touch.clientX : 0;
+      startY = touch ? touch.clientY : 0;
       deltaX = 0;
+      deltaY = 0;
       track.style.transition = 'none';
       stopCarouselAutoplay();
     }
 
     function onDragMove(e) {
       if (!isDragging) return;
-      const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+      const touch = e.type && e.type.includes('touch') ? e.touches[0] : e;
+      if (!touch) return;
+
+      const currentX = touch.clientX;
+      const currentY = touch.clientY;
       deltaX = currentX - startX;
+      deltaY = currentY - startY;
 
-      const containerWidth = container.clientWidth || 1000;
-      const baseOffset = -currentSlide * containerWidth;
-
-      let moveX = baseOffset + deltaX;
-      if (currentSlide === 0 && deltaX > 0) {
-        moveX = baseOffset + deltaX * 0.3;
-      } else if (currentSlide === totalSlides - 1 && deltaX < 0) {
-        moveX = baseOffset + deltaX * 0.3;
+      // Determinar la dirección dominante del gesto
+      if (isHorizontalDrag === null) {
+        if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+          isHorizontalDrag = Math.abs(deltaX) > Math.abs(deltaY);
+        }
       }
 
-      track.style.transform = `translateX(${moveX}px)`;
+      // Si el gesto es vertical (desplazarse hacia abajo/arriba en la página), cancelar drag y permitir scroll
+      if (isHorizontalDrag === false) {
+        isDragging = false;
+        track.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+        goToSlide(currentSlide);
+        startCarouselAutoplay();
+        return;
+      }
+
+      if (isHorizontalDrag === true) {
+        const containerWidth = container.clientWidth || 1000;
+        const baseOffset = -currentSlide * containerWidth;
+
+        let moveX = baseOffset + deltaX;
+        if (currentSlide === 0 && deltaX > 0) {
+          moveX = baseOffset + deltaX * 0.3;
+        } else if (currentSlide === totalSlides - 1 && deltaX < 0) {
+          moveX = baseOffset + deltaX * 0.3;
+        }
+
+        track.style.transform = `translateX(${moveX}px)`;
+      }
     }
 
     function onDragEnd() {

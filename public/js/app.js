@@ -360,35 +360,65 @@ function initCarouselTouchGestures() {
 
   let isDragging = false;
   let startX = 0;
+  let startY = 0;
   let deltaX = 0;
+  let deltaY = 0;
+  let isHorizontalDrag = null;
 
   function onDragStart(e) {
     isDragging = true;
-    startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    isHorizontalDrag = null;
+    const touch = e.type && e.type.includes('touch') ? e.touches[0] : e;
+    startX = touch ? touch.clientX : 0;
+    startY = touch ? touch.clientY : 0;
     deltaX = 0;
+    deltaY = 0;
     track.style.transition = 'none';
     stopAutoPlay();
   }
 
   function onDragMove(e) {
     if (!isDragging) return;
-    const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const touch = e.type && e.type.includes('touch') ? e.touches[0] : e;
+    if (!touch) return;
+
+    const currentX = touch.clientX;
+    const currentY = touch.clientY;
     deltaX = currentX - startX;
+    deltaY = currentY - startY;
 
-    const containerWidth = container.clientWidth || 1000;
-    const baseOffset = -currentSlideIndex * containerWidth;
-
-    let moveX = baseOffset + deltaX;
-    const slides = document.querySelectorAll('.carousel-slide');
-    const maxIdx = Math.max(0, slides.length - 1);
-
-    if (currentSlideIndex === 0 && deltaX > 0) {
-      moveX = baseOffset + deltaX * 0.3;
-    } else if (currentSlideIndex === maxIdx && deltaX < 0) {
-      moveX = baseOffset + deltaX * 0.3;
+    // Determinar dirección del gesto
+    if (isHorizontalDrag === null) {
+      if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+        isHorizontalDrag = Math.abs(deltaX) > Math.abs(deltaY);
+      }
     }
 
-    track.style.transform = `translateX(${moveX}px)`;
+    // Cancelar si es desplazamiento vertical (para hacer scroll en la página)
+    if (isHorizontalDrag === false) {
+      isDragging = false;
+      track.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+      updateCarouselView();
+      startAutoPlay();
+      return;
+    }
+
+    if (isHorizontalDrag === true) {
+      const containerWidth = container.clientWidth || 1000;
+      const baseOffset = -currentSlideIndex * containerWidth;
+
+      let moveX = baseOffset + deltaX;
+      const slides = document.querySelectorAll('.carousel-slide');
+      const maxIdx = Math.max(0, slides.length - 1);
+
+      if (currentSlideIndex === 0 && deltaX > 0) {
+        moveX = baseOffset + deltaX * 0.3;
+      } else if (currentSlideIndex === maxIdx && deltaX < 0) {
+        moveX = baseOffset + deltaX * 0.3;
+      }
+
+      track.style.transform = `translateX(${moveX}px)`;
+    }
   }
 
   function onDragEnd() {
