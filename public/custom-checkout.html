@@ -12,9 +12,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Scripts Oficiales de Culqi y Culqi 3DS -->
-  <script src="https://checkout.culqi.com/js/v4"></script>
+  <!-- Scripts Oficiales de Culqi (Custom Checkout multipago v1.0 y 3DS) -->
   <script src="https://3ds.culqi.com"></script>
+  <script src="https://js.culqi.com/checkout-js"></script>
+  <script src="/culqi/culqi-payment.js"></script>
 
   <style>
     :root {
@@ -354,11 +355,57 @@
       } catch (e) {}
     }
 
-    // 3. Iniciar flujo de pago con Culqi 3DS
+    // 3. Iniciar flujo de pago con Custom Culqi Checkout Multipago v1.0
     async function initiateCulqiPayment() {
       const btn = document.getElementById('btn-start-culqi-payment');
       btn.disabled = true;
-      btn.innerHTML = `<span>Iniciando Pasarela Culqi...</span>`;
+      btn.innerHTML = `<span>Iniciando Pasarela Culqi Multipago...</span>`;
+
+      if (window.BuchisapaCulqi && typeof window.BuchisapaCulqi.openCustomCheckout === 'function') {
+        try {
+          await window.BuchisapaCulqi.openCustomCheckout({
+            amount: orderData.amount,
+            orderNumber: orderData.orderNumber,
+            customerEmail: orderData.customerEmail,
+            customerName: orderData.customerName,
+            orderPayload: {
+              ...orderData,
+              paymentMethod: 'Culqi Multipago Online'
+            },
+            menuType: 'sidebar',
+            onSuccess: (result) => {
+              const chargeId = result.chargeId || (result.order && result.order.id) || `chr_${Date.now()}`;
+              showStatus(`✅ ¡Pago Exitoso! ID: ${chargeId}`, 'success');
+              
+              if (window.Android && window.Android.onPaymentSuccess) {
+                window.Android.onPaymentSuccess(JSON.stringify(result));
+              }
+
+              localStorage.removeItem('buchisapa_cart');
+
+              try {
+                window.open(`https://wa.me/51943312024?text=${waMsg}`, '_blank');
+              } catch (e) {}
+
+              setTimeout(() => {
+                window.location.href = `/?order_success=${orderData.orderNumber}`;
+              }, 1200);
+            },
+            onError: (err) => {
+              const errMsg = err.message || 'El pago fue declinado por tu entidad bancaria.';
+              showStatus(`⚠️ ${errMsg}`, 'error');
+              if (window.Android && window.Android.onPaymentError) {
+                window.Android.onPaymentError(errMsg);
+              }
+              btn.disabled = false;
+              btn.innerHTML = `<span>Reintentar Pago con Culqi</span>`;
+            }
+          });
+          return;
+        } catch (err) {
+          console.warn('Fallback al método alternativo:', err);
+        }
+      }
 
       await fetchServerCulqiConfig();
 
@@ -374,7 +421,7 @@
       // Configuración Culqi v4
       window.Culqi.publicKey = publicKey;
       window.Culqi.settings({
-        title: 'BuchiSapa Burger & Broaster',
+        title: 'BuchiSapa - Pollería & Parrillas',
         currency: 'PEN',
         amount: amountInCents
       });
@@ -382,7 +429,7 @@
       window.Culqi.options({
         lang: 'es',
         modal: true,
-        installments: false,
+        installments: true,
         paymentMethods: {
           tarjeta: true,
           yape: true,
@@ -390,32 +437,8 @@
           bancaMovil: true,
           agente: true,
           cuotealo: false
-        },
-        style: {
-          bgcolor: '#0f172a',
-          maincolor: '#dc2626',
-          disabledcolor: '#94a3b8',
-          buttontext: '#ffffff',
-          maintext: '#ffffff',
-          desctext: '#cbd5e1'
         }
       });
-
-      // Configuración Culqi 3DS
-      if (window.Culqi3DS) {
-        try {
-          window.Culqi3DS.publicKey = publicKey;
-          window.Culqi3DS.settings = {
-            charge: {
-              totalAmount: amountInCents,
-              returnUrl: window.location.href
-            }
-          };
-          window.Culqi3DS.device = window.Culqi3DS.generateDevice ? window.Culqi3DS.generateDevice() : undefined;
-        } catch (e) {
-          console.warn('Culqi3DS init error:', e);
-        }
-      }
 
       // Handler global de respuesta de Culqi
       window.culqi = async function() {
@@ -455,18 +478,14 @@
               // Limpiar carrito local
               localStorage.removeItem('buchisapa_cart');
 
-              // Redirección a WhatsApp con confirmación
-              let waMsg = `*PAGO ONLINE EXITOSO BUCHISAPA* 🍗✅%0A`;
-              waMsg += `*Orden:* %23${orderData.orderNumber}%0A`;
-              waMsg += `*Cliente:* ${encodeURIComponent(orderData.customerName)}%0A`;
-              waMsg += `*Transacción Culqi:* ${chargeId}%0A`;
-              waMsg += `*Monto Pagado:* S/ ${orderData.amount.toFixed(2)}%0A`;
-              waMsg += `*Modalidad:* ${orderData.orderType === 'pickup' ? 'Recojo en Tienda' : 'Delivery'}%0A`;
-              waMsg += `*Estado:* ✅ PAGADO Y CONFIRMADO EN COCINA`;
+              // Abrir WhatsApp en pestaña separada si es compatible y volver a index.html
+              try {
+                window.open(`https://wa.me/51943312024?text=${waMsg}`, '_blank');
+              } catch (e) {}
 
               setTimeout(() => {
-                window.location.href = `https://wa.me/51943312024?text=${waMsg}`;
-              }, 600);
+                window.location.href = `/?order_success=${orderData.orderNumber}`;
+              }, 1200);
 
             } else {
               const errMsg = result.error || 'El pago fue declinado por tu entidad bancaria.';

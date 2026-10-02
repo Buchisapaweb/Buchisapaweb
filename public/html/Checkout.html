@@ -93,21 +93,23 @@
           </div>
         </div>
 
-        <!-- GRUPO: MÉTODO DE PAGO -->
+        <!-- GRUPO: MÉTODO DE PAGO (SOLO TARJETA ONLINE) -->
         <div class="form-group checkout-form-group">
-          <label class="checkout-form-label" for="cust-payment">
+          <label class="checkout-form-label">
             <span>Método de Pago</span>
             <span class="label-req">*</span>
           </label>
-          <div class="input-with-icon">
-            <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-            <select id="cust-payment" class="checkout-form-select">
-              <option value="culqi">💳 Tarjeta Débito / Crédito / Yape (Culqi Online)</option>
-              <option value="yape">📱 Yape / Plin Manual (943 312 024)</option>
-              <option value="tarjeta">💳 Tarjeta POS (Visa / Mastercard contraentrega)</option>
-              <option value="efectivo">💵 Efectivo contraentrega</option>
-            </select>
+          <div style="background: #f8fafc; border: 1.5px solid #dc2626; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 20px;">💳</span>
+              <div>
+                <strong style="color: #0f172a; font-size: 13px; display: block;">Tarjeta Débito / Crédito</strong>
+                <span style="color: #64748b; font-size: 11px;">Pago Online Seguro con Culqi</span>
+              </div>
+            </div>
+            <span style="background: #16a34a; color: white; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 9999px;">ACTIVO</span>
           </div>
+          <input type="hidden" id="cust-payment" value="culqi">
         </div>
 
         <!-- GRUPO: NOTAS PARA COCINA -->

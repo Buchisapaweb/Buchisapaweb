@@ -53,7 +53,7 @@ var BuchisapaCart = window.BuchisapaCart = {
   },
 
   init() {
-    const saved = localStorage.getItem('buchisapa_cart_v1');
+    const saved = localStorage.getItem('buchisapa_cart') || localStorage.getItem('buchisapa_cart_v1');
     const savedType = localStorage.getItem('buchisapa_order_type');
     if (savedType) {
       this.orderType = savedType;
@@ -95,7 +95,9 @@ var BuchisapaCart = window.BuchisapaCart = {
         item.selectedSauces = [];
       }
     });
-    localStorage.setItem('buchisapa_cart_v1', JSON.stringify(this.items));
+    const serialized = JSON.stringify(this.items);
+    localStorage.setItem('buchisapa_cart', serialized);
+    localStorage.setItem('buchisapa_cart_v1', serialized);
     this.updateUI();
   },
 

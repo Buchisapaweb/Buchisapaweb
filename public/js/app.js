@@ -92,7 +92,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) {}
 
-  // 8. Inicializar Gestos Táctiles (Swipe) en Carrusel Móvil
+  // 8. Si proviene de un pedido completado con éxito, mostrar confirmación
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderSuccessCode = urlParams.get('order_success');
+    if (orderSuccessCode) {
+      setTimeout(() => {
+        if (window.BuchisapaPush) {
+          window.BuchisapaPush.playChime();
+          window.BuchisapaPush.showToast({
+            title: `🍗 ¡Pedido #${orderSuccessCode} Recibido!`,
+            message: 'Tu pago fue confirmado y tu comanda ya está siendo preparada en cocina.',
+            stage: 'listo',
+            icon: '✅'
+          });
+        }
+      }, 400);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  } catch (e) {}
+
+  // 9. Inicializar Gestos Táctiles (Swipe) en Carrusel Móvil
   initCarouselTouchGestures();
 
   // 11. Registrar Service Worker para PWA
@@ -4510,9 +4530,9 @@ async function submitOrder(e) {
     } catch (e) {}
   }
 
-  const STORE_FULL_ADDRESS = 'Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪';
-  const STORE_GPS_URL = 'https://maps.google.com/?q=-12.01635,-76.88455';
-  const STORE_HOURS = 'Lunes a Domingo, de 6:00 PM a 5:00 AM';
+  var STORE_FULL_ADDRESS = window.STORE_FULL_ADDRESS || 'Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪';
+  var STORE_GPS_URL = window.STORE_GPS_URL || 'https://maps.google.com/?q=-12.01635,-76.88455';
+  var STORE_HOURS = window.STORE_HOURS || 'Lunes a Domingo, de 6:00 PM a 5:00 AM';
 
   const finalAddress = isPickup ? STORE_FULL_ADDRESS : (addressInput || 'Santa Clara, Ate');
 

@@ -3,10 +3,15 @@
  * Archivo: /js/checkout.js
  */
 
-const STORE_FULL_ADDRESS = 'Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪';
-const STORE_HOURS = 'Lunes a Domingo, de 6:00 PM a 5:00 AM';
+(function () {
+  'use strict';
 
-function getCleanStoredAddress() {
+  window.STORE_FULL_ADDRESS = window.STORE_FULL_ADDRESS || 'Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪';
+  window.STORE_HOURS = window.STORE_HOURS || 'Lunes a Domingo, de 6:00 PM a 5:00 AM';
+  var STORE_FULL_ADDRESS = window.STORE_FULL_ADDRESS;
+  var STORE_HOURS = window.STORE_HOURS;
+
+  function getCleanStoredAddress() {
   const raw = localStorage.getItem('buchisapa_delivery_address') || '';
   if (!raw) return '';
   try {
@@ -187,8 +192,9 @@ function closeCheckoutModalAndOpenCart() {
   }, 100);
 }
 
-// Exponer globalmente
-window.openCheckoutModal = openCheckoutModal;
-window.closeCheckoutModal = closeCheckoutModal;
-window.closeCheckoutModalAndOpenCart = closeCheckoutModalAndOpenCart;
-window.getCleanStoredAddress = getCleanStoredAddress;
+  // Exponer globalmente
+  window.openCheckoutModal = openCheckoutModal;
+  window.closeCheckoutModal = closeCheckoutModal;
+  window.closeCheckoutModalAndOpenCart = closeCheckoutModalAndOpenCart;
+  window.getCleanStoredAddress = getCleanStoredAddress;
+})();

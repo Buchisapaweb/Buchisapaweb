@@ -14,9 +14,11 @@
   <link rel="stylesheet" href="/css/comun.css">
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/Checkout.css">
+  <link rel="stylesheet" href="/culqi/culqi.css">
   
-  <script src="https://checkout.culqi.com/js/v4"></script>
-  <script src="/js/culqi-payment.js"></script>
+  <!-- CULQI OFICIAL CUSTOM CHECKOUT MULTIPAGO JS SDK & DEDICATED MODULE -->
+  <script src="https://js.culqi.com/checkout-js"></script>
+  <script src="/culqi/culqi-payment.js"></script>
 </head>
 <body class="checkout-standalone-body">
 
@@ -129,25 +131,175 @@
               </div>
             </div>
 
-            <!-- CAMPO: MÉTODO DE PAGO -->
-            <div class="checkout-input-group">
-              <label for="cust-payment" class="checkout-field-label">
-                <span>Método de Pago</span>
-                <span class="field-required">*</span>
-              </label>
-              <div class="field-input-wrapper">
-                <svg class="field-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-                <select id="cust-payment" class="checkout-field-control checkout-select-control">
-                  <option value="culqi">💳 Tarjeta Débito / Crédito / Yape (Culqi Online)</option>
-                  <option value="yape">📱 Yape / Plin Manual (943 312 024)</option>
-                  <option value="tarjeta">💳 Tarjeta POS (Visa / Mastercard contraentrega)</option>
-                  <option value="efectivo">💵 Efectivo contraentrega</option>
-                </select>
+            <!-- CAMPO OCULTO DE PAGO CULQI -->
+            <input type="hidden" id="cust-payment" value="culqi">
+
+            <!-- CONTENEDOR DE DISEÑO OFICIAL CULQI -->
+            <div class="culqi-card-container">
+              
+              <!-- BARRA SUPERIOR: PRECIO TOTAL -->
+              <div class="culqi-header-bar">
+                <div class="culqi-header-left">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  <span>Precio total</span>
+                </div>
+                <div class="culqi-total-amount" id="culqi-display-total">
+                  S/ 0.00
+                </div>
+              </div>
+
+              <!-- PESTAÑAS DE MÉTODOS DE PAGO CULQI -->
+              <div class="culqi-methods-tabs">
+                <div class="culqi-method-tab active">
+                  <span class="culqi-tab-icon">💳</span>
+                  <span class="culqi-tab-title">Tarjeta débito / crédito</span>
+                </div>
+                <div class="culqi-method-tab" style="opacity: 0.7;" title="Disponible en pasarela popup">
+                  <span class="culqi-tab-icon">🟣</span>
+                  <span class="culqi-tab-title">Yape</span>
+                </div>
+                <div class="culqi-method-tab" style="opacity: 0.7;" title="Disponible en pasarela popup">
+                  <span class="culqi-tab-icon">📲</span>
+                  <span class="culqi-tab-title">Billeteras móviles</span>
+                </div>
+                <div class="culqi-method-tab" style="opacity: 0.7;" title="Disponible en pasarela popup">
+                  <span class="culqi-tab-icon">🖥️</span>
+                  <span class="culqi-tab-title">Banca por internet</span>
+                </div>
+              </div>
+
+              <!-- FORMULARIO DE TARJETA CULQI -->
+              <div id="culqi-embedded-form">
+                
+                <!-- NÚMERO DE TARJETA -->
+                <div class="culqi-form-group">
+                  <label class="culqi-label" for="card-number-input">
+                    Número de tarjeta
+                  </label>
+                  <div class="culqi-input-box">
+                    <input 
+                      type="text" 
+                      id="card-number-input" 
+                      class="culqi-input" 
+                      placeholder="9999 9999 9999 9999" 
+                      maxlength="19"
+                      required
+                      oninput="formatCardNumberInput(this)"
+                    >
+                    <span class="culqi-card-badge" id="card-brand-icon">
+                      <span style="color: #2563eb; font-weight: 900; font-style: italic;">VISA</span>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- VENCIMIENTO Y CÓDIGO DE SEGURIDAD EN 2 COLUMNAS -->
+                <div class="culqi-grid-row">
+                  <div>
+                    <label class="culqi-label" for="card-expiry-input">
+                      Vencimiento
+                    </label>
+                    <div class="culqi-input-box">
+                      <input 
+                        type="text" 
+                        id="card-expiry-input" 
+                        class="culqi-input" 
+                        placeholder="01/29" 
+                        maxlength="5"
+                        required
+                        oninput="formatCardExpiryInput(this)"
+                      >
+                    </div>
+                  </div>
+                  <div>
+                    <label class="culqi-label" for="card-cvv-input">
+                      Código de seguridad
+                    </label>
+                    <div class="culqi-input-box">
+                      <input 
+                        type="password" 
+                        id="card-cvv-input" 
+                        class="culqi-input" 
+                        placeholder="999" 
+                        maxlength="4"
+                        required
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- NÚMERO DE CUOTAS (OPCIONAL CULQI) -->
+                <div class="culqi-form-group">
+                  <label class="culqi-label" for="card-installments-input">
+                    Número de cuotas
+                  </label>
+                  <select id="card-installments-input" class="culqi-select">
+                    <option value="1" selected>Sin cuotas (Pago directo)</option>
+                    <option value="2">2 cuotas</option>
+                    <option value="3">3 cuotas</option>
+                    <option value="6">6 cuotas</option>
+                    <option value="12">12 cuotas</option>
+                  </select>
+                </div>
+
+                <!-- CORREO ELECTRÓNICO -->
+                <div class="culqi-form-group">
+                  <label class="culqi-label" for="card-email-input">
+                    Correo electrónico
+                  </label>
+                  <div class="culqi-input-box">
+                    <input 
+                      type="email" 
+                      id="card-email-input" 
+                      class="culqi-input" 
+                      placeholder="correo@electronico.com"
+                      required
+                    >
+                  </div>
+                </div>
+
+                <!-- BOTÓN AUTO-RELLENO DE PRUEBA -->
+                <div style="margin-top: 4px; margin-bottom: 12px; display: flex; justify-content: flex-end;">
+                  <button type="button" class="culqi-test-pill-btn" onclick="fillTestCardDetails()">
+                    ⚡ Rellenar Tarjeta de Prueba Exitosa
+                  </button>
+                </div>
+
+                <!-- BOTÓN PRINCIPAL DE PAGO CULQI NARANJA -->
+                <button type="submit" class="culqi-pay-button" id="checkout-main-submit-btn">
+                  <span id="checkout-submit-btn-text">Pagar S/ 0.00</span>
+                </button>
+
+                <!-- BOTÓN POPUP CUSTOM CULQI MULTIPAGO -->
+                <div style="margin-top: 10px; text-align: center;">
+                  <button type="button" class="culqi-multipago-alt-btn" onclick="openCulqiCustomCheckoutFromForm()" style="width: 100%; padding: 12px; background: #0f172a; border: 1.5px solid #dc2626; color: #ffffff; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>✨ O pagar con Ventana Multipago (Yape, Tarjetas, Billeteras)</span>
+                  </button>
+                </div>
+
+                <!-- SELLOS DE CONFIANZA OFICIALES CULQI Y BCP -->
+                <div class="culqi-trust-footer">
+                  <div class="culqi-security-row">
+                    <span>🔒 Compra segura con</span>
+                    <span class="culqi-pci-badge">PCI</span>
+                    <span>y</span>
+                    <span class="culqi-visa-badge">Verified by VISA</span>
+                  </div>
+                  <div class="culqi-brand-row">
+                    <div class="culqi-logo-text">
+                      <span>Culqi</span>
+                      <span class="culqi-logo-q">𝐐</span>
+                    </div>
+                    <span style="color: #cbd5e1;">|</span>
+                    <span>Con el respaldo de</span>
+                    <span class="culqi-bcp-badge">BCP›</span>
+                  </div>
+                </div>
+
               </div>
             </div>
 
             <!-- CAMPO: NOTAS PARA COCINA -->
-            <div class="checkout-input-group">
+            <div class="checkout-input-group" style="margin-top: 10px;">
               <label for="cust-notes" class="checkout-field-label">
                 <span>Notas para cocina / salsas extras</span>
                 <span class="field-optional">(Opcional)</span>
@@ -155,25 +307,56 @@
               <textarea id="cust-notes" class="checkout-field-control checkout-textarea-control" rows="2" placeholder="Ej: Enviar ají extra de la casa, por favor"></textarea>
             </div>
 
-            <div class="mobile-order-summary-cta">
-              <button type="submit" class="checkout-primary-cta-btn" id="checkout-main-submit-btn">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                <span>Confirmar Pedido (WhatsApp)</span>
-              </button>
-            </div>
-
           </form>
         </div>
       </section>
+
+      <!-- PANTALLA DE ÉXITO DE PAGO WEB -->
+      <div id="checkout-web-success-modal" style="display: none; position: fixed; inset: 0; background: rgba(11, 17, 32, 0.85); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 32px 24px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.6); animation: zoomIn 0.3s ease;">
+          <div style="width: 72px; height: 72px; background: rgba(34, 197, 94, 0.15); border: 2px solid #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 34px;">
+            ✅
+          </div>
+          <h2 style="font-size: 22px; font-weight: 900; color: #ffffff; margin-bottom: 6px;">¡Pago Web Confirmado!</h2>
+          <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Tu pedido fue pagado con éxito y ya fue transmitido a la cocina de BuchiSapa.</p>
+          
+          <div style="background: #0f172a; border-radius: 16px; padding: 16px; margin-bottom: 24px; text-align: left; font-size: 13.5px; color: #cbd5e1; line-height: 1.6;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span>Orden:</span> <strong id="success-order-code" style="color: #f8fafc;">#---</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span>Transacción:</span> <strong id="success-charge-id" style="color: #4ade80;">chr_---</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Total Pagado:</span> <strong id="success-total-paid" style="color: #ef4444; font-size: 16px; font-weight: 900;">S/ 0.00</strong>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button type="button" id="btn-success-whatsapp" style="background: #22c55e; color: #ffffff; border: none; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);">
+              <span>📲 Enviar Comprobante a WhatsApp</span>
+            </button>
+            <a href="/" style="background: rgba(255,255,255,0.08); color: #f8fafc; border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 14px; font-weight: 700; font-size: 14px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <span>🍽️ Volver a la Carta</span>
+            </a>
+          </div>
+        </div>
+      </div>
 
     </div>
   </main>
 
   <script>
+  (function () {
+    'use strict';
+
     // CONSTANTES OFICIALES DE BUCHISAPA
-    const STORE_FULL_ADDRESS = 'Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪';
-    const STORE_GPS_URL = 'https://maps.google.com/?q=-12.01635,-76.88455';
-    const STORE_HOURS = 'Lunes a Domingo, de 6:00 PM a 5:00 AM';
+    window.STORE_FULL_ADDRESS = window.STORE_FULL_ADDRESS || 'Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪';
+    window.STORE_GPS_URL = window.STORE_GPS_URL || 'https://maps.google.com/?q=-12.01635,-76.88455';
+    window.STORE_HOURS = window.STORE_HOURS || 'Lunes a Domingo, de 6:00 PM a 5:00 AM';
+    var STORE_FULL_ADDRESS = window.STORE_FULL_ADDRESS;
+    var STORE_GPS_URL = window.STORE_GPS_URL;
+    var STORE_HOURS = window.STORE_HOURS;
 
     function getCleanAddress(raw) {
       if (!raw) return '';
@@ -195,9 +378,9 @@
     let deliveryFee = 0.00;
 
     function initCheckoutPage() {
-      // 1. Cargar items del carrito
+      // 1. Cargar items del carrito (sincronizado con buchisapa_cart y buchisapa_cart_v1)
       try {
-        const savedCart = localStorage.getItem('buchisapa_cart');
+        const savedCart = localStorage.getItem('buchisapa_cart') || localStorage.getItem('buchisapa_cart_v1');
         if (savedCart) {
           cartItems = JSON.parse(savedCart);
         }
@@ -239,20 +422,24 @@
       const addressInput = document.getElementById('cust-address');
 
       if (isPickup) {
-        modalityEmoji.textContent = '🏪';
-        modalityText.textContent = 'Recojo en Tienda (Santa Clara)';
-        modalityBadge.textContent = 'Gratis (S/ 0.00)';
-        modalityBadge.style.background = '#16a34a';
-        storeBox.style.display = 'block';
-        addressRow.style.display = 'none';
+        if (modalityEmoji) modalityEmoji.textContent = '🏪';
+        if (modalityText) modalityText.textContent = 'Recojo en Tienda (Santa Clara)';
+        if (modalityBadge) {
+          modalityBadge.textContent = 'Gratis (S/ 0.00)';
+          modalityBadge.style.background = '#16a34a';
+        }
+        if (storeBox) storeBox.style.display = 'block';
+        if (addressRow) addressRow.style.display = 'none';
         if (addressInput) addressInput.removeAttribute('required');
       } else {
-        modalityEmoji.textContent = '🛵';
-        modalityText.textContent = 'Delivery a Domicilio';
-        modalityBadge.textContent = 'Envío S/ 4.00';
-        modalityBadge.style.background = '#2563eb';
-        storeBox.style.display = 'none';
-        addressRow.style.display = 'block';
+        if (modalityEmoji) modalityEmoji.textContent = '🛵';
+        if (modalityText) modalityText.textContent = 'Delivery a Domicilio';
+        if (modalityBadge) {
+          modalityBadge.textContent = 'Envío S/ 4.00';
+          modalityBadge.style.background = '#2563eb';
+        }
+        if (storeBox) storeBox.style.display = 'none';
+        if (addressRow) addressRow.style.display = 'block';
         if (addressInput) {
           addressInput.setAttribute('required', 'required');
           const savedAddr = localStorage.getItem('buchisapa_delivery_address');
@@ -273,7 +460,7 @@
         }
       } catch (e) {}
 
-      // 5. Renderizar lista de platos y totales
+      // 5. Renderizar lista de platos y sincronizar montos con Culqi
       renderItemsAndTotals();
     }
 
@@ -282,14 +469,16 @@
       let subtotal = 0;
       let totalQty = 0;
 
-      cartItems.forEach(it => {
-        const qty = parseInt(it.quantity) || 1;
-        const price = parseFloat(it.price) || 0;
-        subtotal += qty * price;
-        totalQty += qty;
-      });
+      if (Array.isArray(cartItems)) {
+        cartItems.forEach(it => {
+          const qty = parseInt(it.quantity) || 1;
+          const price = parseFloat(it.price) || 0;
+          subtotal += qty * price;
+          totalQty += qty;
+        });
+      }
 
-      if (listEl) {
+      if (listEl && Array.isArray(cartItems)) {
         listEl.innerHTML = cartItems.map(it => {
           const qty = parseInt(it.quantity) || 1;
           const price = parseFloat(it.price) || 0;
@@ -320,6 +509,66 @@
       if (delEl) delEl.textContent = isPickup ? 'Gratis (S/ 0.00)' : `S/ ${deliveryFee.toFixed(2)}`;
       const totEl = document.getElementById('summary-total');
       if (totEl) totEl.textContent = `S/ ${total.toFixed(2)}`;
+
+      // ACTUALIZAR INMEDIATAMENTE ENCABEZADO Y BOTÓN NARANJA DE CULQI
+      const culqiDisplayTotal = document.getElementById('culqi-display-total');
+      if (culqiDisplayTotal) {
+        culqiDisplayTotal.textContent = `S/ ${total.toFixed(2)}`;
+      }
+
+      const btnText = document.getElementById('checkout-submit-btn-text');
+      if (btnText) {
+        btnText.textContent = total > 0 
+          ? `Pagar S/ ${total.toFixed(2)}` 
+          : `Pagar`;
+      }
+    }
+
+    function formatCardNumberInput(input) {
+      let v = input.value.replace(/\D/g, '').substring(0, 16);
+      let formatted = v.match(/.{1,4}/g)?.join(' ') || v;
+      input.value = formatted;
+
+      const icon = document.getElementById('card-brand-icon');
+      if (icon) {
+        if (v.startsWith('4')) icon.innerHTML = '<span style="color: #2563eb; font-weight: 900; font-style: italic;">VISA</span>';
+        else if (v.startsWith('5')) icon.innerHTML = '<span style="color: #ea580c; font-weight: 900;">MASTERCARD</span>';
+        else if (v.startsWith('3')) icon.innerHTML = '<span style="color: #0284c7; font-weight: 900;">AMEX</span>';
+        else icon.innerHTML = '<span style="color: #2563eb; font-weight: 900; font-style: italic;">VISA</span>';
+      }
+    }
+
+    function formatCardExpiryInput(input) {
+      let v = input.value.replace(/\D/g, '').substring(0, 4);
+      if (v.length >= 2) {
+        input.value = `${v.substring(0, 2)}/${v.substring(2, 4)}`;
+      } else {
+        input.value = v;
+      }
+    }
+
+    function fillTestCardDetails() {
+      const num = document.getElementById('card-number-input');
+      const exp = document.getElementById('card-expiry-input');
+      const cvv = document.getElementById('card-cvv-input');
+      const email = document.getElementById('card-email-input');
+
+      if (num) {
+        num.value = '4111 1111 1111 1111';
+        formatCardNumberInput(num);
+      }
+      if (exp) exp.value = '09/30';
+      if (cvv) cvv.value = '123';
+      if (email && !email.value) email.value = 'review@culqi.com';
+    }
+
+    function updatePaymentButtonText() {
+      try {
+        const saved = localStorage.getItem('buchisapa_cart') || localStorage.getItem('buchisapa_cart_v1');
+        if (saved) cartItems = JSON.parse(saved);
+      } catch (e) {}
+
+      renderItemsAndTotals();
     }
 
     async function handleCheckoutSubmit(e) {
@@ -347,6 +596,12 @@
         subtotal += (parseFloat(it.price) || 0) * (parseInt(it.quantity) || 1);
       });
       const total = subtotal + deliveryFee;
+
+      if (!Array.isArray(cartItems) || cartItems.length === 0 || total <= 0) {
+        alert('Tu carrito está vacío. Por favor selecciona tus platos favoritos en la carta antes de pagar.');
+        window.location.href = '/';
+        return;
+      }
 
       // Código de orden de 3 dígitos limpio
       const orderCodeNum = Math.floor(100 + Math.random() * 900);
@@ -427,39 +682,61 @@
 
       const submitBtn = document.getElementById('checkout-main-submit-btn');
 
-      // FLUJO 1: PAGO ONLINE DIRECTO CON CULQI (TARJETAS / YAPE)
+      // FLUJO DE PAGO ONLINE CON TARJETA CULQI POR LA WEB
       if (payment === 'culqi') {
+        const cardNum = document.getElementById('card-number-input')?.value.replace(/\s/g, '');
+        const cardExp = document.getElementById('card-expiry-input')?.value.trim();
+        const cardCvv = document.getElementById('card-cvv-input')?.value.trim();
+        const cardEmail = document.getElementById('card-email-input')?.value.trim() || loggedCustomer?.email || 'cliente@buchisapa.pe';
+
         if (submitBtn) {
-          submitBtn.innerHTML = `<span>💳 Abriendo pasarela Culqi...</span>`;
+          submitBtn.innerHTML = `<span>💳 Validando tarjeta y procesando pago con Culqi...</span>`;
           submitBtn.disabled = true;
         }
 
+        const [expM, expY] = (cardExp || '').split('/');
+
         if (window.BuchisapaCulqi) {
-          window.BuchisapaCulqi.openCheckout({
+          window.BuchisapaCulqi.processCardPayment({
+            cardData: {
+              cardNumber: cardNum,
+              expMonth: expM,
+              expYear: expY,
+              cvv: cardCvv,
+              email: cardEmail
+            },
             amount: total,
-            orderNumber: orderCodeNum,
-            customerEmail: loggedCustomer?.email || 'cliente@buchisapa.pe',
-            customerName: name,
             orderPayload: orderPayload,
-            onSuccess: (resData) => {
+            onSuccess: (chargeResult) => {
+              const chargeId = chargeResult.chargeId || `chr_${Date.now()}`;
               localStorage.removeItem('buchisapa_cart');
-              const chargeId = resData.chargeId || `chr_${Date.now()}`;
-              const culqiWaText = waText.replace(
-                `*Pago:* ${encodeURIComponent(paymentLabel)}`,
-                `*Pago:* ✅ PAGADO ONLINE CON CULQI (ID: ${encodeURIComponent(chargeId)})`
-              );
-              if (submitBtn) {
-                submitBtn.innerHTML = `<span>✅ ¡Pago exitoso! Abriendo WhatsApp...</span>`;
+
+              const successModal = document.getElementById('checkout-web-success-modal');
+              if (successModal) {
+                document.getElementById('success-order-code').textContent = `#${orderCodeNum}`;
+                document.getElementById('success-charge-id').textContent = chargeId;
+                document.getElementById('success-total-paid').textContent = `S/ ${total.toFixed(2)}`;
+                successModal.style.display = 'flex';
+
+                setTimeout(() => {
+                  window.location.href = `/?order_success=${orderCodeNum}`;
+                }, 2500);
+              } else {
+                window.location.href = `/?order_success=${orderCodeNum}`;
               }
-              setTimeout(() => {
-                window.location.href = `https://wa.me/51943312024?text=${culqiWaText}`;
-              }, 400);
             },
             onError: (err) => {
+              console.error('❌ Error en el pago Culqi:', err);
               if (submitBtn) {
-                submitBtn.innerHTML = `<span>Confirmar Pedido (WhatsApp)</span>`;
                 submitBtn.disabled = false;
+                updatePaymentButtonText();
               }
+              alert(`⚠️ Error al procesar el pago con tarjeta:\n${err.message || 'Verifica los datos de tu tarjeta e inténtalo nuevamente.'}`);
+            }
+          }).catch(() => {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              updatePaymentButtonText();
             }
           });
           return;
@@ -483,8 +760,8 @@
           const errData = await res.json().catch(() => ({}));
           alert(errData.message || 'Uno o más platos se agotaron en cocina. Por favor verifica tu carrito.');
           if (submitBtn) {
-            submitBtn.innerHTML = `<span>Confirmar Pedido (WhatsApp)</span>`;
             submitBtn.disabled = false;
+            updatePaymentButtonText();
           }
           return;
         }
@@ -495,17 +772,114 @@
       // Limpiar carrito local
       localStorage.removeItem('buchisapa_cart');
 
-      // Feedback y redirección a WhatsApp
+      // Feedback en botón
       if (submitBtn) {
-        submitBtn.innerHTML = `<span>✅ ¡Pedido registrado! Abriendo WhatsApp...</span>`;
+        submitBtn.innerHTML = `<span>✅ ¡Pedido registrado con éxito!</span>`;
       }
 
+      // Abrir WhatsApp en pestaña separada si es compatible y redirigir inmediatamente a index.html
+      try {
+        window.open(`https://wa.me/51943312024?text=${waText}`, '_blank');
+      } catch (e) {}
+
       setTimeout(() => {
-        window.location.href = `https://wa.me/51943312024?text=${waText}`;
-      }, 400);
+        window.location.href = `/?order_success=${orderCodeNum}`;
+      }, 500);
     }
 
-    document.addEventListener('DOMContentLoaded', initCheckoutPage);
+    async function openCulqiCustomCheckoutFromForm() {
+      const name = document.getElementById('cust-name')?.value.trim();
+      const phone = document.getElementById('cust-phone')?.value.trim();
+      if (!name) {
+        alert('Por favor ingresa tu nombre y apellido primero.');
+        document.getElementById('cust-name')?.focus();
+        return;
+      }
+      if (!phone || phone.length < 9) {
+        alert('Por favor ingresa un número de WhatsApp/celular válido (9 dígitos).');
+        document.getElementById('cust-phone')?.focus();
+        return;
+      }
+
+      const isPickup = (orderType === 'pickup');
+      let address = isPickup ? STORE_FULL_ADDRESS : document.getElementById('cust-address')?.value.trim();
+      const notes = document.getElementById('cust-notes')?.value.trim();
+      const orderCodeNum = Math.floor(1000 + Math.random() * 9000);
+
+      const orderPayload = {
+        orderNumber: orderCodeNum,
+        customerName: name,
+        customerPhone: phone,
+        customerEmail: loggedCustomer?.email || 'cliente@buchisapa.pe',
+        orderType: orderType,
+        deliveryAddress: address || 'Recojo en Local Fijo Santa Clara',
+        deliveryReference: isPickup ? 'Tienda Principal Santa Clara' : '',
+        paymentMethod: 'Culqi Multipago Online',
+        notes: notes || 'Pedido registrado desde Checkout',
+        items: cartItems.map(it => ({
+          id: it.id,
+          name: it.name,
+          price: parseFloat(it.price) || 0,
+          quantity: parseInt(it.quantity) || 1,
+          selectedSauces: it.selectedSauces || it.sauces || [],
+          item: { id: it.id, name: it.name, price: parseFloat(it.price) || 0 }
+        })),
+        subtotal: subtotal,
+        deliveryFee: deliveryFee,
+        total: total
+      };
+
+      if (window.BuchisapaCulqi && typeof window.BuchisapaCulqi.openCustomCheckout === 'function') {
+        await window.BuchisapaCulqi.openCustomCheckout({
+          amount: total,
+          orderNumber: orderCodeNum,
+          customerEmail: orderPayload.customerEmail,
+          customerName: name,
+          orderPayload: orderPayload,
+          menuType: 'sidebar',
+          onSuccess: (res) => {
+            const chargeId = res.chargeId || `chr_${Date.now()}`;
+            localStorage.removeItem('buchisapa_cart');
+            const successModal = document.getElementById('checkout-web-success-modal');
+            if (successModal) {
+              document.getElementById('success-order-code').textContent = `#${orderCodeNum}`;
+              document.getElementById('success-charge-id').textContent = chargeId;
+              document.getElementById('success-total-paid').textContent = `S/ ${total.toFixed(2)}`;
+              successModal.style.display = 'flex';
+              setTimeout(() => {
+                window.location.href = `/?order_success=${orderCodeNum}`;
+              }, 2500);
+            } else {
+              window.location.href = `/?order_success=${orderCodeNum}`;
+            }
+          },
+          onError: (err) => {
+            alert(`⚠️ Error en Culqi: ${err.message}`);
+          }
+        });
+      } else {
+        alert('Cargando pasarela Culqi Multipago, por favor intenta en unos segundos...');
+      }
+    }
+
+    window.openCulqiCustomCheckoutFromForm = openCulqiCustomCheckoutFromForm;
+    window.handleCheckoutSubmit = handleCheckoutSubmit;
+    window.formatCardNumberInput = formatCardNumberInput;
+    window.formatCardExpiryInput = formatCardExpiryInput;
+    window.fillTestCardDetails = fillTestCardDetails;
+    window.initCheckoutPage = initCheckoutPage;
+    window.updatePaymentButtonText = updatePaymentButtonText;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initCheckoutPage();
+        updatePaymentButtonText();
+      });
+    } else {
+      initCheckoutPage();
+      updatePaymentButtonText();
+    }
+  })();
   </script>
 </body>
 </html>

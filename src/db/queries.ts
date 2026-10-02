@@ -881,12 +881,165 @@ function savePromotionsToDisk() {
   }
 }
 
+const ORDERS_FILE = path.join(process.cwd(), 'data', 'orders.json');
+const TICKETS_FILE = path.join(process.cwd(), 'data', 'tickets.json');
+
+function generateInitialOrders(): Order[] {
+  const now = new Date();
+  const d = (hoursAgo: number) => new Date(now.getTime() - hoursAgo * 3600 * 1000).toISOString();
+
+  return [
+    {
+      id: 'ORD-1001',
+      orderNumber: 1001,
+      customerName: 'Carlos Mendoza',
+      customerPhone: '987654321',
+      customerEmail: 'carlos.mendoza@gmail.com',
+      orderType: 'delivery',
+      deliveryAddress: 'Av. Nicolás de Piérola 450, Ate - Lima',
+      deliveryReference: 'Frente al parque central',
+      paymentMethod: 'Culqi Tarjeta Online',
+      notes: 'Enviar ají extra de la casa bien picante',
+      status: 'en_preparacion',
+      subtotal: 30.00,
+      deliveryFee: 4.00,
+      total: 34.00,
+      items: JSON.stringify([
+        { name: 'Acevichadas (Alitas x5)', quantity: 2, price: 15.00, selectedSauces: ['Salsa Acevichada', 'Ají de Pollería Clásico'] }
+      ]),
+      createdAt: d(1)
+    },
+    {
+      id: 'ORD-1002',
+      orderNumber: 1002,
+      customerName: 'Valeria Ramos',
+      customerPhone: '943128765',
+      customerEmail: 'valeria.ramos@outlook.com',
+      orderType: 'pickup',
+      deliveryAddress: 'Recojo en Tienda (Santa Clara)',
+      paymentMethod: 'Yape',
+      notes: 'Sin tártara',
+      status: 'recibido',
+      subtotal: 26.00,
+      deliveryFee: 0.00,
+      total: 26.00,
+      items: JSON.stringify([
+        { name: 'BuchiBurger Doble Artesanal', quantity: 1, price: 22.00, selectedSauces: ['Mayonesa de la Casa'] },
+        { name: 'Aguajina Helada 500ml', quantity: 1, price: 4.00 }
+      ]),
+      createdAt: d(2)
+    },
+    {
+      id: 'ORD-1003',
+      orderNumber: 1003,
+      customerName: 'Jorge Paredes',
+      customerPhone: '912345678',
+      customerEmail: 'jorge.paredes@hotmail.com',
+      orderType: 'salon',
+      tableNumber: 'Mesa 4',
+      paymentMethod: 'Efectivo',
+      notes: 'Pollo parte pierna bien doradito',
+      status: 'entregado',
+      subtotal: 41.00,
+      deliveryFee: 0.00,
+      total: 41.00,
+      items: JSON.stringify([
+        { name: 'Pollo Broaster Pierna + Papas', quantity: 2, price: 16.50, selectedSauces: ['Ají de Pollería Clásico', 'Tártara Criolla'] },
+        { name: 'Inca Kola 500ml', quantity: 2, price: 4.00 }
+      ]),
+      createdAt: d(4)
+    },
+    {
+      id: 'ORD-1004',
+      orderNumber: 1004,
+      customerName: 'Lucía Quispe',
+      customerPhone: '955432198',
+      customerEmail: 'lucia.quispe@gmail.com',
+      orderType: 'delivery',
+      deliveryAddress: 'Jr. 28 de Julio 320, Santa Clara',
+      paymentMethod: 'Culqi Tarjeta Online',
+      notes: 'Tocar el timbre verde',
+      status: 'despachado',
+      subtotal: 29.00,
+      deliveryFee: 4.00,
+      total: 33.00,
+      items: JSON.stringify([
+        { name: 'Tacacho con Cecina y Chorizo', quantity: 1, price: 25.00, selectedSauces: ['Chimichurri Selvático'] },
+        { name: 'Maracuyá Natural 500ml', quantity: 1, price: 4.00 }
+      ]),
+      createdAt: d(5)
+    },
+    {
+      id: 'ORD-1005',
+      orderNumber: 1005,
+      customerName: 'Renzo Silva',
+      customerPhone: '966778899',
+      customerEmail: 'renzo.silva@gmail.com',
+      orderType: 'delivery',
+      deliveryAddress: 'Av. La Estrella Mz. B Lte. 12',
+      paymentMethod: 'Yape',
+      status: 'entregado',
+      subtotal: 32.00,
+      deliveryFee: 4.00,
+      total: 36.00,
+      items: JSON.stringify([
+        { name: 'Salchipapa Especial Broaster', quantity: 2, price: 16.00, selectedSauces: ['Crema de Rocoto Macho', 'Tártara Criolla'] }
+      ]),
+      createdAt: d(24) // Ayer
+    },
+    {
+      id: 'ORD-1006',
+      orderNumber: 1006,
+      customerName: 'Ana Beltrán',
+      customerPhone: '988223344',
+      customerEmail: 'ana.beltran@gmail.com',
+      orderType: 'delivery',
+      deliveryAddress: 'Calle San Martín 104',
+      paymentMethod: 'Culqi Tarjeta Online',
+      status: 'entregado',
+      subtotal: 48.00,
+      deliveryFee: 4.00,
+      total: 52.00,
+      items: JSON.stringify([
+        { name: 'Chaufa Amazónico con Cecina', quantity: 2, price: 24.00, selectedSauces: ['Chimichurri Selvático'] }
+      ]),
+      createdAt: d(48) // Hace 2 días
+    }
+  ];
+}
+
+function loadOrdersFromDisk(): Order[] {
+  try {
+    if (fs.existsSync(ORDERS_FILE)) {
+      const raw = fs.readFileSync(ORDERS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    console.error('Error al cargar órdenes de disco:', err);
+  }
+  const initial = generateInitialOrders();
+  saveOrdersToDisk(initial);
+  return initial;
+}
+
+function saveOrdersToDisk(data?: Order[]) {
+  try {
+    const list = data || ordersStore;
+    const dir = path.dirname(ORDERS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(ORDERS_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error al guardar órdenes en disco:', err);
+  }
+}
+
 // IN-MEMORY STORES
 const categoriesStore = [...initialCategories];
 let productsStore = [...initialProducts];
 const saucesStore = [...initialSauces];
 let promotionsStore: Promotion[] = loadPromotionsFromDisk();
-const ordersStore: Order[] = [];
+const ordersStore: Order[] = loadOrdersFromDisk();
 const claimsStore: Claim[] = [];
 
 // QUERIES
@@ -978,7 +1131,7 @@ export async function reorderPromotions(orderedIds: string[]): Promise<Promotion
 
 export async function getOrders(status?: string, email?: string): Promise<Order[]> {
   let list = [...ordersStore];
-  if (status) {
+  if (status && status !== 'todos') {
     list = list.filter(o => o.status.toLowerCase() === status.toLowerCase());
   }
   if (email) {
@@ -1007,6 +1160,8 @@ export async function createOrder(data: any): Promise<Order> {
     paymentMethod: data.paymentMethod || 'Yape',
     notes: data.notes,
     status: data.status || 'recibido',
+    subtotal: Number(data.subtotal || data.total) || 0,
+    deliveryFee: Number(data.deliveryFee) || (data.orderType === 'pickup' ? 0 : 4.00),
     total: Number(data.total) || 0,
     items: typeof data.items === 'string' ? data.items : JSON.stringify(data.items),
     userId: data.userId,
@@ -1014,6 +1169,7 @@ export async function createOrder(data: any): Promise<Order> {
   };
 
   ordersStore.unshift(newOrder);
+  saveOrdersToDisk();
   return newOrder;
 }
 
@@ -1021,6 +1177,7 @@ export async function updateOrderStatus(id: string, status: string): Promise<Ord
   const order = ordersStore.find(o => o.id === id || String(o.orderNumber) === id);
   if (!order) return null;
   order.status = status;
+  saveOrdersToDisk();
   return order;
 }
 
@@ -1030,6 +1187,7 @@ export async function deleteOrder(id: string): Promise<boolean> {
   ordersStore.length = 0;
   ordersStore.push(...filtered);
   customTicketsStore = customTicketsStore.filter(t => t.id !== id && t.id !== `tk-${id}` && t.orderId !== id && String(t.orderNumber) !== id);
+  saveOrdersToDisk();
   return true;
 }
 
