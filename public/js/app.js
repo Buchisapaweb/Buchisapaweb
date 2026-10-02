@@ -4310,6 +4310,8 @@ function renderCardsInContainer(items, container) {
     else if (rawCat.includes('AMAZON') || rawCat.includes('SELVA')) rawCat = 'PLATOS AMAZÓNICOS';
     else if (rawCat.includes('REFRESCO')) rawCat = 'REFRESCOS';
     else if (rawCat.includes('SALCHI')) rawCat = 'SALCHIPAPAS Y SALCHIBROASTERS';
+    else if (rawCat.includes('PROMO')) rawCat = 'PROMOCIONES';
+    else if (rawCat.includes('ADICION')) rawCat = 'ADICIONAL';
     else rawCat = rawCat.replace(/-/g, ' ');
 
     const fallbackImg = getCategoryBannerFallback(catId);

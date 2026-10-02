@@ -775,6 +775,72 @@ const initialProducts: Product[] = [
     stock: 50,
     image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80',
     includes_sauces: true
+  },
+  // 10. ADICIONALES Y GUARNICIONES (5)
+  {
+    id: 'adic-1',
+    name: 'Porción de Papas Fritas BuchiSapa',
+    category_id: 'adicional',
+    price: 7.00,
+    description: 'Porción generosa de papas crocantes doradas al punto perfecto.',
+    badge: 'EXTRA',
+    popular: true,
+    available: true,
+    stock: 100,
+    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'adic-2',
+    name: 'Porción de Tacacho Extra',
+    category_id: 'adicional',
+    price: 8.00,
+    description: 'Bolas de plátano machacado con cecina y chicharrón crujiente.',
+    badge: 'SELVA',
+    popular: true,
+    available: true,
+    stock: 80,
+    image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: false
+  },
+  {
+    id: 'adic-3',
+    name: 'Salsa Acevichada Especial (Pote)',
+    category_id: 'adicional',
+    price: 3.50,
+    description: 'Pote adicional de la icónica salsa acevichada de la casa.',
+    badge: 'CREMA',
+    popular: true,
+    available: true,
+    stock: 150,
+    image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: false
+  },
+  {
+    id: 'adic-4',
+    name: 'Huevo Frito a la Montada Extra',
+    category_id: 'adicional',
+    price: 2.50,
+    description: 'Huevo fresco frito con yema blanda para acompañar tu plato o hamburguesa.',
+    badge: 'EXTRA',
+    popular: false,
+    available: true,
+    stock: 100,
+    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: false
+  },
+  {
+    id: 'adic-5',
+    name: 'Porción de Arroz Amazónico Chaufa',
+    category_id: 'adicional',
+    price: 6.50,
+    description: 'Arroz chaufa salteado al wók con finos toques aromáticos de la selva.',
+    badge: 'GUARNICIÓN',
+    popular: false,
+    available: true,
+    stock: 90,
+    image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: false
   }
 ];
 
