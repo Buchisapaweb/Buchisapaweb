@@ -604,9 +604,8 @@
         return;
       }
 
-      // Código de orden de 3 dígitos limpio
-      const orderCodeNum = Math.floor(100 + Math.random() * 900);
-      const orderCode = `#${orderCodeNum}`;
+      // Código de orden formal PC00001
+      const orderCode = `PC${String(Math.floor(1 + Math.random() * 999)).padStart(5, '0')}`;
 
       // Etiqueta de método de pago
       let paymentLabel = 'YAPE / PLIN (943 312 024)';
@@ -714,16 +713,16 @@
 
               const successModal = document.getElementById('checkout-web-success-modal');
               if (successModal) {
-                document.getElementById('success-order-code').textContent = `#${orderCodeNum}`;
+                document.getElementById('success-order-code').textContent = orderCode;
                 document.getElementById('success-charge-id').textContent = chargeId;
                 document.getElementById('success-total-paid').textContent = `S/ ${total.toFixed(2)}`;
                 successModal.style.display = 'flex';
 
                 setTimeout(() => {
-                  window.location.href = `/?order_success=${orderCodeNum}`;
+                  window.location.href = `/?order_success=${orderCode}`;
                 }, 2500);
               } else {
-                window.location.href = `/?order_success=${orderCodeNum}`;
+                window.location.href = `/?order_success=${orderCode}`;
               }
             },
             onError: (err) => {
@@ -805,10 +804,11 @@
       const isPickup = (orderType === 'pickup');
       let address = isPickup ? STORE_FULL_ADDRESS : document.getElementById('cust-address')?.value.trim();
       const notes = document.getElementById('cust-notes')?.value.trim();
-      const orderCodeNum = Math.floor(1000 + Math.random() * 9000);
+      const orderCode = `PC${String(Math.floor(1 + Math.random() * 999)).padStart(5, '0')}`;
 
       const orderPayload = {
-        orderNumber: orderCodeNum,
+        orderNumber: orderCode,
+        orderCode: orderCode,
         customerName: name,
         customerPhone: phone,
         customerEmail: loggedCustomer?.email || 'cliente@buchisapa.pe',
@@ -833,7 +833,7 @@
       if (window.BuchisapaCulqi && typeof window.BuchisapaCulqi.openCustomCheckout === 'function') {
         await window.BuchisapaCulqi.openCustomCheckout({
           amount: total,
-          orderNumber: orderCodeNum,
+          orderNumber: orderCode,
           customerEmail: orderPayload.customerEmail,
           customerName: name,
           orderPayload: orderPayload,
@@ -843,15 +843,15 @@
             localStorage.removeItem('buchisapa_cart');
             const successModal = document.getElementById('checkout-web-success-modal');
             if (successModal) {
-              document.getElementById('success-order-code').textContent = `#${orderCodeNum}`;
+              document.getElementById('success-order-code').textContent = orderCode;
               document.getElementById('success-charge-id').textContent = chargeId;
               document.getElementById('success-total-paid').textContent = `S/ ${total.toFixed(2)}`;
               successModal.style.display = 'flex';
               setTimeout(() => {
-                window.location.href = `/?order_success=${orderCodeNum}`;
+                window.location.href = `/?order_success=${orderCode}`;
               }, 2500);
             } else {
-              window.location.href = `/?order_success=${orderCodeNum}`;
+              window.location.href = `/?order_success=${orderCode}`;
             }
           },
           onError: (err) => {

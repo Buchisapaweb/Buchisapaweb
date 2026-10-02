@@ -1,7 +1,7 @@
 [
   {
     "id": "ORD-1790929779050",
-    "orderNumber": 5544,
+    "orderNumber": "PC00001",
     "customerName": "Juan Perez",
     "customerPhone": "922886724",
     "orderType": "delivery",
@@ -14,11 +14,12 @@
     "deliveryFee": 4,
     "total": 65,
     "items": "[{\"id\":\"p1\",\"name\":\"1 Pollo a la Brasa\",\"price\":65,\"quantity\":1}]",
-    "createdAt": "2026-10-02T08:29:39.050Z"
+    "createdAt": "2026-10-02T08:29:39.050Z",
+    "orderCode": "PC00001"
   },
   {
     "id": "ORD-1001",
-    "orderNumber": 1001,
+    "orderNumber": "PC00002",
     "customerName": "Carlos Mendoza",
     "customerPhone": "987654321",
     "customerEmail": "carlos.mendoza@gmail.com",
@@ -32,11 +33,12 @@
     "deliveryFee": 4,
     "total": 34,
     "items": "[{\"name\":\"Acevichadas (Alitas x5)\",\"quantity\":2,\"price\":15,\"selectedSauces\":[\"Salsa Acevichada\",\"Ají de Pollería Clásico\"]}]",
-    "createdAt": "2026-10-02T07:22:42.554Z"
+    "createdAt": "2026-10-02T07:22:42.554Z",
+    "orderCode": "PC00002"
   },
   {
     "id": "ORD-1002",
-    "orderNumber": 1002,
+    "orderNumber": "PC00003",
     "customerName": "Valeria Ramos",
     "customerPhone": "943128765",
     "customerEmail": "valeria.ramos@outlook.com",
@@ -49,11 +51,12 @@
     "deliveryFee": 0,
     "total": 26,
     "items": "[{\"name\":\"BuchiBurger Doble Artesanal\",\"quantity\":1,\"price\":22,\"selectedSauces\":[\"Mayonesa de la Casa\"]},{\"name\":\"Aguajina Helada 500ml\",\"quantity\":1,\"price\":4}]",
-    "createdAt": "2026-10-02T06:22:42.554Z"
+    "createdAt": "2026-10-02T06:22:42.554Z",
+    "orderCode": "PC00003"
   },
   {
     "id": "ORD-1003",
-    "orderNumber": 1003,
+    "orderNumber": "PC00004",
     "customerName": "Jorge Paredes",
     "customerPhone": "912345678",
     "customerEmail": "jorge.paredes@hotmail.com",
@@ -66,11 +69,12 @@
     "deliveryFee": 0,
     "total": 41,
     "items": "[{\"name\":\"Pollo Broaster Pierna + Papas\",\"quantity\":2,\"price\":16.5,\"selectedSauces\":[\"Ají de Pollería Clásico\",\"Tártara Criolla\"]},{\"name\":\"Inca Kola 500ml\",\"quantity\":2,\"price\":4}]",
-    "createdAt": "2026-10-02T04:22:42.554Z"
+    "createdAt": "2026-10-02T04:22:42.554Z",
+    "orderCode": "PC00004"
   },
   {
     "id": "ORD-1004",
-    "orderNumber": 1004,
+    "orderNumber": "PC00005",
     "customerName": "Lucía Quispe",
     "customerPhone": "955432198",
     "customerEmail": "lucia.quispe@gmail.com",
@@ -83,11 +87,12 @@
     "deliveryFee": 4,
     "total": 33,
     "items": "[{\"name\":\"Tacacho con Cecina y Chorizo\",\"quantity\":1,\"price\":25,\"selectedSauces\":[\"Chimichurri Selvático\"]},{\"name\":\"Maracuyá Natural 500ml\",\"quantity\":1,\"price\":4}]",
-    "createdAt": "2026-10-02T03:22:42.554Z"
+    "createdAt": "2026-10-02T03:22:42.554Z",
+    "orderCode": "PC00005"
   },
   {
     "id": "ORD-1005",
-    "orderNumber": 1005,
+    "orderNumber": "PC00006",
     "customerName": "Renzo Silva",
     "customerPhone": "966778899",
     "customerEmail": "renzo.silva@gmail.com",
@@ -99,11 +104,12 @@
     "deliveryFee": 4,
     "total": 36,
     "items": "[{\"name\":\"Salchipapa Especial Broaster\",\"quantity\":2,\"price\":16,\"selectedSauces\":[\"Crema de Rocoto Macho\",\"Tártara Criolla\"]}]",
-    "createdAt": "2026-10-01T08:22:42.554Z"
+    "createdAt": "2026-10-01T08:22:42.554Z",
+    "orderCode": "PC00006"
   },
   {
     "id": "ORD-1006",
-    "orderNumber": 1006,
+    "orderNumber": "PC00007",
     "customerName": "Ana Beltrán",
     "customerPhone": "988223344",
     "customerEmail": "ana.beltran@gmail.com",
@@ -115,6 +121,7 @@
     "deliveryFee": 4,
     "total": 52,
     "items": "[{\"name\":\"Chaufa Amazónico con Cecina\",\"quantity\":2,\"price\":24,\"selectedSauces\":[\"Chimichurri Selvático\"]}]",
-    "createdAt": "2026-09-30T08:22:42.554Z"
+    "createdAt": "2026-09-30T08:22:42.554Z",
+    "orderCode": "PC00007"
   }
 ]

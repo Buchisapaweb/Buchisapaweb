@@ -4618,8 +4618,11 @@ async function submitOrder(e) {
     // Guardar teléfono para próximos pedidos
     if (phone) localStorage.setItem('buchisapa_delivery_phone', phone);
 
-    // Código de orden limpio (ej: #669)
-    const orderCode = createdOrder.orderNumber ? `#${createdOrder.orderNumber}` : `#${Math.floor(100 + Math.random() * 900)}`;
+    // Código de orden formal PC00001
+    const rawCode = createdOrder.orderCode || createdOrder.orderNumber || '1';
+    const orderCode = String(rawCode).toUpperCase().startsWith('PC')
+      ? String(rawCode).toUpperCase()
+      : `PC${String(rawCode).replace(/\D/g, '').padStart(5, '0')}`;
 
     // Mapeo amigable de método de pago
     let paymentLabel = 'YAPE / PLIN (943 312 024)';

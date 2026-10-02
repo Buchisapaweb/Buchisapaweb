@@ -49,7 +49,8 @@ export interface Promotion {
 
 export interface Order {
   id: string;
-  orderNumber: number;
+  orderNumber: number | string;
+  orderCode?: string;
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
@@ -1161,7 +1162,7 @@ const categoriesStore: Category[] = loadCategoriesFromDisk();
 let productsStore: Product[] = loadProductsFromDisk();
 const saucesStore = [...initialSauces];
 let promotionsStore: Promotion[] = loadPromotionsFromDisk();
-const ordersStore: Order[] = loadOrdersFromDisk();
+let ordersStore: Order[] = loadOrdersFromDisk();
 const claimsStore: Claim[] = [];
 
 // CATEGORÍAS CRUD
@@ -1286,7 +1287,39 @@ export async function reorderPromotions(orderedIds: string[]): Promise<Promotion
   return promotionsStore.sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 
+export function formatOrderCode(orderNumberOrId: any): string {
+  if (!orderNumberOrId) return 'PC00001';
+  const str = String(orderNumberOrId).trim();
+  if (str.toUpperCase().startsWith('PC')) {
+    const numPart = str.substring(2).replace(/\D/g, '');
+    if (numPart) {
+      return `PC${numPart.padStart(5, '0')}`;
+    }
+    return str.toUpperCase();
+  }
+  const digits = str.replace(/\D/g, '');
+  if (digits) {
+    const num = parseInt(digits, 10);
+    if (num < 100000) {
+      return `PC${String(num).padStart(5, '0')}`;
+    } else {
+      const shortNum = num % 100000 || 1;
+      return `PC${String(shortNum).padStart(5, '0')}`;
+    }
+  }
+  return `PC00001`;
+}
+
 export async function getOrders(status?: string, email?: string): Promise<Order[]> {
+  ordersStore = loadOrdersFromDisk().map((o, index) => {
+    const code = formatOrderCode(o.orderCode || o.orderNumber || (index + 1));
+    return {
+      ...o,
+      orderCode: code,
+      orderNumber: code
+    };
+  });
+
   let list = [...ordersStore];
   if (status && status !== 'todos') {
     list = list.filter(o => o.status.toLowerCase() === status.toLowerCase());
@@ -1303,10 +1336,39 @@ export async function getOrderById(id: string): Promise<Order | null> {
   return order || null;
 }
 
+export function getNextOrderCode(): string {
+  let maxNumber = 0;
+  for (const o of ordersStore) {
+    const raw = String(o.orderCode || o.orderNumber || o.id || '');
+    const match = raw.match(/PC(\d+)/i);
+    if (match) {
+      const val = parseInt(match[1], 10);
+      if (val > maxNumber) maxNumber = val;
+    } else {
+      const digits = raw.replace(/\D/g, '');
+      if (digits) {
+        const val = parseInt(digits, 10);
+        if (val < 100000 && val > maxNumber) maxNumber = val;
+      }
+    }
+  }
+  const nextNum = maxNumber + 1;
+  return `PC${String(nextNum).padStart(5, '0')}`;
+}
+
 export async function createOrder(data: any): Promise<Order> {
+  let code = data.orderCode;
+  if (!code && data.orderNumber && String(data.orderNumber).toUpperCase().startsWith('PC')) {
+    code = String(data.orderNumber).toUpperCase();
+  }
+  if (!code) {
+    code = getNextOrderCode();
+  }
+
   const newOrder: Order = {
     id: data.id || `ORD-${Date.now()}`,
-    orderNumber: data.orderNumber || Math.floor(100 + Math.random() * 900),
+    orderNumber: code,
+    orderCode: code,
     customerName: data.customerName,
     customerPhone: data.customerPhone,
     customerEmail: data.customerEmail,

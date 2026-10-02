@@ -303,6 +303,7 @@
     // Render Tabla Escritorio
     if (tbody) {
       tbody.innerHTML = filtered.map(o => {
+        const orderCodeFormatted = window.AdminUtils ? window.AdminUtils.formatOrderCode(o) : (o.orderCode || o.orderNumber || o.id);
         const dateObj = new Date(o.createdAt || o.date || Date.now());
         const timeStr = dateObj.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
         const clientName = o.customerName || o.customer?.name || 'Cliente Mostrador';
@@ -317,7 +318,7 @@
 
         return `
           <tr>
-            <td style="font-weight: 800; color: var(--accent-orange);">#${o.orderCode || (o.id || '').substring(0, 6)}</td>
+            <td style="font-weight: 800; color: var(--accent-orange);">${orderCodeFormatted}</td>
             <td style="color: var(--text-muted); font-size: 0.8rem;">${timeStr}</td>
             <td style="font-weight: 600; color: #fff;">${clientName}</td>
             <td><span class="status-badge" style="font-size: 0.72rem; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-card);">${orderType}</span></td>
@@ -332,6 +333,7 @@
     // Render Tarjetas Móviles
     if (mobileContainer) {
       mobileContainer.innerHTML = filtered.map(o => {
+        const orderCodeFormatted = window.AdminUtils ? window.AdminUtils.formatOrderCode(o) : (o.orderCode || o.orderNumber || o.id);
         const dateObj = new Date(o.createdAt || o.date || Date.now());
         const timeStr = dateObj.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
         const clientName = o.customerName || o.customer?.name || 'Cliente Mostrador';
@@ -348,7 +350,7 @@
           <div class="mobile-sales-card">
             <div class="mobile-sales-card-header">
               <div>
-                <span style="font-weight: 800; color: var(--accent-orange); font-size: 0.88rem;">#${o.orderCode || (o.id || '').substring(0, 6)}</span>
+                <span style="font-weight: 800; color: var(--accent-orange); font-size: 0.88rem;">${orderCodeFormatted}</span>
                 <span style="color: var(--text-muted); font-size: 0.75rem; margin-left: 6px;">• ${timeStr}</span>
               </div>
               <span class="status-badge ${badgeClass}" style="font-size: 0.68rem;">${status}</span>
@@ -535,6 +537,7 @@
         doc.text('📜 DETALLE DE TRANSACCIONES DE VENTA', 14, startY);
 
         const txRows = orders.map(o => {
+          const orderCodeFormatted = window.AdminUtils ? window.AdminUtils.formatOrderCode(o) : (o.orderCode || o.orderNumber || o.id);
           const dateObj = new Date(o.createdAt || o.date || Date.now());
           const timeStr = dateObj.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
           const clientName = o.customerName || o.customer?.name || 'Cliente Mostrador';
@@ -543,7 +546,7 @@
           const total = parseFloat(o.total || 0).toFixed(2);
           const status = (o.status || 'Completado').toUpperCase();
 
-          return [`#${o.orderCode || (o.id || '').substring(0, 6)}`, timeStr, clientName, orderType, method, `S/ ${total}`, status];
+          return [orderCodeFormatted, timeStr, clientName, orderType, method, `S/ ${total}`, status];
         });
 
         if (typeof doc.autoTable === 'function') {
@@ -670,11 +673,12 @@
           </thead>
           <tbody>
             ${orders.length > 0 ? orders.map(o => {
+              const orderCodeFormatted = window.AdminUtils ? window.AdminUtils.formatOrderCode(o) : (o.orderCode || o.orderNumber || o.id);
               const dateObj = new Date(o.createdAt || o.date || Date.now());
               const timeStr = dateObj.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
               return `
                 <tr>
-                  <td><strong>#${o.orderCode || (o.id || '').substring(0, 6)}</strong></td>
+                  <td><strong>${orderCodeFormatted}</strong></td>
                   <td>${timeStr}</td>
                   <td>${o.customerName || o.customer?.name || 'Cliente Mostrador'}</td>
                   <td><span class="badge">${(o.orderType || o.type || 'Tienda').toUpperCase()}</span></td>

@@ -126,7 +126,7 @@
     }
 
     container.innerHTML = filtered.map(order => {
-      const orderNum = order.orderNumber ? `#ORD-${String(order.orderNumber).padStart(4, '0')}` : `#${order.id}`;
+      const orderNum = window.AdminUtils ? window.AdminUtils.formatOrderCode(order) : (order.orderCode || order.orderNumber || order.id);
       const customer = order.customerName || order.customer?.name || 'Cliente Particular';
       const phone = order.customerPhone || order.customer?.phone || '';
       const address = order.deliveryAddress || order.customer?.address || 'Dirección en Iquitos';

@@ -89,10 +89,37 @@
     if (el) el.classList.remove('active');
   }
 
+  function formatOrderCode(orderOrCode) {
+    if (!orderOrCode) return 'PC00001';
+    if (typeof orderOrCode === 'object') {
+      orderOrCode = orderOrCode.orderCode || orderOrCode.orderNumber || orderOrCode.id || '';
+    }
+    const str = String(orderOrCode).trim();
+    if (str.toUpperCase().startsWith('PC')) {
+      const numPart = str.substring(2).replace(/\D/g, '');
+      if (numPart) {
+        return `PC${numPart.padStart(5, '0')}`;
+      }
+      return str.toUpperCase();
+    }
+    const digits = str.replace(/\D/g, '');
+    if (digits) {
+      const num = parseInt(digits, 10);
+      if (num < 100000) {
+        return `PC${String(num).padStart(5, '0')}`;
+      } else {
+        const shortNum = num % 100000 || 1;
+        return `PC${String(shortNum).padStart(5, '0')}`;
+      }
+    }
+    return 'PC00001';
+  }
+
   window.AdminUtils = {
     showToast,
     formatSoles,
     formatCategoryName,
+    formatOrderCode,
     escapeHtml,
     openModal,
     closeModal
@@ -102,6 +129,7 @@
   window.showToast = showToast;
   window.formatSoles = formatSoles;
   window.formatCategoryName = formatCategoryName;
+  window.formatOrderCode = formatOrderCode;
   window.escapeHtml = escapeHtml;
 
 })();

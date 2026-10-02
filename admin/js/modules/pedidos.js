@@ -146,7 +146,8 @@
         for (const order of orders) {
           if (!previousOrderIds.has(order.id) && (order.status === 'recibido' || order.status === 'pendiente')) {
             BuchisapaKdsAudio.triggerAlert(order);
-            window.showToast?.(`🔔 ¡Nuevo pedido #${order.orderNumber || order.id}!`, 'info');
+            const codeLabel = window.AdminUtils ? window.AdminUtils.formatOrderCode(order) : (order.orderCode || order.orderNumber || order.id);
+            window.showToast?.(`🔔 ¡Nuevo pedido ${codeLabel}!`, 'info');
             break;
           }
         }
@@ -297,7 +298,7 @@
         <div class="order-card">
           <div class="order-header-row">
             <div class="order-id-group">
-              <span class="order-number">Orden #${order.orderNumber || order.id}</span>
+              <span class="order-number">Orden ${window.AdminUtils ? window.AdminUtils.formatOrderCode(order) : (order.orderCode || order.orderNumber || order.id)}</span>
               <span class="order-type-badge">${isDelivery ? '🛵 Delivery' : '🛍️ Recojo'}</span>
               <span class="badge ${getStatusBadgeClass(status)}">${getStatusLabel(status)}</span>
             </div>
