@@ -26,8 +26,7 @@ const usersStore = new Map<string, UserProfile>();
 // List of recognized admin email addresses
 const ADMIN_EMAILS = [
   'buchisapaweb@gmail.com',
-  'admin@buchisapa.pe',
-  'nexaltustecsac@gmail.com'
+  'admin@buchisapa.pe'
 ];
 
 // Seed default users (Admin + Sample Customer)

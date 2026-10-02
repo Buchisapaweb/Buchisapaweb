@@ -1271,7 +1271,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       if (supabaseUser) {
         const meta = supabaseUser.user_metadata || {};
         const appMeta = supabaseUser.app_metadata || {};
-        const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
+        const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe'];
         const isAdminUser = Boolean(
           meta.isAdmin === true ||
           meta.role === 'admin' ||
@@ -1330,7 +1330,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         });
       }
 
-      const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
+      const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe'];
       const isAdminUser = Boolean(
         localUser.role === 'admin' ||
         localUser.isAdmin === true ||
@@ -1397,7 +1397,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       }
 
       // 2. Verificar por correo electrónico registrado
-      const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe', 'nexaltustecsac@gmail.com'];
+      const ADMIN_EMAILS = ['buchisapaweb@gmail.com', 'admin@buchisapa.pe'];
       if (emailClean) {
         const user = await getUserByEmail(emailClean);
         const isAdmin = Boolean(
@@ -1418,35 +1418,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  // Endpoint FASE 1: /api/cliente/send-otp
-  app.post(['/api/cliente/send-otp', '/app/api/cliente/send-otp'], async (req: Request, res: Response) => {
-    try {
-      const { email, nombres, name } = req.body || {};
-      const targetEmail = email || req.body.correo;
-      if (!targetEmail || !targetEmail.includes('@')) {
-        return res.status(400).json({ success: false, error: 'Correo electrónico válido requerido' });
-      }
-
-      const cleanEmail = targetEmail.trim().toLowerCase();
-      const cleanNombres = (nombres || name || cleanEmail.split('@')[0]).trim();
-
-      // 1. Generar código de 6 dígitos
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-      // 2. Guardar en memoria con Map por 5 minutos (300,000ms) sin usar Supabase
-      const result = await sendVerificationEmail(cleanEmail, cleanNombres);
-
-      res.json({
-        success: true,
-        message: `Código enviado a tu correo ${cleanEmail}`,
-        email: cleanEmail,
-        debugCode: result.debugCode || code
-      });
-    } catch (error: any) {
-      console.error('Error en /api/cliente/send-otp:', error);
-      res.status(500).json({ success: false, error: error.message || 'Error al enviar OTP' });
-    }
-  });
 
   // Solicitar envío de código OTP de 6 dígitos al correo
   app.post('/api/auth/send-verification-code', async (req: Request, res: Response) => {

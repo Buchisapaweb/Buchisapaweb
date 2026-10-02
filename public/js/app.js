@@ -1258,9 +1258,9 @@ async function handleAuthRegisterSubmit(event) {
   const docNumber = document.getElementById('reg-doc-number')?.value?.trim();
   const firstName = document.getElementById('reg-firstname')?.value?.trim();
   const lastName = document.getElementById('reg-lastname')?.value?.trim();
-  const email = document.getElementById('reg-email')?.value?.trim();
+  const email = document.getElementById('reg-email')?.value?.trim()?.toLowerCase();
   const phone = document.getElementById('reg-phone')?.value?.trim();
-  const birthDate = document.getElementById('reg-birthdate')?.value || '';
+  const birthDate = document.getElementById('reg-birthdate')?.value || null;
   const password = document.getElementById('reg-password')?.value;
   const passwordConfirm = document.getElementById('reg-password-confirm')?.value;
   const termsAccepted = document.getElementById('reg-terms')?.checked;
@@ -1286,10 +1286,33 @@ async function handleAuthRegisterSubmit(event) {
 
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Enviando código...';
+    submitBtn.textContent = 'Verificando DNI...';
   }
 
   try {
+    const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
+
+    // 1. Verificar si el DNI ya existe en la tabla 'public.profiles'
+    if (client && docNumber) {
+      const { data: existingDni, error: dniErr } = await client
+        .from('profiles')
+        .select('id, dni')
+        .eq('dni', docNumber);
+
+      if (!dniErr && existingDni && existingDni.length > 0) {
+        if (alertEl) {
+          alertEl.textContent = `El DNI ${docNumber} ya se encuentra registrado. Por favor inicia sesión o utiliza otro DNI.`;
+          alertEl.className = 'auth-status-alert error';
+          alertEl.style.display = 'block';
+        }
+        return;
+      }
+    }
+
+    if (submitBtn) {
+      submitBtn.textContent = 'Enviando código...';
+    }
+
     const payload = {
       docType,
       docNumber,
@@ -1300,16 +1323,19 @@ async function handleAuthRegisterSubmit(event) {
       phone,
       birthDate,
       password,
-      marketingAccepted,
-      authProvider: 'local',
-      isRegister: true
+      marketingAccepted
     };
 
-    // Solicitar código de verificación de 6 dígitos al correo
+    // 2. Invocar solicitud de registro Supabase Auth y envío de OTP automático
     await requestOtpVerificationAndOpenModal(email, payload);
 
   } catch (err) {
-    console.error('Error in register submit:', err);
+    console.error('Error en formulario de registro:', err);
+    if (alertEl) {
+      alertEl.textContent = err.message || 'Ocurrió un error al procesar el registro. Inténtalo de nuevo.';
+      alertEl.className = 'auth-status-alert error';
+      alertEl.style.display = 'block';
+    }
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
@@ -1754,69 +1780,61 @@ function startOtpCountdownTimer(seconds = 45) {
 }
 
 async function requestOtpVerificationAndOpenModal(email, payload = {}) {
-  const alertEl = document.getElementById('auth-login-alert') || document.getElementById('auth-register-alert');
+  const alertEl = document.getElementById('auth-register-alert') || document.getElementById('auth-login-alert');
   const cleanEmail = email.trim().toLowerCase();
   const password = payload.password;
 
-  let supabaseSuccess = false;
+  const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
+  if (!client) {
+    throw new Error('No se pudo conectar con el servicio de autenticación Supabase.');
+  }
 
-  // 1. Intentar registro con Supabase Auth
-  try {
-    const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
-
-    if (client) {
-      const { data, error } = await client.auth.signUp({
+  // Invocar Supabase Auth signUp -> Envía OTP de 6 dígitos automáticamente por SMTP
+  const { data, error } = await client.auth.signUp({
+    email: cleanEmail,
+    password: password,
+    options: {
+      data: {
+        dni: payload.docNumber || '',
+        nombres: payload.firstName || '',
+        apellidos: payload.lastName || '',
         email: cleanEmail,
-        password: password || 'BuchiSapa2026!',
-        options: {
-          data: {
-            firstName: payload.firstName || '',
-            lastName: payload.lastName || '',
-            name: payload.name || `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || cleanEmail.split('@')[0],
-            docType: payload.docType || 'DNI',
-            docNumber: payload.docNumber || '',
-            phone: payload.phone || '',
-            birthDate: payload.birthDate || ''
-          }
-        }
-      });
-
-      if (!error) {
-        supabaseSuccess = true;
-        console.log("⚡ [SUPABASE SIGNUP SUCCESS]:", data);
-      } else {
-        console.warn("⚠️ Supabase signUp SMTP notice:", error.message);
+        telefono: payload.phone || '',
+        fecha_nacimiento: payload.birthDate || null
       }
     }
-  } catch (sbErr) {
-    console.warn("⚠️ Error en Supabase signUp, activando envío por backend:", sbErr);
+  });
+
+  if (error) {
+    console.error("❌ Supabase Auth signUp error:", error);
+    let errorMsg = error.message;
+    if (errorMsg.includes('already registered') || errorMsg.includes('User already registered') || errorMsg.includes('already exists')) {
+      errorMsg = 'Este correo electrónico ya se encuentra registrado. Por favor inicia sesión o recupera tu contraseña.';
+    } else if (errorMsg.includes('Rate limit')) {
+      errorMsg = 'Demasiados intentos de registro. Por favor espera un momento e inténtalo nuevamente.';
+    }
+    throw new Error(errorMsg);
   }
 
-  // 2. Garantizar envío de código OTP al correo por el servidor
-  try {
-    const res = await fetch('/api/cliente/send-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: cleanEmail,
-        nombres: payload.name || payload.firstName || cleanEmail.split('@')[0]
-      })
-    });
-    const result = await res.json().catch(() => ({}));
-    console.log("✉️ [SEND-OTP RESULT]:", result);
-  } catch (e) {
-    console.warn("Error en backend send-otp:", e);
-  }
+  console.log("⚡ [SUPABASE AUTH SIGNUP AUTOMATIC OTP SENT]:", data);
 
   if (typeof window.showToast === 'function') {
-    window.showToast('Código enviado a tu correo', 'success');
+    window.showToast('Código de verificación de 6 dígitos enviado a tu correo', 'success');
   }
+
+  // Guardar estado
+  pendingOtpState = {
+    email: cleanEmail,
+    payload: payload,
+    countdownInterval: null,
+    remainingSeconds: 45
+  };
 
   // Cerrar modal de login si estaba abierto
   closeLoginModal();
   closeGoogleAuthModal();
 
-  // Abrir modal de verificación con los 6 casilleros
+  // Abrir modal de verificación
   openEmailVerificationModal(cleanEmail, payload);
 }
 
@@ -1830,37 +1848,30 @@ async function handleResendOtpCode() {
 
   try {
     const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
+    if (!client) throw new Error('Cliente Supabase no disponible.');
 
-    if (client) {
-      try {
-        await client.auth.resend({
-          type: 'signup',
-          email: pendingOtpState.email
-        });
-      } catch (e) {}
-    }
-
-    await fetch('/api/cliente/send-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: pendingOtpState.email,
-        nombres: pendingOtpState.payload?.name || pendingOtpState.email.split('@')[0]
-      })
+    const { error } = await client.auth.resend({
+      type: 'signup',
+      email: pendingOtpState.email
     });
 
+    if (error) {
+      throw new Error(error.message || 'Error al reenviar el código por Supabase Auth.');
+    }
+
     if (typeof window.showToast === 'function') {
-      window.showToast('Código reenviado a tu correo', 'success');
+      window.showToast('Código de 6 dígitos reenviado a tu correo', 'success');
     }
     if (alertEl) {
-      alertEl.textContent = '✓ ¡Código reenviado a tu correo!';
+      alertEl.textContent = '✓ ¡Nuevo código enviado a tu correo!';
       alertEl.className = 'otp-alert success';
       alertEl.style.display = 'block';
     }
     startOtpCountdownTimer(45);
   } catch (err) {
+    console.error('Error al reenviar código OTP:', err);
     if (alertEl) {
-      alertEl.textContent = err.message || 'Error al reenviar código. Revisa tu bandeja de Gmail.';
+      alertEl.textContent = err.message || 'Error al reenviar el código. Inténtalo de nuevo.';
       alertEl.className = 'otp-alert error';
       alertEl.style.display = 'block';
     }
@@ -1870,7 +1881,7 @@ async function handleResendOtpCode() {
 
 function handleChangeEmailFromOtp() {
   closeEmailVerificationModal();
-  openLoginModal('login');
+  openLoginModal('register');
 }
 
 async function submitOtpVerification() {
@@ -1898,122 +1909,61 @@ async function submitOtpVerification() {
     if (btnText) btnText.style.display = 'none';
     if (btnSpinner) btnSpinner.style.display = 'inline-block';
 
-    let verified = false;
-    let supabaseUserId = null;
     const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
+    if (!client) throw new Error('Cliente Supabase no inicializado.');
 
-    // 1. Verificación con Supabase Auth (verifyOtp)
-    if (client) {
-      try {
-        const { data, error } = await client.auth.verifyOtp({
-          email,
-          token: code,
-          type: 'signup'
-        });
-
-        if (!error && (data?.user || data?.session?.user)) {
-          verified = true;
-          const userObj = data.user || data.session.user;
-          supabaseUserId = userObj.id;
-          console.log("⚡ [SUPABASE VERIFY OTP SUCCESS]:", data);
-        } else if (error) {
-          console.warn("⚠️ Supabase verifyOtp error:", error.message);
-        }
-      } catch (sbErr) {
-        console.warn("⚠️ Exception in Supabase verifyOtp:", sbErr);
-      }
-    }
-
-    // 2. Fallback de verificación backend si no validó directamente con Supabase
-    if (!verified) {
-      try {
-        const res = await fetch('/api/auth/verify-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email,
-            code,
-            name: payload.name || `${payload.firstName || ''} ${payload.lastName || ''}`.trim(),
-            docType: payload.docType || 'DNI',
-            docNumber: payload.docNumber || '',
-            phone: payload.phone || ''
-          })
-        });
-
-        const result = await res.json().catch(() => ({}));
-        if (res.ok && result.success) {
-          verified = true;
-        } else if (code === '123456' || code === '000000') {
-          verified = true;
-        } else {
-          throw new Error(result.error || 'Código de verificación inválido o expirado.');
-        }
-      } catch (backendErr) {
-        if (code === '123456' || code === '000000') {
-          verified = true;
-        } else {
-          throw backendErr;
-        }
-      }
-    }
-
-    // 3. Guardar en la tabla 'profiles' de Supabase
-    if (client) {
-      try {
-        let uId = supabaseUserId;
-        if (!uId) {
-          const { data: userData } = await client.auth.getUser();
-          uId = userData?.user?.id;
-        }
-
-        if (uId) {
-          const profileRecord = {
-            id: uId,
-            dni: payload.docNumber || payload.dni || '',
-            nombres: payload.firstName || payload.nombres || '',
-            apellidos: payload.lastName || payload.apellidos || '',
-            email: email,
-            telefono: payload.phone || payload.telefono || '',
-            fecha_nacimiento: payload.birthDate || payload.fecha_nacimiento || null
-          };
-
-          console.log("📝 [INSERTING TO SUPABASE PROFILES]:", profileRecord);
-          const { error: profileError } = await client.from('profiles').insert([profileRecord]);
-
-          if (profileError) {
-            console.warn("⚠️ Profiles insert warning, attempting upsert:", profileError.message);
-            await client.from('profiles').upsert([profileRecord]);
-          } else {
-            console.log("✅ Perfil guardado exitosamente en tabla 'profiles'!");
-          }
-        }
-      } catch (pErr) {
-        console.warn("⚠️ Exception writing to profiles table:", pErr);
-      }
-    }
-
-    // Guardar copia local de sesión de cliente
-    const customer = {
-      id: supabaseUserId || `USR-${Date.now()}`,
-      name: payload.name || `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || email.split('@')[0],
-      firstName: payload.firstName || 'Cliente',
-      lastName: payload.lastName || '',
+    // 1. Verificación nativa con Supabase Auth (verifyOtp)
+    const { data, error } = await client.auth.verifyOtp({
       email: email,
-      phone: payload.phone || '',
-      docType: payload.docType || 'DNI',
-      docNumber: payload.docNumber || '',
-      authProvider: 'local',
-      role: 'customer',
-      isAdmin: false,
-      emailVerified: true,
-      updatedAt: new Date().toISOString()
+      token: code,
+      type: 'signup'
+    });
+
+    if (error) {
+      console.error("❌ Supabase verifyOtp error:", error);
+      let errorMsg = error.message;
+      if (errorMsg.includes('invalid') || errorMsg.includes('expired') || errorMsg.includes('Otp')) {
+        errorMsg = 'El código de 6 dígitos es incorrecto o ha expirado. Revisa tu correo o solicita uno nuevo.';
+      }
+      throw new Error(errorMsg);
+    }
+
+    const verifiedUser = data?.user || data?.session?.user;
+    if (!verifiedUser || !verifiedUser.id) {
+      throw new Error('No se pudo confirmar la sesión del usuario verificado.');
+    }
+
+    const userId = verifiedUser.id;
+    console.log("✅ [OTP VERIFIED SUCCESSFULLY FOR USER]:", userId);
+
+    // 2. INSERT automático en la tabla public.profiles de Supabase
+    const profileRecord = {
+      id: userId,
+      dni: payload.docNumber || payload.dni || '',
+      nombres: payload.firstName || payload.nombres || '',
+      apellidos: payload.lastName || payload.apellidos || '',
+      email: email,
+      telefono: payload.phone || payload.telefono || '',
+      fecha_nacimiento: payload.birthDate || payload.fecha_nacimiento || null
     };
 
-    localStorage.setItem('buchisapa_customer', JSON.stringify(customer));
-    if (typeof updateNavbarUserAuth === 'function') updateNavbarUserAuth();
+    console.log("📝 [AUTOMATIC INSERT TO PUBLIC.PROFILES]:", profileRecord);
+    const { error: profileError } = await client.from('profiles').insert([profileRecord]);
+
+    if (profileError) {
+      console.warn("⚠️ Error al insertar perfil, intentando upsert:", profileError.message);
+      const { error: upsertErr } = await client.from('profiles').upsert([profileRecord]);
+      if (upsertErr) {
+        console.error("❌ Error en upsert profiles:", upsertErr.message);
+      } else {
+        console.log("✅ Perfil actualizado/guardado con upsert en public.profiles!");
+      }
+    } else {
+      console.log("✅ Perfil guardado automáticamente en public.profiles!");
+    }
 
     if (alertEl) {
-      alertEl.textContent = '✓ ¡Correo verificado y perfil guardado! Redirigiendo a inicio de sesión...';
+      alertEl.textContent = '✓ ¡Correo verificado y perfil registrado correctamente! Redirigiendo a inicio de sesión...';
       alertEl.className = 'otp-alert success';
       alertEl.style.display = 'block';
     }
@@ -2022,7 +1972,7 @@ async function submitOtpVerification() {
       window.showToast('¡Cuenta creada e insertada en profiles correctamente!', 'success');
     }
 
-    // 4. Redirigir a /login
+    // 3. Redirigir a /login (vista login)
     setTimeout(() => {
       closeEmailVerificationModal();
       clearAllAuthForms();
@@ -2033,9 +1983,9 @@ async function submitOtpVerification() {
     }, 1200);
 
   } catch (err) {
-    console.error('Error in submitOtpVerification:', err);
+    console.error('Error en verificación de OTP:', err);
     if (alertEl) {
-      alertEl.textContent = err.message || 'Código inválido o expirado. Por favor verifica en tu Gmail.';
+      alertEl.textContent = err.message || 'Código inválido o expirado. Revisa tu correo.';
       alertEl.className = 'otp-alert error';
       alertEl.style.display = 'block';
     }
