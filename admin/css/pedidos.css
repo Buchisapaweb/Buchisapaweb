@@ -64,11 +64,11 @@
 }
 
 .btn-highlight-glow {
-  background: linear-gradient(135deg, #e024c3 0%, #ff007f 100%) !important;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
   color: #ffffff !important;
   font-weight: 800 !important;
-  box-shadow: 0 4px 14px rgba(224, 36, 195, 0.4) !important;
-  border: none !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .btn-highlight-glow:hover {
@@ -494,9 +494,9 @@
 .pulse-dot {
   width: 7px;
   height: 7px;
-  background-color: #ff007f;
+  background-color: #ef4444;
   border-radius: 50%;
-  box-shadow: 0 0 8px #ff007f;
+  box-shadow: 0 0 8px #ef4444;
   animation: pulse-glow 1.5s infinite;
 }
 
@@ -610,10 +610,10 @@
 }
 
 .category-pill.active {
-  background: linear-gradient(135deg, #e024c3 0%, #00f0ff 100%);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: #ffffff;
-  border: none;
-  box-shadow: 0 4px 12px rgba(224, 36, 195, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
 }
 
 .stock-body {

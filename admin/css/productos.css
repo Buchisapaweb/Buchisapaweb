@@ -51,10 +51,10 @@
 
 .category-chip.active {
   color: #fff;
-  background: linear-gradient(135deg, #ff007f 0%, #e024c3 100%);
-  border-color: #ff007f;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  border-color: #ef4444;
   font-weight: 800;
-  box-shadow: 0 0 16px rgba(255, 0, 127, 0.45);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
 }
 
 /* CATALOG SEARCH & ACTIONS ROW */
@@ -1006,7 +1006,7 @@
 }
 
 .btn-save-category-hero {
-  background: linear-gradient(135deg, #ff007f 0%, #7928ca 100%);
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
   color: #ffffff;
   font-weight: 800;
   font-size: 0.95rem;
@@ -1518,8 +1518,8 @@
   flex: 1.5;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #e024c3 0%, #ff007f 100%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
   font-weight: 800;
   font-size: 0.92rem;
@@ -1528,13 +1528,14 @@
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(224, 36, 195, 0.45);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.45);
   transition: all 0.22s ease;
 }
 
 .btn-submit-elegant:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(224, 36, 195, 0.65);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 8px 26px rgba(220, 38, 38, 0.6);
 }
 
 .form-page-grid {
@@ -1616,11 +1617,11 @@
 }
 
 .btn-glow-submit {
-  background: linear-gradient(135deg, #e024c3 0%, #ff007f 100%) !important;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
   color: #ffffff !important;
   font-weight: 800 !important;
-  box-shadow: 0 6px 20px rgba(224, 36, 195, 0.45) !important;
-  border: none !important;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .btn-glow-submit:hover {
