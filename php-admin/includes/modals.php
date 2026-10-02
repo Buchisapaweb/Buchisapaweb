@@ -1,0 +1,751 @@
+  <!-- ==========================================================================
+       MODAL: CREAR / EDITAR PRODUCTO
+       ========================================================================== -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="product-modal-title">Nuevo Producto</h3>
+        <button class="modal-close-btn modal-close-trigger" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="product-form">
+        <input type="hidden" id="form-product-id">
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="form-product-name">Nombre del Producto *</label>
+            <input type="text" class="form-input" id="form-product-name" required placeholder="Ej. BuchiBurger Super Especial">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="form-product-category">Categoría *</label>
+              <select class="form-select" id="form-product-category" required>
+                <option value="platos-amazonicos">🌿 Platos Amazónicos</option>
+                <option value="hamburguesas">🍔 Hamburguesas</option>
+                <option value="broaster">🍗 Pollo Broaster</option>
+                <option value="salchipapas">🍟 Salchipapas &amp; Salchibroasters</option>
+                <option value="alitas">🍗 Alitas Crujientes</option>
+                <option value="bebidas">🥤 Bebidas y Gaseosas</option>
+                <option value="refrescos">🍹 Refrescos Caseros</option>
+                <option value="infusiones">☕ Infusiones y Café</option>
+                <option value="combos">✨ Combos Especiales</option>
+                <option value="extras">🔥 Extras y Salsas</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="form-product-price">Precio (S/) *</label>
+              <input type="number" step="0.5" class="form-input" id="form-product-price" required placeholder="18.00">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="form-product-stock">Stock Inicial (unidades)</label>
+              <input type="number" class="form-input" id="form-product-stock" value="25" min="0">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="form-product-badge">Etiqueta Especial</label>
+              <input type="text" class="form-input" id="form-product-badge" placeholder="Ej. TOP VENTAS, NUEVO">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-product-description">Descripción del Plato</label>
+            <textarea class="form-textarea" id="form-product-description" rows="3" placeholder="Ingredientes, preparación y detalles para el cliente..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-product-image">URL de Imagen (Opcional)</label>
+            <input type="url" class="form-input" id="form-product-image" placeholder="https://ejemplo.com/foto.jpg">
+          </div>
+
+          <div class="modal-switch-box">
+            <div>
+              <p class="modal-title-white">Disponible en la Carta</p>
+              <p class="modal-subtitle-text">Los clientes podrán ordenarlo inmediatamente</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="form-product-available" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: CONFIRMAR ELIMINACIÓN
+       ========================================================================== -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title-danger">Confirmar Eliminación</h3>
+        <button class="modal-close-btn modal-close-trigger" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="delete-modal-msg" class="modal-msg-text">
+          ¿Estás seguro de que deseas eliminar permanentemente este producto de la carta?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
+        <button type="button" class="btn btn-outline-danger bg-btn-danger" id="btn-confirm-delete">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: VISTA PREVIA DE TICKET TÉRMICO (80MM OFICIAL)
+       ========================================================================== -->
+  <div class="modal-overlay" id="ticket-preview-modal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title-sub" id="ticket-preview-modal-title">Ticket de Venta TK00001</h3>
+          <p class="modal-subtitle-text">Formato térmico oficial BuchiSapa (80mm)</p>
+        </div>
+        <button class="modal-close-btn modal-close-trigger" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body modal-body-padded">
+        <div class="thermal-ticket-container" id="thermal-receipt-render-target">
+          <!-- Renderizado dinámico vía scripts -->
+        </div>
+      </div>
+
+      <div class="modal-footer modal-footer-space-between">
+        <button type="button" class="btn btn-secondary modal-close-trigger">Cerrar</button>
+        <button type="button" class="btn btn-primary btn-flex-gap" id="btn-print-active-ticket">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>Imprimir en Térmica (80mm)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: EMISIÓN DE NUEVO TICKET RÁPIDO
+       ========================================================================== -->
+  <div class="modal-overlay" id="new-ticket-modal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title-white">+ Emitir Nuevo Ticket Rápido</h3>
+          <p class="modal-subtitle-text">Venta directa en mostrador o comanda rápida</p>
+        </div>
+        <button class="modal-close-btn modal-close-trigger" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="new-ticket-form">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="ticket-form-customer">Nombre del Cliente *</label>
+              <input type="text" class="form-input" id="ticket-form-customer" required placeholder="Ej. Carlos Paredes" value="Cliente Mostrador">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ticket-form-phone">Teléfono / WhatsApp</label>
+              <input type="tel" class="form-input" id="ticket-form-phone" placeholder="984 123 456">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="ticket-form-type">Tipo de Pedido *</label>
+              <select class="form-select" id="ticket-form-type" required>
+                <option value="pickup">Mostrador / Para Llevar</option>
+                <option value="salon">Consumo en Salón</option>
+                <option value="delivery">Delivery</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ticket-form-payment">Método de Pago *</label>
+              <select class="form-select" id="ticket-form-payment" required>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Yape">Yape</option>
+                <option value="Plin">Plin</option>
+                <option value="Tarjeta Niubiz POS">Tarjeta Niubiz POS</option>
+                <option value="Transferencia BCP">Transferencia BCP</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ticket-form-product-select">Seleccionar Plato de la Carta *</label>
+            <select class="form-select" id="ticket-form-product-select">
+              <!-- Cargado dinámicamente con productos activos -->
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="ticket-form-quantity">Cantidad</label>
+              <input type="number" class="form-input" id="ticket-form-quantity" min="1" max="50" value="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ticket-form-unit-price">Precio Unitario (S/)</label>
+              <input type="number" step="0.5" class="form-input" id="ticket-form-unit-price" value="18.00">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ticket-form-notes">Notas / Especificaciones (Opcional)</label>
+            <input type="text" class="form-input" id="ticket-form-notes" placeholder="Ej. Sin cebolla, extra salsa de cocona">
+          </div>
+
+          <div class="modal-total-box">
+            <span class="text-white-bold">Total a Cobrar:</span>
+            <span class="modal-total-display" id="ticket-form-total-display">S/ 18.00</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Emitir e Imprimir Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: REGISTRAR MOVIMIENTO DE CAJA CHICA (INGRESO / EGRESO)
+       ========================================================================== -->
+  <div class="modal-overlay" id="caja-movement-modal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title-white">Registrar Movimiento de Caja Chica</h3>
+          <p class="modal-subtitle-text">Entrada o salida puntual de efectivo</p>
+        </div>
+        <button class="modal-close-btn modal-close-trigger" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="caja-movement-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="mov-form-tipo">Tipo de Movimiento *</label>
+            <select class="form-select" id="mov-form-tipo" required>
+              <option value="egreso">🔴 Salida / Gasto (Egreso)</option>
+              <option value="ingreso">🟢 Entrada Extra (Ingreso)</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="mov-form-categoria">Categoría *</label>
+              <select class="form-select" id="mov-form-categoria" required>
+                <option value="Insumos de Cocina">Insumos de Cocina (Hielo, Verduras)</option>
+                <option value="Empaques y Despacho">Empaques / Bolsas / Descartables</option>
+                <option value="Limpieza y Servicios">Limpieza y Aseo</option>
+                <option value="Combustible / Delivery">Combustible / Apoyo Delivery</option>
+                <option value="Cambio de Sencillo">Cambio de Sencillo (Ingreso)</option>
+                <option value="Otros Gastos">Otros Gastos Menores</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mov-form-monto">Monto (S/) *</label>
+              <input type="number" step="0.5" min="0.5" class="form-input" id="mov-form-monto" required placeholder="25.00">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="mov-form-motivo">Motivo o Justificación Detallada *</label>
+            <textarea class="form-textarea" id="mov-form-motivo" rows="2" required placeholder="Ej. Compra de 2 bolsas de hielo frappé para los refrescos"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="mov-form-comprobante">N° Comprobante / Boleta (Opcional)</label>
+              <input type="text" class="form-input" id="mov-form-comprobante" placeholder="Ej. BOL-0982">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mov-form-responsable">Responsable</label>
+              <input type="text" class="form-input" id="mov-form-responsable" value="Admin BuchiSapa" readonly>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar en Caja</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: CIERRE DE TURNO / CORTE DE CAJA Z
+       ========================================================================== -->
+  <div class="modal-overlay" id="caja-close-modal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title-warning">🔒 Cierre de Turno / Corte Z</h3>
+          <p class="modal-subtitle-text">Finalizar arqueo del turno actual</p>
+        </div>
+        <button class="modal-close-btn modal-close-trigger" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="caja-close-form">
+        <div class="modal-body">
+          <div class="modal-summary-box">
+            <div class="modal-row-sm">
+              <span class="text-muted-custom">Efectivo Sistema Esperado:</span>
+              <strong id="modal-close-expected">S/ 0.00</strong>
+            </div>
+            <div class="modal-row-sm">
+              <span class="text-muted-custom">Total Ventas del Turno:</span>
+              <strong id="modal-close-sales" class="modal-title-success">S/ 0.00</strong>
+            </div>
+          </div>
+
+          <div class="form-group mt-12">
+            <label class="form-label" for="modal-close-real-cash">Monto Físico Real Contado en Gaveta (S/) *</label>
+            <input type="number" step="0.5" class="form-input form-input-lg-bold" id="modal-close-real-cash" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modal-close-notes">Observaciones del Cierre</label>
+            <textarea class="form-textarea" id="modal-close-notes" rows="2" placeholder="Notas sobre el turno, incidencias o motivos de diferencia..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
+          <button type="submit" class="btn btn-primary bg-btn-warning">
+            Confirmar y Cerrar Turno
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: APERTURA DE TURNO DE CAJA
+       ========================================================================== -->
+  <div class="modal-overlay" id="caja-open-modal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title-success">🟢 Apertura de Turno de Caja</h3>
+          <p class="modal-subtitle-text">Iniciar operaciones y registrar fondo inicial</p>
+        </div>
+        <button class="modal-close-btn modal-close-trigger" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="caja-open-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="modal-open-initial-cash">Fondo Inicial de Sencillo en Caja (S/) *</label>
+            <input type="number" step="0.5" class="form-input form-input-lg-bold" id="modal-open-initial-cash" value="250.00" required>
+            <span class="text-muted-xs">Monto para vuelto y sencillo al comenzar el turno.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modal-open-cajero">Cajero Responsable</label>
+            <input type="text" class="form-input" id="modal-open-cajero" value="Admin BuchiSapa" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
+          <button type="submit" class="btn btn-primary bg-btn-success">
+            Abrir Caja Ahora
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: CREAR / EDITAR IMAGEN DE PORTADA
+       ========================================================================== -->
+  <div class="modal-overlay" id="portada-modal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 id="portada-modal-title" class="modal-title-white">Configurar Portada</h3>
+          <p class="modal-subtitle-text">Imágenes para Escritorio (PortadaXE.webp) y Móvil (PortadaXM.webp)</p>
+        </div>
+        <button class="modal-close-btn modal-close-trigger" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="portada-form-modal">
+        <input type="hidden" id="portada-modal-form-id">
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="portada-modal-form-title">Nombre / Identificador *</label>
+            <input type="text" class="form-input" id="portada-modal-form-title" required placeholder="Ej. Portada 1">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="portada-modal-form-image">🖥️ Imagen para Escritorio (Panorámica / PC) *</label>
+            <input type="text" class="form-input" id="portada-modal-form-image" required placeholder="Ej. /imagenes/portada/Portada1E.webp">
+            <span class="text-muted-xs">Formato horizontal panorámico para computadoras y laptops.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="portada-modal-form-image-mobile">📱 Imagen para Móviles (Vertical / Smartphone) *</label>
+            <input type="text" class="form-input" id="portada-modal-form-image-mobile" required placeholder="Ej. /imagenes/portada/Portada1M.webp">
+            <span class="text-muted-xs">Formato vertical adaptado a la pantalla de celulares.</span>
+          </div>
+
+          <div class="modal-switch-box">
+            <div>
+              <p class="modal-title-white">Visible en Carousel</p>
+              <p class="modal-subtitle-text">Aparecerá en el inicio para todos los clientes</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="portada-modal-form-active" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-trigger">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Portada</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: INICIO DE SESIÓN DE ADMINISTRADOR OFICIAL
+       ========================================================================== -->
+  <div class="modal-overlay" id="admin-login-modal" style="display: none !important; z-index: -1; opacity: 0; pointer-events: none;">
+    <div class="modal-dialog modal-md" style="max-width: 480px; border: 1px solid rgba(255, 0, 127, 0.45); box-shadow: 0 25px 70px rgba(0,0,0,0.85), 0 0 40px rgba(255, 0, 127, 0.22); border-radius: 18px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(255,0,127,0.18) 0%, rgba(224,36,195,0.1) 100%); border-bottom: 1px solid rgba(255,0,127,0.3); padding: 22px 24px 18px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,0,127,0.4); display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: 0 0 15px rgba(255,0,127,0.3); flex-shrink: 0;">
+            <img src="/imagenes/logo/logo-buchisapa.webp" alt="BuchiSapa" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+          <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255,0,127,0.2); color: #ff66b2; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(255,0,127,0.4); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px;">
+              <span>🔒 ACCESO RESTRINGIDO</span>
+            </div>
+            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 900; color: #ffffff; letter-spacing: -0.01em;">Panel de Administración</h3>
+            <p style="margin: 2px 0 0; font-size: 0.78rem; color: #a1a1aa;">Burger &amp; Broaster - Sistema Oficial</p>
+          </div>
+        </div>
+      </div>
+
+      <form id="admin-login-form" onsubmit="window.handleAdminLoginFormSubmit(event)">
+        <div class="modal-body" style="padding: 24px;">
+          <div id="admin-login-alert" style="display: none; padding: 12px 14px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; line-height: 1.4; margin-bottom: 6px;"></div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="admin-login-email" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Correo de Administrador</span>
+              <span style="font-size: 0.72rem; color: #00f0ff; font-weight: 600;">Autorizado</span>
+            </label>
+            <input 
+              type="email" 
+              class="form-input" 
+              id="admin-login-email" 
+              placeholder="correo@administrador.com" 
+              required 
+              autocomplete="email"
+              style="padding: 12px 14px; font-size: 0.9rem;"
+            >
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label" for="admin-login-password">Contraseña de Acceso</label>
+            <div style="position: relative; display: flex; align-items: center;">
+              <input 
+                type="password" 
+                class="form-input" 
+                id="admin-login-password" 
+                placeholder="••••••••" 
+                required 
+                autocomplete="current-password"
+                style="padding: 12px 42px 12px 14px; font-size: 0.9rem;"
+              >
+              <button 
+                type="button" 
+                id="admin-password-toggle-btn"
+                onclick="window.toggleAdminPasswordVisibility()" 
+                style="position: absolute; right: 10px; background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; border-radius: 6px;" 
+                title="Mostrar u ocultar contraseña"
+                aria-label="Mostrar contraseña"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; background: rgba(9, 5, 20, 0.9);">
+          <a href="/index.html" style="color: #94a3b8; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.15s ease;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+            <span>Ir a la Carta</span>
+          </a>
+          <button type="submit" id="btn-admin-login-submit" class="btn btn-primary" style="padding: 10px 22px; font-size: 0.88rem;">
+            <span>Ingresar al Panel</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  <!-- ====================================================================
+       MODAL: CREAR / EDITAR PROMOCIÓN COMERCIAL
+       ==================================================================== -->
+  <div class="modal-overlay" id="promotion-modal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="promotion-modal-title" class="modal-title-white">Nueva Promoción Comercial</h3>
+          <p class="modal-subtitle-text">Configura el título, precios de oferta, foto y detalles del combo</p>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="document.getElementById('promotion-modal').classList.remove('active')" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="promotion-form">
+        <input type="hidden" id="promotion-form-id">
+
+        <div class="modal-body">
+          <!-- Vista previa de la promoción -->
+          <div class="modal-preview-container" style="display: flex; gap: 14px; background: #0b0f19; padding: 12px; border-radius: 12px; border: 1px solid var(--border-subtle); align-items: center; margin-bottom: 16px;">
+            <img id="promotion-form-preview-img" src="/imagenes/portada/Portada1E.webp" alt="Preview" style="width: 100px; height: 75px; object-fit: cover; border-radius: 8px;">
+            <div style="flex: 1;">
+              <h5 id="promotion-form-preview-title" style="color: #fff; font-size: 0.95rem; font-weight: 800; margin: 0 0 4px;">COMBO BUCHISAPA</h5>
+              <div id="promotion-form-preview-price" style="font-size: 1.1rem; font-weight: 900; color: #ef4444;">S/ 35.00 <span style="text-decoration: line-through; color: #94a3b8; font-size: 0.8rem; margin-left: 6px;">S/ 45.00</span></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+              <label class="form-label" for="promotion-form-title">Título de la Promoción *</label>
+              <input type="text" class="form-input" id="promotion-form-title" required placeholder="Ej. Combo Familiar Amazónico" oninput="window.updatePromotionFormPreview()">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" for="promotion-form-badge">Etiqueta (Badge)</label>
+              <input type="text" class="form-input" id="promotion-form-badge" placeholder="Ej. 🔥 MÁS PEDIDO">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="promotion-form-price">Precio de Oferta (S/) *</label>
+              <input type="number" step="0.5" class="form-input" id="promotion-form-price" required placeholder="45.00" oninput="window.updatePromotionFormPreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="promotion-form-original-price">Precio Regular / Anterior (S/)</label>
+              <input type="number" step="0.5" class="form-input" id="promotion-form-original-price" placeholder="58.00" oninput="window.updatePromotionFormPreview()">
+              <span class="text-muted-xs">Aparecerá tachado para resaltar el ahorro del cliente.</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="promotion-form-description">Descripción de lo que incluye *</label>
+            <textarea class="form-textarea" id="promotion-form-description" rows="2" required placeholder="Ej. 1 Juane Tradicional + 1 Tacacho con Cecina + 1/4 Pollo Broaster + 2 Refrescos de Cocona helados"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="promotion-form-image">URL de la Imagen *</label>
+            <input type="text" class="form-input" id="promotion-form-image" required placeholder="Ej. /imagenes/portada/Portada2E.webp" oninput="window.updatePromotionFormPreview()">
+          </div>
+
+          <!-- Sugerencias locales rápidas -->
+          <div class="form-group mt-neg6">
+            <label class="form-label text-muted-sm">Sugerencias de imágenes disponibles:</label>
+            <div class="portada-preset-thumbs">
+              <div class="portada-preset-item" onclick="window.selectPromotionPreset('/imagenes/portada/Portada1E.webp')" title="Broaster">
+                <img src="/imagenes/portada/Portada1E.webp" alt="Broaster">
+              </div>
+              <div class="portada-preset-item" onclick="window.selectPromotionPreset('/imagenes/portada/Portada2E.webp')" title="Juane / Selva">
+                <img src="/imagenes/portada/Portada2E.webp" alt="Juane">
+              </div>
+              <div class="portada-preset-item" onclick="window.selectPromotionPreset('/imagenes/portada/Portada3E.webp')" title="Hamburguesas">
+                <img src="/imagenes/portada/Portada3E.webp" alt="Burger">
+              </div>
+              <div class="portada-preset-item" onclick="window.selectPromotionPreset('/imagenes/portada/Portada4E.webp')" title="Amazónica">
+                <img src="/imagenes/portada/Portada4E.webp" alt="Amazónica">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="promotion-form-features">Detalles en Viñetas (Una por línea)</label>
+            <textarea class="form-textarea" id="promotion-form-features" rows="3" placeholder="✦ 1 Juane Tradicional en hoja de bijao&#10;🌴 Tacacho artesanal con cecina ahumada&#10;🍗 1/4 Pollo Broaster crujiente&#10;🍹 2 Refrescos de Cocona natural"></textarea>
+            <span class="text-muted-xs">Se mostrarán como etiquetas resaltadas en la tarjeta de la tienda.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-checkbox-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+              <input type="checkbox" id="promotion-form-active" checked style="width: 18px; height: 18px; accent-color: var(--accent-orange);">
+              <span style="color: #fff; font-weight: 700; font-size: 0.88rem;">Promoción Activa (Visible inmediatamente para clientes)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('promotion-modal').classList.remove('active')">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Guardar Promoción
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: NUEVO ACOMPAÑAMIENTO / GUARNICIÓN
+       ========================================================================== -->
+  <div class="modal-overlay" id="accompaniment-modal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <h3 class="modal-title-white">🥔 Nuevo Acompañamiento / Guarnición</h3>
+        <button class="modal-close-btn modal-close-trigger" onclick="document.getElementById('accompaniment-modal').classList.remove('active')" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="accompaniment-form" onsubmit="window.handleAccompanimentFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="form-acc-name">Nombre del Acompañamiento *</label>
+            <input type="text" class="form-input" id="form-acc-name" required placeholder="Ej. Papas Fritas Artesanales, Tacacho de Plátano Bellaco, Yucas Fritas">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="form-acc-price">Precio Adicional (S/) *</label>
+              <input type="number" step="0.5" class="form-input" id="form-acc-price" required value="0.00" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="form-acc-category">Categoría Asociada</label>
+              <select class="form-select" id="form-acc-category">
+                <option value="todas">Todas las categorías</option>
+                <option value="platos-amazonicos">🌿 Amazónicos</option>
+                <option value="broaster">🍗 Pollo Broaster</option>
+                <option value="hamburguesas">🍔 Hamburguesas</option>
+                <option value="salchipapas">🍟 Salchipapas</option>
+                <option value="alitas">🍗 Alitas</option>
+                <option value="extras">🔥 Extras</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-acc-desc">Descripción / Porción</label>
+            <textarea class="form-textarea" id="form-acc-desc" rows="2" placeholder="Ej. Porción personal de papas crujientes con sal marina."></textarea>
+          </div>
+
+          <div class="modal-switch-box">
+            <div>
+              <p class="modal-title-white">Disponible para Selección</p>
+              <p class="modal-subtitle-text">Los clientes podrán agregarlo a sus platos</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="form-acc-available" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('accompaniment-modal').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Acompañamiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: NUEVA CREMA DE LA CASA
+       ========================================================================== -->
+  <div class="modal-overlay" id="sauce-modal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <h3 class="modal-title-white">🧴 Nueva Crema / Salsa de la Casa</h3>
+        <button class="modal-close-btn modal-close-trigger" onclick="document.getElementById('sauce-modal').classList.remove('active')" title="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="sauce-form" onsubmit="window.handleSauceFormSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="form-sauce-name">Nombre de la Crema / Salsa *</label>
+            <input type="text" class="form-input" id="form-sauce-name" required placeholder="Ej. Ají Pollero BuchiSapa, Tártara Artesanal, Crema de Cocona">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="form-sauce-price">Precio Adicional / Porción Extra (S/)</label>
+              <input type="number" step="0.5" class="form-input" id="form-sauce-price" value="0.00" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="form-sauce-level">Nivel de Picante / Tipo</label>
+              <select class="form-select" id="form-sauce-level">
+                <option value="Sin Picante">🟢 Sin Picante (Suave)</option>
+                <option value="Picante Medio">🟡 Picante Medio</option>
+                <option value="Furia Picante">🔴 Picante Intenso / Furia</option>
+                <option value="Cremosa Especial">✨ Cremosa Especial</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-sauce-desc">Descripción de Ingredientes / Receta</label>
+            <textarea class="form-textarea" id="form-sauce-desc" rows="2" placeholder="Ej. Preparada con ají amarillo fresco, huacatay, queso fresco y especias de la casa."></textarea>
+          </div>
+
+          <div class="modal-switch-box">
+            <div>
+              <p class="modal-title-white">Disponible en Barra de Cremas</p>
+              <p class="modal-subtitle-text">Aparecerá en el selector de cremas para los clientes</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="form-sauce-available" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('sauce-modal').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Crema de la Casa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR DE ALERTAS TOAST -->
+  <div class="toast-container" id="toast-container"></div>

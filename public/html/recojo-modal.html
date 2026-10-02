@@ -1,0 +1,63 @@
+<!-- MODAL DE RECOJO EN TIENDA / UBICACIÓN Y HORARIOS -->
+<div class="modal-backdrop" id="recojo-modal" style="display: none;" onclick="if(event.target === this) closeRecojoModal()">
+  <div class="modal-box recojo-modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="recojo-modal-header-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2">
+          <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+          <path d="M2 7h20"/>
+        </svg>
+        <h3 class="modal-title">Recojo en Tienda</h3>
+      </div>
+      <button type="button" class="modal-close" onclick="closeRecojoModal()" aria-label="Cerrar modal">&times;</button>
+    </div>
+
+    <div class="modal-body recojo-modal-body">
+      <!-- BADGE DE ESTADO DEL LOCAL EN VIVO -->
+      <div class="recojo-status-banner" id="recojo-status-banner">
+        <span class="recojo-pulse-dot"></span>
+        <span id="recojo-status-text">Atendiendo ahora mismo (6:00 PM - 5:00 AM)</span>
+      </div>
+
+      <!-- UBICACIÓN FÍSICA -->
+      <div class="recojo-info-card">
+        <div class="recojo-icon-circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="recojo-info-content">
+          <h4 class="recojo-info-title">Sede Santa Clara</h4>
+          <p class="recojo-info-text">
+            Av. La Estrella con Calle 28 de Julio (Esquina de la Posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪
+          </p>
+        </div>
+      </div>
+
+      <!-- HORARIOS -->
+      <div class="recojo-info-card">
+        <div class="recojo-icon-circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="recojo-info-content">
+          <h4 class="recojo-info-title">Horario de Atención</h4>
+          <p class="recojo-info-text">
+            Lunes a Domingo: <strong>6:00 PM a 5:00 AM</strong> (Atención nocturna corrida)
+          </p>
+        </div>
+      </div>
+
+      <!-- BENEFICIO -->
+      <div class="recojo-benefit-box">
+        <span class="recojo-benefit-badge">⚡ SIN COSTO DE ENVÍO</span>
+        <p>Tu pedido estará listo en aproximadamente <strong>15 a 20 minutos</strong> después de realizar tu compra.</p>
+      </div>
+
+      <!-- BOTÓN DE SELECCIÓN -->
+      <button type="button" class="recojo-confirm-btn" onclick="selectPickupOption()">
+        <span>Elegir Recojo en Local</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>

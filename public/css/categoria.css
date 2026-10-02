@@ -1,0 +1,121 @@
+.categoria-wrapper {
+  width: 100%;
+}
+
+.section-title-wrap {
+  text-align: center;
+  margin: 24px 0 20px;
+}
+
+.section-kicker {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  color: #dc2626;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.section-heading {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+@media (min-width: 768px) {
+  .section-heading {
+    font-size: 32px;
+  }
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.mobile-category-cards-grid,
+.desktop-category-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+@media (min-width: 480px) {
+  .mobile-category-cards-grid,
+  .desktop-category-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-category-cards-grid,
+  .desktop-category-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-category-cards-grid,
+  .desktop-category-cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+}
+
+.category-banner-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.category-banner-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+}
+
+.category-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.category-banner-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.5px;
+}
+
+.cat-banner-alitas { background-image: url('/imagenes/categorias/alitas/banner.webp'); }
+.cat-banner-bebidas { background-image: url('/imagenes/categorias/bebidas/banner.webp'); }
+.cat-banner-broaster { background-image: url('/imagenes/categorias/broaster/banner.webp'); }
+.cat-banner-hamburguesas { background-image: url('/imagenes/categorias/hamburguesas/banner.webp'); }
+.cat-banner-infusiones { background-image: url('/imagenes/categorias/infusiones/banner.webp'); }
+.cat-banner-platos-amazonicos { background-image: url('/imagenes/categorias/platos-amazonicos/banner.webp'); }
+.cat-banner-refrescos { background-image: url('/imagenes/categorias/refrescos/banner.webp'); }
+.cat-banner-salchipapas { background-image: url('/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp'); }
+.cat-banner-promociones { background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80'), linear-gradient(135deg, #ef4444, #f59e0b); }
+.cat-banner-adicional { background-image: url('https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=800&q=80'), linear-gradient(135deg, #10b981, #06b6d4); }
+

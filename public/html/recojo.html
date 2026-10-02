@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Método de Entrega | Recojo en Santa Clara - BuchiSapa</title>
+  <meta name="description" content="Elige tu método de entrega: Recojo en Restaurante Santa Clara (Ate) sin costo de envío o Delivery a domicilio.">
+  <link rel="icon" type="image/png" href="/imagenes/logo/logo-buchisapa.webp">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS para Mapas Interactivos -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <link rel="stylesheet" href="/css/comun.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/recojo.css">
+</head>
+<body class="recojo-page-body">
+
+  <!-- ENCABEZADO MINIMALISTA OFICIAL -->
+  <header class="recojo-page-header">
+    <div class="container recojo-header-container">
+      <a href="/" class="recojo-brand-link" title="BuchiSapa - Volver al Inicio">
+        <img src="/imagenes/logo/logo-buchisapa.webp" alt="BuchiSapa Logo" class="recojo-brand-img">
+        <span class="recojo-brand-name">BUCHISAPA</span>
+      </a>
+
+      <div class="recojo-header-actions">
+        <a href="/" class="recojo-back-btn" title="Volver a la carta">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+          <span>Volver</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="recojo-main-wrap">
+    <div class="container recojo-content-box">
+      
+      <!-- ENCABEZADO DE SECCIÓN -->
+      <div class="recojo-title-block">
+        <div class="recojo-title-row">
+          <h1 class="recojo-main-heading">Elige el método de entrega</h1>
+        </div>
+        <p class="recojo-subtitle">Selecciona cómo deseas recibir tu pedido BuchiSapa recién preparado.</p>
+      </div>
+
+      <!-- SELECTOR DE MÉTODO (TABS TIPO PARDOS CHICKEN) -->
+      <div class="delivery-tabs-pill-wrap" role="tablist">
+        <button 
+          type="button" 
+          id="tab-pickup-btn" 
+          class="delivery-tab-pill active" 
+          role="tab" 
+          aria-selected="true" 
+          onclick="switchDeliveryMode('pickup')"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+            <path d="M2 7h20"/>
+          </svg>
+          <span>RECOJO EN RESTAURANTE</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="tab-delivery-btn" 
+          class="delivery-tab-pill" 
+          role="tab" 
+          aria-selected="false" 
+          onclick="switchDeliveryMode('delivery')"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h1"/>
+            <circle cx="7" cy="17" r="2"/>
+            <path d="M9 17h6"/>
+            <circle cx="17" cy="17" r="2"/>
+          </svg>
+          <span>DELIVERY</span>
+        </button>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- CONTENIDO: VISTA RECOJO EN RESTAURANTE (DEFAULT) -->
+      <!-- ============================================== -->
+      <section id="panel-pickup-view" class="delivery-panel-content active" role="tabpanel">
+        
+        <div class="pickup-card-highlight">
+          <div class="pickup-card-header">
+            <div class="pickup-card-title-group">
+              <span class="pickup-badge-active">LOCAL DISPONIBLE</span>
+              <h2 class="pickup-store-name">BuchiSapa - Sede Santa Clara (Ate)</h2>
+            </div>
+            <div class="pickup-free-pill">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>SIN COSTO DE ENVÍO</span>
+            </div>
+          </div>
+
+          <div class="pickup-details-grid">
+            <div class="pickup-detail-row">
+              <div class="pickup-detail-icon red-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                  <circle cx="12" cy="10" r="3.2"/>
+                </svg>
+              </div>
+              <div class="pickup-detail-text">
+                <span class="pickup-detail-label">Dirección del Local</span>
+                <p class="pickup-detail-val">Av. La Estrella con Calle 28 de Julio (Esquina de la Posta, a 1 cuadra del Real Plaza Santa Clara), Ate, Lima 🇵🇪</p>
+                <span class="pickup-detail-sub">Referencia: A media cuadra del parque central y 1 cdra. de la Carretera Central.</span>
+              </div>
+            </div>
+
+            <div class="pickup-detail-row">
+              <div class="pickup-detail-icon green-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div class="pickup-detail-text">
+                <span class="pickup-detail-label">Horario de Atención</span>
+                <p class="pickup-detail-val">Lunes a Domingo: <strong>6:00 PM – 5:00 AM</strong> (Atención nocturna corrida)</p>
+                <div class="status-live-pill">
+                  <span class="live-indicator-dot"></span>
+                  <span>Atendiendo pedidos ahora mismo</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pickup-detail-row">
+              <div class="pickup-detail-icon orange-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="m16 12-4-4-4 4"/>
+                  <path d="M12 16V8"/>
+                </svg>
+              </div>
+              <div class="pickup-detail-text">
+                <span class="pickup-detail-label">Tiempo Estimado de Preparación</span>
+                <p class="pickup-detail-val">Tu pedido estará listo en <strong>15 a 20 minutos</strong></p>
+                <span class="pickup-detail-sub">Pasa directo a la barra de despacho sin hacer cola.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- MAPA INTERACTIVO DE SEDE SANTA CLARA -->
+          <div class="pickup-map-section">
+            <div class="pickup-map-header">
+              <div class="pickup-map-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8Z"/></svg>
+                <span>Ubicación en Santa Clara</span>
+              </div>
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=-12.01635,-76.88455" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="google-maps-ext-btn"
+              >
+                <span>Abrir en Google Maps</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+
+            <div id="pickup-leaflet-map" class="recojo-leaflet-box" aria-label="Mapa de ubicación Buchisapa Santa Clara"></div>
+          </div>
+
+          <!-- BOTÓN DE CONFIRMACIÓN PRINCIPAL -->
+          <div class="pickup-actions-footer">
+            <button type="button" class="btn-confirm-pickup" onclick="confirmPickupOption()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Confirmar Recojo en Santa Clara</span>
+            </button>
+            <p class="pickup-helper-note">Al confirmar, podrás explorar la carta completa con delivery gratis S/ 0.00.</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================== -->
+      <!-- CONTENIDO: VISTA DELIVERY A DOMICILIO -->
+      <!-- ============================================== -->
+      <section id="panel-delivery-view" class="delivery-panel-content" role="tabpanel" style="display: none;">
+        
+        <!-- BOTÓN USAR GPS ACTUAL -->
+        <button type="button" class="btn-use-gps" onclick="detectClientCurrentLocation()">
+          <span class="gps-target-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="3"/>
+              <line x1="12" x2="12" y1="2" y2="5"/>
+              <line x1="12" x2="12" y1="19" y2="22"/>
+              <line x1="2" x2="5" y1="12" y2="12"/>
+              <line x1="19" x2="22" y1="12" y2="12"/>
+            </svg>
+          </span>
+          <span id="gps-button-label">Usa tu ubicación actual</span>
+        </button>
+
+        <!-- BUSCADOR DE DIRECCIÓN -->
+        <div class="delivery-search-wrapper">
+          <div class="delivery-input-box">
+            <input 
+              type="text" 
+              id="delivery-address-search" 
+              class="delivery-field-input" 
+              placeholder="Ingresa tu dirección en Santa Clara / Ate..." 
+              value="Santa Clara, Ate, Lima, Perú"
+              autocomplete="off"
+            >
+            <button type="button" class="input-clear-btn" onclick="clearDeliveryInput()" aria-label="Limpiar dirección">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- FORMULARIO DE DETALLES DE DIRECCIÓN -->
+        <div class="delivery-form-grid">
+          <div class="form-group-half">
+            <label class="form-label" for="street-number-input">Número de la calle <span class="required-star">*</span></label>
+            <input type="text" id="street-number-input" class="form-control" placeholder="Ej: 142" value="S/N">
+          </div>
+
+          <div class="form-group-half">
+            <label class="form-label" for="interior-number-input">Interior/Dpto <span class="optional-tag">(Opcional)</span></label>
+            <input type="text" id="interior-number-input" class="form-control" placeholder="Ej: Dpto 302, Mz A Lte 4">
+          </div>
+
+          <div class="form-group-full">
+            <label class="form-label" for="reference-input">Referencia <span class="required-star">*</span></label>
+            <input type="text" id="reference-input" class="form-control" placeholder="Indicaciones para la entrega (ej: Frente al parque, portón verde)">
+          </div>
+
+          <div class="form-group-full">
+            <label class="form-label">Etiqueta tu dirección <span class="required-star">*</span></label>
+            <div class="address-tags-row">
+              <button type="button" class="tag-pill active" onclick="setAddressTag('Casa', this)">🏠 Casa</button>
+              <button type="button" class="tag-pill" onclick="setAddressTag('Trabajo', this)">💼 Trabajo</button>
+              <button type="button" class="tag-pill" onclick="setAddressTag('Pareja', this)">❤️ Pareja</button>
+              <button type="button" class="tag-pill" onclick="setAddressTag('Otro', this)">📍 Otro</button>
+            </div>
+            <input type="hidden" id="selected-address-tag" value="Casa">
+          </div>
+        </div>
+
+        <!-- MAPA INTERACTIVO DE CONFIRMACIÓN -->
+        <div class="delivery-map-container">
+          <div id="delivery-leaflet-map" class="delivery-leaflet-box" aria-label="Mapa de dirección de entrega"></div>
+          <div class="map-floating-hint">
+            <span>💡 Puedes arrastrar el mapa para ubicar tu puerta exacta</span>
+          </div>
+        </div>
+
+        <!-- TARIFA DE DELIVERY -->
+        <div class="delivery-fee-badge-box">
+          <div class="fee-badge-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.4"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h1"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+            <span>Tarifa de Delivery Santa Clara:</span>
+          </div>
+          <span class="fee-amount">S/ 4.00</span>
+        </div>
+
+        <!-- BOTÓN CONFIRMAR DELIVERY -->
+        <div class="delivery-actions-footer">
+          <button type="button" class="btn-confirm-delivery" onclick="confirmDeliveryOption()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <span>Confirmar Dirección y Explorar Carta</span>
+          </button>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- NOTIFICACIÓN TOAST INLINE -->
+  <div id="recojo-toast" class="recojo-toast-box" style="display: none;">
+    <span id="recojo-toast-icon">✅</span>
+    <span id="recojo-toast-text">Método confirmado con éxito</span>
+  </div>
+
+  <!-- Leaflet JS para renderizado ágil de mapas -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/js/recojo.js?v=20260930_2"></script>
+</body>
+</html>
