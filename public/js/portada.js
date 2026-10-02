@@ -2,8 +2,6 @@
   let currentSlide = 0;
   let totalSlides = 5;
   let carouselInterval = null;
-  let touchStartX = 0;
-  let touchEndX = 0;
 
   function goToSlide(index) {
     const track = document.getElementById('hero-carousel-track');
@@ -17,6 +15,7 @@
     else if (index >= totalSlides) currentSlide = 0;
     else currentSlide = index;
 
+    track.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
     track.style.transform = `translateX(-${currentSlide * 100}%)`;
 
     if (dotsContainer) {
@@ -53,23 +52,64 @@
     const container = document.querySelector('.hero-carousel-container');
     if (!track || !container) return;
 
+    let isDragging = false;
+    let startX = 0;
+    let deltaX = 0;
+
+    function onDragStart(e) {
+      isDragging = true;
+      startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+      deltaX = 0;
+      track.style.transition = 'none';
+      stopCarouselAutoplay();
+    }
+
+    function onDragMove(e) {
+      if (!isDragging) return;
+      const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+      deltaX = currentX - startX;
+
+      const containerWidth = container.clientWidth || 1000;
+      const baseOffset = -currentSlide * containerWidth;
+
+      let moveX = baseOffset + deltaX;
+      if (currentSlide === 0 && deltaX > 0) {
+        moveX = baseOffset + deltaX * 0.3;
+      } else if (currentSlide === totalSlides - 1 && deltaX < 0) {
+        moveX = baseOffset + deltaX * 0.3;
+      }
+
+      track.style.transform = `translateX(${moveX}px)`;
+    }
+
+    function onDragEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      track.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+
+      if (deltaX < -40) {
+        nextSlide();
+      } else if (deltaX > 40) {
+        prevSlide();
+      } else {
+        goToSlide(currentSlide);
+      }
+      startCarouselAutoplay();
+    }
+
     container.addEventListener('mouseenter', stopCarouselAutoplay);
     container.addEventListener('mouseleave', startCarouselAutoplay);
 
-    container.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-      stopCarouselAutoplay();
-    }, { passive: true });
+    container.addEventListener('touchstart', onDragStart, { passive: true });
+    container.addEventListener('touchmove', onDragMove, { passive: true });
+    container.addEventListener('touchend', onDragEnd, { passive: true });
 
-    container.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      const diff = touchStartX - touchEndX;
-      if (Math.abs(diff) > 40) {
-        if (diff > 0) nextSlide();
-        else prevSlide();
-      }
-      startCarouselAutoplay();
-    }, { passive: true });
+    container.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      onDragStart(e);
+    });
+    window.addEventListener('mousemove', onDragMove);
+    window.addEventListener('mouseup', onDragEnd);
 
     startCarouselAutoplay();
   }

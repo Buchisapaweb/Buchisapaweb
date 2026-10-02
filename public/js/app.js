@@ -329,6 +329,7 @@ function updateCarouselView() {
   const slides = document.querySelectorAll('.carousel-slide');
   if (!track) return;
 
+  track.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
   track.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
 
   if (slides[currentSlideIndex]) {
@@ -354,36 +355,70 @@ function updateCarouselView() {
  */
 function initCarouselTouchGestures() {
   const container = document.querySelector('.hero-carousel-container');
-  if (!container) return;
+  const track = document.getElementById('hero-carousel-track');
+  if (!container || !track) return;
 
-  let touchStartX = 0;
-  let touchEndX = 0;
+  let isDragging = false;
+  let startX = 0;
+  let deltaX = 0;
 
-  container.addEventListener('touchstart', (e) => {
-    if (e.changedTouches && e.changedTouches[0]) {
-      touchStartX = e.changedTouches[0].screenX;
-      stopAutoPlay();
+  function onDragStart(e) {
+    isDragging = true;
+    startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    deltaX = 0;
+    track.style.transition = 'none';
+    stopAutoPlay();
+  }
+
+  function onDragMove(e) {
+    if (!isDragging) return;
+    const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    deltaX = currentX - startX;
+
+    const containerWidth = container.clientWidth || 1000;
+    const baseOffset = -currentSlideIndex * containerWidth;
+
+    let moveX = baseOffset + deltaX;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const maxIdx = Math.max(0, slides.length - 1);
+
+    if (currentSlideIndex === 0 && deltaX > 0) {
+      moveX = baseOffset + deltaX * 0.3;
+    } else if (currentSlideIndex === maxIdx && deltaX < 0) {
+      moveX = baseOffset + deltaX * 0.3;
     }
-  }, { passive: true });
 
-  container.addEventListener('touchend', (e) => {
-    if (e.changedTouches && e.changedTouches[0]) {
-      touchEndX = e.changedTouches[0].screenX;
-      const diff = touchEndX - touchStartX;
-      if (Math.abs(diff) > 40) {
-        if (diff < 0) {
-          moveCarousel(1); // Deslizar hacia la izquierda -> siguiente
-        } else {
-          moveCarousel(-1); // Deslizar hacia la derecha -> anterior
-        }
-      } else {
-        startAutoPlay();
-      }
+    track.style.transform = `translateX(${moveX}px)`;
+  }
+
+  function onDragEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    track.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+
+    if (deltaX < -40) {
+      moveCarousel(1);
+    } else if (deltaX > 40) {
+      moveCarousel(-1);
+    } else {
+      updateCarouselView();
     }
-  }, { passive: true });
+    startAutoPlay();
+  }
 
   container.addEventListener('mouseenter', () => stopAutoPlay());
   container.addEventListener('mouseleave', () => startAutoPlay());
+
+  container.addEventListener('touchstart', onDragStart, { passive: true });
+  container.addEventListener('touchmove', onDragMove, { passive: true });
+  container.addEventListener('touchend', onDragEnd, { passive: true });
+
+  container.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    onDragStart(e);
+  });
+  window.addEventListener('mousemove', onDragMove);
+  window.addEventListener('mouseup', onDragEnd);
 }
 
 
