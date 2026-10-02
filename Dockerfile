@@ -1,35 +1,38 @@
-# Multi-stage Dockerfile for BuchiSapa Full-Stack Restaurant App
+# STAGE 1: Builder Node.js para Vite + Server Express
 FROM node:20-alpine AS builder
-
 WORKDIR /app
-
-# Copy package manifests
 COPY package*.json ./
 RUN npm install
-
-# Copy source code
 COPY . .
-
-# Build Vite frontend, compile HTML partials, and bundle Express server.cjs
 RUN npm run build
 
-# Production runtime stage
-FROM node:20-alpine AS runner
+# STAGE 2: PHP 8.3 Apache para Render
+FROM php:8.3-apache
 
-WORKDIR /app
+# Instalar Node.js y dependencias necesarias
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    unzip \
+    libpq-dev \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && docker-php-ext-install pdo pdo_pgsql \
+    && a2enmod rewrite
 
-ENV NODE_ENV=production
-ENV PORT=3000
+WORKDIR /var/www/html
 
-# Copy built artifacts and production dependencies
-COPY package*.json ./
-RUN npm install --omit=dev
-
+# Copiar archivos compilados y frontend
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/admin ./admin
-COPY --from=builder /app/index.html ./index.html
+COPY --from=builder /app/data ./data
+COPY --from=builder /app/php-admin ./php-admin
+COPY --from=builder /app/server.ts ./server.ts
+COPY --from=builder /app/package*.json ./
 
-EXPOSE 3000
+# Instalar dependencias de producción
+RUN npm install --only=production
+
+EXPOSE 80 3000
 
 CMD ["node", "dist/server.cjs"]

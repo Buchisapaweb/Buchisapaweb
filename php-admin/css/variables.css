@@ -1,0 +1,101 @@
+/* ==========================================================================
+   BUCHISAPA ADMIN - DESIGN TOKENS & VARIABLES
+   Layer: /admin/css/variables.css
+   Modern Luxury Restaurant Executive Dark Theme
+   ========================================================================== */
+
+:root {
+  /* Ultra-Premium Obsidian Canvas & Elevated Surfaces */
+  --bg-main: #07090e;
+  --bg-body-gradient: radial-gradient(circle at 85% 10%, rgba(220, 38, 38, 0.08) 0%, transparent 40%),
+                      radial-gradient(circle at 15% 90%, rgba(59, 130, 246, 0.06) 0%, transparent 45%),
+                      linear-gradient(180deg, #07090e 0%, #0a0d14 100%);
+  --bg-sidebar: rgba(10, 13, 20, 0.88);
+  --bg-topbar: rgba(10, 13, 20, 0.85);
+  --bg-card: rgba(17, 22, 34, 0.78);
+  --bg-card-hover: rgba(24, 31, 48, 0.92);
+  --bg-card-gradient: linear-gradient(145deg, rgba(22, 28, 44, 0.82) 0%, rgba(13, 17, 27, 0.88) 100%);
+  --bg-surface: rgba(15, 20, 31, 0.72);
+  --bg-surface-elevated: rgba(26, 34, 52, 0.86);
+  --bg-input: rgba(11, 15, 24, 0.82);
+
+  /* Refined Micro-Borders & Glass Highlights */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-card: rgba(255, 255, 255, 0.09);
+  --border-card-hover: rgba(255, 255, 255, 0.18);
+  --border-highlight: rgba(255, 255, 255, 0.16);
+  --border-focus: #ef4444;
+  --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* Typography Colors */
+  --text-main: #f8fafc;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+
+  /* Refined Luxury Brand Accents */
+  --accent-red: #ef4444;
+  --accent-red-hover: #dc2626;
+  --accent-red-subtle: rgba(239, 68, 68, 0.14);
+  --accent-red-glow: 0 0 24px rgba(239, 68, 68, 0.35);
+
+  --accent-gold: #f59e0b;
+  --accent-gold-subtle: rgba(245, 158, 11, 0.14);
+  --accent-gold-glow: 0 0 24px rgba(245, 158, 11, 0.35);
+
+  --accent-emerald: #10b981;
+  --accent-emerald-subtle: rgba(16, 185, 129, 0.14);
+  --accent-emerald-glow: 0 0 24px rgba(16, 185, 129, 0.35);
+
+  --accent-cyan: #06b6d4;
+  --accent-cyan-subtle: rgba(6, 182, 212, 0.14);
+  --accent-cyan-glow: 0 0 24px rgba(6, 182, 212, 0.35);
+
+  --accent-blue: #3b82f6;
+  --accent-blue-subtle: rgba(59, 130, 246, 0.14);
+  --accent-blue-glow: 0 0 24px rgba(59, 130, 246, 0.35);
+
+  --accent-purple: #a855f7;
+  --accent-purple-subtle: rgba(168, 85, 247, 0.14);
+  --accent-purple-glow: 0 0 24px rgba(168, 85, 247, 0.35);
+
+  --accent-pink: #ec4899;
+  --accent-pink-subtle: rgba(236, 72, 153, 0.14);
+
+  /* Status Colors */
+  --status-active: #10b981;
+  --status-active-bg: rgba(16, 185, 129, 0.14);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.14);
+  --status-danger: #ef4444;
+  --status-danger-bg: rgba(239, 68, 68, 0.14);
+  --status-info: #06b6d4;
+  --status-info-bg: rgba(6, 182, 212, 0.14);
+
+  /* Layout Dimensions */
+  --sidebar-width: 264px;
+  --header-height: 72px;
+  --bottom-bar-height: 64px;
+
+  /* Border Radii */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows & Elevations */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.7);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-subtle);
+  --shadow-card-hover: 0 12px 32px -4px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--border-highlight);
+
+  /* Fonts & Smooth Transitions */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}

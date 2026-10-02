@@ -1,0 +1,657 @@
+        <!-- ====================================================================
+             6. VISTA TICKET (EMISIÓN Y BOLETAS TÉRMICAS 80MM)
+             ==================================================================== -->
+        <style>
+          /* ESTILOS PREMIUM GLASSMORPHIC PARA EL PERSONALIZADOR EN EL MÓDULO DE TICKETS */
+          .admin-client-card {
+            background: linear-gradient(145deg, rgba(23, 32, 54, 0.95), rgba(13, 18, 30, 0.98));
+            border: 1.5px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.08);
+            color: #f8fafc;
+            backdrop-filter: blur(14px);
+            transition: all 0.2s ease;
+          }
+          .admin-client-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          }
+          .admin-client-card-title {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+          }
+          .admin-client-card-category {
+            font-size: 11px;
+            font-weight: 800;
+            color: #34d399;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 4px;
+            display: inline-block;
+          }
+          .admin-client-card-price {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #10b981;
+            margin-top: 4px;
+            text-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+          }
+          .admin-client-card-unit-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #94a3b8;
+            display: block;
+          }
+          .admin-client-section-box {
+            background: rgba(10, 15, 26, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-top: 14px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+          }
+          .admin-client-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+          }
+          .admin-client-section-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          .admin-client-section-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+          }
+          .admin-client-section-icon.pink {
+            background: rgba(244, 63, 94, 0.2);
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            color: #fb7185;
+          }
+          .admin-client-section-icon.yellow {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+          }
+          .admin-client-section-h3 {
+            margin: 0;
+            font-size: 14.5px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+          }
+          .admin-client-section-subtitle {
+            margin: 3px 0 0 0;
+            font-size: 11.5px;
+            color: #94a3b8;
+            font-weight: 500;
+          }
+          .admin-client-section-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+          }
+          .admin-preset-btn {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 5px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s ease;
+            border: 1.5px solid transparent;
+          }
+          .admin-preset-btn.teal {
+            border-color: rgba(16, 185, 129, 0.45);
+            background: rgba(16, 185, 129, 0.16);
+            color: #34d399;
+          }
+          .admin-preset-btn.teal:hover {
+            background: rgba(16, 185, 129, 0.28);
+            border-color: #10b981;
+          }
+          .admin-preset-btn.yellow {
+            border-color: rgba(245, 158, 11, 0.45);
+            background: rgba(245, 158, 11, 0.16);
+            color: #fbbf24;
+          }
+          .admin-preset-btn.yellow:hover {
+            background: rgba(245, 158, 11, 0.28);
+            border-color: #f59e0b;
+          }
+          .admin-preset-btn.outline {
+            border-color: rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+          }
+          .admin-preset-btn.outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+          }
+          .admin-client-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+          }
+          .admin-client-toggle-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.18s ease;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            background: rgba(19, 27, 44, 0.85);
+            color: #cbd5e1;
+          }
+          .admin-client-toggle-card:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(25, 36, 58, 0.95);
+          }
+          .admin-client-toggle-card.active {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.14);
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.15);
+          }
+          .admin-client-item-left {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+          }
+          .admin-client-item-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.18s ease;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            background: rgba(11, 16, 28, 0.9);
+            flex-shrink: 0;
+          }
+          .admin-client-toggle-card.active .admin-client-item-checkbox {
+            border-color: #10b981;
+            background: #10b981;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+          }
+          .admin-client-item-check {
+            display: none;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1;
+          }
+          .admin-client-toggle-card.active .admin-client-item-check {
+            display: block;
+          }
+          .admin-client-item-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #cbd5e1;
+          }
+          .admin-client-toggle-card.active .admin-client-item-name {
+            font-weight: 800;
+            color: #ffffff;
+          }
+          .admin-client-item-badge {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+          }
+          .admin-client-toggle-card.active .admin-client-item-badge {
+            font-weight: 800;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+          }
+        </style>
+        <section class="admin-view" id="view-ticket">
+
+          <!-- CONTENEDOR 1: LISTADO DE TICKETS Y MÉTRICAS -->
+          <div id="ticket-list-section">
+            <div class="section-panel ticket-main-panel">
+              
+              <!-- Cabecera de la Vista -->
+              <div class="ticket-header-block">
+                <div class="ticket-title-group">
+                  <div class="ticket-title-badge">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    <span>Módulo de Comprobantes</span>
+                  </div>
+                  <h3 class="ticket-view-title">Emisión y Control de Tickets</h3>
+                  <p class="ticket-view-subtitle">Comprobantes oficiales de venta, comandas de cocina y reimpresión térmica en 80mm.</p>
+                </div>
+                
+                <div class="ticket-header-actions">
+                  <button type="button" class="btn-ticket-secondary" onclick="window.clearAllTicketsPrompt()" style="color: #f87171; border-color: rgba(239, 68, 68, 0.35);" title="Borrar tickets anteriores">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <span>Limpiar Historial</span>
+                  </button>
+                  <button type="button" class="btn-ticket-secondary" onclick="window.testThermalPrinter()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    <span>Probar Impresora</span>
+                  </button>
+                  <button type="button" class="btn-ticket-primary" onclick="window.openNewTicketModal()">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                    <span>Emitir Ticket Rápido</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Métricas de Tickets Centradas y Estilizadas -->
+              <div class="ticket-metrics-grid">
+                <div class="ticket-stat-card card-orange">
+                  <div class="ticket-stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/></svg>
+                  </div>
+                  <span class="ticket-stat-label">TICKETS EMITIDOS HOY</span>
+                  <span class="ticket-stat-number" id="ticket-metric-count">0</span>
+                  <span class="ticket-stat-desc">Comprobantes generados</span>
+                </div>
+
+                <div class="ticket-stat-card card-green">
+                  <div class="ticket-stat-icon">
+                    <span class="ticket-soles-icon">S/</span>
+                  </div>
+                  <span class="ticket-stat-label">TOTAL FACTURADO</span>
+                  <span class="ticket-stat-number" id="ticket-metric-total">S/ 0.00</span>
+                  <span class="ticket-stat-desc">Ventas con comprobante</span>
+                </div>
+              </div>
+
+              <!-- Filtros y Búsqueda de Tickets Adaptativos -->
+              <div class="ticket-filters-wrapper">
+                <div class="ticket-search-box">
+                  <svg class="ticket-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input type="text" id="ticket-search-input" class="ticket-search-input" placeholder="Buscar por número (ej. #1132) o cliente..." oninput="window.filterTickets()">
+                </div>
+
+                <!-- Selectores Desplegables Sucesivos Hacia Abajo (Custom In-Page Dropdowns) -->
+                <div class="ticket-custom-selects-grid">
+                  
+                  <!-- Selector 1: Tipo de Pedido -->
+                  <div class="custom-dropdown-container" id="dropdown-ticket-type">
+                    <label class="custom-dropdown-label">🛵 TIPO DE PEDIDO</label>
+                    <button type="button" class="custom-dropdown-trigger" onclick="window.toggleCustomDropdown('dropdown-ticket-type', event)">
+                      <div class="custom-dropdown-selected-val">
+                        <span class="dropdown-val-icon" id="type-dropdown-current-icon">✨</span>
+                        <span class="dropdown-val-text" id="type-dropdown-current-text">Todos los Tipos</span>
+                      </div>
+                      <svg class="dropdown-chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    
+                    <div class="custom-dropdown-menu">
+                      <div class="custom-dropdown-item is-selected" data-value="todos" onclick="window.selectCustomDropdownOption('type', 'todos', '✨', 'Todos los Tipos')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">✨</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Todos los Tipos</span>
+                            <span class="dropdown-item-sub">Ver todos los comprobantes</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="delivery" onclick="window.selectCustomDropdownOption('type', 'delivery', '🛵', 'Delivery')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">🛵</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Delivery</span>
+                            <span class="dropdown-item-sub">Pedidos con motorizado</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="recojo" onclick="window.selectCustomDropdownOption('type', 'recojo', '🛍️', 'Recojo')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">🛍️</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Recojo</span>
+                            <span class="dropdown-item-sub">Para llevar en local</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="salon" onclick="window.selectCustomDropdownOption('type', 'salon', '🍽️', 'Salón')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">🍽️</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Salón</span>
+                            <span class="dropdown-item-sub">Consumo en mesa local</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Selector 2: Método de Pago -->
+                  <div class="custom-dropdown-container" id="dropdown-ticket-payment">
+                    <label class="custom-dropdown-label">💳 MÉTODO DE PAGO</label>
+                    <button type="button" class="custom-dropdown-trigger" onclick="window.toggleCustomDropdown('dropdown-ticket-payment', event)">
+                      <div class="custom-dropdown-selected-val">
+                        <span class="dropdown-val-icon" id="payment-dropdown-current-icon">⚡</span>
+                        <span class="dropdown-val-text" id="payment-dropdown-current-text">Todos los Pagos</span>
+                      </div>
+                      <svg class="dropdown-chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    
+                    <div class="custom-dropdown-menu">
+                      <div class="custom-dropdown-item is-selected" data-value="todos" onclick="window.selectCustomDropdownOption('payment', 'todos', '⚡', 'Todos los Pagos')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">⚡</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Todos los Pagos</span>
+                            <span class="dropdown-item-sub">Cualquier forma de pago</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="efectivo" onclick="window.selectCustomDropdownOption('payment', 'efectivo', '💵', 'Efectivo')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">💵</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Efectivo</span>
+                            <span class="dropdown-item-sub">Moneda física en caja</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="yape" onclick="window.selectCustomDropdownOption('payment', 'yape', '📱', 'Yape / Plin')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">📱</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Yape / Plin</span>
+                            <span class="dropdown-item-sub">Billeteras digitales móviles</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+
+                      <div class="custom-dropdown-item" data-value="tarjeta" onclick="window.selectCustomDropdownOption('payment', 'tarjeta', '💳', 'Tarjeta POS')">
+                        <div class="dropdown-item-content">
+                          <span class="dropdown-item-icon">💳</span>
+                          <div class="dropdown-item-texts">
+                            <span class="dropdown-item-title">Tarjeta POS</span>
+                            <span class="dropdown-item-sub">Débito / Crédito Niubiz</span>
+                          </div>
+                        </div>
+                        <span class="dropdown-item-check">✓</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Inputs ocultos sincronizados para estado -->
+                <input type="hidden" id="ticket-filter-type" value="todos">
+                <input type="hidden" id="ticket-filter-payment" value="todos">
+              </div>
+
+              <!-- Vista de Tickets en Tarjetas para Móvil -->
+              <div class="ticket-cards-mobile-view" id="tickets-cards-container">
+                <!-- Se inyecta dinámicamente vía tickets.js -->
+              </div>
+
+              <!-- Tabla de Tickets Emitidos para Escritorio -->
+              <div class="ticket-table-desktop-view">
+                <table class="admin-table ticket-data-table">
+                  <thead>
+                    <tr>
+                      <th>N° TICKET / FOLIO</th>
+                      <th>FECHA &amp; HORA</th>
+                      <th>CLIENTE</th>
+                      <th>TIPO</th>
+                      <th>MÉTODO DE PAGO</th>
+                      <th>ITEMS</th>
+                      <th>TOTAL</th>
+                      <th>ESTADO</th>
+                      <th style="text-align: right;">ACCIONES</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tickets-table-body">
+                    <!-- Render dinámico vía scripts -->
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- CONTENEDOR 2: FORMULARIO EN PÁGINA DE EMISIÓN DE TICKET -->
+          <div id="ticket-form-page-section" class="admin-form-page-container" style="display: none;">
+            <div class="form-page-header">
+              <button type="button" class="btn-back-page" onclick="window.closeTicketViews()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                <span>Volver a Tickets</span>
+              </button>
+              <div class="form-page-title-group">
+                <h3 class="form-page-title">+ Emitir Nuevo Ticket Rápido</h3>
+                <p class="form-page-subtitle">Genera comprobantes directos de venta en delivery o salón.</p>
+              </div>
+            </div>
+
+            <form id="new-ticket-form">
+              <div class="form-card-panel" style="max-width: 680px; margin: 0 auto;">
+                <div class="form-group">
+                  <label class="form-label" for="ticket-form-customer">Nombre del Cliente *</label>
+                  <input type="text" class="form-input" id="ticket-form-customer" required placeholder="Ej. Carlos Paredes" value="Cliente">
+                </div>
+
+                <!-- Selector Visual Llamativo: Tipo de Pedido (Salón, Delivery o Recojo en Local) - 1 POR FILA -->
+                <div class="form-group" style="margin-top: 6px;">
+                  <label class="form-label">Tipo de Pedido *</label>
+                  <input type="hidden" id="ticket-form-type" value="salon" required>
+                  <div class="ticket-visual-option-grid" id="ticket-form-type-selector" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                    <div class="ticket-visual-card is-selected" data-value="salon" onclick="window.selectTicketFormType('salon', this)">
+                      <div class="ticket-visual-card-icon">🍽️</div>
+                      <div class="ticket-visual-card-info">
+                        <span class="ticket-visual-card-title">Salón</span>
+                        <span class="ticket-visual-card-sub">Consumo en mesa</span>
+                      </div>
+                      <div class="ticket-visual-check">✓</div>
+                    </div>
+
+                    <div class="ticket-visual-card" data-value="delivery" onclick="window.selectTicketFormType('delivery', this)">
+                      <div class="ticket-visual-card-icon">🛵</div>
+                      <div class="ticket-visual-card-info">
+                        <span class="ticket-visual-card-title">Delivery</span>
+                        <span class="ticket-visual-card-sub">Envío a domicilio</span>
+                      </div>
+                      <div class="ticket-visual-check">✓</div>
+                    </div>
+
+                    <div class="ticket-visual-card" data-value="recojo" onclick="window.selectTicketFormType('recojo', this)">
+                      <div class="ticket-visual-card-icon">🛍️</div>
+                      <div class="ticket-visual-card-info">
+                        <span class="ticket-visual-card-title">Recojo</span>
+                        <span class="ticket-visual-card-sub">Para llevar en local</span>
+                      </div>
+                      <div class="ticket-visual-check">✓</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección de Campos Específicos para Delivery (Teléfono/WhatsApp, Dirección, Costo) - OBLIGATORIOS -->
+                <div id="ticket-form-delivery-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.4); border-radius: 14px; padding: 16px; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 1.25rem;">🛵</span>
+                      <strong style="color: #34d399; font-size: 0.95rem;">Datos de Entrega y Delivery</strong>
+                    </div>
+                    <span style="font-size: 0.72rem; font-weight: 800; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 2px 8px; border-radius: 6px;">OBLIGATORIOS</span>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" for="ticket-form-phone" style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #22c55e; font-size: 1.1rem;">📱</span>
+                        <span style="font-weight: 800; color: #ffffff;">Teléfono / WhatsApp *</span>
+                      </span>
+                      <span style="font-size: 0.75rem; color: #f87171; font-weight: 700;">Requerido</span>
+                    </label>
+                    <input type="tel" class="form-input" id="ticket-form-phone" placeholder="Ej. 987654321" style="border-color: rgba(34, 197, 94, 0.4); font-weight: 700; font-size: 1rem;">
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" for="ticket-form-address" style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #38bdf8; font-size: 1.1rem;">📍</span>
+                        <span style="font-weight: 800; color: #ffffff;">Dirección de Entrega / Referencia *</span>
+                      </span>
+                      <span style="font-size: 0.75rem; color: #f87171; font-weight: 700;">Requerido</span>
+                    </label>
+                    <input type="text" class="form-input" id="ticket-form-address" placeholder="Ej. Av. Nicolás de Piérola 425 - Santa Clara" style="font-weight: 600;">
+                  </div>
+
+                  <!-- Campo Independiente de Costo de Delivery -->
+                  <div class="form-group" id="ticket-form-delivery-fee-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="ticket-form-delivery-fee" style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="font-weight: 800; color: #ffffff;">Costo de Envío / Delivery (S/) *</span>
+                      <span style="font-size: 0.75rem; color: #f87171; font-weight: 700;">Requerido</span>
+                    </label>
+                    <input type="number" step="0.5" class="form-input" id="ticket-form-delivery-fee" min="0" value="5.00" placeholder="0.00" oninput="window.updateTicketFormTotal()" style="font-weight: 700; border-color: rgba(16, 185, 129, 0.4);">
+                  </div>
+                </div>
+
+                <!-- Selector Visual Llamativo: Método de Pago -->
+                <div class="form-group" style="margin-top: 10px;">
+                  <label class="form-label">Método de Pago *</label>
+                  <input type="hidden" id="ticket-form-payment" value="Efectivo" required>
+                  <div class="ticket-payment-badges-grid" id="ticket-form-payment-selector">
+                    <button type="button" class="ticket-payment-badge is-selected" data-value="Efectivo" onclick="window.selectTicketFormPayment('Efectivo', this)">
+                      <span class="payment-badge-icon">💵</span>
+                      <span class="payment-badge-text">Efectivo</span>
+                    </button>
+                    <button type="button" class="ticket-payment-badge" data-value="Yape" onclick="window.selectTicketFormPayment('Yape', this)">
+                      <span class="payment-badge-icon">📱</span>
+                      <span class="payment-badge-text">Yape</span>
+                    </button>
+                    <button type="button" class="ticket-payment-badge" data-value="Plin" onclick="window.selectTicketFormPayment('Plin', this)">
+                      <span class="payment-badge-icon">🟣</span>
+                      <span class="payment-badge-text">Plin</span>
+                    </button>
+                    <button type="button" class="ticket-payment-badge" data-value="Tarjeta POS" onclick="window.selectTicketFormPayment('Tarjeta POS', this)">
+                      <span class="payment-badge-icon">💳</span>
+                      <span class="payment-badge-text">Tarjeta POS</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 1. Selección por Categoría del Admin de Productos (MAYÚSCULAS SIN EMOJIS) -->
+                <div class="form-group" style="margin-top: 14px;">
+                  <label class="form-label" for="ticket-form-category-select">CATEGORÍA DE CARTA *</label>
+                  <select class="form-select" id="ticket-form-category-select" onchange="window.onTicketCategoryChange(this.value)">
+                    <!-- Cargado en mayúsculas sin emojis -->
+                  </select>
+                </div>
+
+                <!-- 2. Catálogo Visual de Productos de la Categoría Seleccionada -->
+                <div class="form-group" style="margin-top: 12px;">
+                  <label class="form-label">PRODUCTOS DISPONIBLES</label>
+                  <div class="ticket-prods-grid" id="ticket-products-grid-container">
+                    <!-- Se inyectan las tarjetas de productos con imagen, ID, categoría, nombre, precio y botón agregar -->
+                  </div>
+                </div>
+
+                <!-- 3. Lista Dinámica de Productos Agregados al Ticket (con salsas, acompañamientos y stepper) -->
+                <div class="form-group" style="margin-top: 18px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="form-label" style="margin-bottom: 0; font-weight: 800;">PRODUCTOS AGREGADOS AL TICKET *</label>
+                    <span class="badge badge-purple" id="ticket-items-count-badge">0 items</span>
+                  </div>
+                  <div id="ticket-items-list-container" class="ticket-items-cart-container">
+                    <!-- Renderizado dinámico de items en el ticket -->
+                  </div>
+                </div>
+
+                <!-- Notas Generales Opcionales (Solo para Delivery) -->
+                <div class="form-group" id="ticket-form-notes-group" style="display: none; margin-top: 14px;">
+                  <label class="form-label" for="ticket-form-notes">Notas / Indicaciones Generales (Opcional)</label>
+                  <input type="text" class="form-input" id="ticket-form-notes" placeholder="Ej. Para llevar bien embalado, enviar servilletas, etc.">
+                </div>
+
+                <div class="modal-total-box">
+                  <span class="text-white-bold">Total a Cobrar:</span>
+                  <span class="modal-total-display" id="ticket-form-total-display">S/ 0.00</span>
+                </div>
+
+                <div class="form-page-actions">
+                  <button type="button" class="btn btn-secondary" onclick="window.closeTicketViews()">Cancelar</button>
+                  <button type="button" class="btn btn-emerald-order" onclick="window.submitTicketForm('order')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <span>Hacer Pedido</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- CONTENEDOR 3: VISTA EN PÁGINA DEL TICKET TÉRMICO (80MM) -->
+          <div id="ticket-preview-page-section" class="admin-form-page-container" style="display: none;">
+            <div class="form-page-header" style="flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 16px; margin-bottom: 20px;">
+              <button type="button" class="btn-back-page" onclick="window.closeTicketViews()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                <span>Volver a Lista</span>
+              </button>
+              <div class="form-page-title-group" style="text-align: center; flex: 1;">
+                <h3 class="form-page-title" id="ticket-preview-page-title" style="margin: 0; font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em;">Ticket de Venta #00001</h3>
+                <p class="form-page-subtitle" id="ticket-preview-page-subtitle" style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.85rem;">Comprobante oficial de venta para el cliente</p>
+              </div>
+            </div>
+
+            <!-- Botón de Impresión Principal Elegante y Centrado -->
+            <div style="display: flex; justify-content: center; margin-bottom: 20px; width: 100%;">
+              <button type="button" class="btn btn-primary btn-lg-bold" id="btn-print-preview-sale" onclick="window.printSaleTicket()" style="width: 100%; max-width: 360px; padding: 14px 20px; font-size: 1rem; font-weight: 800; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.35); cursor: pointer;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                <span>Imprimir Ticket de Venta</span>
+              </button>
+              <button type="button" class="btn btn-emerald-order btn-lg-bold" id="btn-print-preview-kitchen" onclick="window.printKitchenTicket()" style="display: none; width: 100%; max-width: 360px; padding: 14px 20px; font-size: 1rem; font-weight: 800; border-radius: 12px; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35); cursor: pointer;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                <span>Imprimir Ticket de Cocina</span>
+              </button>
+            </div>
+
+            <div style="display: flex; justify-content: center; padding: 8px 0 24px 0;">
+              <div class="thermal-ticket-container" id="thermal-receipt-render-target" style="width: 100%; max-width: 360px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border-radius: 8px; overflow: hidden;">
+                <!-- Renderizado dinámico vía scripts -->
+              </div>
+            </div>
+          </div>
+
+        </section>
+
