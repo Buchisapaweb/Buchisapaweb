@@ -475,24 +475,17 @@
         }
         totalFormattedLabel = `S/ ${totalSalesSoles.toFixed(0)}`;
       } else {
-        // Enlace proporcional al catálogo oficial de platos cuando no hay ventas
-        const catalogCounts = {
-          'hamburguesas': 12, 'salchipapas': 7, 'platos-amazonicos': 7,
-          'refrescos': 5, 'adicional': 5, 'bebidas': 5, 'promociones': 4, 'broaster': 4, 'infusiones': 3, 'alitas': 2
-        };
-        const totalCatalogProds = 54;
+        // Estado limpio cuando no hay ventas aún
         chartData = CATEGORIES_DEF.map(cat => {
-          const catProds = catalogCounts[cat.key] || 3;
-          const pct = Math.round((catProds / totalCatalogProds) * 100);
           return {
             label: cat.label,
-            value: pct,
+            value: 0,
             soles: 0,
             count: 0,
             color: cat.color
           };
         });
-        totalFormattedLabel = '100%';
+        totalFormattedLabel = 'S/ 0.00';
       }
     } else {
       centerSubtitle = 'Canal';
@@ -523,14 +516,14 @@
         totalFormattedLabel = `S/ ${totalCanalSoles.toFixed(0)}`;
       } else {
         chartData = [
-          { label: '🛵 Delivery', value: 50, soles: 0, count: 0, color: '#00f0ff' },
-          { label: '🍽️ Local / Salón', value: 50, soles: 0, count: 0, color: '#00ff88' }
+          { label: '🛵 Delivery', value: 0, soles: 0, count: 0, color: '#00f0ff' },
+          { label: '🍽️ Local / Salón', value: 0, soles: 0, count: 0, color: '#00ff88' }
         ];
-        totalFormattedLabel = '100%';
+        totalFormattedLabel = 'S/ 0.00';
       }
     }
 
-    const totalVal = chartData.reduce((s, i) => s + i.value, 0) || 100;
+    const totalVal = chartData.reduce((s, i) => s + i.value, 0);
     const centerX = width / 2;
     const centerY = height / 2;
     const radius = Math.min(centerX, centerY) - 8;
@@ -545,27 +538,41 @@
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    let startAngle = -Math.PI / 2;
-
-    chartData.forEach(item => {
-      const sliceAngle = (item.value / totalVal) * (Math.PI * 2);
-      const endAngle = startAngle + sliceAngle;
-
+    if (totalVal === 0) {
+      // Anillo base sutil cuando no hay ventas
       ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-      ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.arc(centerX, centerY, innerRadius, Math.PI * 2, 0, true);
       ctx.closePath();
-
-      ctx.fillStyle = item.color;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
       ctx.fill();
-
-      // Separador elegante entre segmentos
-      ctx.strokeStyle = '#120b24';
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.5;
       ctx.stroke();
+    } else {
+      let startAngle = -Math.PI / 2;
 
-      startAngle = endAngle;
-    });
+      chartData.forEach(item => {
+        if (item.value <= 0) return;
+        const sliceAngle = (item.value / totalVal) * (Math.PI * 2);
+        const endAngle = startAngle + sliceAngle;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+        ctx.closePath();
+
+        ctx.fillStyle = item.color;
+        ctx.fill();
+
+        // Separador elegante entre segmentos
+        ctx.strokeStyle = '#120b24';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        startAngle = endAngle;
+      });
+    }
 
     // Texto Central
     ctx.fillStyle = '#ffffff';

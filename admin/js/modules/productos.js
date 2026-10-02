@@ -91,7 +91,40 @@
     const gridContainer = document.getElementById('products-grid-container');
     const tableBody = document.getElementById('products-table-body');
     const state = window.AdminState = window.AdminState || {};
+
+    // Auto-recuperación si state.filteredProducts o state.allProducts no se han inicializado
+    if (!state.allProducts || state.allProducts.length === 0) {
+      state.allProducts = (typeof window.getFallbackProducts === 'function')
+        ? window.getFallbackProducts()
+        : (state.defaultSignatureProducts || []);
+    }
+
+    if (!state.filteredProducts || (state.filteredProducts.length === 0 && (!state.currentCategory || state.currentCategory === 'todos') && !state.searchQuery)) {
+      state.filteredProducts = [...state.allProducts];
+    }
+
     const prods = state.filteredProducts || [];
+
+    const safeEscape = (str) => {
+      if (window.AdminUtils && typeof window.AdminUtils.escapeHtml === 'function') {
+        return window.AdminUtils.escapeHtml(str);
+      }
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    };
+
+    const safeFormatSoles = (val) => {
+      if (window.AdminUtils && typeof window.AdminUtils.formatSoles === 'function') {
+        return window.AdminUtils.formatSoles(val);
+      }
+      return `S/ ${parseFloat(val || 0).toFixed(2)}`;
+    };
+
+    const safeFormatCat = (catId) => {
+      if (window.AdminUtils && typeof window.AdminUtils.formatCategoryName === 'function') {
+        return window.AdminUtils.formatCategoryName(catId);
+      }
+      return String(catId || 'General').toUpperCase();
+    };
 
     if (gridContainer) {
       if (prods.length === 0) {
@@ -107,11 +140,11 @@
           const imgUrl = prod.image || '/imagenes/portada/Portada1E.webp';
           const prodCode = getProductCode(prod, idx);
           const catCode = getCategoryCode(prod.category_id);
-          const catName = window.AdminUtils.formatCategoryName(prod.category_id);
+          const catName = safeFormatCat(prod.category_id);
           return `
             <div class="product-card ${!isAvail ? 'unavailable' : ''}">
               <div class="product-card-img-wrap">
-                <img src="${imgUrl}" alt="${window.AdminUtils.escapeHtml(prod.name)}" class="product-card-img" loading="lazy">
+                <img src="${imgUrl}" alt="${safeEscape(prod.name)}" class="product-card-img" loading="lazy">
                 <span class="product-badge-pill" style="left: 12px; right: auto; background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(239,68,68,0.4); color: #f87171; font-weight: 800; letter-spacing: 0.5px;">ID: ${prodCode}</span>
               </div>
               <div class="product-card-body">
@@ -119,11 +152,11 @@
                   <span style="font-family: monospace; font-weight: 800; color: #f87171; background: rgba(239, 68, 68, 0.1); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.25); font-size: 0.72rem;">[${catCode}]</span>
                   <span>${catName}</span>
                 </span>
-                <h4 class="product-card-title">${window.AdminUtils.escapeHtml(prod.name)}</h4>
-                <p class="product-card-desc">${window.AdminUtils.escapeHtml(prod.description || '')}</p>
+                <h4 class="product-card-title">${safeEscape(prod.name)}</h4>
+                <p class="product-card-desc">${safeEscape(prod.description || '')}</p>
                 <div class="product-card-footer">
                   <div>
-                    <span class="product-price-tag">${window.AdminUtils.formatSoles(prod.price)}</span>
+                    <span class="product-price-tag">${safeFormatSoles(prod.price)}</span>
                     <div class="product-stock-tag">Stock: ${prod.stock ?? 25} un.</div>
                   </div>
                   <div class="product-actions">
@@ -147,7 +180,7 @@
         const isAvail = prod.available !== false;
         const prodCode = getProductCode(prod, idx);
         const catCode = getCategoryCode(prod.category_id);
-        const catName = window.AdminUtils.formatCategoryName(prod.category_id);
+        const catName = safeFormatCat(prod.category_id);
         return `
           <tr>
             <td>
@@ -156,14 +189,14 @@
             <td>
               <div style="display: flex; align-items: center; gap: 12px;">
                 <img src="${prod.image || '/imagenes/portada/Portada1E.webp'}" alt="" style="width: 36px; height: 36px; border-radius: var(--radius-sm); object-fit: cover;">
-                <span style="font-weight: 700; color: #fff;">${window.AdminUtils.escapeHtml(prod.name)}</span>
+                <span style="font-weight: 700; color: #fff;">${safeEscape(prod.name)}</span>
               </div>
             </td>
             <td>
               <span style="font-family: monospace; font-weight: 700; color: rgba(255, 255, 255, 0.7); margin-right: 4px;">[${catCode}]</span>
               <span>${catName}</span>
             </td>
-            <td style="font-weight: 800; color: var(--accent-orange);">${window.AdminUtils.formatSoles(prod.price)}</td>
+            <td style="font-weight: 800; color: var(--accent-orange);">${safeFormatSoles(prod.price)}</td>
             <td>${prod.stock ?? 25} un.</td>
             <td>
               <span class="badge ${isAvail ? 'badge-green' : 'badge-red'}">
@@ -209,27 +242,25 @@
 
   // Default and Custom Categories Management with 4-Digit Unique Codes
   const DEFAULT_CATEGORIES = [
-    { id: 'alitas', code: '1001', slug: 'alitas', name: 'ALITAS' },
-    { id: 'bebidas', code: '1002', slug: 'bebidas', name: 'BEBIDAS' },
-    { id: 'broaster', code: '1003', slug: 'broaster', name: 'BROASTER' },
-    { id: 'hamburguesas', code: '1004', slug: 'hamburguesas', name: 'HAMBURGUESAS' },
-    { id: 'infusiones', code: '1005', slug: 'infusiones', name: 'INFUSIONES' },
-    { id: 'platos-amazonicos', code: '1006', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS' },
-    { id: 'refrescos', code: '1007', slug: 'refrescos', name: 'REFRESCOS' },
-    { id: 'salchipapas', code: '1008', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS' },
-    { id: 'promociones', code: '1009', slug: 'promociones', name: 'PROMOCIONES' },
-    { id: 'adicional', code: '1010', slug: 'adicional', name: 'ADICIONAL' }
+    { id: 'alitas', code: '1001', slug: 'alitas', name: 'ALITAS', image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80' },
+    { id: 'bebidas', code: '1002', slug: 'bebidas', name: 'BEBIDAS', image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80' },
+    { id: 'broaster', code: '1003', slug: 'broaster', name: 'BROASTER', image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80' },
+    { id: 'hamburguesas', code: '1004', slug: 'hamburguesas', name: 'HAMBURGUESAS', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80' },
+    { id: 'infusiones', code: '1005', slug: 'infusiones', name: 'INFUSIONES', image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&auto=format&fit=crop&q=80' },
+    { id: 'platos-amazonicos', code: '1006', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS', image: 'https://images.unsplash.com/photo-1625944525533-473f1a3d54e7?w=600&auto=format&fit=crop&q=80' },
+    { id: 'refrescos', code: '1007', slug: 'refrescos', name: 'REFRESCOS', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80' },
+    { id: 'salchipapas', code: '1008', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS', image: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?w=600&auto=format&fit=crop&q=80' },
+    { id: 'promociones', code: '1009', slug: 'promociones', name: 'PROMOCIONES', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80' },
+    { id: 'adicional', code: '1010', slug: 'adicional', name: 'ADICIONAL', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&auto=format&fit=crop&q=80' }
   ];
 
   function getCategoryCode(catId) {
     if (!catId) return '1001';
     const key = String(catId).toLowerCase().trim();
     if (/^\d{4}$/.test(key)) return key;
-    const found = DEFAULT_CATEGORIES.find(c => c.id === key || c.slug === key || c.code === key);
-    if (found) return found.code;
-    const custom = getCustomCategories();
-    const customFound = custom.find(c => c.id === key || c.code === key || c.slug === key);
-    if (customFound) return customFound.code || customFound.id;
+    const all = getAllCategories();
+    const found = all.find(c => String(c.id).toLowerCase() === key || String(c.slug).toLowerCase() === key || String(c.code) === key || String(c.name).toLowerCase() === key);
+    if (found) return found.code || found.id || '1001';
     return '1001';
   }
 
@@ -277,10 +308,15 @@
 
   function getAllCategories() {
     const state = window.AdminState = window.AdminState || {};
-    if (Array.isArray(state.allCategories) && state.allCategories.length > 0) {
-      return state.allCategories;
-    }
-    return DEFAULT_CATEGORIES;
+    const list = (Array.isArray(state.allCategories) && state.allCategories.length > 0)
+      ? state.allCategories
+      : DEFAULT_CATEGORIES;
+    return [...list].sort((a, b) => {
+      const codeA = parseInt(a.code || a.id, 10) || 9999;
+      const codeB = parseInt(b.code || b.id, 10) || 9999;
+      if (codeA !== codeB) return codeA - codeB;
+      return (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' });
+    });
   }
 
   async function fetchCategories() {
@@ -393,30 +429,173 @@
     }
   });
 
-  function renderCategoryChips() {
-    const container = document.querySelector('.category-filter-chips');
+  // ADMIN CATEGORY FILTER DROPDOWN LOGIC
+  function toggleAdminCategoryFilterDropdown(e) {
+    if (e) e.stopPropagation();
+    const dropdown = document.getElementById('admin-cat-filter-dropdown');
+    const trigger = document.getElementById('admin-cat-select-trigger');
+    if (!dropdown) return;
+
+    const isVisible = dropdown.style.display === 'flex' || dropdown.style.display === 'block';
+    if (isVisible) {
+      closeAdminCategoryFilterDropdown();
+    } else {
+      dropdown.style.display = 'flex';
+      if (trigger) trigger.classList.add('active');
+      renderAdminCategoryDropdownFilterList();
+      setTimeout(() => {
+        const input = document.getElementById('admin-cat-filter-search-input');
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+      }, 100);
+    }
+  }
+
+  function closeAdminCategoryFilterDropdown() {
+    const dropdown = document.getElementById('admin-cat-filter-dropdown');
+    const trigger = document.getElementById('admin-cat-select-trigger');
+    if (dropdown) dropdown.style.display = 'none';
+    if (trigger) trigger.classList.remove('active');
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('admin-cat-select-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      closeAdminCategoryFilterDropdown();
+    }
+  });
+
+  function renderAdminCategoryDropdownFilterList(filterQuery = '') {
+    const container = document.getElementById('admin-cat-dropdown-items-list');
     if (!container) return;
+
+    const state = window.AdminState = window.AdminState || {};
+    const currentCat = state.currentCategory || 'todos';
+    const allCats = getAllCategories();
+    const allProds = state.allProducts || [];
+
+    const q = filterQuery.toLowerCase().trim();
+    const totalProdCount = allProds.length;
+
+    let itemsHtml = '';
+
+    // Item: "Todos los Platos"
+    const isTodosSelected = currentCat === 'todos';
+    if (!q || 'todos los platos'.includes(q) || 'todos'.includes(q) || 'all'.includes(q)) {
+      itemsHtml += `
+        <div class="admin-cat-item ${isTodosSelected ? 'active' : ''}" onclick="window.selectAdminCategoryFilter('todos', 'Todos los Platos', ${totalProdCount})">
+          <div class="admin-cat-item-left">
+            <span class="admin-cat-badge">ALL</span>
+            <span class="admin-cat-name">Todos los Platos</span>
+          </div>
+          <div class="admin-cat-item-right">
+            <span class="admin-cat-prod-count">${totalProdCount} platos</span>
+            ${isTodosSelected ? '<span class="admin-cat-check">✓</span>' : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    // Filtrar categorías por búsqueda (nombre o ID)
+    const filteredCats = allCats.filter(c => {
+      if (!q) return true;
+      const catName = String(c.name || '').toLowerCase();
+      const catCode = String(c.code || c.id || '').toLowerCase();
+      return catName.includes(q) || catCode.includes(q);
+    });
+
+    filteredCats.forEach(c => {
+      const catCode = c.code || c.id;
+      const isSelected = currentCat === c.id || currentCat === c.code || currentCat === c.slug;
+      
+      const activeCatCode = getCategoryCode(c.id);
+      const targetCatClean = String(c.id).toLowerCase().trim();
+      
+      const count = allProds.filter(p => {
+        const pCat = String(p.category_id || p.category || '').toLowerCase().trim();
+        const pCatCode = getCategoryCode(pCat);
+        return pCat === targetCatClean || pCatCode === activeCatCode || pCat.includes(targetCatClean) || targetCatClean.includes(pCat);
+      }).length;
+
+      const safeName = window.AdminUtils ? window.AdminUtils.escapeHtml(c.name) : c.name;
+      const escapedTitle = safeName.replace(/'/g, "\\'");
+
+      itemsHtml += `
+        <div class="admin-cat-item ${isSelected ? 'active' : ''}" onclick="window.selectAdminCategoryFilter('${c.id}', '${escapedTitle}', ${count})">
+          <div class="admin-cat-item-left">
+            <span class="admin-cat-badge">ID: ${catCode}</span>
+            <span class="admin-cat-name">${safeName}</span>
+          </div>
+          <div class="admin-cat-item-right">
+            <span class="admin-cat-prod-count">${count} platos</span>
+            ${isSelected ? '<span class="admin-cat-check">✓</span>' : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    if (!itemsHtml) {
+      itemsHtml = `<div style="padding: 16px; text-align: center; color: #94a3b8; font-size: 12px;">No se encontraron categorías para "${filterQuery}"</div>`;
+    }
+
+    container.innerHTML = itemsHtml;
+  }
+
+  function filterAdminCategoryDropdownList(q) {
+    renderAdminCategoryDropdownFilterList(q);
+  }
+
+  function selectAdminCategoryFilter(catId, catName, count) {
+    const state = window.AdminState = window.AdminState || {};
+    state.currentCategory = catId;
+
+    const titleEl = document.getElementById('admin-cat-selected-title');
+    const countEl = document.getElementById('admin-cat-count-badge');
+
+    if (titleEl) titleEl.textContent = catName;
+    if (countEl) countEl.textContent = `${count} ${count === 1 ? 'Plato' : 'Platos'}`;
+
+    closeAdminCategoryFilterDropdown();
+    applyProductFilters();
+  }
+
+  function renderCategoryChips() {
     const state = window.AdminState = window.AdminState || {};
     const activeCategory = state.currentCategory || 'todos';
-    const cats = getAllCategories();
+    const allCats = getAllCategories();
+    const allProds = state.allProducts || [];
 
-    let html = `<button class="category-chip ${activeCategory === 'todos' ? 'active' : ''}" data-category="todos">Todos los Platos</button>`;
-    cats.forEach(c => {
-      const isActive = activeCategory === c.id || activeCategory === c.code;
-      const codeLabel = c.code || c.id;
-      html += `<button class="category-chip ${isActive ? 'active' : ''}" data-category="${c.id}">${c.name} <span style="opacity: 0.7; font-size: 0.75rem;">(${codeLabel})</span></button>`;
-    });
-    container.innerHTML = html;
+    const titleEl = document.getElementById('admin-cat-selected-title');
+    const countEl = document.getElementById('admin-cat-count-badge');
 
-    // Attach click listeners to chips
-    container.querySelectorAll('.category-chip').forEach(btn => {
-      btn.onclick = () => {
-        container.querySelectorAll('.category-chip').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.currentCategory = btn.getAttribute('data-category') || 'todos';
-        applyProductFilters();
-      };
-    });
+    if (activeCategory === 'todos') {
+      if (titleEl) titleEl.textContent = 'Todos los Platos';
+      if (countEl) countEl.textContent = `${allProds.length} Platos`;
+    } else {
+      const selected = allCats.find(c => c.id === activeCategory || c.code === activeCategory || c.slug === activeCategory);
+      if (selected) {
+        if (titleEl) titleEl.textContent = selected.name;
+        
+        const activeCatCode = getCategoryCode(selected.id);
+        const targetCatClean = String(selected.id).toLowerCase().trim();
+        const count = allProds.filter(p => {
+          const pCat = String(p.category_id || p.category || '').toLowerCase().trim();
+          const pCatCode = getCategoryCode(pCat);
+          return pCat === targetCatClean || pCatCode === activeCatCode || pCat.includes(targetCatClean) || targetCatClean.includes(pCat);
+        }).length;
+
+        if (countEl) countEl.textContent = `${count} ${count === 1 ? 'Plato' : 'Platos'}`;
+      }
+    }
+
+    renderAdminCategoryDropdownFilterList();
+  }
+
+  function scrollCategoryChips(direction) {
+    // Legacy support
   }
 
   // GESTOR DE CATEGORÍAS EN NUEVA PÁGINA REDIRECCIONABLE
@@ -491,6 +670,76 @@
     return `<div class="squircle-icon-badge ${colorClass}">${svgContent}</div>`;
   }
 
+  function updateCategoryFormLivePreview() {
+    const code = document.getElementById('form-cat-page-code')?.value || '1011';
+    const name = document.getElementById('form-cat-page-name')?.value.trim() || 'NOMBRE DE LA CATEGORÍA';
+    const phrase = document.getElementById('form-cat-page-desc')?.value.trim() || '¡Frase promocional y eslogan de los productos de esta categoría!';
+    const image = document.getElementById('form-cat-page-image')?.value.trim() || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80';
+
+    const badgeEl = document.getElementById('cat-preview-badge-id');
+    const titleEl = document.getElementById('cat-preview-title-text');
+    const phraseEl = document.getElementById('cat-preview-phrase-text');
+    const imgEl = document.getElementById('cat-preview-banner-img');
+
+    if (badgeEl) badgeEl.textContent = `ID: ${code}`;
+    if (titleEl) titleEl.textContent = name.toUpperCase();
+    if (phraseEl) phraseEl.textContent = phrase;
+    if (imgEl && image) imgEl.src = image;
+  }
+
+  function setCategoryFormImagePreview(url) {
+    const img = document.getElementById('cat-preview-img');
+    const placeholder = document.getElementById('cat-preview-placeholder');
+    const removeBtn = document.getElementById('btn-remove-cat-img');
+    const input = document.getElementById('form-cat-page-image');
+
+    if (url && url.trim() !== '') {
+      if (img) {
+        img.src = url.trim();
+        img.style.display = 'block';
+      }
+      if (placeholder) placeholder.style.display = 'none';
+      if (removeBtn) removeBtn.style.display = 'inline-flex';
+      if (input && input.value !== url) input.value = url;
+    } else {
+      if (img) {
+        img.src = '';
+        img.style.display = 'none';
+      }
+      if (placeholder) placeholder.style.display = 'block';
+      if (removeBtn) removeBtn.style.display = 'none';
+      if (input) input.value = '';
+      const fileInput = document.getElementById('form-cat-page-image-file');
+      if (fileInput) fileInput.value = '';
+    }
+    updateCategoryFormLivePreview();
+  }
+
+  function handleCategoryImageFileUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const dataUrl = event.target?.result;
+      if (dataUrl) {
+        setCategoryFormImagePreview(dataUrl);
+        const urlInput = document.getElementById('form-cat-page-image');
+        if (urlInput) urlInput.value = dataUrl;
+        window.showToast(`✓ Foto de categoría cargada (${file.name})`, 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleCategoryImageUrlInput(url) {
+    setCategoryFormImagePreview(url ? url.trim() : '');
+  }
+
+  function removeCategoryImage() {
+    setCategoryFormImagePreview('');
+  }
+
   function renderCategoryListInManager() {
     const containers = [
       document.getElementById('categories-full-list-container'),
@@ -515,17 +764,27 @@
         return cat === cId || cat === code;
       }).length;
 
+      const catImg = c.image || '';
+
       return `
         <div class="category-item-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px; transition: all 0.2s ease;">
-          <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
-            <span class="cat-card-code-pill" style="font-family: monospace; font-weight: 800; font-size: 0.8rem; color: #f87171; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); padding: 3px 8px; border-radius: 6px;">ID: ${c.code || c.id}</span>
-            <div style="min-width: 0;">
-              <h4 style="margin: 0; font-size: 0.98rem; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${window.AdminUtils ? window.AdminUtils.escapeHtml(c.name) : c.name}</h4>
-              <span style="font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 2px;">${prodCount} ${prodCount === 1 ? 'plato en carta' : 'platos en carta'}</span>
+          <div style="display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1;">
+            <!-- Thumbnail de Imagen de Categoría -->
+            <div style="width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: rgba(18, 11, 36, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative;">
+              ${catImg ? `<img src="${catImg}" alt="${c.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display: none; font-size: 24px;">📁</span>` : `<span style="font-size: 24px;">📁</span>`}
+            </div>
+
+            <div style="min-width: 0; flex: 1;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                <span class="cat-card-code-pill" style="font-family: monospace; font-weight: 800; font-size: 0.78rem; color: #f87171; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); padding: 2px 7px; border-radius: 6px;">ID: ${c.code || c.id}</span>
+                <h4 style="margin: 0; font-size: 0.96rem; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${window.AdminUtils ? window.AdminUtils.escapeHtml(c.name) : c.name}</h4>
+              </div>
+              <span style="font-size: 0.74rem; color: var(--text-muted); display: block;">${prodCount} ${prodCount === 1 ? 'plato en carta' : 'platos en carta'} ${c.description ? `• <span style="opacity: 0.8;">${window.AdminUtils ? window.AdminUtils.escapeHtml(c.description) : c.description}</span>` : ''}</span>
             </div>
           </div>
+
           <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
-            <button type="button" class="btn-edit-category-sleek" onclick="window.editCategory('${c.id}')" title="Editar categoría" style="padding: 7px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.14); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+            <button type="button" class="btn-edit-category-sleek" onclick="window.editCategory('${c.id}')" title="Editar categoría e imagen" style="padding: 7px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.14); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
               <span>Editar</span>
             </button>
@@ -564,6 +823,8 @@
       setTimeout(() => nameInput.focus(), 100);
     }
     if (descInput) descInput.value = target.description || '';
+    setCategoryFormImagePreview(target.image || '');
+
     if (titleEl) titleEl.textContent = 'Editar Categoría';
     if (subtitleEl) subtitleEl.textContent = `Modificando categoría "${target.name}"`;
     if (btnText) btnText.textContent = 'Actualizar Categoría';
@@ -586,6 +847,8 @@
     if (nameInput) nameInput.value = '';
     if (descInput) descInput.value = '';
     if (codeInput) codeInput.value = getNextCategoryCode();
+    setCategoryFormImagePreview('');
+
     if (titleEl) titleEl.textContent = 'Crear Nueva Categoría';
     if (subtitleEl) subtitleEl.textContent = 'Se activará inmediatamente para agrupar y filtrar platos en la tienda';
     if (btnText) btnText.textContent = 'Guardar Categoría';
@@ -598,11 +861,13 @@
     const pageNameInput = document.getElementById('form-cat-page-name');
     const pageCodeInput = document.getElementById('form-cat-page-code');
     const pageDescInput = document.getElementById('form-cat-page-desc');
+    const pageImageInput = document.getElementById('form-cat-page-image');
 
     const editId = editIdInput ? editIdInput.value.trim() : '';
     const name = pageNameInput ? pageNameInput.value.trim().toUpperCase() : '';
     const code = pageCodeInput ? pageCodeInput.value.trim() : getNextCategoryCode();
     const description = pageDescInput ? pageDescInput.value.trim() : '';
+    const image = pageImageInput ? pageImageInput.value.trim() : '';
 
     if (!name) return;
 
@@ -611,23 +876,23 @@
     try {
       if (isEdit) {
         if (window.AdminApi && typeof window.AdminApi.saveCategory === 'function') {
-          await window.AdminApi.saveCategory({ id: editId, code, name, description }, true, editId);
+          await window.AdminApi.saveCategory({ id: editId, code, name, description, image }, true, editId);
         } else {
           await fetch(`/api/categories/${editId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, name, description })
+            body: JSON.stringify({ code, name, description, image })
           });
         }
         window.showToast(`✓ Categoría "${name}" actualizada con éxito`, 'success');
       } else {
         if (window.AdminApi && typeof window.AdminApi.saveCategory === 'function') {
-          await window.AdminApi.saveCategory({ code, name, description }, false);
+          await window.AdminApi.saveCategory({ code, name, description, image }, false);
         } else {
           await fetch('/api/categories', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, name, description })
+            body: JSON.stringify({ code, name, description, image })
           });
         }
         window.showToast(`✓ Categoría "${name}" creada con éxito`, 'success');
@@ -894,8 +1159,10 @@
     window.showToast(`✓ Crema de la Casa "${name}" guardada con éxito`, 'success');
   }
 
-  // Auto-init category chips on load
+  // Auto-init category chips and products on load
   document.addEventListener('DOMContentLoaded', () => {
+    applyProductFilters();
+    fetchProducts();
     fetchCategories();
     renderCategoryChips();
     renderCategoryDropdownOptions();
@@ -920,6 +1187,11 @@
   window.deleteCategory = deleteCategory;
   window.handleCreateCategorySubmit = handleCreateCategorySubmit;
   window.handleProductImageFileUpload = handleProductImageFileUpload;
+  window.handleCategoryImageFileUpload = handleCategoryImageFileUpload;
+  window.handleCategoryImageUrlInput = handleCategoryImageUrlInput;
+  window.removeCategoryImage = removeCategoryImage;
+  window.setCategoryFormImagePreview = setCategoryFormImagePreview;
+  window.updateCategoryFormLivePreview = updateCategoryFormLivePreview;
 
   window.openAccompanimentModal = openAccompanimentModal;
   window.handleAccompanimentFormSubmit = handleAccompanimentFormSubmit;
@@ -930,5 +1202,12 @@
   window.selectCategoryOption = selectCategoryOption;
   window.closeCategoryDropdown = closeCategoryDropdown;
   window.renderCustomCategoryDropdownList = renderCustomCategoryDropdownList;
+  window.scrollCategoryChips = scrollCategoryChips;
+
+  window.toggleAdminCategoryFilterDropdown = toggleAdminCategoryFilterDropdown;
+  window.closeAdminCategoryFilterDropdown = closeAdminCategoryFilterDropdown;
+  window.renderAdminCategoryDropdownFilterList = renderAdminCategoryDropdownFilterList;
+  window.filterAdminCategoryDropdownList = filterAdminCategoryDropdownList;
+  window.selectAdminCategoryFilter = selectAdminCategoryFilter;
 })();
 

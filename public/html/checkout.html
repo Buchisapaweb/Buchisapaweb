@@ -299,15 +299,6 @@
               </div>
             </div>
 
-            <!-- CAMPO: NOTAS PARA COCINA -->
-            <div class="checkout-input-group" style="margin-top: 10px;">
-              <label for="cust-notes" class="checkout-field-label">
-                <span>Notas para cocina / salsas extras</span>
-                <span class="field-optional">(Opcional)</span>
-              </label>
-              <textarea id="cust-notes" class="checkout-field-control checkout-textarea-control" rows="2" placeholder="Ej: Enviar ají extra de la casa, por favor"></textarea>
-            </div>
-
           </form>
         </div>
       </section>
@@ -358,6 +349,12 @@
     var STORE_FULL_ADDRESS = window.STORE_FULL_ADDRESS;
     var STORE_GPS_URL = window.STORE_GPS_URL;
     var STORE_HOURS = window.STORE_HOURS;
+
+    var loggedCustomer = null;
+    try {
+      var savedCust = localStorage.getItem('buchisapa_customer');
+      if (savedCust) loggedCustomer = JSON.parse(savedCust);
+    } catch (e) {}
 
     function getCleanAddress(raw) {
       if (!raw) return '';
@@ -578,7 +575,7 @@
       const name = document.getElementById('cust-name').value.trim();
       const phone = document.getElementById('cust-phone').value.trim();
       const payment = document.getElementById('cust-payment').value;
-      const notes = document.getElementById('cust-notes').value.trim();
+      const notes = document.getElementById('cust-notes')?.value?.trim() || '';
       const isPickup = (orderType === 'pickup');
       let address = isPickup ? STORE_FULL_ADDRESS : document.getElementById('cust-address').value.trim();
 

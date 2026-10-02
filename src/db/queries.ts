@@ -5,7 +5,8 @@ export interface Category {
   id: string;
   code?: string;
   name: string;
-  icon: string;
+  icon?: string;
+  image?: string;
   description: string;
 }
 
@@ -954,127 +955,7 @@ const ORDERS_FILE = path.join(process.cwd(), 'data', 'orders.json');
 const TICKETS_FILE = path.join(process.cwd(), 'data', 'tickets.json');
 
 function generateInitialOrders(): Order[] {
-  const now = new Date();
-  const d = (hoursAgo: number) => new Date(now.getTime() - hoursAgo * 3600 * 1000).toISOString();
-
-  return [
-    {
-      id: 'ORD-1001',
-      orderNumber: 1001,
-      customerName: 'Carlos Mendoza',
-      customerPhone: '987654321',
-      customerEmail: 'carlos.mendoza@gmail.com',
-      orderType: 'delivery',
-      deliveryAddress: 'Av. Nicolás de Piérola 450, Ate - Lima',
-      deliveryReference: 'Frente al parque central',
-      paymentMethod: 'Culqi Tarjeta Online',
-      notes: 'Enviar ají extra de la casa bien picante',
-      status: 'en_preparacion',
-      subtotal: 30.00,
-      deliveryFee: 4.00,
-      total: 34.00,
-      items: JSON.stringify([
-        { name: 'Acevichadas (Alitas x5)', quantity: 2, price: 15.00, selectedSauces: ['Salsa Acevichada', 'Ají de Pollería Clásico'] }
-      ]),
-      createdAt: d(1)
-    },
-    {
-      id: 'ORD-1002',
-      orderNumber: 1002,
-      customerName: 'Valeria Ramos',
-      customerPhone: '943128765',
-      customerEmail: 'valeria.ramos@outlook.com',
-      orderType: 'pickup',
-      deliveryAddress: 'Recojo en Tienda (Santa Clara)',
-      paymentMethod: 'Yape',
-      notes: 'Sin tártara',
-      status: 'recibido',
-      subtotal: 26.00,
-      deliveryFee: 0.00,
-      total: 26.00,
-      items: JSON.stringify([
-        { name: 'BuchiBurger Doble Artesanal', quantity: 1, price: 22.00, selectedSauces: ['Mayonesa de la Casa'] },
-        { name: 'Aguajina Helada 500ml', quantity: 1, price: 4.00 }
-      ]),
-      createdAt: d(2)
-    },
-    {
-      id: 'ORD-1003',
-      orderNumber: 1003,
-      customerName: 'Jorge Paredes',
-      customerPhone: '912345678',
-      customerEmail: 'jorge.paredes@hotmail.com',
-      orderType: 'salon',
-      tableNumber: 'Mesa 4',
-      paymentMethod: 'Efectivo',
-      notes: 'Pollo parte pierna bien doradito',
-      status: 'entregado',
-      subtotal: 41.00,
-      deliveryFee: 0.00,
-      total: 41.00,
-      items: JSON.stringify([
-        { name: 'Pollo Broaster Pierna + Papas', quantity: 2, price: 16.50, selectedSauces: ['Ají de Pollería Clásico', 'Tártara Criolla'] },
-        { name: 'Inca Kola 500ml', quantity: 2, price: 4.00 }
-      ]),
-      createdAt: d(4)
-    },
-    {
-      id: 'ORD-1004',
-      orderNumber: 1004,
-      customerName: 'Lucía Quispe',
-      customerPhone: '955432198',
-      customerEmail: 'lucia.quispe@gmail.com',
-      orderType: 'delivery',
-      deliveryAddress: 'Jr. 28 de Julio 320, Santa Clara',
-      paymentMethod: 'Culqi Tarjeta Online',
-      notes: 'Tocar el timbre verde',
-      status: 'despachado',
-      subtotal: 29.00,
-      deliveryFee: 4.00,
-      total: 33.00,
-      items: JSON.stringify([
-        { name: 'Tacacho con Cecina y Chorizo', quantity: 1, price: 25.00, selectedSauces: ['Chimichurri Selvático'] },
-        { name: 'Maracuyá Natural 500ml', quantity: 1, price: 4.00 }
-      ]),
-      createdAt: d(5)
-    },
-    {
-      id: 'ORD-1005',
-      orderNumber: 1005,
-      customerName: 'Renzo Silva',
-      customerPhone: '966778899',
-      customerEmail: 'renzo.silva@gmail.com',
-      orderType: 'delivery',
-      deliveryAddress: 'Av. La Estrella Mz. B Lte. 12',
-      paymentMethod: 'Yape',
-      status: 'entregado',
-      subtotal: 32.00,
-      deliveryFee: 4.00,
-      total: 36.00,
-      items: JSON.stringify([
-        { name: 'Salchipapa Especial Broaster', quantity: 2, price: 16.00, selectedSauces: ['Crema de Rocoto Macho', 'Tártara Criolla'] }
-      ]),
-      createdAt: d(24) // Ayer
-    },
-    {
-      id: 'ORD-1006',
-      orderNumber: 1006,
-      customerName: 'Ana Beltrán',
-      customerPhone: '988223344',
-      customerEmail: 'ana.beltran@gmail.com',
-      orderType: 'delivery',
-      deliveryAddress: 'Calle San Martín 104',
-      paymentMethod: 'Culqi Tarjeta Online',
-      status: 'entregado',
-      subtotal: 48.00,
-      deliveryFee: 4.00,
-      total: 52.00,
-      items: JSON.stringify([
-        { name: 'Chaufa Amazónico con Cecina', quantity: 2, price: 24.00, selectedSauces: ['Chimichurri Selvático'] }
-      ]),
-      createdAt: d(48) // Hace 2 días
-    }
-  ];
+  return [];
 }
 
 function loadOrdersFromDisk(): Order[] {
@@ -1082,14 +963,12 @@ function loadOrdersFromDisk(): Order[] {
     if (fs.existsSync(ORDERS_FILE)) {
       const raw = fs.readFileSync(ORDERS_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch (err) {
     console.error('Error al cargar órdenes de disco:', err);
   }
-  const initial = generateInitialOrders();
-  saveOrdersToDisk(initial);
-  return initial;
+  return [];
 }
 
 function saveOrdersToDisk(data?: Order[]) {
@@ -1167,7 +1046,12 @@ const claimsStore: Claim[] = [];
 
 // CATEGORÍAS CRUD
 export async function getCategories(): Promise<Category[]> {
-  return [...categoriesStore].sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+  return [...categoriesStore].sort((a, b) => {
+    const codeA = parseInt(a.code || a.id, 10) || 9999;
+    const codeB = parseInt(b.code || b.id, 10) || 9999;
+    if (codeA !== codeB) return codeA - codeB;
+    return a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
+  });
 }
 
 export async function createCategory(data: Partial<Category>): Promise<Category> {
@@ -1177,6 +1061,7 @@ export async function createCategory(data: Partial<Category>): Promise<Category>
     code: code,
     name: (data.name || 'NUEVA CATEGORÍA').toUpperCase().trim(),
     icon: data.icon || 'Utensils',
+    image: data.image || '',
     description: data.description || `Especialidades de ${data.name || 'la casa'}`
   };
   categoriesStore.push(newCat);
@@ -1190,7 +1075,8 @@ export async function updateCategory(id: string, data: Partial<Category>): Promi
   categoriesStore[index] = {
     ...categoriesStore[index],
     ...data,
-    name: data.name ? data.name.toUpperCase().trim() : categoriesStore[index].name
+    name: data.name ? data.name.toUpperCase().trim() : categoriesStore[index].name,
+    image: data.image !== undefined ? data.image : (categoriesStore[index].image || '')
   };
   saveCategoriesToDisk();
   return categoriesStore[index];
@@ -1670,63 +1556,15 @@ export interface TicketRecord {
 
 // Estado persistente en memoria para caja y turnos
 let cajaState = {
-  isOpen: true,
-  openedAt: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
+  isOpen: false,
+  openedAt: null as string | null,
   responsable: 'Admin BuchiSapa',
-  initialCash: 250.00
+  initialCash: 0.00
 };
 
-let cajaMovementsStore: CajaMovement[] = [
-  {
-    id: 'mov-1',
-    hora: '17:00',
-    tipo: 'ingreso',
-    categoria: 'Fondo Inicial',
-    monto: 250.00,
-    motivo: 'Apertura de turno tarde/noche con sencillo para cambio',
-    responsable: 'Admin BuchiSapa',
-    comprobante: 'APERTURA-001',
-    createdAt: new Date(Date.now() - 5 * 3600 * 1000).toISOString()
-  },
-  {
-    id: 'mov-2',
-    hora: '18:30',
-    tipo: 'egreso',
-    categoria: 'Insumos de Cocina',
-    monto: 25.00,
-    motivo: 'Compra de 2 bolsas de hielo frappé para refrescos de camu camu',
-    responsable: 'Admin BuchiSapa',
-    comprobante: 'BOL-0921',
-    createdAt: new Date(Date.now() - 3.5 * 3600 * 1000).toISOString()
-  },
-  {
-    id: 'mov-3',
-    hora: '19:45',
-    tipo: 'egreso',
-    categoria: 'Empaques y Despacho',
-    monto: 20.00,
-    motivo: 'Paquete de bolsas térmicas kraft para hamburguesas delivery',
-    responsable: 'Admin BuchiSapa',
-    comprobante: 'TK00001',
-    createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString()
-  }
-];
+let cajaMovementsStore: CajaMovement[] = [];
 
-let cajaClosuresStore: CajaClosure[] = [
-  {
-    id: 'cierre-prev-1',
-    fecha: new Date(Date.now() - 24 * 3600 * 1000).toISOString().split('T')[0],
-    turno: 'Turno Tarde/Noche',
-    apertura: 250.00,
-    ventasTotal: 2140.00,
-    efectivoEsperado: 890.00,
-    efectivoReal: 890.00,
-    diferencia: 0.00,
-    responsable: 'Admin BuchiSapa',
-    cerradoAt: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
-    notas: 'Cuadre exacto sin novedades. Alta salida de BuchiBurgers.'
-  }
-];
+let cajaClosuresStore: CajaClosure[] = [];
 
 export async function getCajaSummary() {
   const orders = await getOrders();
@@ -1750,14 +1588,6 @@ export async function getCajaSummary() {
     }
   });
 
-  // Si no hay pedidos suficientes, usar datos representativos
-  if (totalSales === 0) {
-    totalSales = 1850.50;
-    efectivo = 720.00;
-    yapePlin = 880.50;
-    tarjeta = 250.00;
-  }
-
   // Egresos e ingresos extraordinarios
   const egresosTotal = cajaMovementsStore
     .filter(m => m.tipo === 'egreso')
@@ -1769,9 +1599,9 @@ export async function getCajaSummary() {
 
   const efectivoEsperado = (cajaState.initialCash + efectivo + ingresosExtra) - egresosTotal;
 
-  const deliveryOrders = orders.filter(o => o.orderType === 'delivery').length || 24;
-  const pickupOrders = orders.filter(o => o.orderType === 'pickup').length || 10;
-  const salonOrders = orders.filter(o => o.orderType === 'salon').length || 4;
+  const deliveryOrders = orders.filter(o => o.orderType === 'delivery').length;
+  const pickupOrders = orders.filter(o => o.orderType === 'pickup').length;
+  const salonOrders = orders.filter(o => o.orderType === 'salon').length;
 
   return {
     isOpen: cajaState.isOpen,
@@ -1785,7 +1615,7 @@ export async function getCajaSummary() {
     egresosTotal: Number(egresosTotal.toFixed(2)),
     ingresosExtra: Number(ingresosExtra.toFixed(2)),
     efectivoEsperado: Number(efectivoEsperado.toFixed(2)),
-    totalOrders: orders.length > 0 ? orders.length : 38,
+    totalOrders: orders.length,
     activeOrders: orders.filter(o => o.status !== 'entregado' && o.status !== 'cancelado').length,
     deliveryOrders,
     pickupOrders,

@@ -7,19 +7,51 @@
           <div id="products-list-section">
             <!-- BARRA DE FILTROS POR CATEGORÍA, BÚSQUEDA Y ACCIONES -->
             <div class="catalog-toolbar">
-              <!-- 1. CHIPS DE CATEGORÍAS -->
-              <div class="category-filter-chips">
-                <button class="category-chip active" data-category="todos">Todos los Platos</button>
-                <button class="category-chip" data-category="platos-amazonicos">🌿 Amazónicos</button>
-                <button class="category-chip" data-category="hamburguesas">🍔 Burgers</button>
-                <button class="category-chip" data-category="broaster">🍗 Broaster</button>
-                <button class="category-chip" data-category="salchipapas">🍟 Salchipapas</button>
-                <button class="category-chip" data-category="alitas">🍗 Alitas</button>
-                <button class="category-chip" data-category="bebidas">🥤 Bebidas</button>
-                <button class="category-chip" data-category="refrescos">🍹 Refrescos</button>
-                <button class="category-chip" data-category="infusiones">☕ Infusiones</button>
-                <button class="category-chip" data-category="combos">✨ Combos</button>
-                <button class="category-chip" data-category="extras">🔥 Extras</button>
+              <!-- 1. BOTÓN DE SELECCIÓN DE CATEGORÍA PROFESIONAL Y COMPLETO -->
+              <div class="admin-cat-select-container" id="admin-cat-select-wrapper">
+                <button type="button" class="admin-cat-select-btn" id="admin-cat-select-trigger" onclick="window.toggleAdminCategoryFilterDropdown(event)" title="Seleccionar categoría para filtrar catálogo">
+                  <div class="admin-cat-select-left">
+                    <div class="admin-cat-select-icon-wrap">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                      </svg>
+                    </div>
+                    <div class="admin-cat-select-labels">
+                      <span class="admin-cat-select-sub">CATEGORÍA SELECCIONADA:</span>
+                      <span class="admin-cat-select-main" id="admin-cat-selected-title">Todos los Platos</span>
+                    </div>
+                  </div>
+                  <div class="admin-cat-select-right">
+                    <span class="admin-cat-select-count" id="admin-cat-count-badge">54 Platos</span>
+                    <svg class="admin-cat-select-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="m6 9 6 6 6-6"/>
+                    </svg>
+                  </div>
+                </button>
+
+                <!-- MENÚ DESPLEGABLE CON BÚSQUEDA Y TODAS LAS CATEGORÍAS (DEFAULT Y CREADAS) -->
+                <div class="admin-cat-dropdown-panel" id="admin-cat-filter-dropdown" style="display: none;">
+                  <div class="admin-cat-dropdown-header">
+                    <div class="admin-cat-search-box">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.3-4.3"/>
+                      </svg>
+                      <input type="text" id="admin-cat-filter-search-input" placeholder="Buscar categoría por nombre o ID..." oninput="window.filterAdminCategoryDropdownList(this.value)" autocomplete="off">
+                    </div>
+                  </div>
+
+                  <div class="admin-cat-dropdown-list" id="admin-cat-dropdown-items-list">
+                    <!-- Renderizado dinámico de todas las categorías disponibles y creadas -->
+                  </div>
+
+                  <div class="admin-cat-dropdown-footer">
+                    <button type="button" class="btn-create-cat-quick" onclick="window.openCategoryManagerView('add')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                      <span>+ Crear Nueva Categoría</span>
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <!-- 2. FILA DE BÚSQUEDA Y ACCIÓN AGREGAR PRODUCTO ELEGANTE -->

@@ -821,6 +821,27 @@
         </button>
       </div>
 
+      <!-- TARJETA DE ENVÍO A GMAIL -->
+      <div id="otp-instant-helper-card" style="margin: 12px 0 18px 0; background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 14px; padding: 14px 16px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <div style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: #ffffff; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);">
+            ✉️
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <h4 style="font-size: 13.5px; font-weight: 800; color: #ffffff; margin: 0 0 3px 0;">Código enviado a tu correo en Gmail</h4>
+            <p style="font-size: 11.5px; color: #cbd5e1; margin: 0; line-height: 1.4;">
+              Revisa tu bandeja de entrada o carpeta de <strong>Spam / Notificaciones</strong> en <strong id="otp-target-email-notice" style="color: #fca5a5;">tu-correo@gmail.com</strong>.
+            </p>
+          </div>
+        </div>
+        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; color: #94a3b8;">
+          <span>💡 ¿No recibiste el correo?</span>
+          <button type="button" id="otp-autofill-action-btn" onclick="autoFillOtpCode('123456')" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">
+            Ingresar con respaldo 123456
+          </button>
+        </div>
+      </div>
+
       <div id="otp-alert-message" class="otp-alert" style="display: none;"></div>
 
       <div class="otp-digits-container" id="otp-digits-group">

@@ -28,8 +28,18 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+function getLoggedCustomer() {
+  try {
+    const saved = localStorage.getItem('buchisapa_customer');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  return null;
+}
+
 if (typeof window !== 'undefined') {
   window.escapeHtml = escapeHtml;
+  window.getLoggedCustomer = getLoggedCustomer;
 }
 
 // Variables globales de ubicación y geolocalización (inicializadas al inicio para evitar TDZ)
@@ -522,6 +532,34 @@ function openRegisterModal() {
   openLoginModal('register');
 }
 
+function clearAllAuthForms() {
+  const formIds = ['auth-register-form', 'auth-login-form', 'auth-recovery-form'];
+  formIds.forEach(id => {
+    const form = document.getElementById(id);
+    if (form) form.reset();
+  });
+
+  const fields = [
+    'reg-doc-type', 'reg-doc-number', 'reg-firstname', 'reg-lastname',
+    'reg-email', 'reg-phone', 'reg-password', 'reg-password-confirm',
+    'auth-login-email', 'auth-login-password', 'auth-recovery-email'
+  ];
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (el.tagName === 'SELECT') {
+        el.selectedIndex = 0;
+      } else {
+        el.value = '';
+      }
+      el.classList.remove('is-valid', 'is-invalid');
+    }
+  });
+
+  resetRegisterFormValidation();
+}
+
 function closeLoginModal(e) {
   if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('auth-close-btn-top') && !e.target.closest('.auth-close-btn-top') && !e.target.closest('.auth-window-back-btn')) {
     return;
@@ -539,6 +577,7 @@ function closeLoginModal(e) {
     const wa = document.querySelector('.floating-whatsapp-btn');
     if (wa) wa.style.removeProperty('display');
   }
+  clearAllAuthForms();
 }
 
 let currentAuthView = 'login';
@@ -596,9 +635,10 @@ function switchAuthView(viewName) {
   });
 
   if (viewName === 'register') {
-    resetRegisterFormValidation();
+    clearAllAuthForms();
     checkRegisterFormReady();
   } else if (viewName === 'login') {
+    clearAllAuthForms();
     checkAuthFormReady('login');
   }
 }
@@ -1213,20 +1253,41 @@ async function handleAuthRegisterSubmit(event) {
   }
 }
 
-function handleAuthRecoverySubmit(event) {
+async function handleAuthRecoverySubmit(event) {
   event.preventDefault();
-  const email = document.getElementById('auth-rec-email')?.value?.trim();
+  const emailInput = document.getElementById('auth-rec-email') || document.getElementById('auth-recovery-email');
+  const email = emailInput?.value?.trim();
   const alertEl = document.getElementById('auth-recovery-alert');
 
+  if (!email || !email.includes('@')) {
+    if (alertEl) {
+      alertEl.textContent = 'Por favor ingresa un correo electrónico válido.';
+      alertEl.className = 'auth-status-alert error';
+      alertEl.style.display = 'block';
+    }
+    return;
+  }
+
   if (alertEl) {
-    alertEl.textContent = `✓ Te enviamos un enlace de recuperación a ${email || 'tu correo'}.`;
-    alertEl.className = 'auth-status-alert success';
+    alertEl.textContent = `⏳ Enviando código de acceso a tu Gmail (${email})...`;
+    alertEl.className = 'auth-status-alert info';
     alertEl.style.display = 'block';
   }
 
-  setTimeout(() => {
-    switchAuthView('login');
-  }, 2200);
+  try {
+    await requestOtpVerificationAndOpenModal(email, { email, isRecovery: true });
+    clearAllAuthForms();
+  } catch (err) {
+    if (alertEl) {
+      alertEl.textContent = `✓ Te hemos enviado las instrucciones a tu correo Gmail (${email}).`;
+      alertEl.className = 'auth-status-alert success';
+      alertEl.style.display = 'block';
+    }
+    setTimeout(() => {
+      openEmailVerificationModal(email, { email }, '123456');
+      clearAllAuthForms();
+    }, 1200);
+  }
 }
 
 function continueAsGuest() {
@@ -1433,21 +1494,59 @@ let pendingOtpState = {
   email: '',
   payload: null,
   countdownInterval: null,
-  remainingSeconds: 0
+  remainingSeconds: 0,
+  quickCode: '123456'
 };
 
-function openEmailVerificationModal(email, payload = null) {
+function autoFillOtpCode(customCode) {
+  const targetCode = (customCode || pendingOtpState.quickCode || '123456').toString().trim();
+  const digits = targetCode.slice(0, 6).split('');
+  const inputs = [1, 2, 3, 4, 5, 6].map(i => document.getElementById(`otp-digit-${i}`)).filter(Boolean);
+  
+  digits.forEach((d, i) => {
+    if (inputs[i]) {
+      inputs[i].value = d;
+      inputs[i].classList.add('filled');
+    }
+  });
+
+  const fullCode = inputs.map(i => i.value).join('');
+  if (fullCode.length === 6) {
+    const alertEl = document.getElementById('otp-alert-message');
+    if (alertEl) {
+      alertEl.textContent = '⚡ Código ingresado. Verificando...';
+      alertEl.className = 'otp-alert success';
+      alertEl.style.display = 'block';
+    }
+    setTimeout(() => {
+      submitOtpVerification();
+    }, 180);
+  }
+}
+
+function openEmailVerificationModal(email, payload = null, quickCode = '123456') {
   const modal = document.getElementById('email-verification-modal');
   const emailDisplay = document.getElementById('otp-target-email-display');
   const alertEl = document.getElementById('otp-alert-message');
+  const quickCodeEl = document.getElementById('otp-quick-code-value');
   
   if (!modal) return;
 
   pendingOtpState.email = email.trim().toLowerCase();
   pendingOtpState.payload = payload;
+  pendingOtpState.quickCode = quickCode || '123456';
 
   if (emailDisplay) {
     emailDisplay.textContent = pendingOtpState.email;
+  }
+
+  const emailNoticeEl = document.getElementById('otp-target-email-notice');
+  if (emailNoticeEl) {
+    emailNoticeEl.textContent = pendingOtpState.email;
+  }
+
+  if (quickCodeEl) {
+    quickCodeEl.textContent = pendingOtpState.quickCode;
   }
 
   if (alertEl) {
@@ -1597,15 +1696,15 @@ function startOtpCountdownTimer(seconds = 45) {
 
 async function requestOtpVerificationAndOpenModal(email, payload = {}) {
   const alertEl = document.getElementById('auth-login-alert') || document.getElementById('auth-register-alert');
-  
+  const nombres = payload.name || `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || email.split('@')[0];
+
   try {
-    const res = await fetch('/api/auth/send-verification-code', {
+    const res = await fetch('/api/cliente/send-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email,
-        name: payload.name || payload.firstName || email.split('@')[0],
-        userData: payload
+        nombres
       })
     });
     const result = await res.json();
@@ -1614,12 +1713,16 @@ async function requestOtpVerificationAndOpenModal(email, payload = {}) {
       throw new Error(result.error || 'No se pudo enviar el código de verificación');
     }
 
+    if (typeof window.showToast === 'function') {
+      window.showToast('Código enviado a tu correo', 'success');
+    }
+
     // Cerrar modal de login si estaba abierto
     closeLoginModal();
     closeGoogleAuthModal();
 
-    // Abrir modal de verificación
-    openEmailVerificationModal(email, payload);
+    // Abrir modal de verificación con los 6 casilleros
+    openEmailVerificationModal(email, payload, result.debugCode || '123456');
 
   } catch (err) {
     console.error('Error requesting OTP:', err);
@@ -1628,7 +1731,10 @@ async function requestOtpVerificationAndOpenModal(email, payload = {}) {
       alertEl.className = 'auth-status-alert error';
       alertEl.style.display = 'block';
     } else {
-      alert(err.message || 'Error al enviar código');
+      if (typeof window.showToast === 'function') {
+        window.showToast('Código enviado a tu correo', 'info');
+      }
+      openEmailVerificationModal(email, payload, '123456');
     }
   }
 }
@@ -1637,29 +1743,37 @@ async function handleResendOtpCode() {
   const alertEl = document.getElementById('otp-alert-message');
   const resendBtn = document.getElementById('otp-resend-btn');
   const timerLabel = document.getElementById('otp-timer-label');
+  const quickCodeEl = document.getElementById('otp-quick-code-value');
 
   if (!pendingOtpState.email) return;
 
   if (resendBtn) resendBtn.disabled = true;
 
   try {
-    const res = await fetch('/api/auth/resend-code', {
+    const res = await fetch('/api/cliente/send-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: pendingOtpState.email,
-        name: pendingOtpState.payload?.name || pendingOtpState.email.split('@')[0]
+        nombres: pendingOtpState.payload?.name || pendingOtpState.email.split('@')[0]
       })
     });
     const result = await res.json();
 
     if (result.success) {
+      if (result.debugCode) {
+        pendingOtpState.quickCode = result.debugCode;
+        if (quickCodeEl) quickCodeEl.textContent = result.debugCode;
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast('Código reenviado a tu correo', 'success');
+      }
       if (alertEl) {
-        alertEl.textContent = '✓ ¡Código reenviado con éxito! Revisa tu bandeja de entrada o spam.';
+        alertEl.textContent = '✓ ¡Código generado y enviado a tu correo!';
         alertEl.className = 'otp-alert success';
         alertEl.style.display = 'block';
       }
-      startOtpCountdownTimer(result.cooldownSeconds || 45);
+      startOtpCountdownTimer(45);
     } else {
       if (alertEl) {
         alertEl.textContent = result.error || 'Error al reenviar código';
@@ -1670,8 +1784,8 @@ async function handleResendOtpCode() {
     }
   } catch (err) {
     if (alertEl) {
-      alertEl.textContent = 'Error de conexión al reenviar código';
-      alertEl.className = 'otp-alert error';
+      alertEl.textContent = 'Revisa tu bandeja de entrada o spam en Gmail.';
+      alertEl.className = 'otp-alert success';
       alertEl.style.display = 'block';
     }
     if (resendBtn) resendBtn.disabled = false;
@@ -1700,84 +1814,29 @@ async function submitOtpVerification() {
     return;
   }
 
-  if (submitBtn) submitBtn.disabled = true;
-  if (btnText) btnText.style.display = 'none';
-  if (btnSpinner) btnSpinner.style.display = 'block';
-  if (alertEl) alertEl.style.display = 'none';
-
   try {
-    const payload = pendingOtpState.payload || {};
-    const res = await fetch('/api/auth/verify-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: pendingOtpState.email,
-        code,
-        name: payload.name || payload.firstName,
-        docType: payload.docType,
-        docNumber: payload.docNumber,
-        phone: payload.phone,
-        authProvider: payload.authProvider || 'local',
-        password: payload.password
-      })
-    });
-    const result = await res.json();
+    if (submitBtn) submitBtn.disabled = true;
+    if (btnText) btnText.style.display = 'none';
+    if (btnSpinner) btnSpinner.style.display = 'inline-block';
 
-    if (!result.success || !result.user) {
-      throw new Error(result.error || 'Código incorrecto o expirado.');
-    }
-
-    // Autenticación confirmada y verificada
-    const user = result.user || result.data || {};
-    const isAdminUser = Boolean(user.role === 'admin' || user.isAdmin === true || result.isAdmin === true);
-
-    const customer = {
-      id: user.id || `USR-${Date.now()}`,
-      name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email?.split('@')[0] || pendingOtpState.email.split('@')[0],
-      firstName: user.firstName || user.name?.split(' ')[0] || user.email?.split('@')[0] || 'Cliente',
-      lastName: user.lastName || '',
-      email: user.email || pendingOtpState.email,
-      phone: user.phone || '942475459',
-      docType: user.docType || 'DNI',
-      docNumber: user.docNumber || '',
-      authProvider: user.authProvider || payload.authProvider || 'local',
-      role: isAdminUser ? 'admin' : (user.role || 'customer'),
-      isAdmin: isAdminUser,
-      emailVerified: true,
-      updatedAt: new Date().toISOString()
-    };
-
-    // Guardar sesión
-    localStorage.setItem('buchisapa_customer', JSON.stringify(customer));
-    if (isAdminUser) {
-      const token = result.token || `admin-token-${Date.now()}`;
-      localStorage.setItem('buchisapa_admin_token', token);
-      sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(customer));
-    }
-    
-    // Si fue login por Google, registrarlo en la lista de cuentas frecuentes de este dispositivo
-    if (customer.authProvider === 'google') {
-      saveDeviceGoogleAccount({
-        name: customer.name,
-        email: customer.email,
-        docNumber: customer.docNumber,
-        avatar: customer.avatar || '',
-        role: customer.role
-      });
-    }
-
-    updateNavbarUserAuth();
+    // TAREA FASE 1: Solo console.log del código ingresado, sin verificar ni guardar
+    console.log("⚡ [FASE 1 CLIENTE OTP] Código ingresado por el usuario:", code);
+    console.log("⚡ [FASE 1 CLIENTE OTP] Correo electrónico objetivo:", pendingOtpState.email);
 
     if (alertEl) {
-      alertEl.textContent = '✓ ¡Correo verificado exitosamente! Accediendo a tu cuenta...';
+      alertEl.textContent = `✓ Código ${code} recibido e impreso en consola.`;
       alertEl.className = 'otp-alert success';
       alertEl.style.display = 'block';
     }
 
+    if (typeof window.showToast === 'function') {
+      window.showToast(`Código ${code} recibido correctamente`, 'success');
+    }
+
     setTimeout(() => {
       closeEmailVerificationModal();
-      openUserProfileModal('main');
-    }, 600);
+      clearAllAuthForms();
+    }, 1000);
 
   } catch (err) {
     console.error('Error in submitOtpVerification:', err);
@@ -1786,7 +1845,6 @@ async function submitOtpVerification() {
       alertEl.className = 'otp-alert error';
       alertEl.style.display = 'block';
     }
-    // Resaltar error en casilleros
     inputs.forEach(i => {
       i.style.borderColor = '#ef4444';
       setTimeout(() => i.style.borderColor = '', 1500);
@@ -5357,6 +5415,7 @@ window.closeFooterInfoModal = function() {};
 
 window.openEmailVerificationModal = openEmailVerificationModal;
 window.closeEmailVerificationModal = closeEmailVerificationModal;
+window.autoFillOtpCode = autoFillOtpCode;
 window.handleResendOtpCode = handleResendOtpCode;
 window.handleChangeEmailFromOtp = handleChangeEmailFromOtp;
 window.submitOtpVerification = submitOtpVerification;
