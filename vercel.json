@@ -3,6 +3,20 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/admin(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/php-admin(.*)",
+      "destination": "/api/index"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

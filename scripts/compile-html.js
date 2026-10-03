@@ -65,7 +65,9 @@ export function compileHtml() {
   }
 
   copyDirRecursive(path.join(ROOT_DIR, 'public'), DIST_DIR);
-  console.log('✅ Archivos públicos copiados a dist/.');
+  copyDirRecursive(path.join(ROOT_DIR, 'admin'), path.join(DIST_DIR, 'admin'));
+  copyDirRecursive(path.join(ROOT_DIR, 'data'), path.join(DIST_DIR, 'data'));
+  console.log('✅ Archivos públicos, admin y catálogo data copiados a dist/.');
 
   // 3. Asegurar rutas directas para Vercel y hosts estáticos
   const directPages = [
@@ -96,6 +98,73 @@ export function compileHtml() {
       fs.writeFileSync(path.join(pageDir, 'index.html'), content, 'utf8');
     }
   }
+
+  // 4. Pre-compilar Panel de Administración estático como respaldo para Vercel
+  try {
+    const headerPath = path.join(ROOT_DIR, 'admin/includes/header.php');
+    const sidebarPath = path.join(ROOT_DIR, 'admin/includes/sidebar.php');
+    const topbarPath = path.join(ROOT_DIR, 'admin/includes/topbar.php');
+    const footerPath = path.join(ROOT_DIR, 'admin/includes/footer.php');
+
+    if (fs.existsSync(headerPath) && fs.existsSync(sidebarPath) && fs.existsSync(topbarPath) && fs.existsSync(footerPath)) {
+      let rawHeader = fs.readFileSync(headerPath, 'utf8').replace(/<\?php[\s\S]*?\?>/g, '');
+      let rawSidebar = fs.readFileSync(sidebarPath, 'utf8').replace(/<\?php[\s\S]*?\?>/g, '');
+      let rawTopbar = fs.readFileSync(topbarPath, 'utf8').replace(/<\?php[\s\S]*?\?>/g, '');
+      let rawFooter = fs.readFileSync(footerPath, 'utf8');
+
+      // Vistas principales a pre-generar
+      const adminViews = ['dashboard', 'productos', 'clientes', 'pedidos', 'ticket', 'configuracion'];
+
+      for (const view of adminViews) {
+        const viewPath = path.join(ROOT_DIR, `admin/views/${view}.php`);
+        if (!fs.existsSync(viewPath)) continue;
+
+        let viewContent = fs.readFileSync(viewPath, 'utf8');
+        viewContent = viewContent.replace(/<\?php[\s\S]*?\?>/g, '');
+
+        let footerScripts = `<script src="/admin/js/${view}.js"></script>`;
+        if (view === 'dashboard') {
+          footerScripts = `<script src="/admin/js/chart.min.js"></script>\n${footerScripts}`;
+        }
+        let viewFooter = rawFooter.replace(/<\?php[\s\S]*?\?>/g, footerScripts);
+
+        let viewHtml = rawHeader;
+        viewHtml += `
+        <div class="flex h-screen overflow-hidden">
+            ${rawSidebar}
+            <div class="flex-1 flex flex-col overflow-hidden">
+                ${rawTopbar}
+                <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#0b0f19]">
+                    ${viewContent}
+                </main>
+            </div>
+        </div>
+        `;
+        viewHtml += viewFooter;
+
+        // Limpiezas y metadatos
+        viewHtml = viewHtml.replace(/<\?php[\s\S]*?\?>/g, '');
+        viewHtml = viewHtml.replace(/\$user_email/g, 'admin@buchisapa.pe');
+        viewHtml = viewHtml.replace(/\$active_title/g, view.charAt(0).toUpperCase() + view.slice(1));
+
+        const adminOutDir = path.join(DIST_DIR, 'admin');
+        if (!fs.existsSync(adminOutDir)) fs.mkdirSync(adminOutDir, { recursive: true });
+
+        // dist/admin/{view}.html
+        fs.writeFileSync(path.join(adminOutDir, `${view}.html`), viewHtml, 'utf8');
+
+        if (view === 'dashboard') {
+          // dist/admin/index.html y dist/admin.html
+          fs.writeFileSync(path.join(adminOutDir, 'index.html'), viewHtml, 'utf8');
+          fs.writeFileSync(path.join(DIST_DIR, 'admin.html'), viewHtml, 'utf8');
+        }
+      }
+      console.log('✅ Vistas estáticas de respaldo del panel admin creadas para Vercel.');
+    }
+  } catch (err) {
+    console.warn('⚠️ Error al pre-compilar panel admin de respaldo:', err.message);
+  }
+
   console.log('✅ Rutas estáticas limpias creadas.');
 }
 
