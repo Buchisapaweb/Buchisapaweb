@@ -31,7 +31,7 @@ foreach ($productos as $p) {
 
 // 10 Categorías oficiales de la carta de clientes
 $categorias_def = [
-    'promociones'       => ['name' => '⭐ PROMOCIONES', 'color' => '#f59e0b'],
+    'promociones'       => ['name' => 'PROMOCIONES', 'color' => '#f59e0b'],
     'alitas'            => ['name' => 'ALITAS', 'color' => '#ef4444'],
     'bebidas'           => ['name' => 'BEBIDAS', 'color' => '#06b6d4'],
     'broaster'          => ['name' => 'BROASTER', 'color' => '#f97316'],

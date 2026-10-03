@@ -2736,8 +2736,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         
         // Mapeo canónico a códigos oficiales C0001 - C0010
         const CATEGORY_MAP: Record<string, { id: string; code: string; slug: string; name: string }> = {
-          'c0001': { id: 'C0001', code: 'C0001', slug: 'promociones', name: '⭐ PROMOCIONES' },
-          'promociones': { id: 'C0001', code: 'C0001', slug: 'promociones', name: '⭐ PROMOCIONES' },
+          'c0001': { id: 'C0001', code: 'C0001', slug: 'promociones', name: 'PROMOCIONES' },
+          'promociones': { id: 'C0001', code: 'C0001', slug: 'promociones', name: 'PROMOCIONES' },
           'c0002': { id: 'C0002', code: 'C0002', slug: 'alitas', name: 'ALITAS' },
           'alitas': { id: 'C0002', code: 'C0002', slug: 'alitas', name: 'ALITAS' },
           'c0003': { id: 'C0003', code: 'C0003', slug: 'bebidas', name: 'BEBIDAS' },
@@ -3031,7 +3031,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         const totalCriticos = productos.filter(p => parseInt(String(p.stock || '0'), 10) <= 5).length;
 
         const CATEGORIAS_DEFINIDAS = [
-            { id: 'C0001', code: 'C0001', slug: 'promociones',       name: '⭐ PROMOCIONES',               icon: 'sparkles',  color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
+            { id: 'C0001', code: 'C0001', slug: 'promociones',       name: 'PROMOCIONES',                  icon: 'sparkles',  color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
             { id: 'C0002', code: 'C0002', slug: 'alitas',            name: 'ALITAS',                       icon: 'flame',     color: '#ef4444', desc: 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.' },
             { id: 'C0003', code: 'C0003', slug: 'bebidas',           name: 'BEBIDAS',                      icon: 'cup-soda',  color: '#06b6d4', desc: 'Gaseosas heladas, agua mineral y bebidas embotelladas.' },
             { id: 'C0004', code: 'C0004', slug: 'broaster',          name: 'BROASTER',                     icon: 'drumstick', color: '#f97316', desc: 'Pollo broaster ultra crocante con papas doradas y cremas.' },
@@ -3099,8 +3099,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
                     return `
                     <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
                         <div class="space-y-3">
-                            <!-- Imagen Grande del Producto -->
-                            <div class="relative w-full h-44 sm:h-48 rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
+                            <!-- Imagen Grande y Cuadrada del Producto -->
+                            <div class="relative w-full aspect-square rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
                                 <img src="${image}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
                                 ${badgeHtml}
                                 <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md ${available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'}">
@@ -3176,18 +3176,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         html = html.replace(/<\?php\s+echo\s+\$totalCriticos;\s*\?>/g, String(totalCriticos));
         html = html.replace(/<\?php\s+echo\s+\$totalCriticos\s*>\s*0\s*\?\s*'text-red-400'\s*:\s*'text-slate-400';\s*\?>/g, totalCriticos > 0 ? 'text-red-400' : 'text-slate-400');
 
-        // Reemplazar barra de filtros de categorías
+        // Reemplazar barra de filtros de categorías de forma robusta
         const filterBarStart = html.indexOf('<div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">');
-        const filterBarEnd = html.indexOf('</div>\n    </div>\n\n    <!-- SECCIONES DIVIDIDAS POR CATEGORÍAS -->');
+        const filterBarEnd = html.indexOf('<!-- SECCIONES DIVIDIDAS POR CATEGORÍAS -->');
         if (filterBarStart !== -1 && filterBarEnd !== -1) {
             const pre = html.substring(0, filterBarStart);
             const post = html.substring(filterBarEnd);
-            html = pre + `<div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">\n${filterTabsHtml}\n` + post;
+            html = pre + `<div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">\n${filterTabsHtml}\n    </div>\n    </div>\n\n    ` + post;
         }
 
-        // Reemplazar contenedor de bloques de categorías
+        // Reemplazar contenedor de bloques de categorías de forma robusta
         const contStart = html.indexOf('<div class="space-y-10" id="productos-container">');
-        const contEnd = html.indexOf('<!-- Modal Container Frame -->');
+        const contEnd = html.indexOf('<div id="modal-container"');
         if (contStart !== -1 && contEnd !== -1) {
             const pre = html.substring(0, contStart);
             const post = html.substring(contEnd);

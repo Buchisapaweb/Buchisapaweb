@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Cargar catálogo de categorías oficial (10 categorías con formato oficial C0001)
 $categoriasDefinidas = [
-    ['id' => 'C0001', 'code' => 'C0001', 'slug' => 'promociones',       'name' => '⭐ PROMOCIONES',               'icon' => 'sparkles',  'color' => '#f59e0b', 'desc' => 'Combos especiales, ofertas de la semana y paquetes familiares.'],
+    ['id' => 'C0001', 'code' => 'C0001', 'slug' => 'promociones',       'name' => 'PROMOCIONES',               'icon' => 'tag',       'color' => '#f59e0b', 'desc' => 'Combos especiales, ofertas de la semana y paquetes familiares.'],
     ['id' => 'C0002', 'code' => 'C0002', 'slug' => 'alitas',            'name' => 'ALITAS',                       'icon' => 'flame',     'color' => '#ef4444', 'desc' => 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.'],
     ['id' => 'C0003', 'code' => 'C0003', 'slug' => 'bebidas',           'name' => 'BEBIDAS',                      'icon' => 'cup-soda',  'color' => '#06b6d4', 'desc' => 'Gaseosas heladas, agua mineral y bebidas embotelladas.'],
     ['id' => 'C0004', 'code' => 'C0004', 'slug' => 'broaster',          'name' => 'BROASTER',                     'icon' => 'drumstick', 'color' => '#f97316', 'desc' => 'Pollo broaster ultra crocante con papas doradas y cremas.'],
@@ -248,7 +248,7 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
 
         <!-- Pestañas Horizontales de Categorías -->
         <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">
-            <button type="button" onclick="seleccionarFiltroCategoria('all')" class="category-tab-btn active px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0" data-cat="all">
+            <button type="button" onclick="seleccionarFiltroCategoria('all')" class="category-tab-btn active px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 bg-orange-600 text-white" data-cat="all">
                 Todos (<?php echo $totalProductos; ?>)
             </button>
             <?php foreach ($categoriasDefinidas as $cat): ?>
@@ -321,8 +321,8 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
                             <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-search-target="<?php echo strtolower($name . ' ' . $desc . ' ' . implode(' ', $accompaniments) . ' ' . implode(' ', $cremas)); ?>">
                                 
                                 <div class="space-y-3">
-                                    <!-- 1. Imagen Grande del Producto -->
-                                    <div class="relative w-full h-44 sm:h-48 rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
+                                    <!-- 1. Imagen Grande y Cuadrada del Producto -->
+                                    <div class="relative w-full aspect-square rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
                                         <img src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($name); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
                                         <?php if (!empty($badge)): ?>
                                             <span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-orange-600/95 text-[9px] font-black text-white uppercase rounded-md tracking-wider shadow-md backdrop-blur-sm">
@@ -380,10 +380,10 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
     </div>
 </div>
 
-<!-- Modal Container Frame -->
-<div id="modal-container" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-opacity duration-150 overflow-y-auto">
-    <div id="modal-content" class="bg-[#121829] border border-slate-800 p-6 rounded-2xl w-full max-w-xl shadow-2xl relative my-8">
-        <!-- Contenido dinámico inyectado por productos.js -->
+<!-- Modal / Full Screen Container Frame -->
+<div id="modal-container" class="fixed inset-0 bg-[#070a13] z-50 hidden transition-all duration-200 overflow-y-auto">
+    <div id="modal-content" class="min-h-screen w-full bg-[#070a13] flex flex-col">
+        <!-- Contenido dinámico a pantalla completa inyectado por productos.js -->
     </div>
 </div>
 

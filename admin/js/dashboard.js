@@ -9,7 +9,7 @@ console.log("📊 Dashboard Module Initialized");
 
 // 10 Categorías oficiales de clientes
 const OFFICIAL_CATEGORIES = [
-    { id: 'promociones',       name: '⭐ PROMOCIONES',               color: '#f59e0b' },
+    { id: 'promociones',       name: 'PROMOCIONES',                  color: '#f59e0b' },
     { id: 'alitas',            name: 'ALITAS',                       color: '#ef4444' },
     { id: 'bebidas',           name: 'BEBIDAS',                      color: '#06b6d4' },
     { id: 'broaster',          name: 'BROASTER',                     color: '#f97316' },
