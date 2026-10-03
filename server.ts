@@ -62,61 +62,7 @@ function getCompiledIndexHtml(): string {
   return template;
 }
 
-function getCompiledAdminHtml(): string {
-  const partials: Record<string, string> = {
-    'SIDEBAR': 'admin/partials/sidebar.html',
-    'TOPBAR': 'admin/partials/topbar.html',
-    'VIEW_DASHBOARD': 'admin/views/dashboard.html',
-    'VIEW_PRODUCTOS': 'admin/views/productos.html',
-    'VIEW_CATEGORIAS': 'admin/views/categorias.html',
-    'VIEW_PEDIDOS': 'admin/views/pedidos.html',
-    'VIEW_VENTAS': 'admin/views/ventas.html',
-    'VIEW_CAJA': 'admin/views/caja.html',
-    'VIEW_TICKET': 'admin/views/ticket.html',
-    'VIEW_PORTADA': 'admin/views/portada.html',
-    'VIEW_INSUMOS': 'admin/views/insumos.html',
-    'VIEW_UTENSILIOS': 'admin/views/utensilios.html',
-    'VIEW_DELIVERY': 'admin/views/delivery.html',
-    'VIEW_UBICACION': 'admin/views/ubicacion.html',
-    'VIEW_REPORTES': 'admin/views/reportes.html',
-    'VIEW_CONFIGURACION': 'admin/views/configuracion.html',
-    'MODALS': 'admin/partials/modals.html'
-  };
-
-  const rutas = [
-    path.join(__dirname, 'admin/index.html'),
-    path.join(__dirname, '../admin/index.html'),
-    path.join(__dirname, 'dist/admin/index.html'),
-    path.join(__dirname, '../dist/admin/index.html'),
-    path.join(process.cwd(), 'admin/index.html'),
-    path.join(process.cwd(), 'dist/admin/index.html'),
-    '/app/admin/index.html',
-    '/app/dist/admin/index.html',
-    '/app/applet/admin/index.html',
-    '/app/applet/dist/admin/index.html'
-  ];
-
-  let template = '';
-  for (const r of rutas) {
-    if (fs.existsSync(r)) {
-      template = fs.readFileSync(r, 'utf8');
-      break;
-    }
-  }
-
-  if (!template) {
-    throw new Error('No se encontró admin/index.html');
-  }
-
-  for (const [key, filePath] of Object.entries(partials)) {
-    const absPath = path.join(process.cwd(), filePath);
-    if (fs.existsSync(absPath)) {
-      const content = fs.readFileSync(absPath, 'utf8');
-      template = template.replace(new RegExp(`<!-- PARTIAL: ${key} -->`, 'g'), content);
-    }
-  }
-  return template;
-}
+// Las vistas administrativas se compilan y emulan dinámicamente en caliente desde la carpeta /admin utilizando PHP en tiempo de ejecución.
 import { sendVerificationEmail, verifyCode } from './src/services/emailVerification';
 import {
   getOrCreateUser,
@@ -532,6 +478,37 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Admin Gemini IA Assist Endpoint
+  app.post('/api/admin/ia-assist', async (req: Request, res: Response) => {
+    try {
+      const { prompt } = req.body;
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        return res.status(400).json({ success: false, error: 'API Key de Gemini no configurada en el servidor' });
+      }
+      
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error en API Gemini: ${response.statusText}`);
+      }
+      
+      const result: any = await response.json();
+      const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      return res.json({ success: true, text });
+    } catch (error: any) {
+      console.error('Error in IA Assist:', error);
+      return res.status(500).json({ success: false, error: error.message || 'Error interno del servidor' });
     }
   });
 
@@ -2712,25 +2689,589 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use('/publico/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
   app.use(encodeURI('/público/imágenes'), express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
 
+  // 2. Archivos estáticos de css, js, html y raíz pública (declarados abajo para dar precedencia al panel de control PHP dinámico)
+
+  // --- EMULADOR DE PANEL DE CONTROL PHP PARA NODE.JS / VERCEL ---
+  async function querySupabase(method: string, endpoint: string, body?: any) {
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ckgvgfpcxeqyilfphnsu.supabase.co'}/rest/v1/${endpoint}`;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M';
+    const headers: Record<string, string> = {
+      'apikey': key,
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    };
+    try {
+      const response = await fetch(url, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined
+      });
+      const status = response.status;
+      const data = await response.json().catch(() => null);
+      return { code: status, data };
+    } catch (err: any) {
+      return { code: 500, error: err.message };
+    }
+  }
+
+  // 1. Recibir acciones POST de los formularios de productos, despacho y cancelación
+  app.post(['/admin', '/admin/index.php', '/admin/views/productos.php', '/admin/views/pedidos.php'], async (req: Request, res: Response) => {
+    const view = (req.query.view as string) || 'clientes';
+    const action = req.body.action || '';
+    
+    let successMsg = '';
+    let errorMsg = '';
+    
+    if (view === 'productos') {
+      if (action === 'create' || action === 'edit') {
+        const id = req.body.id;
+        const payload = {
+          name: req.body.name,
+          description: req.body.description,
+          price: parseFloat(req.body.price || '0'),
+          stock: parseInt(req.body.stock || '0', 10),
+          category: req.body.category,
+          image: req.body.image_url || '/imagenes/productos/fallback.webp',
+          available: req.body.available === 'true'
+        };
+        
+        if (action === 'create') {
+          const idForm = req.body.id_form;
+          const supRes = await querySupabase('POST', 'products', { id: idForm, ...payload });
+          if (supRes.code >= 200 && supRes.code < 300) {
+            successMsg = 'Plato creado con éxito en Supabase';
+          } else {
+            errorMsg = `Error al crear producto: Code ${supRes.code}`;
+          }
+        } else {
+          const supRes = await querySupabase('PATCH', `products?id=eq.${id}`, payload);
+          if (supRes.code >= 200 && supRes.code < 300) {
+            successMsg = 'Plato actualizado con éxito en Supabase';
+          } else {
+            errorMsg = `Error al actualizar producto: Code ${supRes.code}`;
+          }
+        }
+      } else if (action === 'delete') {
+        const id = req.body.id;
+        if (id) {
+          const supRes = await querySupabase('DELETE', `products?id=eq.${id}`);
+          if (supRes.code >= 200 && supRes.code < 300) {
+            successMsg = 'Plato eliminado de la carta con éxito';
+          } else {
+            errorMsg = `Error al eliminar de la base de datos: Code ${supRes.code}`;
+          }
+        }
+      }
+    } else if (view === 'pedidos') {
+      if (action === 'update_status') {
+        const id = req.body.id;
+        const status = req.body.status;
+        if (id && status) {
+          const supRes = await querySupabase('PATCH', `orders?id=eq.${id}`, { status });
+          if (supRes.code >= 200 && supRes.code < 300) {
+            successMsg = `El pedido ha cambiado al estado '${status}' con éxito`;
+          } else {
+            errorMsg = `Error al actualizar estado del pedido: Code ${supRes.code}`;
+          }
+        }
+      }
+    }
+    
+    const viewQuery = view ? `?view=${view}` : '';
+    const successQuery = successMsg ? `&success=${encodeURIComponent(successMsg)}` : '';
+    const errorQuery = errorMsg ? `&error=${encodeURIComponent(errorMsg)}` : '';
+    res.redirect(`/admin/index.php${viewQuery}${successQuery}${errorQuery}`);
+  });
+
+  // 2. Compilar sobre la marcha y servir el Panel de Administración PHP real en HTML compatible con Vercel
+  app.get(['/admin', '/admin.html', '/admin/index.php', /^\/admin(?:\/.*)?$/, /^\/php-admin(?:\/.*)?$/], async (req: Request, res: Response, next) => {
+    // Pasar a express.static si se solicitan archivos específicos con extensión (CSS, JS, imágenes, etc.)
+    if (path.extname(req.path) && path.extname(req.path) !== '.php' && !req.path.endsWith('/admin')) {
+      return next();
+    }
+    
+    let view = (req.query.view as string) || 'dashboard';
+    const allowedViews = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket'];
+    if (!allowedViews.includes(view)) {
+      view = 'dashboard';
+    }
+    
+    const successFlash = (req.query.success as string) || '';
+    const errorFlash = (req.query.error as string) || '';
+    
+    try {
+      const headerPath = path.join(process.cwd(), 'admin/includes/header.php');
+      const sidebarPath = path.join(process.cwd(), 'admin/includes/sidebar.php');
+      const topbarPath = path.join(process.cwd(), 'admin/includes/topbar.php');
+      const footerPath = path.join(process.cwd(), 'admin/includes/footer.php');
+      const viewPath = path.join(process.cwd(), `admin/views/${view}.php`);
+      
+      let header = fs.readFileSync(headerPath, 'utf8');
+      let sidebar = fs.readFileSync(sidebarPath, 'utf8');
+      let topbar = fs.readFileSync(topbarPath, 'utf8');
+      let footer = fs.readFileSync(footerPath, 'utf8');
+      let viewContent = fs.readFileSync(viewPath, 'utf8');
+      
+      // Limpiar etiquetas de apertura PHP y requires de inicialización para concatenar como una plantilla HTML limpia
+      header = header.replace(/<\?php[\s\S]*?\?>/g, '');
+      sidebar = sidebar.replace(/<\?php[\s\S]*?current_view\s*=\s*[\s\S]*?\?>/g, '');
+      topbar = topbar.replace(/<\?php[\s\S]*?\?>/g, '');
+      footer = footer.replace(/<\?php[\s\S]*?\?>/g, '');
+      
+      let html = header;
+      html += `
+      <div class="flex h-screen overflow-hidden">
+          ${sidebar}
+          <div class="flex-1 flex flex-col overflow-hidden">
+              ${topbar}
+              <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#0b0f19]">
+                  ${viewContent}
+              </main>
+          </div>
+      </div>
+      `;
+      html += footer;
+      
+      // Consultar datos reales de Supabase en caliente para renderizar el panel PHP en caliente
+      let clientes: any[] = [];
+      let productos: any[] = [];
+      let categorias: any[] = [];
+      let pedidos: any[] = [];
+      
+      if (view === 'clientes') {
+        const supRes = await querySupabase('GET', 'perfiles?select=*&order=created_at.desc');
+        clientes = Array.isArray(supRes.data) ? supRes.data : [];
+      } else if (view === 'productos') {
+        const supResProd = await querySupabase('GET', 'products?select=*&order=category.asc');
+        productos = Array.isArray(supResProd.data) ? supResProd.data : [];
+        const supResCat = await querySupabase('GET', 'categories?select=id,name');
+        categorias = Array.isArray(supResCat.data) ? supResCat.data : [];
+      } else if (view === 'pedidos' || view === 'ticket') {
+        const supResOrd = await querySupabase('GET', 'orders?select=*&order=created_at.desc');
+        pedidos = Array.isArray(supResOrd.data) ? supResOrd.data : [];
+      } else if (view === 'dashboard') {
+        const supResCl = await querySupabase('GET', 'perfiles?select=id');
+        clientes = Array.isArray(supResCl.data) ? supResCl.data : [];
+        const supResProd = await querySupabase('GET', 'products?select=*');
+        productos = Array.isArray(supResProd.data) ? supResProd.data : [];
+        const supResOrd = await querySupabase('GET', 'orders?select=*&order=created_at.desc');
+        pedidos = Array.isArray(supResOrd.data) ? supResOrd.data : [];
+      }
+      
+      // Construir notificaciones flotantes (reemplazando banners PHP vacíos)
+      let flashHtml = '';
+      if (successFlash) {
+        flashHtml += `
+        <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-2 animate-fade-in shadow-lg">
+            <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
+            <span>${successFlash}</span>
+        </div>`;
+      }
+      if (errorFlash) {
+        flashHtml += `
+        <div class="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold rounded-xl flex items-center gap-2 animate-fade-in shadow-lg">
+            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+            <span>${errorFlash}</span>
+        </div>`;
+      }
+      
+      // Inyectar alertas y remover cabeceras PHP redundantes
+      html = html.replace(/<\?php\s+if\s*\(!empty\(\$success\)\):\s*\?>[\s\S]*?<\?php\s+endif;\s*\?>/g, flashHtml);
+      html = html.replace(/<\?php\s+if\s*\(!empty\(\$error\)\):\s*\?>[\s\S]*?<\?php\s+endif;\s*\?>/g, '');
+      html = html.replace(/<\?php\s+if\s*\(session_status\(\)\s*===\s*PHP_SESSION_NONE\)\s*\{[\s\S]*?\}[\s\S]*?\?>/g, '');
+      html = html.replace(/<\?php[\s\S]*?require_once[\s\S]*?\?>/g, '');
+      html = html.replace(/<\?php[\s\S]*?\$pedidos_por_estado[\s\S]*?\?>/g, '');
+      html = html.replace(/<\?php[\s\S]*?\$allowed_views[\s\S]*?\?>/g, '');
+      html = html.replace(/<\?php[\s\S]*?\$current_view[\s\S]*?\?>/g, '');
+      html = html.replace(/<\?php[\s\S]*?\$active_view[\s\S]*?\?>/g, '');
+      html = html.replace(/<\?php[\s\S]*?checkAdminAuth\(\);[\s\S]*?\?>/g, '');
+      
+      // Formatear títulos y relojes
+      const view_title = view === 'dashboard' ? 'Dashboard' : view === 'clientes' ? 'Clientes' : view === 'productos' ? 'Productos' : view === 'pedidos' ? 'Pedidos' : 'Ticket';
+      html = html.replace(/<\?php\s+echo\s+\$active_title;\s*\?>/g, view_title);
+      html = html.replace(/<\?php\s+echo\s+htmlspecialchars\(\$active_title\);\s*\?>/g, view_title);
+      html = html.replace(/<\?php\s+echo\s+htmlspecialchars\(\$user_email\);\s*\?>/g, 'admin@buchisapa.pe');
+      html = html.replace(/<\?php\s+echo\s+substr\(\$user_email,\s*0,\s*2\);\s*\?>/g, 'AD');
+      html = html.replace(/<\?php\s+echo\s+date\('H:i:s'\);\s*\?>/g, new Date().toLocaleTimeString('es-PE', { hour12: false }));
+      
+      // Resaltado de clases activas del Sidebar para todas las 5 pestañas
+      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'dashboard'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'dashboard' ? '$1' : '$2');
+      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'clientes'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'clientes' ? '$1' : '$2');
+      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'productos'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'productos' ? '$1' : '$2');
+      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'pedidos'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'pedidos' ? '$1' : '$2');
+      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'ticket'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'ticket' ? '$1' : '$2');
+      
+      // Renderizar loops basados en la base de datos de Supabase
+      if (view === 'clientes') {
+        html = html.replace(/<\?php\s+echo\s+count\(\$clientes\);\s*\?>/g, String(clientes.length));
+        
+        const renderLoop = (itemTemplate: string) => {
+          if (clientes.length === 0) {
+            return `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-semibold">No se encontraron clientes registrados en Supabase.</td></tr>`;
+          }
+          return clientes.map(c => {
+            const rawDate = c.created_at || c.createdAt || new Date().toISOString();
+            const dateStr = new Date(rawDate).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+            const docType = c.docType || 'DNI';
+            const docNumber = c.docNumber || 'No especificado';
+            const name = c.name || 'Usuario Sin Nombre';
+            const phone = c.phone || 'Sin teléfono registrado';
+            const email = c.email || 'Sin correo electrónico';
+            
+            let temp = itemTemplate;
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\(\$c\['docType'\]\s*\?\?\s*'DNI'\)\s*\.\s*'\s*:\s*'\s*\.\s*\(\$c\['docNumber'\]\s*\?\?\s*'No especificado'\)\);\s*\?>/g, `${docType} : ${docNumber}`);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['docType'\]\s*\?\?\s*'DNI'\);\s*\?>/g, docType);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['docNumber'\]\s*\?\?\s*'No registrado'\);\s*\?>/g, docNumber);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['name'\]\s*\?\?\s*'Usuario Sin Nombre'\);\s*\?>/g, name);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['phone'\]\s*\?\?\s*'Sin teléfono registrado'\);\s*\?>/g, phone);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['phone'\]\s*\?\?\s*'Sin registro'\);\s*\?>/g, phone);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['email'\]\s*\?\?\s*'Sin correo electrónico'\);\s*\?>/g, email);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['email'\]\s*\?\?\s*'Sin registro'\);\s*\?>/g, email);
+            temp = temp.replace(/<\?php\s+echo\s+\$dateStr;\s*\?>/g, dateStr);
+            temp = temp.replace(/<\?php\s+echo\s+date\('d\/m\/Y',\s*strtotime\(\$rawDate\)\);\s*\?>/g, new Date(rawDate).toLocaleDateString('es-PE'));
+            return temp;
+          }).join('\n');
+        };
+        
+        html = html.replace(/<\?php\s+if\s*\(empty\(\$clientes\)\):[\s\S]*?<\?php\s+else:\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g, (m, content) => {
+          return renderLoop(content);
+        });
+      }
+      else if (view === 'productos') {
+        html = html.replace(/const activeCategories = <\?php echo json_encode\(\$categorias\); \?>;/g, `const activeCategories = ${JSON.stringify(categorias)};`);
+        
+        const renderLoop = (itemTemplate: string) => {
+          if (productos.length === 0) {
+            return `<tr><td colspan="7" class="p-8 text-center text-slate-500 font-semibold">No hay productos en el catálogo de Supabase.</td></tr>`;
+          }
+          return productos.map(p => {
+            const id = p.id || '';
+            const name = p.name || 'Sin nombre';
+            const description = p.description || 'Sin guarnición descrita';
+            const category = p.category || 'broaster';
+            const price = parseFloat(p.price || '0');
+            const stock = parseInt(p.stock || '0', 10);
+            const image = p.image || '/imagenes/productos/fallback.webp';
+            const available = p.available === undefined ? true : Boolean(p.available);
+            
+            let temp = itemTemplate;
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['image'\]\s*\?\?\s*'\/imagenes\/productos\/fallback\.webp'\);\s*\?>/g, image);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['name'\]\s*\?\?\s*''\);\s*\?>/g, name);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['description'\]\s*\?\?\s*'Sin guarniciones descritas'\);\s*\?>/g, description);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['category'\]\s*\?\?\s*'broaster'\);\s*\?>/g, category);
+            temp = temp.replace(/<\?php\s+echo\s+number_format\(floatval\(\$p\['price'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, price.toFixed(2));
+            temp = temp.replace(/<\?php\s+echo\s+\$stock;\s*\?>/g, String(stock));
+            temp = temp.replace(/<\?php\s+echo\s+\$available\s*\?\s*'Disponible'\s*:\s*'Agotado';\s*\?>/g, available ? 'Disponible' : 'Agotado');
+            temp = temp.replace(/<\?php\s+echo\s+\$available\s*\?\s*'text-emerald-400'\s*:\s*'text-slate-500';\s*\?>/g, available ? 'text-emerald-400' : 'text-slate-500');
+            temp = temp.replace(/<\?php\s+echo\s+\$isCrit\s*\?\s*'text-red-400 font-black'\s*:\s*'text-slate-300 font-bold';\s*\?>/g, stock <= 5 ? 'text-red-400 font-black' : 'text-slate-300 font-bold');
+            temp = temp.replace(/<\?php\s+echo\s+\$isCrit\s*\?\s*'text-red-400 font-black animate-pulse'\s*:\s*'text-slate-400 font-bold';\s*\?>/g, stock <= 5 ? 'text-red-400 font-black animate-pulse' : 'text-slate-400 font-bold');
+            temp = temp.replace(/<\?php\s+echo\s+json_encode\(\$p,\s*JSON_HEX_APOS\s*\|\s*JSON_HEX_QUOT\);\s*\?>/g, JSON.stringify(p).replace(/'/g, '&#39;').replace(/"/g, '&quot;'));
+            temp = temp.replace(/<\?php\s+echo\s+\$p\['id'\];\s*\?>/g, id);
+            return temp;
+          }).join('\n');
+        };
+        
+        html = html.replace(/<\?php\s+if\s*\(empty\(\$productos\)\):[\s\S]*?<\?php\s+else:\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g, (m, content) => {
+          return renderLoop(content);
+        });
+      }
+      else if (view === 'pedidos') {
+        const renderLoop = (itemTemplate: string) => {
+          if (pedidos.length === 0) {
+            return `<tr><td colspan="8" class="p-8 text-center text-slate-500 font-semibold">No se encontraron órdenes en Supabase.</td></tr>`;
+          }
+          
+          return pedidos.map(o => {
+            const orderNum = o.orderNumber || o.id || '';
+            const customerName = o.customerName || 'Cliente';
+            const customerPhone = o.customerPhone || 'Sin teléfono';
+            const total = parseFloat(o.total || '0');
+            const orderType = o.orderType || 'Delivery';
+            const paymentMethod = o.paymentMethod || 'Yape';
+            const status = (o.status || 'recibido').toLowerCase();
+            const created_at = o.created_at || new Date().toISOString();
+            const timeStr = new Date(created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
+            
+            let items: any[] = [];
+            try {
+              items = typeof o.items === 'string' ? JSON.parse(o.items || '[]') : (o.items || []);
+            } catch(e) {}
+            
+            let temp = itemTemplate;
+            
+            const subLoopRegex = /<\?php\s+if\s*\(is_array\(\$items\)\):\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g;
+            temp = temp.replace(subLoopRegex, (sm, subContent) => {
+              return items.map(it => {
+                let s = subContent;
+                s = s.replace(/<\?php\s+echo\s+\$it\['quantity'\]\s*\?\?\s*1;\s*\?>/g, String(it.quantity || 1));
+                s = s.replace(/<\?php\s+echo\s+htmlspecialchars\(\$it\['name'\]\s*\?\?\s*'Plato'\);\s*\?>/g, it.name || 'Plato');
+                return s;
+              }).join('\n');
+            });
+            
+            let actionHtml = '';
+            if (status === 'recibido') {
+              actionHtml = `<button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold h-11 lg:h-8 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="chef-hat" class="w-3.5 h-3.5"></i> Iniciar Cocina</button><input type="hidden" name="status" value="preparando">`;
+            } else if (status === 'preparando') {
+              actionHtml = `<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold h-11 lg:h-8 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Despachar</button><input type="hidden" name="status" value="en_camino">`;
+            } else if (status === 'en_camino') {
+              actionHtml = `<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold h-11 lg:h-8 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Entregado</button><input type="hidden" name="status" value="entregado">`;
+            } else {
+              actionHtml = `<span class="text-slate-500 text-[10px] block text-center font-black py-2 bg-slate-800/10 border border-slate-800/40 rounded-xl select-none uppercase tracking-widest"><i data-lucide="archive-restore" class="w-3 h-3 inline mr-1"></i> Despachado</span>`;
+            }
+            
+            temp = temp.replace(/<\?php\s+echo\s+\$actionHtml;\s*\?>/g, actionHtml);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$orderNum\);\s*\?>/g, orderNum);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerName'\]\s*\?\?\s*'Cliente'\);\s*\?>/g, customerName);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerPhone'\]\s*\?\?\s*'Sin teléfono'\);\s*\?>/g, customerPhone);
+            temp = temp.replace(/<\?php\s+echo\s+isset\(\$o\['created_at'\]\)\s*\?\s*date\('h:i A',\s*strtotime\(\$o\['created_at'\]\)\)\s*:\s*'Ahora';\s*\?>/g, timeStr);
+            temp = temp.replace(/<\?php\s+echo\s+number_format\(floatval\(\$o\['total'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, total.toFixed(2));
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['orderType'\]\s*\?\?\s*'Delivery'\);\s*\?>/g, orderType);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['paymentMethod'\]\s*\?\?\s*'Yape'\);\s*\?>/g, paymentMethod);
+            temp = temp.replace(/<\?php\s+echo\s+\$status;\s*\?>/g, status);
+            temp = temp.replace(/<\?php\s+echo\s+\$stateColor;\s*\?>/g, status === 'entregado' || status === 'completado' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400' : status === 'cancelado' ? 'bg-red-500/10 border-red-500/25 text-red-400' : status === 'preparando' ? 'bg-sky-500/10 border-sky-500/25 text-sky-400' : 'bg-amber-500/10 border-amber-500/25 text-amber-400');
+            temp = temp.replace(/<\?php\s+echo\s+\$o\['id'\];\s*\?>/g, o.id);
+            return temp;
+          }).join('\n');
+        };
+        
+        // Loops de comanda tradicionales y móviles
+        html = html.replace(/<\?php\s+if\s*\(empty\(\$pedidos\)\):[\s\S]*?<\?php\s+else:\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g, (m, content) => {
+          return renderLoop(content);
+        });
+        
+        // Inyectar columnas Kanban
+        const colsMeta = {
+          recibido: { title: 'Recibidos', badge: 'border-amber-500/20 bg-amber-500/5 text-amber-400' },
+          preparando: { title: 'Cocina', badge: 'border-sky-500/20 bg-sky-500/5 text-sky-400' },
+          en_camino: { title: 'En Camino', badge: 'border-indigo-500/20 bg-indigo-500/5 text-indigo-400' },
+          entregado: { title: 'Entregados', badge: 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400' }
+        };
+        
+        let colsHtml = '';
+        Object.entries(colsMeta).forEach(([col_id, meta]) => {
+          const orders_in_col = pedidos.filter(o => {
+            const ost = (o.status || 'recibido').toLowerCase();
+            return ost === col_id || (col_id === 'entregado' && ost === 'completado');
+          });
+          const count = orders_in_col.length;
+          
+          let cardsHtml = '';
+          if (count === 0) {
+            cardsHtml = `<div class="h-28 border border-dashed border-slate-800/60 rounded-xl flex flex-col items-center justify-center p-4 text-center select-none"><i data-lucide="inbox" class="w-5 h-5 text-slate-600 mb-1"></i><span class="text-[10px] font-bold text-slate-500">Sin comandas</span></div>`;
+          } else {
+            const matchCardTemplate = html.match(/<!-- Kanban Comanda Card -->[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>/);
+            const cardTemplate = matchCardTemplate ? matchCardTemplate[0] : '';
+            
+            if (cardTemplate) {
+              cardsHtml = orders_in_col.map(o => {
+                const orderNum = o.orderNumber || o.id || '';
+                const customerName = o.customerName || 'Cliente';
+                const total = parseFloat(o.total || '0');
+                const orderType = o.orderType || 'Delivery';
+                const status = (o.status || 'recibido').toLowerCase();
+                
+                let items: any[] = [];
+                try {
+                  items = typeof o.items === 'string' ? JSON.parse(o.items || '[]') : (o.items || []);
+                } catch(e) {}
+                
+                let ct = cardTemplate;
+                
+                const subLoopRegex = /<\?php\s+if\s*\(is_array\(\$items\)\):\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g;
+                ct = ct.replace(subLoopRegex, (sm, subContent) => {
+                  return items.map(it => {
+                    let s = subContent;
+                    s = s.replace(/<\?php\s+echo\s+\$it\['quantity'\]\s*\?\?\s*1;\s*\?>/g, String(it.quantity || 1));
+                    s = s.replace(/<\?php\s+echo\s+htmlspecialchars\(\$it\['name'\]\s*\?\?\s*'Plato'\);\s*\?>/g, it.name || 'Plato');
+                    return s;
+                  }).join('\n');
+                });
+                
+                let actionHtml = '';
+                if (status === 'recibido') {
+                  actionHtml = `<button type="submit" class="w-full bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="chef-hat" class="w-3.5 h-3.5"></i> Cocinar</button><input type="hidden" name="status" value="preparando">`;
+                } else if (status === 'preparando') {
+                  actionHtml = `<button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Despachar</button><input type="hidden" name="status" value="en_camino">`;
+                } else if (status === 'en_camino') {
+                  actionHtml = `<button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Entregar</button><input type="hidden" name="status" value="entregado">`;
+                } else {
+                  actionHtml = `<span class="text-slate-500 text-[10px] block text-center font-black py-2 bg-slate-800/10 border border-slate-800/40 rounded-xl select-none uppercase tracking-widest"><i data-lucide="archive-restore" class="w-3 h-3 inline mr-1"></i> Despachado</span>`;
+                }
+                
+                ct = ct.replace(/<\?php\s+echo\s+\$actionHtml;\s*\?>/g, actionHtml);
+                ct = ct.replace(/<\?php\s+echo\s+htmlspecialchars\(\$orderNum\);\s*\?>/g, orderNum);
+                ct = ct.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerName'\]\s*\?\?\s*'Cliente'\);\s*\?>/g, customerName);
+                ct = ct.replace(/<\?php\s+echo\s+number_format\(floatval\(\$o\['total'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, total.toFixed(2));
+                ct = ct.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['orderType'\]\s*\?\?\s*'Delivery'\);\s*\?>/g, orderType);
+                ct = ct.replace(/<\?php\s+echo\s+\$status;\s*\?>/g, status);
+                ct = ct.replace(/<\?php\s+echo\s+\$o\['id'\];\s*\?>/g, o.id);
+                return ct;
+              }).join('\n');
+            }
+          }
+          
+          colsHtml += `
+          <!-- Column Container -->
+          <div class="bg-[#0f1424]/40 rounded-2xl border border-slate-800/80 p-4 flex flex-col h-[calc(100vh-230px)] min-w-[270px] max-w-[320px] shrink-0 animate-fade-in">
+              <!-- Column Header -->
+              <div class="flex items-center justify-between mb-4 pb-3.5 border-b border-slate-800/60 shrink-0">
+                  <h3 class="font-extrabold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <span class="w-1.5 h-3 bg-orange-500 rounded-sm"></span>
+                      ${meta.title}
+                  </h3>
+                  <span class="px-2 py-0.5 border rounded-md text-[9px] font-black uppercase ${meta.badge}">
+                      ${count}
+                  </span>
+              </div>
+              
+              <!-- Cards scrollable region inside columns -->
+              <div class="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-none">
+                  ${cardsHtml}
+              </div>
+          </div>
+          `;
+        });
+        
+        const boardStartIdx = html.indexOf('<div id="desktop-kanban-board"');
+        const boardEndIdx = html.indexOf('<!-- ========================================================================= -->\n    <!-- MOBILE VIEW: TOUCH-FIRST CARDS');
+        if (boardStartIdx !== -1 && boardEndIdx !== -1) {
+          const preBoard = html.substring(0, boardStartIdx);
+          const postBoard = html.substring(boardEndIdx);
+          html = preBoard + `<div id="desktop-kanban-board" class="hidden lg:grid grid-cols-4 gap-4 overflow-x-auto pb-4 pt-1 animate-fade-in select-none">${colsHtml}</div>\n    ` + postBoard;
+        }
+      }
+      else if (view === 'dashboard') {
+        // Calcular métricas
+        let ventas_totales = 0;
+        let pedidos_atendidos = 0;
+        pedidos.forEach(o => {
+          const st = (o.status || 'recibido').toLowerCase();
+          if (st === 'entregado' || st === 'completado') {
+            ventas_totales += parseFloat(o.total || '0');
+            pedidos_atendidos++;
+          }
+        });
+        
+        const productos_criticos = productos.filter(p => parseInt(p.stock || '0', 10) <= 5);
+        const stock_critico_count = productos_criticos.length;
+        
+        // Reemplazar métricas del Dashboard
+        html = html.replace(/<\?php\s+echo\s+number_format\(\$ventas_totales,\s*2\);\s*\?>/g, ventas_totales.toFixed(2));
+        html = html.replace(/<\?php\s+echo\s+\$pedidos_atendidos;\s*\?>/g, String(pedidos_atendidos));
+        html = html.replace(/<\?php\s+echo\s+count\(\$clientes\);\s*\?>/g, String(clientes.length));
+        html = html.replace(/<\?php\s+echo\s+\$stock_critico_count;\s*\?>/g, String(stock_critico_count));
+        html = html.replace(/<\?php\s+echo\s+\$stock_critico_count\s*>\s*0\s*\?\s*'text-red-400 font-black animate-pulse'\s*:\s*'text-white';\s*\?>/g, stock_critico_count > 0 ? 'text-red-400 font-black animate-pulse' : 'text-white');
+        
+        // Loop de pedidos recientes
+        const recentOrdersTemplateRegex = /<\?php\s+foreach\s*\(\$recent_orders\s+as\s+\$o\):\s*\*?\?>([\s\S]*?)<\?php\s+endforeach;\s*\?>/g;
+        html = html.replace(recentOrdersTemplateRegex, (m, template) => {
+          const recent_orders = pedidos.slice(0, 5);
+          if (recent_orders.length === 0) {
+            return `<div class="py-12 text-center text-slate-500 font-semibold text-xs select-none">No hay comandas todavía.</div>`;
+          }
+          return recent_orders.map(o => {
+            const orderNum = o.orderNumber || o.id || '';
+            const status = (o.status || 'recibido').toLowerCase();
+            const customerName = o.customerName || 'Cliente';
+            const total = parseFloat(o.total || '0');
+            const created_at = o.created_at || new Date().toISOString();
+            const timeStr = new Date(created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
+            
+            let temp = template;
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$orderNum\);\s*\?>/g, orderNum);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerName'\]\s*\?\?\s*'Cliente'\);\s*\?>/g, customerName);
+            temp = temp.replace(/<\?php\s+echo\s+number_format\(floatval\(\$o\['total'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, total.toFixed(2));
+            temp = temp.replace(/<\?php\s+echo\s+isset\(\$o\['created_at'\]\)\s*\?\s*date\('h:i A',\s*strtotime\(\$o\['created_at'\]\)\)\s*:\s*'Ahora';\s*\?>/g, timeStr);
+            temp = temp.replace(/<\?php\s+echo\s+\$status;\s*\?>/g, status);
+            temp = temp.replace(/<\?php\s+echo\s+\$stateColor;\s*\?>/g, status === 'entregado' || status === 'completado' ? 'text-emerald-400 bg-emerald-500/5 border-emerald-500/10' : status === 'cancelado' ? 'text-red-400 bg-red-500/5 border-red-500/10' : status === 'preparando' ? 'text-sky-400 bg-sky-500/5 border-sky-500/10' : 'text-amber-400 bg-amber-500/5 border-amber-500/10');
+            return temp;
+          }).join('\n');
+        });
+        
+        // Loop de productos críticos
+        const productsCritTemplateRegex = /<\?php\s+foreach\s*\(\$productos_criticos\s+as\s+\$p\):\s*\*?\?>([\s\S]*?)<\?php\s+endforeach;\s*\?>/g;
+        html = html.replace(productsCritTemplateRegex, (m, template) => {
+          const recent_crit = productos_criticos.slice(0, 5);
+          if (recent_crit.length === 0) {
+            return `<div class="py-12 text-center text-slate-500 font-semibold text-xs select-none">No hay productos en stock crítico.</div>`;
+          }
+          return recent_crit.map(p => {
+            const name = p.name || '';
+            const category = p.category || 'broaster';
+            const stock = parseInt(p.stock || '0', 10);
+            const image = p.image || '/imagenes/productos/fallback.webp';
+            
+            let temp = template;
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['image'\]\s*\?\?\s*'\/imagenes\/productos\/fallback\.webp'\);\s*\?>/g, image);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['name'\]\s*\?\?\s*''\);\s*\?>/g, name);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['category'\]\s*\?\?\s*'broaster'\);\s*\?>/g, category);
+            temp = temp.replace(/<\?php\s+echo\s+\$stk;\s*\?>/g, String(stock));
+            return temp;
+          }).join('\n');
+        });
+        
+        // Limpiar condicionales vacíos redundantes de PHP
+        html = html.replace(/<\?php\s+if\s*\(empty\(\$recent_orders\)\):[\s\S]*?<\?php\s+else:[\s\S]*?\?>/g, '');
+        html = html.replace(/<\?php\s+if\s*\(empty\(\$productos_criticos\)\):[\s\S]*?<\?php\s+else:[\s\S]*?\?>/g, '');
+        html = html.replace(/<\?php\s+endif;\s*\?>/g, '');
+      }
+      else if (view === 'ticket') {
+        const renderLoop = (itemTemplate: string) => {
+          if (pedidos.length === 0) {
+            return `<tr><td colspan="6" class="p-8 text-center text-slate-500 font-semibold select-none">No hay pedidos disponibles para emitir tickets.</td></tr>`;
+          }
+          return pedidos.map(o => {
+            const orderNum = o.orderNumber || o.id || '';
+            const customerName = o.customerName || 'Cliente';
+            const customerPhone = o.customerPhone || 'Sin teléfono';
+            const total = parseFloat(o.total || '0');
+            const orderType = o.orderType || 'Delivery';
+            
+            let items: any[] = [];
+            try {
+              items = typeof o.items === 'string' ? JSON.parse(o.items || '[]') : (o.items || []);
+            } catch(e) {}
+            
+            let briefStr = '';
+            if (items.length > 0) {
+              const sliceItems = items.slice(0, 2);
+              briefStr = sliceItems.map(it => `${it.quantity || 1}x ${it.name || 'Plato'}`).join(', ');
+              if (items.length > 2) {
+                briefStr += '...';
+              }
+            }
+            
+            let temp = itemTemplate;
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$orderNum\);\s*\?>/g, orderNum);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerName'\]\s*\?\?\s*'Cliente'\);\s*\?>/g, customerName);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerPhone'\]\s*\?\?\s*'Sin teléfono'\);\s*\?>/g, customerPhone);
+            temp = temp.replace(/<\?php\s+echo\s+number_format\(floatval\(\$o\['total'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, total.toFixed(2));
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['orderType'\]\s*\?\?\s*'Delivery'\);\s*\?>/g, orderType);
+            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$itemsBrief\);\s*\?>/g, briefStr);
+            temp = temp.replace(/<\?php\s+echo\s+json_encode\(\$o,\s*JSON_HEX_APOS\s*\|\s*JSON_HEX_QUOT\);\s*\?>/g, JSON.stringify(o).replace(/'/g, '&#39;').replace(/"/g, '&quot;'));
+            return temp;
+          }).join('\n');
+        };
+        
+        html = html.replace(/<\?php\s+if\s*\(empty\(\$pedidos\)\):[\s\S]*?<\?php\s+else:\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g, (m, content) => {
+          return renderLoop(content);
+        });
+      }
+      
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      res.send(html);
+    } catch (e: any) {
+      res.status(500).send(`Error de emulación de panel PHP: ${e.message}`);
+    }
+  });
+  app.use('/admin', express.static(path.join(process.cwd(), 'admin'), { ...staticOptions, index: false }));
+
   // 2. Archivos estáticos de css, js, html y raíz pública (todos dentro de public/)
   app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
   app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
-
-  // 3. Servir HTML Compilado del Panel de Administración para /admin y cualquier subruta (/admin/dashboard, /admin/productos, etc.)
-  app.get(['/admin', '/admin.html', /^\/admin(?:\/.*)?$/], (req: Request, res: Response, next) => {
-    // Si la petición solicita un archivo específico con extensión (.css, .js, .png, etc.), pasar a express.static
-    if (path.extname(req.path)) {
-      return next();
-    }
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.send(getCompiledAdminHtml());
-  });
-
-  // 4. Panel de Administración Oficial BuchiSapa (Archivos estáticos CSS, JS, imágenes)
-  app.use('/admin', express.static(path.join(process.cwd(), 'admin'), { ...staticOptions, index: false }));
 
   app.get(['/reclamaciones', '/reclamaciones.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'public/html/reclamaciones.html'));
