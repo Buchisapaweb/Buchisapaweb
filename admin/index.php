@@ -6,7 +6,7 @@
 require_once __DIR__ . '/config/supabase.php';
 require_once __DIR__ . '/includes/auth.php';
 
-// Procesar acción de cerrar sesión con redirección infalible a /index.html de la raíz
+// Procesar acción de cerrar sesión con redirección infalible a /index.html de la raíz (con i minúscula)
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -25,7 +25,7 @@ checkAdminAuth();
 // Obtener vista activa (por defecto dashboard)
 $view = $_GET['view'] ?? 'dashboard';
 
-$allowed_views = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket'];
+$allowed_views = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket', 'configuracion'];
 if (!in_array($view, $allowed_views)) {
     $view = 'dashboard';
 }

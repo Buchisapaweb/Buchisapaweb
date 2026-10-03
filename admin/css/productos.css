@@ -1,0 +1,13 @@
+/**
+ * BUCHISAPA BURGER & BROASTER - PRODUCTOS MODULE CSS
+ * admin/css/productos.css
+ */
+
+.product-image-ratio {
+    aspect-ratio: 1 / 1;
+}
+
+.stock-warning-border {
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}

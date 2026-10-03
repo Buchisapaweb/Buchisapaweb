@@ -1,0 +1,17 @@
+/**
+ * BUCHISAPA BURGER & BROASTER - PEDIDOS MODULE CSS
+ * admin/css/pedidos.css
+ */
+
+.kds-column-card-shadow {
+    box-shadow: 0 4px 12px rgba(15, 20, 36, 0.4);
+}
+
+.comanda-badge-pulse {
+    animation: alertPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes alertPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.85; }
+}

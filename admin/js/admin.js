@@ -3,6 +3,20 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Load Custom Admin Config (Photo and Name) from localStorage
+    const savedPhoto = localStorage.getItem('admin_photo');
+    const savedName = localStorage.getItem('admin_name');
+    
+    const topbarPhoto = document.getElementById('topbar-admin-img');
+    const topbarName = document.getElementById('topbar-admin-name');
+    
+    if (savedPhoto && topbarPhoto) {
+        topbarPhoto.src = savedPhoto;
+    }
+    if (savedName && topbarName) {
+        topbarName.textContent = savedName;
+    }
+
     // Initialize Lucide Icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
@@ -18,16 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Auto-dismiss alert notifications after 4 seconds with slide/fade animation
-    const flashMessages = document.querySelectorAll('.animate-fade-in');
+    const flashMessages = document.querySelectorAll('.admin-flash-message');
     flashMessages.forEach(msg => {
-        if (msg.id !== 'desktop-kanban-board') {
-            setTimeout(() => {
-                msg.style.opacity = '0';
-                msg.style.transform = 'translateY(-10px)';
-                msg.style.transition = 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
-                setTimeout(() => msg.remove(), 350);
-            }, 4000);
-        }
+        setTimeout(() => {
+            msg.style.opacity = '0';
+            msg.style.transform = 'translateY(-10px)';
+            msg.style.transition = 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+            setTimeout(() => msg.remove(), 350);
+        }, 4000);
     });
 });
 

@@ -2786,13 +2786,20 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // 2. Compilar sobre la marcha y servir el Panel de Administración PHP real en HTML compatible con Vercel
   app.get(['/admin', '/admin.html', '/admin/index.php', /^\/admin(?:\/.*)?$/, /^\/php-admin(?:\/.*)?$/], async (req: Request, res: Response, next) => {
+    // Interceptar la acción de logout en el emulador de desarrollo
+    if (req.query.action === 'logout') {
+      res.setHeader('Set-Cookie', 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+      res.redirect('/index.html');
+      return;
+    }
+
     // Pasar a express.static si se solicitan archivos específicos con extensión (CSS, JS, imágenes, etc.)
     if (path.extname(req.path) && path.extname(req.path) !== '.php' && !req.path.endsWith('/admin')) {
       return next();
     }
     
     let view = (req.query.view as string) || 'dashboard';
-    const allowedViews = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket'];
+    const allowedViews = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket', 'configuracion'];
     if (!allowedViews.includes(view)) {
       view = 'dashboard';
     }
@@ -2817,7 +2824,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       header = header.replace(/<\?php[\s\S]*?\?>/g, '');
       sidebar = sidebar.replace(/<\?php[\s\S]*?current_view\s*=\s*[\s\S]*?\?>/g, '');
       topbar = topbar.replace(/<\?php[\s\S]*?\?>/g, '');
-      footer = footer.replace(/<\?php[\s\S]*?\?>/g, '');
+      // Compile view-specific dynamic footer scripts rather than stripping them blindly
+      let footerScripts = '';
+      if (view === 'dashboard') {
+        footerScripts += '    <script src="/admin/js/chart.min.js"></script>\n';
+      }
+      const allowedScriptViews = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket', 'configuracion'];
+      if (allowedScriptViews.includes(view)) {
+        footerScripts += `    <script src="/admin/js/${view}.js"></script>`;
+      }
+      footer = footer.replace(/<\?php[\s\S]*?\?>/g, footerScripts);
       
       let html = header;
       html += `
@@ -2863,14 +2879,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       let flashHtml = '';
       if (successFlash) {
         flashHtml += `
-        <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-2 animate-fade-in shadow-lg">
+        <div class="admin-flash-message p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-2 animate-fade-in shadow-lg">
             <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
             <span>${successFlash}</span>
         </div>`;
       }
       if (errorFlash) {
         flashHtml += `
-        <div class="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold rounded-xl flex items-center gap-2 animate-fade-in shadow-lg">
+        <div class="admin-flash-message p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold rounded-xl flex items-center gap-2 animate-fade-in shadow-lg">
             <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
             <span>${errorFlash}</span>
         </div>`;
@@ -2888,19 +2904,20 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       html = html.replace(/<\?php[\s\S]*?checkAdminAuth\(\);[\s\S]*?\?>/g, '');
       
       // Formatear títulos y relojes
-      const view_title = view === 'dashboard' ? 'Dashboard' : view === 'clientes' ? 'Clientes' : view === 'productos' ? 'Productos' : view === 'pedidos' ? 'Pedidos' : 'Ticket';
+      const view_title = view === 'dashboard' ? 'Dashboard' : view === 'clientes' ? 'Clientes' : view === 'productos' ? 'Productos' : view === 'pedidos' ? 'Pedidos y Comandas' : view === 'ticket' ? 'Ticket' : 'Configuración';
       html = html.replace(/<\?php\s+echo\s+\$active_title;\s*\?>/g, view_title);
       html = html.replace(/<\?php\s+echo\s+htmlspecialchars\(\$active_title\);\s*\?>/g, view_title);
       html = html.replace(/<\?php\s+echo\s+htmlspecialchars\(\$user_email\);\s*\?>/g, 'admin@buchisapa.pe');
       html = html.replace(/<\?php\s+echo\s+substr\(\$user_email,\s*0,\s*2\);\s*\?>/g, 'AD');
       html = html.replace(/<\?php\s+echo\s+date\('H:i:s'\);\s*\?>/g, new Date().toLocaleTimeString('es-PE', { hour12: false }));
       
-      // Resaltado de clases activas del Sidebar para todas las 5 pestañas
+      // Resaltado de clases activas del Sidebar para todas las 6 pestañas
       html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'dashboard'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'dashboard' ? '$1' : '$2');
       html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'clientes'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'clientes' ? '$1' : '$2');
       html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'productos'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'productos' ? '$1' : '$2');
       html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'pedidos'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'pedidos' ? '$1' : '$2');
       html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'ticket'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'ticket' ? '$1' : '$2');
+      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'configuracion'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'configuracion' ? '$1' : '$2');
       
       // Renderizar loops basados en la base de datos de Supabase
       if (view === 'clientes') {
@@ -3260,6 +3277,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         });
       }
       
+      // Inyectar CSS y JS específicos de la vista en el emulador Node/Vercel
+      html = html.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${view}.css">\n</head>`);
+      html = html.replace('</body>', `  <script src="/admin/js/${view}.js"></script>\n</body>`);
+
+      // Eliminar cualquier bloque de etiquetas PHP residuales que no hayan sido compiladas (para evitar que se impriman como texto en el navegador)
+      html = html.replace(/<\?php[\s\S]*?\?>/g, '');
+
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
       res.send(html);

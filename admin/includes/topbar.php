@@ -7,13 +7,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$active_view = $_GET['view'] ?? 'clientes';
+$active_view = $_GET['view'] ?? 'dashboard';
 $view_titles = [
+    'dashboard' => 'Dashboard',
     'clientes' => 'Clientes',
     'productos' => 'Productos',
-    'pedidos' => 'Pedidos y Comandas'
+    'pedidos' => 'Pedidos y Comandas',
+    'ticket' => 'Ticket y Boletas',
+    'configuracion' => 'Configuración'
 ];
-$active_title = $view_titles[$active_view] ?? 'Clientes';
+$active_title = $view_titles[$active_view] ?? 'Dashboard';
 $user_email = $_SESSION['user']['email'] ?? $_SESSION['admin_user']['email'] ?? 'admin@buchisapa.pe';
 ?>
 <!-- Topbar Header wrapper conforming to Top Bar Contract -->
@@ -50,16 +53,14 @@ $user_email = $_SESSION['user']['email'] ?? $_SESSION['admin_user']['email'] ?? 
             <?php echo date('H:i:s'); ?>
         </span>
         
-        <!-- User Badge Profile Card -->
-        <div class="flex items-center gap-2 bg-[#121829] border border-slate-800/80 pl-3 pr-2.5 py-1.5 rounded-xl max-w-[180px] sm:max-w-none">
-            <div class="text-right hidden sm:block">
-                <span class="text-[10px] font-black text-white block truncate max-w-[110px]"><?php echo htmlspecialchars($user_email); ?></span>
-                <span class="text-[9px] text-orange-500 font-bold uppercase tracking-wider block">Admin Principal</span>
+        <!-- User Badge Profile Card (Completely independent: no backgrounds, no border boxes, no wrappers) -->
+        <div class="flex items-center gap-3 select-none cursor-pointer">
+            <div class="text-right">
+                <span id="topbar-admin-name" class="text-xs font-extrabold text-white block leading-tight truncate max-w-[120px]">Administrador</span>
+                <span class="text-[9px] text-orange-500 font-bold uppercase tracking-widest block leading-none mt-1">Admin Principal</span>
             </div>
-            <!-- Standard Avatar Circle representing Admin status -->
-            <div class="w-7 h-7 bg-orange-500/10 border border-orange-500/20 text-orange-400 font-black text-[10px] rounded-lg flex items-center justify-center shrink-0 uppercase select-none">
-                <?php echo substr($user_email, 0, 2); ?>
-            </div>
+            <!-- Dynamic Avatar - Direct img element with NO borders, NO outer boxes, completely independent -->
+            <img id="topbar-admin-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop" class="w-9 h-9 rounded-xl object-cover shadow-lg transition-transform duration-200 hover:scale-105" alt="Foto Administrador" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%232b1a0a%22/><text x=%2250%25%22 y=%2255%25%22 font-size=%2232%22 font-family=%22sans-serif%22 font-weight=%22bold%22 fill=%22%23f97316%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>AD</text></svg>';">
         </div>
     </div>
 </header>

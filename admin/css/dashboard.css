@@ -1,0 +1,16 @@
+/**
+ * BUCHISAPA BURGER & BROASTER - DASHBOARD MODULE CSS
+ * admin/css/dashboard.css
+ */
+
+.dashboard-metric-pulse {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+}
+
+.kds-ticker-item {
+    transition: transform 0.2s ease;
+}
+
+.kds-ticker-item:hover {
+    transform: translateX(4px);
+}

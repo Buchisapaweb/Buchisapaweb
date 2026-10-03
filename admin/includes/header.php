@@ -14,5 +14,12 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Custom CSS Styles -->
     <link rel="stylesheet" href="/admin/css/admin.css">
+    <?php
+    $current_style_view = $_GET['view'] ?? 'dashboard';
+    $allowed_style_views = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket', 'configuracion'];
+    if (in_array($current_style_view, $allowed_style_views)) {
+        echo '    <link rel="stylesheet" href="/admin/css/' . htmlspecialchars($current_style_view) . '.css">';
+    }
+    ?>
 </head>
 <body class="bg-[#070a13] text-[#f1f5f9] overflow-hidden antialiased font-['Plus_Jakarta_Sans',system-ui,sans-serif] selection:bg-orange-500/25 selection:text-orange-300">

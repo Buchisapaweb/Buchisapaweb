@@ -1,0 +1,32 @@
+/**
+ * BUCHISAPA BURGER & BROASTER - CONFIGURACIÓN MODULE CSS
+ * admin/css/configuracion.css
+ */
+
+/* Premium Inputs Animations & Styling Customizations */
+.premium-input {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.08);
+}
+
+/* Preset Avatars Hover Zooming effects */
+.preset-avatar-btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.preset-avatar-btn:hover {
+    transform: scale(1.05);
+    border-color: #f97316 !important;
+}
+
+/* Responsive grid adaptations */
+@media (max-width: 640px) {
+    #config-preview-img {
+        width: 80px;
+        height: 80px;
+    }
+}

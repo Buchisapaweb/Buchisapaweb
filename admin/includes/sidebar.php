@@ -9,7 +9,7 @@ $current_view = $_GET['view'] ?? 'dashboard';
 <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden transition-opacity"></div>
 
 <!-- Sidebar Container -->
-<aside id="admin-sidebar" class="fixed inset-y-0 left-0 w-64 bg-[#0f1424] border-r border-slate-800/80 flex flex-col justify-between z-40 shrink-0 h-full transition-transform duration-200 -translate-x-full lg:translate-x-0 lg:static">
+<aside id="admin-sidebar" class="fixed inset-y-0 left-0 w-full lg:w-64 bg-[#0f1424] border-r border-slate-800/80 flex flex-col justify-between z-40 shrink-0 h-full transition-transform duration-200 -translate-x-full lg:translate-x-0 lg:static">
     <div>
         <!-- Brand Identity Header: Now showing the official brand logo and only "BuchiSapa" as name -->
         <div class="p-6 border-b border-slate-800/80 flex items-center justify-between">
@@ -19,13 +19,13 @@ $current_view = $_GET['view'] ?? 'dashboard';
                     <h1 class="font-extrabold text-lg text-white leading-none tracking-tight select-none">BuchiSapa</h1>
                 </div>
             </div>
-            <!-- Mobile Close Button inside drawer -->
-            <button onclick="toggleSidebar()" class="p-1.5 text-slate-400 hover:text-white lg:hidden">
-                <i data-lucide="x" class="w-4 h-4"></i>
+            <!-- Mobile Close Button inside drawer (styled to look like a premium control in a full-screen menu) -->
+            <button onclick="toggleSidebar()" class="w-10 h-10 rounded-xl bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 active:scale-95 transition-all lg:hidden" aria-label="Cerrar panel lateral">
+                <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
 
-        <!-- Navigation Slots: Dashboard -> Clientes -> Productos -> Pedidos -> Ticket -->
+        <!-- Navigation Slots: Dashboard -> Clientes -> Productos -> Pedidos -> Ticket -> Configuración -->
         <nav class="p-4 space-y-1">
             <p class="px-3 text-[10px] font-black uppercase text-slate-500 tracking-wider mb-2 select-none">Administración</p>
             
@@ -57,6 +57,12 @@ $current_view = $_GET['view'] ?? 'dashboard';
             <a href="/admin/index.php?view=ticket" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'ticket' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
                 <i data-lucide="ticket" class="w-4 h-4"></i>
                 <span>Ticket</span>
+            </a>
+
+            <!-- 6. Configuracion Link -->
+            <a href="/admin/index.php?view=configuracion" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'configuracion' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                <span>Configuración</span>
             </a>
         </nav>
     </div>

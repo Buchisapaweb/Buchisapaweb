@@ -1,0 +1,14 @@
+/**
+ * BUCHISAPA BURGER & BROASTER - TICKET MODULE CSS
+ * admin/css/ticket.css
+ */
+
+.pos-thermal-container {
+    font-family: 'Courier New', Courier, monospace !important;
+}
+
+@media print {
+    .print-hidden {
+        display: none !important;
+    }
+}
