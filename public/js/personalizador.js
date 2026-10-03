@@ -96,228 +96,103 @@
       return [];
     }
 
-    // 1. PLATOS AMAZÓNICOS
-    if (name.includes('patacones con chorizo') || (name.includes('patacon') && name.includes('chorizo'))) {
-      return [
-        'Patacones de plátano verde fritos',
-        'Chorizo frito en bolitas',
-        'Salsa / Crema'
-      ];
+    // 1. PROMOCIONES (4 oficiales)
+    if (name.includes('buchi duo') || name.includes('buchi dúo')) {
+      return ['Papa crocante', 'Hamburguesa artesanal', 'Ensalada fresca'];
     }
-    if (name.includes('tacacho')) {
-      return [
-        'Tacacho con plátano asado',
-        'Cecina ahumada de la selva',
-        'Chorizo amazónico',
-        'Plátano maduro frito',
-        'Sarza criolla / ají de cocona'
-      ];
+    if (name.includes('broaster familiar')) {
+      return ['Papa crocante', 'Ensalada fresca', 'Arroz'];
     }
-    if (name.includes('juane') || name.includes('juanes')) {
-      return [
-        'Juane de arroz con gallina',
-        'Huevo duro',
-        'Aceituna de botija',
-        'Plátano maduro frito',
-        'Ensalada de cocona / ají de cocona'
-      ];
+    if (name.includes('salchi burger')) {
+      return ['Queso cheddar', 'Papa crocante', 'Ensalada fresca'];
     }
-    if (name.includes('chilcano') || name.includes('carachama')) {
-      return [
-        'Carachama / pescado del día entero',
-        'Yuca sancochada',
-        'Caldo chilcano'
-      ];
-    }
-    if (name.includes('palometa')) {
-      return [
-        'Palometa frita entera',
-        'Arroz blanco',
-        'Plátano maduro frito',
-        'Salsa criolla / ají'
-      ];
-    }
-    if (name.includes('caldo amazónico') || name.includes('caldo amazonico')) {
-      return [
-        'Caldo verde amazónico con pescado/pollo',
-        'Culantro y hierbas selváticas',
-        'Yuca sancochada'
-      ];
-    }
-    if (name.includes('chaufa') || (name.includes('chaufa') && cat.includes('amazon'))) {
-      return [
-        'Arroz chaufa con cecina',
-        'Chorizo amazónico en trozos',
-        'Huevo salteado'
-      ];
+    if (name.includes('selva power')) {
+      return ['Maduros fritos', 'Sarza criolla', 'Papa crocante', 'Ensalada fresca'];
     }
 
-    // 2. HAMBURGUESAS
-    if (name.includes('choripan') || name.includes('choripán')) {
-      return [
-        'Papas fritas',
-        'Chorizo parrillero',
-        'Ensalada fresca',
-        'Crema'
-      ];
+    // 2. HAMBURGUESAS (12 productos)
+    if (name === 'clásica' || name === 'clasica') {
+      return ['Hamburguesa artesanal', 'Papa crocante', 'Ensalada fresca'];
+    }
+    if (name.includes('choripán') || name.includes('choripan')) {
+      return ['Papas crocantes', 'Chorizo', 'Ensalada fresca'];
     }
     if (name.includes('hawaiana carne')) {
-      return [
-        'Papa frita',
-        'Carne artesanal',
-        'Huevo frito',
-        'Jamón',
-        'Queso fundido',
-        'Piña a la plancha',
-        'Ensalada fresca',
-        'Crema'
-      ];
+      return ['Papa crocante', 'Carne artesanal', 'Huevo', 'Jamón', 'Queso', 'Piña', 'Ensalada fresca'];
     }
     if (name.includes('hawaiana pollo')) {
-      return [
-        'Papa frita',
-        'Pollo crispy',
-        'Huevo frito',
-        'Jamón',
-        'Queso fundido',
-        'Piña a la plancha',
-        'Ensalada fresca',
-        'Crema'
-      ];
+      return ['Papa crocante', 'Pollo crispy', 'Huevo', 'Jamón', 'Queso', 'Piña', 'Ensalada fresca'];
     }
     if (name.includes('deshilachado')) {
-      return [
-        'Papas fritas',
-        'Pollo deshilachado con mayonesa casera',
-        'Ensalada fresca',
-        'Crema'
-      ];
+      return ['Papas crocantes', 'Ensalada fresca'];
     }
     if (name.includes('filete')) {
-      return [
-        'Papas fritas',
-        'Filete de pollo a la plancha',
-        'Ensalada fresca',
-        'Crema'
-      ];
+      return ['Papas crocantes', 'Ensalada fresca'];
     }
-    if (name.includes('cheese') || name.includes('cheeseburger')) {
-      return [
-        'Hamburguesa de casa',
-        'Queso cheddar'
-      ];
+    if (name.includes('cheese')) {
+      return ['Queso cheddar'];
     }
     if (name.includes('bacon')) {
-      return [
-        'Hamburguesa artesanal',
-        'Papas fritas',
-        'Tocino crocante',
-        'Queso cheddar'
-      ];
+      return ['Papas crocantes', 'Tocino', 'Queso'];
     }
     if (name.includes('suprema')) {
-      return [
-        'Hamburguesa artesanal',
-        'Tocino crocante',
-        'Queso fundido',
-        'Huevo frito',
-        'Jamón',
-        'Papas fritas',
-        'Ensalada fresca',
-        'Crema'
-      ];
+      return ['Tocino', 'Queso', 'Huevo frito', 'Jamón'];
+    }
+    if (name.includes('hamburguesa a lo pobre')) {
+      return ['Huevo frito', 'Queso', 'Jamón', 'Plátano'];
     }
     if (name.includes('royal a lo pobre')) {
-      return [
-        'Papa frita',
-        'Carne artesanal',
-        'Huevo frito',
-        'Jamón',
-        'Queso fundido',
-        'Plátano maduro frito',
-        'Ensalada fresca',
-        'Crema'
-      ];
+      return ['Papa crocante', 'Carne artesanal', 'Huevo', 'Jamón', 'Queso', 'Plátano', 'Ensalada fresca'];
     }
-    if (name.includes('royal')) {
-      return [
-        'Carne casera / Pollo deshilachado / Hamburguesa de pollo / Hamburguesa de Chorizo',
-        'Papas fritas',
-        'Ensalada fresca',
-        'Crema'
-      ];
+    if (name === 'royal') {
+      return ['Carne casera', 'Pollo deshilachado', 'Pollo', 'Chorizo'];
     }
-    if (name.includes('hamburguesa a lo pobre') || (name.includes('a lo pobre') && cat.includes('hamburguesa'))) {
-      return [
-        'Hamburguesa artesanal',
-        'Huevo frito',
-        'Queso fundido',
-        'Jamón',
-        'Plátano maduro frito',
-        'Papas fritas'
-      ];
-    }
-    if (name.includes('clásica') || name.includes('clasica') || cat.includes('hamburguesa')) {
-      return [
-        'Hamburguesa (carne o pollo)',
-        'Papas fritas',
-        'Ensalada fresca',
-        'Crema'
-      ];
+    if (cat.includes('hamburguesa')) {
+      return ['Hamburguesa artesanal', 'Papa crocante', 'Ensalada fresca'];
     }
 
-    // 3. BROASTER (Todos con: Papa + ensalada + arroz + cremas)
+    // 3. BROASTER (4 productos)
     if (cat.includes('broaster') || (name.includes('broaster') && !name.includes('salchi'))) {
-      return [
-        'Papa frita',
-        'Ensalada fresca',
-        'Arroz blanco',
-        'Cremas de la casa'
-      ];
+      return ['Papa crocante', 'Ensalada fresca', 'Arroz'];
     }
 
-    // 4. SALCHIPAPAS Y SALCHIBROASTERS (Todos con: Papas + ensalada + cremas)
-    if (name.includes('salchipapa a lo pobre')) {
-      return [
-        'Papas fritas',
-        'Salchicha en rodajas',
-        'Huevo frito',
-        'Plátano maduro frito',
-        'Ensalada fresca',
-        'Cremas'
-      ];
-    }
-    if (name.includes('salchichorizo')) {
-      return [
-        'Papas fritas',
-        'Chorizo amazónico en rodajas',
-        'Ensalada fresca',
-        'Cremas'
-      ];
-    }
-    if (name.includes('salchibroaster')) {
-      return [
-        'Papas fritas',
-        'Presa de pollo broaster crujiente',
-        'Ensalada fresca',
-        'Cremas'
-      ];
-    }
-    if (name.includes('salchipapa') || cat.includes('salchipapa')) {
-      return [
-        'Papas fritas',
-        'Salchicha en rodajas',
-        'Ensalada fresca',
-        'Cremas'
-      ];
+    // 4. SALCHIPAPAS Y SALCHIBROASTERS (7 productos)
+    if (cat.includes('salchipapa') || cat.includes('salchi')) {
+      return ['Papas crocantes', 'Ensalada fresca'];
     }
 
-    // 5. ALITAS (Todos con: + 5 alitas + papas)
+    // 5. ALITAS (2 productos)
     if (cat.includes('alita') || name.includes('alita')) {
-      return [
-        '5 alitas crocantes',
-        'Papas fritas'
-      ];
+      return ['5 alitas', 'Papas crocantes'];
+    }
+
+    // 6. PLATOS AMAZÓNICOS (7 productos)
+    if (name.includes('patacones con chorizo') || (name.includes('patacon') && name.includes('chorizo'))) {
+      return ['Patacones', 'Chorizo'];
+    }
+    if (name.includes('tacacho')) {
+      return ['Maduros fritos', 'Sarza criolla'];
+    }
+    if (name.includes('juane') || name.includes('juanes')) {
+      return ['Maduros fritos'];
+    }
+    if (name.includes('chilcano') || name.includes('carachama')) {
+      return ['Inguiri', 'Plátano'];
+    }
+    if (name.includes('palometa')) {
+      return ['Arroz', 'Maduro frito'];
+    }
+    if (name.includes('caldo amazónico') || name.includes('caldo amazonico')) {
+      return ['Yuca', 'Verduras de la selva'];
+    }
+    if (name.includes('chaufa') || (name.includes('chaufa') && cat.includes('amazon'))) {
+      return ['Cecina y chorizo amazónico salteado'];
+    }
+
+    // 7. ADICIONALES (8 productos)
+    if (cat.includes('adicion')) {
+      return [];
+    }
     }
 
     // Fallback general

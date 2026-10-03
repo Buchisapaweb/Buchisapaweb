@@ -1,73 +1,99 @@
 [
   {
     "id": "promo-1",
-    "title": "Combo Familiar Amazónico",
-    "description": "1 Juane Tradicional + 1 Tacacho con Cecina + 1/4 Pollo Broaster + 2 Refrescos de Cocona helados",
-    "price": 45.0,
-    "originalPrice": 58.0,
+    "title": "PROMO BUCHI DUO",
+    "description": "Una experiencia pensada para dos. Disfruta de dos Hamburguesas Tipo Clásica elaboradas con nuestra hamburguesa artesanal premium, acompañadas de dos Gaseosas Personales Pepsi.",
+    "price": 22.0,
+    "originalPrice": 26.0,
     "image": "/imagenes/portada/Portada2E.webp",
-    "badge": "🔥 MÁS PEDIDO",
+    "badge": "🔥 DÚO FAVORITO",
     "active": true,
     "order": 1,
     "features": [
-      "✦ 1 Juane Tradicional en hoja de bijao",
-      "🌴 Tacacho artesanal con cecina ahumada",
-      "🍗 1/4 Pollo Broaster crujiente",
-      "🍹 2 Refrescos de Cocona natural"
+      "🍔 2 Hamburguesas artesanales clásicas",
+      "🍟 Papa crocante",
+      "🥗 Ensalada fresca",
+      "🥤 2 Gaseosas Personales Pepsi"
+    ],
+    "accompaniments": [
+      "Papa crocante",
+      "Hamburguesa artesanal",
+      "Ensalada fresca"
     ],
     "createdAt": "2026-09-26T23:50:00.000Z"
   },
   {
     "id": "promo-2",
-    "title": "Dúo Broaster Ultra Crunch",
-    "description": "2 Porciones de 1/4 Broaster (Pecho y Pierna) + Gran porción de Papas Nativas + Cremas Caseras + 2 Gaseosas 500ml",
-    "price": 32.0,
-    "originalPrice": 40.0,
+    "title": "PROMO BROASTER FAMILIAR",
+    "description": "La selección ideal para compartir en familia. Incluye un Broaster Presa Pecho, un Broaster Presa Pierna y un Broaster Presa Ala, con el sabor crujiente que nos caracteriza, más una Gaseosa Personal Inca Kola.",
+    "price": 38.0,
+    "originalPrice": 46.0,
     "image": "/imagenes/portada/Portada1E.webp",
-    "badge": "✨ OFERTA DÚO",
+    "badge": "🍗 FAMILIAR CRUNCH",
     "active": true,
     "order": 2,
     "features": [
-      "🍗 2 Presas de Pollo Broaster crocante",
-      "🍟 Porción generosa de Papas Nativas",
-      "🤍 Cremas caseras de la casa",
-      "🥤 2 Gaseosas 500ml heladas"
+      "🍗 3 Presas Broaster (Pecho, Pierna, Ala)",
+      "🍟 Papa crocante",
+      "🥗 Ensalada fresca",
+      "🍚 Arroz graneado",
+      "🥤 1 Gaseosa Personal Inca Kola"
+    ],
+    "accompaniments": [
+      "Papa crocante",
+      "Ensalada fresca",
+      "Arroz"
     ],
     "createdAt": "2026-09-26T23:50:00.000Z"
   },
   {
     "id": "promo-3",
-    "title": "Trío Burger & Alitas Fest",
-    "description": "2 Hamburguesas Clásicas Artesanales + 6 Alitas Broaster BBQ + Papas Fritas Familiares + Gaseosa 1.5L",
-    "price": 42.0,
-    "originalPrice": 52.0,
+    "title": "PROMO SALCHI BURGER",
+    "description": "La fusión de nuestros dos clásicos más pedidos. Una Hamburguesa Tipo Cheese Burguer y una Salchipapa Tipo Salchipapa Clásica, acompañadas de una Gaseosa Personal Coca Cola.",
+    "price": 24.0,
+    "originalPrice": 29.0,
     "image": "/imagenes/portada/Portada3E.webp",
-    "badge": "🍔 COMBO FEST",
+    "badge": "✨ COMBO FUSIÓN",
     "active": true,
     "order": 3,
     "features": [
-      "🍔 2 Hamburguesas de pura carne seleccionada",
-      "🍗 6 Alitas Broaster en salsa BBQ",
-      "🍟 Papas fritas doradas tamaño familiar",
-      "🥤 Gaseosa grande de 1.5L"
+      "🍔 1 Hamburguesa Cheese Burguer",
+      "🍟 1 Salchipapa Clásica con Papas crocantes",
+      "🧀 Queso cheddar derretido",
+      "🥗 Ensalada fresca",
+      "🥤 1 Gaseosa Personal Coca Cola"
+    ],
+    "accompaniments": [
+      "Queso cheddar",
+      "Papa crocante",
+      "Ensalada fresca"
     ],
     "createdAt": "2026-09-26T23:50:00.000Z"
   },
   {
     "id": "promo-4",
-    "title": "Banquete Amazónico BuchiSapa",
-    "description": "1 Hamburguesa Amazónica (cecina + plátano bellaco) + 1 Porción de Patacones con Cecina + 1 Refresco de Camu Camu",
-    "price": 28.0,
-    "originalPrice": 36.0,
+    "title": "PROMO SELVA POWER",
+    "description": "Un homenaje a la Amazonía. Compuesto por un Plato Amazónico Tipo Tacacho con Cecina y un Salchibroaster Tipo Salchibroaster Pierna Presa Pierna, junto a una Gaseosa Personal Fanta.",
+    "price": 29.0,
+    "originalPrice": 35.0,
     "image": "/imagenes/portada/Portada4E.webp",
-    "badge": "🌴 100% REGIONAL",
+    "badge": "🌴 100% AMAZÓNICO",
     "active": true,
     "order": 4,
     "features": [
-      "🍔 Hamburguesa Amazónica especial",
-      "🌴 Crujientes patacones con cecina ahumada",
-      "🔥 Ají de cocona con charapita",
-      "🍹 Refresco natural de Camu Camu"
+      "🌴 1 Plato Amazónico Tacacho con Cecina",
+      "🍗 1 Salchibroaster Pierna",
+      "🍌 Maduros fritos",
+      "🧅 Sarza criolla",
+      "🍟 Papa crocante",
+      "🥗 Ensalada fresca",
+      "🥤 1 Gaseosa Personal Fanta"
+    ],
+    "accompaniments": [
+      "Maduros fritos",
+      "Sarza criolla",
+      "Papa crocante",
+      "Ensalada fresca"
     ],
     "createdAt": "2026-09-26T23:50:00.000Z"
   }

@@ -2765,21 +2765,23 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         const code = id;
 
         const badge = req.body.badge || null;
-        const image = req.body.image_url || '/imagenes/productos/fallback.webp';
-        const available = req.body.available === 'true' || req.body.available === true;
+        const image = req.body.image_url || req.body.image || '/imagenes/productos/fallback.webp';
+        const available = req.body.available === 'true' || req.body.available === true || req.body.available === '1' || req.body.available === 'on' || req.body.available === 1;
 
         let accompaniments: string[] = [];
-        if (Array.isArray(req.body.accompaniments)) {
-          accompaniments = req.body.accompaniments;
-        } else if (typeof req.body.accompaniments === 'string') {
-          accompaniments = req.body.accompaniments.split('\n').map((l: string) => l.split(',')).flat().map((s: string) => s.trim()).filter(Boolean);
+        const rawAccs = req.body.accompaniments !== undefined ? req.body.accompaniments : req.body['accompaniments[]'];
+        if (Array.isArray(rawAccs)) {
+          accompaniments = rawAccs;
+        } else if (typeof rawAccs === 'string') {
+          accompaniments = rawAccs.split('\n').map((l: string) => l.split(',')).flat().map((s: string) => s.trim()).filter(Boolean);
         }
 
         let cremas: string[] = [];
-        if (Array.isArray(req.body.cremas)) {
-          cremas = req.body.cremas;
-        } else if (typeof req.body.cremas === 'string') {
-          cremas = req.body.cremas.split(',').map((s: string) => s.trim()).filter(Boolean);
+        const rawCremas = req.body.cremas !== undefined ? req.body.cremas : req.body['cremas[]'];
+        if (Array.isArray(rawCremas)) {
+          cremas = rawCremas;
+        } else if (typeof rawCremas === 'string') {
+          cremas = rawCremas.split(',').map((s: string) => s.trim()).filter(Boolean);
         }
 
         const productPayload = {
@@ -2813,7 +2815,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
           successMsg = '¡Plato actualizado con éxito!';
         }
       } else if (action === 'delete') {
-        const id = req.body.id;
+        const id = String(req.body.id || req.query.id || '').trim();
         if (id) {
           await deleteProduct(id);
           broadcastProductStockUpdate({ id, deleted: true, available: false, stock: 0 });
@@ -2836,6 +2838,15 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       }
     }
     
+    // Si la petición es AJAX / JSON, responder JSON directamente para rendimiento instantáneo
+    if (req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest' || req.is('json')) {
+      return res.json({
+        success: !errorMsg,
+        message: successMsg || errorMsg,
+        error: errorMsg || null
+      });
+    }
+
     const viewQuery = view ? `?view=${view}` : '';
     const successQuery = successMsg ? `&success=${encodeURIComponent(successMsg)}` : '';
     const errorQuery = errorMsg ? `&error=${encodeURIComponent(errorMsg)}` : '';
@@ -3090,20 +3101,15 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
                     const accompaniments = Array.isArray(p.accompaniments) ? p.accompaniments : [];
                     const cremas = Array.isArray(p.cremas) ? p.cremas : [];
 
-                    const badgeHtml = badge 
-                        ? `<span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-orange-600/95 text-[9px] font-black text-white uppercase rounded-md tracking-wider shadow-md backdrop-blur-sm">${badge}</span>` 
-                        : '';
-
                     const pJsonStr = JSON.stringify(p).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 
                     return `
-                    <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
+                    <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-producto-id="${id}" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
                         <div class="space-y-3">
                             <!-- Imagen Grande y Cuadrada del Producto -->
                             <div class="relative w-full aspect-square rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
-                                <img src="${image}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
-                                ${badgeHtml}
-                                <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md ${available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'}">
+                                <img src="${image}" alt="${name}" class="producto-img-element w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
+                                <span class="producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md ${available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'}">
                                     ${available ? 'Disponible' : 'Agotado'}
                                 </span>
                             </div>
@@ -3111,12 +3117,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
                             <!-- Datos Principales: Nombre, Stock y Precio -->
                             <div>
                                 <div class="flex items-start justify-between gap-2">
-                                    <h4 class="font-black text-base text-white leading-snug line-clamp-2">${name}</h4>
-                                    <span class="font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
+                                    <h4 class="producto-title-text font-black text-base text-white leading-snug line-clamp-2">${name}</h4>
+                                    <span class="producto-price-text font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
                                 </div>
                                 <div class="flex items-center gap-2 mt-2">
                                     <span class="inline-flex items-center gap-1.5 text-xs font-mono-numbers font-bold ${isCrit ? 'text-red-400 animate-pulse' : 'text-slate-300'}">
-                                        <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: ${stock}
+                                        <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: <span class="producto-stock-text">${stock} un.</span>
                                     </span>
                                 </div>
                             </div>
@@ -3134,13 +3140,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
                                     <i data-lucide="edit-3" class="w-3.5 h-3.5 text-orange-400"></i>
                                     <span>Editar</span>
                                 </button>
-                                <form action="/admin/index.php?view=productos" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas eliminar «${name.replace(/'/g, "\\'")}» de la carta?')">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="${id}">
-                                    <button type="submit" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
-                                </form>
+                                <button type="button" onclick="eliminarPlatoAjax('${id}', '${name.replace(/'/g, "\\'")}')" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
                             </div>
                         </div>
                     </div>

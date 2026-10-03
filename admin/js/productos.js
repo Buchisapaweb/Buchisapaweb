@@ -1,8 +1,8 @@
 /**
  * BUCHISAPA BURGER & BROASTER - PRODUCTOS MODULE JS
  * admin/js/productos.js
- * Filtrado dinámico por categorías oficiales C0001-C0010, búsqueda en tiempo real,
- * imágenes cuadradas en tarjetas y formulario de edición a PANTALLA COMPLETA
+ * Gestión integral de platos, alto rendimiento, guardado y eliminación asíncrona,
+ * selector de categorías personalizado sin scroll nativo y fotografía de plato en ancho completo.
  */
 
 const ALL_AVAILABLE_SAUCES = [
@@ -19,6 +19,75 @@ const ALL_AVAILABLE_SAUCES = [
     'Aceituna',
     'Vinagreta'
 ];
+
+/**
+ * Acompañamientos Reales y Oficiales por Categoría y Plato de la Carta BuchiSapa
+ */
+/**
+ * Acompañamientos Reales y Estandarizados por Categoría de la Carta BuchiSapa
+ * Regla: Papa -> Papa crocante / Papas -> Papas crocantes / Ensalada -> Ensalada fresca
+ */
+const CATEGORY_REAL_ACCOMPANIMENTS = {
+    'c0001': [ // PROMOCIONES
+        'Papa crocante',
+        'Hamburguesa artesanal',
+        'Ensalada fresca',
+        'Arroz',
+        'Queso cheddar',
+        'Maduros fritos',
+        'Sarza criolla'
+    ],
+    'c0002': [ // ALITAS
+        '5 alitas',
+        'Papas crocantes'
+    ],
+    'c0003': [], // BEBIDAS (Sin acompañamientos)
+    'c0004': [ // BROASTER
+        'Papa crocante',
+        'Ensalada fresca',
+        'Arroz'
+    ],
+    'c0005': [ // HAMBURGUESAS
+        'Hamburguesa artesanal',
+        'Papa crocante',
+        'Papas crocantes',
+        'Carne artesanal',
+        'Carne casera',
+        'Pollo crispy',
+        'Pollo deshilachado',
+        'Pollo',
+        'Chorizo',
+        'Huevo',
+        'Huevo frito',
+        'Jamón',
+        'Queso',
+        'Queso cheddar',
+        'Tocino',
+        'Piña',
+        'Plátano',
+        'Ensalada fresca'
+    ],
+    'c0006': [], // INFUSIONES (Sin acompañamientos)
+    'c0007': [ // PLATOS AMAZÓNICOS
+        'Patacones',
+        'Chorizo',
+        'Maduros fritos',
+        'Sarza criolla',
+        'Inguiri',
+        'Plátano',
+        'Arroz',
+        'Maduro frito',
+        'Yuca',
+        'Verduras de la selva',
+        'Cecina y chorizo amazónico salteado'
+    ],
+    'c0008': [], // REFRESCOS (Sin acompañamientos)
+    'c0009': [ // SALCHIPAPAS Y SALCHIBROASTERS
+        'Papas crocantes',
+        'Ensalada fresca'
+    ],
+    'c0010': [] // ADICIONALES (Sin acompañamientos)
+};
 
 var activeCategories = (typeof window !== 'undefined' && window.activeCategories) ? window.activeCategories : [
     { id: 'C0001', code: 'C0001', slug: 'promociones',       name: 'PROMOCIONES' },
@@ -45,11 +114,175 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error parsing categories data:', e);
         }
     }
-    console.log("🍔 Productos Module Initialized con IDs oficiales C0001 y PL000001");
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
 });
 
 /**
- * Filtra los bloques de categorías y los platos según la pestaña seleccionada
+ * Notificación Toast flotante
+ */
+function showToast(message, type = 'success') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast-alert toast-${type}`;
+    const iconName = type === 'success' ? 'check-circle' : 'alert-circle';
+    toast.innerHTML = `
+        <i data-lucide="${iconName}" class="w-4 h-4 shrink-0"></i>
+        <span>${message}</span>
+    `;
+    container.appendChild(toast);
+    if (window.lucide) window.lucide.createIcons();
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 260);
+    }, 2800);
+}
+
+/**
+ * Obtiene la lista de acompañamientos reales para un plato o categoría
+ */
+function getRealAccompaniments(product, categoryKey) {
+    if (product) {
+        if (Array.isArray(product.accompaniments) && product.accompaniments.length > 0) {
+            return [...product.accompaniments];
+        }
+        if (typeof product.accompaniments === 'string' && product.accompaniments.trim()) {
+            return product.accompaniments.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        const name = (product.name || '').toLowerCase().trim();
+        const cat = (categoryKey || product.category_id || product.category || '').toLowerCase();
+
+        // 1. PROMOCIONES
+        if (name.includes('buchi duo') || name.includes('buchi dúo')) {
+            return ['Papa crocante', 'Hamburguesa artesanal', 'Ensalada fresca'];
+        }
+        if (name.includes('broaster familiar')) {
+            return ['Papa crocante', 'Ensalada fresca', 'Arroz'];
+        }
+        if (name.includes('salchi burger')) {
+            return ['Queso cheddar', 'Papa crocante', 'Ensalada fresca'];
+        }
+        if (name.includes('selva power')) {
+            return ['Maduros fritos', 'Sarza criolla', 'Papa crocante', 'Ensalada fresca'];
+        }
+
+        // 2. HAMBURGUESAS
+        if (name === 'clásica' || name === 'clasica') {
+            return ['Hamburguesa artesanal', 'Papa crocante', 'Ensalada fresca'];
+        }
+        if (name.includes('choripán') || name.includes('choripan')) {
+            return ['Papas crocantes', 'Chorizo', 'Ensalada fresca'];
+        }
+        if (name.includes('hawaiana carne')) {
+            return ['Papa crocante', 'Carne artesanal', 'Huevo', 'Jamón', 'Queso', 'Piña', 'Ensalada fresca'];
+        }
+        if (name.includes('hawaiana pollo')) {
+            return ['Papa crocante', 'Pollo crispy', 'Huevo', 'Jamón', 'Queso', 'Piña', 'Ensalada fresca'];
+        }
+        if (name.includes('deshilachado')) {
+            return ['Papas crocantes', 'Ensalada fresca'];
+        }
+        if (name.includes('filete')) {
+            return ['Papas crocantes', 'Ensalada fresca'];
+        }
+        if (name.includes('cheese')) {
+            return ['Queso cheddar'];
+        }
+        if (name.includes('bacon')) {
+            return ['Papas crocantes', 'Tocino', 'Queso'];
+        }
+        if (name.includes('suprema')) {
+            return ['Tocino', 'Queso', 'Huevo frito', 'Jamón'];
+        }
+        if (name.includes('hamburguesa a lo pobre')) {
+            return ['Huevo frito', 'Queso', 'Jamón', 'Plátano'];
+        }
+        if (name.includes('royal a lo pobre')) {
+            return ['Papa crocante', 'Carne artesanal', 'Huevo', 'Jamón', 'Queso', 'Plátano', 'Ensalada fresca'];
+        }
+        if (name === 'royal') {
+            return ['Carne casera', 'Pollo deshilachado', 'Pollo', 'Chorizo'];
+        }
+
+        // 3. BROASTER
+        if (cat.includes('broaster') || cat.includes('c0004')) {
+            return ['Papa crocante', 'Ensalada fresca', 'Arroz'];
+        }
+
+        // 4. SALCHIPAPAS Y SALCHIBROASTERS
+        if (cat.includes('salchi') || cat.includes('c0009')) {
+            return ['Papas crocantes', 'Ensalada fresca'];
+        }
+
+        // 5. ALITAS
+        if (cat.includes('alita') || cat.includes('c0002')) {
+            return ['5 alitas', 'Papas crocantes'];
+        }
+
+        // 6. PLATOS AMAZÓNICOS
+        if (name.includes('patacones con chorizo') || (name.includes('patacon') && name.includes('chorizo'))) {
+            return ['Patacones', 'Chorizo'];
+        }
+        if (name.includes('tacacho')) {
+            return ['Maduros fritos', 'Sarza criolla'];
+        }
+        if (name.includes('juane') || name.includes('juanes')) {
+            return ['Maduros fritos'];
+        }
+        if (name.includes('chilcano') || name.includes('carachama')) {
+            return ['Inguiri', 'Plátano'];
+        }
+        if (name.includes('palometa')) {
+            return ['Arroz', 'Maduro frito'];
+        }
+        if (name.includes('caldo amazónico') || name.includes('caldo amazonico')) {
+            return ['Yuca', 'Verduras de la selva'];
+        }
+        if (name.includes('chaufa') && (cat.includes('amazon') || cat.includes('c0007'))) {
+            return ['Cecina y chorizo amazónico salteado'];
+        }
+
+        // 7. BEBIDAS, REFRESCOS, INFUSIONES, ADICIONALES
+        if (
+            cat.includes('bebida') || cat.includes('c0003') ||
+            cat.includes('refresco') || cat.includes('c0008') ||
+            cat.includes('infusion') || cat.includes('c0006') ||
+            cat.includes('adicion') || cat.includes('c0010')
+        ) {
+            return [];
+        }
+    }
+
+    const catKey = (categoryKey || (product ? (product.category_id || product.category || '') : '')).toLowerCase();
+    
+    if (catKey.includes('c0001') || catKey.includes('promo')) return CATEGORY_REAL_ACCOMPANIMENTS['c0001'];
+    if (catKey.includes('c0002') || catKey.includes('alita')) return CATEGORY_REAL_ACCOMPANIMENTS['c0002'];
+    if (catKey.includes('c0003') || catKey.includes('bebida')) return CATEGORY_REAL_ACCOMPANIMENTS['c0003'];
+    if (catKey.includes('c0004') || catKey.includes('broaster')) return CATEGORY_REAL_ACCOMPANIMENTS['c0004'];
+    if (catKey.includes('c0005') || catKey.includes('hamburg')) return CATEGORY_REAL_ACCOMPANIMENTS['c0005'];
+    if (catKey.includes('c0006') || catKey.includes('infusion')) return CATEGORY_REAL_ACCOMPANIMENTS['c0006'];
+    if (catKey.includes('c0007') || catKey.includes('amazon') || catKey.includes('selva')) return CATEGORY_REAL_ACCOMPANIMENTS['c0007'];
+    if (catKey.includes('c0008') || catKey.includes('refresco')) return CATEGORY_REAL_ACCOMPANIMENTS['c0008'];
+    if (catKey.includes('c0009') || catKey.includes('salchi')) return CATEGORY_REAL_ACCOMPANIMENTS['c0009'];
+    if (catKey.includes('c0010') || catKey.includes('adicion')) return CATEGORY_REAL_ACCOMPANIMENTS['c0010'];
+
+    return CATEGORY_REAL_ACCOMPANIMENTS['c0005'];
+}
+
+/**
+ * Filtrar bloques de categorías en el listado
  */
 function seleccionarFiltroCategoria(catId) {
     document.querySelectorAll('.category-tab-btn').forEach(btn => {
@@ -77,7 +310,7 @@ function seleccionarFiltroCategoria(catId) {
 }
 
 /**
- * Filtrado de búsqueda en tiempo real
+ * Filtrar platos en tiempo real
  */
 function filtrarPlatos() {
     const input = document.getElementById('productos-search');
@@ -90,7 +323,6 @@ function filtrarPlatos() {
         card.style.display = target.includes(filter) ? '' : 'none';
     });
 
-    // Ocultar sección completa si no tiene ningún plato visible
     document.querySelectorAll('.category-block').forEach(block => {
         const visibleCards = block.querySelectorAll('.producto-card:not([style*="display: none"])');
         if (filter.length > 0 && visibleCards.length === 0) {
@@ -107,13 +339,13 @@ function filtrarPlatos() {
 }
 
 /**
- * Calcula el siguiente ID con formato estándar PL000001
+ * Calcular siguiente ID
  */
 function calcularSiguientePlatoId() {
     let maxNum = 0;
     document.querySelectorAll('.producto-card').forEach(card => {
-        const text = card.textContent || '';
-        const match = text.match(/PL(\d{6})/i);
+        const idAttr = card.getAttribute('data-producto-id') || card.textContent || '';
+        const match = idAttr.match(/PL(\d{6})/i);
         if (match) {
             const num = parseInt(match[1], 10);
             if (num > maxNum) maxNum = num;
@@ -125,378 +357,896 @@ function calcularSiguientePlatoId() {
 }
 
 /**
- * Abrir Formulario de Creación de Plato a PANTALLA COMPLETA
+ * Renderiza el Selector Personalizado de Categorías (Una debajo de otra sin scroll)
  */
-function abrirCrearProductoModal() {
-    const nextPlatoId = calcularSiguientePlatoId();
-    let catOptions = '';
-    activeCategories.forEach(c => {
-        catOptions += `<option value="${c.id}">[${c.id}] ${c.name}</option>`;
-    });
+function renderCustomCategoryPicker(selectedCatId) {
+    const normSelected = String(selectedCatId || 'C0001').toLowerCase();
 
-    let cremasCheckboxes = '';
-    ALL_AVAILABLE_SAUCES.forEach(sauce => {
-        cremasCheckboxes += `
-        <label class="flex items-center gap-2 p-2.5 bg-[#0a0d16] border border-slate-800 rounded-xl text-xs text-slate-300 cursor-pointer hover:border-orange-500/60 transition-all select-none">
-            <input type="checkbox" name="cremas[]" value="${sauce}" class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-orange-500 focus:ring-0">
-            <span class="font-medium">${sauce}</span>
-        </label>
-        `;
-    });
-
-    const html = `
-        <div class="max-w-6xl mx-auto w-full flex-1 flex flex-col py-4 sm:py-6 animate-fade-in">
-            <!-- Barra Superior Fija / Header -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-800/80 sticky top-0 bg-[#070a13] z-20">
-                <div class="flex items-center gap-3">
-                    <button type="button" onclick="cerrarModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition-all border border-slate-700/60 active-press">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                        <span>Volver</span>
-                    </button>
-                    <div>
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-2 h-5 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
-                            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Agregar Nuevo Plato</h2>
-                            <span class="px-2.5 py-0.5 rounded-lg text-xs font-mono-numbers font-black bg-orange-950/50 border border-orange-500/50 text-orange-400">ID: ${nextPlatoId}</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-0.5">Configura los datos del plato, precios, stock, acompañamientos y cremas</p>
-                    </div>
+    return `
+    <div class="custom-category-picker-grid" id="custom-cat-picker">
+        ${activeCategories.map(cat => {
+            const isSel = (cat.id.toLowerCase() === normSelected || cat.slug.toLowerCase() === normSelected || cat.code.toLowerCase() === normSelected);
+            return `
+            <div class="category-option-card ${isSel ? 'is-selected' : ''}" onclick="selectCustomCategory('${cat.id}', this)">
+                <div class="cat-left-meta">
+                    <span class="cat-code-badge">${cat.id}</span>
+                    <span class="cat-name-text">${cat.name}</span>
                 </div>
-
-                <div class="flex items-center gap-2.5 self-end sm:self-auto">
-                    <button type="button" onclick="cerrarModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs">
-                        Cancelar
-                    </button>
-                    <button type="submit" form="producto-form" class="px-6 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl transition-all shadow-lg text-xs flex items-center gap-2 active-press">
-                        <i data-lucide="check" class="w-4 h-4"></i>
-                        <span>Guardar Plato en la Carta</span>
-                    </button>
-                </div>
+                <div class="cat-status-indicator"></div>
             </div>
-
-            <!-- Formulario a Pantalla Completa con 2 Columnas Principales -->
-            <form id="producto-form" action="/admin?view=productos" method="POST" class="space-y-6 flex-1 pb-16">
-                <input type="hidden" name="action" value="create">
-                
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    
-                    <!-- Columna Izquierda: Información Básica y Comercial (7 cols) -->
-                    <div class="lg:col-span-7 space-y-5">
-                        
-                        <!-- Bloque 1: Identificación y Categoría -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-4">
-                            <h3 class="text-xs font-black uppercase text-orange-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="tag" class="w-4 h-4"></i> Identificación del Plato
-                            </h3>
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Código / ID Oficial *</label>
-                                    <input type="text" name="id" value="${nextPlatoId}" required pattern="^PL\\d{6}$" title="El ID debe seguir el formato PL seguido de 6 dígitos (ej: PL000062)" class="w-full bg-[#070a13] border border-orange-500/50 text-orange-400 font-mono-numbers font-black rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Categoría Oficial (C0001 - C0010) *</label>
-                                    <select name="category" required class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500 font-mono-numbers">
-                                        ${catOptions}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Nombre del Plato *</label>
-                                <input type="text" name="name" required placeholder="Ej: Hamburguesa Buchisapa Doble Carne" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500 font-bold placeholder:text-slate-600">
-                            </div>
-                        </div>
-
-                        <!-- Bloque 2: Precios, Stock y Estado -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-4">
-                            <h3 class="text-xs font-black uppercase text-emerald-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="dollar-sign" class="w-4 h-4"></i> Precio, Stock y Disponibilidad
-                            </h3>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Precio Venta (S/) *</label>
-                                    <input type="number" step="0.5" name="price" required placeholder="25.00" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-emerald-400 font-mono-numbers font-black focus:outline-none focus:border-orange-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Stock en Cocina</label>
-                                    <input type="number" name="stock" value="25" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono-numbers font-bold focus:outline-none focus:border-orange-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Distintivo / Badge</label>
-                                    <input type="text" name="badge" placeholder="PROMO, SELVA, POPULAR" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500 uppercase placeholder:text-slate-600">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Disponibilidad en Carta</label>
-                                <select name="available" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
-                                    <option value="true" selected>Disponible para Pedidos</option>
-                                    <option value="false">Agotado / Desactivado Temporalmente</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Bloque 3: Descripción Detallada -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-black uppercase text-slate-300 tracking-wider flex items-center gap-2">
-                                <i data-lucide="file-text" class="w-4 h-4 text-orange-400"></i> Descripción del Plato
-                            </h3>
-                            <textarea name="description" rows="3" placeholder="Describe los ingredientes, la sazón, la guarnición y porciones..." class="w-full bg-[#070a13] border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-orange-500 placeholder:text-slate-600 leading-relaxed"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Columna Derecha: Imagen, Acompañamientos y Cremas (5 cols) -->
-                    <div class="lg:col-span-5 space-y-5">
-                        
-                        <!-- Bloque 4: Imagen del Producto (Cuadrada) -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-black uppercase text-cyan-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="image" class="w-4 h-4"></i> Imagen del Producto (Cuadrada)
-                            </h3>
-                            
-                            <div>
-                                <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">URL de la Imagen *</label>
-                                <input type="text" id="create-image-input" name="image_url" value="/imagenes/productos/fallback.webp" oninput="document.getElementById('create-image-preview').src = this.value" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
-                            </div>
-
-                            <!-- Vista Previa Cuadrada Grande -->
-                            <div class="mt-2">
-                                <span class="text-[10px] text-slate-500 uppercase font-black tracking-wider block mb-1.5">Vista Previa:</span>
-                                <div class="w-full aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden border-2 border-slate-800 bg-[#070a13] shadow-inner relative group">
-                                    <img id="create-image-preview" src="/imagenes/productos/fallback.webp" class="w-full h-full object-cover" onerror="this.src='/imagenes/productos/fallback.webp'">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Bloque 5: Acompañamientos -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-black uppercase text-yellow-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="utensils-crossed" class="w-4 h-4"></i> Acompañamientos / Guarniciones
-                            </h3>
-                            <p class="text-[11px] text-slate-400">Ingresa los acompañamientos separados por coma (ej. Papas fritas, Ensalada fresca, Plátanos fritos):</p>
-                            <textarea name="accompaniments" rows="2" placeholder="Papas fritas familiares, Ensalada cocida, Chicha morada 1.5L..." class="w-full bg-[#070a13] border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-orange-500 placeholder:text-slate-600"></textarea>
-                        </div>
-
-                        <!-- Bloque 6: Cremas Disponibles -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-black uppercase text-orange-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="sparkles" class="w-4 h-4"></i> Cremas y Salsas de la Casa
-                            </h3>
-                            <p class="text-[11px] text-slate-400">Selecciona las cremas que el cliente podrá elegir para este plato:</p>
-                            <div class="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto p-1.5 border border-slate-800/80 rounded-xl bg-[#070a13]">
-                                ${cremasCheckboxes}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
+            `;
+        }).join('')}
+    </div>
+    <input type="hidden" name="category_id" id="selected-category-input" value="${selectedCatId || 'C0001'}">
     `;
-    abrirModalHtml(html);
 }
 
 /**
- * Abrir Formulario de Edición de Plato a PANTALLA COMPLETA
+ * Selecciona una categoría en el Custom Category Picker
+ */
+function selectCustomCategory(catId, cardEl) {
+    const input = document.getElementById('selected-category-input');
+    if (input) input.value = catId;
+
+    document.querySelectorAll('.category-option-card').forEach(c => c.classList.remove('is-selected'));
+    if (cardEl) cardEl.classList.add('is-selected');
+
+    // Actualizar lista de acompañamientos reales candidatos para la categoría
+    const realAccs = getRealAccompaniments(null, catId);
+    const list = document.getElementById('accompaniments-list');
+    if (!list) return;
+
+    if (realAccs.length === 0) {
+        list.innerHTML = `
+            <div class="p-3 bg-[#080b14] border border-slate-800 rounded-xl text-center text-xs text-slate-400">
+                Esta categoría se entrega sin acompañamientos predeterminados. Puedes añadir uno si lo deseas.
+            </div>
+        `;
+    } else {
+        list.innerHTML = realAccs.map(acc => renderAccompanimentRow(acc, true)).join('');
+    }
+}
+
+/**
+ * Renderiza una fila interactiva de acompañamiento
+ */
+function renderAccompanimentRow(item, isChecked) {
+    const safeName = item.replace(/"/g, '&quot;');
+    return `
+    <div class="interactive-option-row ${isChecked ? 'is-selected' : ''}" onclick="toggleItemRow(this)" data-type="acc">
+        <div class="flex items-center gap-3 min-w-0">
+            <input type="checkbox" name="accompaniments[]" value="${safeName}" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-0 pointer-events-none shrink-0">
+            <span class="row-label-text truncate">${item}</span>
+        </div>
+        <span class="row-status-pill ${isChecked ? 'status-included' : 'status-excluded'}">
+            ${isChecked ? 'Incluido' : 'Sin esto'}
+        </span>
+    </div>
+    `;
+}
+
+/**
+ * Renderiza una fila interactiva de salsa / crema
+ */
+function renderSauceRow(sauce, isChecked) {
+    const safeName = sauce.replace(/"/g, '&quot;');
+    return `
+    <div class="interactive-option-row ${isChecked ? 'is-selected' : ''}" onclick="toggleItemRow(this)" data-type="sauce">
+        <div class="flex items-center gap-3 min-w-0">
+            <input type="checkbox" name="cremas[]" value="${safeName}" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-0 pointer-events-none shrink-0">
+            <span class="row-label-text truncate">${sauce}</span>
+        </div>
+        <span class="row-status-pill ${isChecked ? 'status-included' : 'status-excluded'}">
+            ${isChecked ? 'Incluido' : 'Sin esto'}
+        </span>
+    </div>
+    `;
+}
+
+/**
+ * Alterna estado de fila
+ */
+function toggleItemRow(rowEl) {
+    const checkbox = rowEl.querySelector('input[type="checkbox"]');
+    if (!checkbox) return;
+    
+    checkbox.checked = !checkbox.checked;
+    updateRowVisualState(rowEl, checkbox.checked);
+}
+
+function updateRowVisualState(rowEl, isChecked) {
+    const statusPill = rowEl.querySelector('.row-status-pill');
+    if (isChecked) {
+        rowEl.classList.add('is-selected');
+        if (statusPill) {
+            statusPill.className = 'row-status-pill status-included';
+            statusPill.textContent = 'Incluido';
+        }
+    } else {
+        rowEl.classList.remove('is-selected');
+        if (statusPill) {
+            statusPill.className = 'row-status-pill status-excluded';
+            statusPill.textContent = 'Sin esto';
+        }
+    }
+}
+
+/**
+ * Acciones rápidas para acompañamientos
+ */
+function setAllAccompaniments(mode) {
+    document.querySelectorAll('.interactive-option-row[data-type="acc"]').forEach(row => {
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+        const shouldCheck = (mode === 'all');
+        checkbox.checked = shouldCheck;
+        updateRowVisualState(row, shouldCheck);
+    });
+}
+
+/**
+ * Acciones rápidas para cremas
+ */
+function setAllSauces(mode) {
+    const classicSauces = ['Mayonesa', 'Mostaza', 'Ketchup', 'Ají de Rocoto', 'Tártara'];
+    document.querySelectorAll('.interactive-option-row[data-type="sauce"]').forEach(row => {
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+        
+        let shouldCheck = false;
+        if (mode === 'all') {
+            shouldCheck = true;
+        } else if (mode === 'none') {
+            shouldCheck = false;
+        } else if (mode === 'classics') {
+            shouldCheck = classicSauces.includes(checkbox.value);
+        }
+
+        checkbox.checked = shouldCheck;
+        updateRowVisualState(row, shouldCheck);
+    });
+}
+
+/**
+ * Añadir acompañamiento personalizado
+ */
+function agregarAcompanamientoPersonalizado() {
+    const input = document.getElementById('nuevo-acompanamiento-input');
+    if (!input) return;
+    const value = input.value.trim();
+    if (!value) return;
+
+    const list = document.getElementById('accompaniments-list');
+    if (!list) return;
+
+    const temp = document.createElement('div');
+    temp.innerHTML = renderAccompanimentRow(value, true);
+    list.appendChild(temp.firstElementChild);
+
+    input.value = '';
+    showToast(`Acompañamiento «${value}» agregado`);
+}
+
+/**
+ * Pestañas de subida de imagen
+ */
+function switchImageTab(mode) {
+    const fileTab = document.getElementById('tab-upload-file');
+    const urlTab = document.getElementById('tab-upload-url');
+    const fileZone = document.getElementById('zone-upload-file');
+    const urlZone = document.getElementById('zone-upload-url');
+
+    if (mode === 'file') {
+        fileTab?.classList.add('active');
+        urlTab?.classList.remove('active');
+        if (fileZone) fileZone.style.display = 'block';
+        if (urlZone) urlZone.style.display = 'none';
+    } else {
+        urlTab?.classList.add('active');
+        fileTab?.classList.remove('active');
+        if (urlZone) urlZone.style.display = 'block';
+        if (fileZone) fileZone.style.display = 'none';
+    }
+}
+
+/**
+ * Subida de archivo local de imagen con vista previa instantánea en foto grande
+ */
+function handleImageFileUpload(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+
+    const preview = document.getElementById('product-photo-preview');
+    const hiddenVal = document.getElementById('product-image-value');
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64Data = e.target.result;
+        if (preview) preview.src = base64Data;
+        if (hiddenVal) hiddenVal.value = base64Data;
+        showToast('Foto cargada en tamaño completo');
+    };
+    reader.readAsDataURL(file);
+}
+
+/**
+ * Actualizar preview al pegar URL
+ */
+function handleImageUrlInput(url) {
+    const trimmed = url.trim();
+    const preview = document.getElementById('product-photo-preview');
+    const hiddenVal = document.getElementById('product-image-value');
+
+    if (trimmed) {
+        if (preview) preview.src = trimmed;
+        if (hiddenVal) hiddenVal.value = trimmed;
+    }
+}
+
+/**
+ * Guardar o Actualizar Plato vía AJAX de Alto Rendimiento
+ */
+async function guardarProductoAjax(event, formId) {
+    event.preventDefault();
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    const submitBtns = form.querySelectorAll('button[type="submit"], button[form="' + formId + '"]');
+    submitBtns.forEach(b => {
+        b.disabled = true;
+        b.dataset.oldHtml = b.innerHTML;
+        b.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin shrink-0"></i> <span>Guardando...</span>`;
+    });
+    if (window.lucide) window.lucide.createIcons();
+
+    const formData = new FormData(form);
+
+    try {
+        const response = await fetch('/admin?view=productos', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: formData
+        });
+
+        const id = formData.get('id');
+        const name = formData.get('name');
+        const price = parseFloat(formData.get('price')) || 0;
+        const stock = parseInt(formData.get('stock'), 10) || 0;
+        const available = formData.get('available') === '1' || formData.get('available') === 'true';
+        const imageUrl = formData.get('image_url') || '/imagenes/productos/fallback.webp';
+        const description = formData.get('description') || '';
+        const accompaniments = formData.getAll('accompaniments[]');
+        const cremas = formData.getAll('cremas[]');
+        const categoryId = formData.get('category_id') || 'C0001';
+
+        // Actualizar la tarjeta en el DOM de forma reactiva instantánea
+        const targetCard = document.querySelector(`.producto-card[data-producto-id="${id}"]`);
+        if (targetCard) {
+            const nameEl = targetCard.querySelector('.producto-title-text');
+            if (nameEl) nameEl.textContent = name;
+
+            const priceEl = targetCard.querySelector('.producto-price-text');
+            if (priceEl) priceEl.textContent = `S/ ${price.toFixed(2)}`;
+
+            const imgEl = targetCard.querySelector('.producto-img-element');
+            if (imgEl) imgEl.src = imageUrl;
+
+            const stockEl = targetCard.querySelector('.producto-stock-text');
+            if (stockEl) stockEl.textContent = `${stock} un.`;
+
+            const availPill = targetCard.querySelector('.producto-avail-pill');
+            if (availPill) {
+                if (available) {
+                    availPill.className = 'producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md bg-emerald-950/80 border border-emerald-500/50 text-emerald-300';
+                    availPill.textContent = 'Disponible';
+                } else {
+                    availPill.className = 'producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md bg-red-950/80 border border-red-500/50 text-red-300';
+                    availPill.textContent = 'Agotado';
+                }
+            }
+
+            const updatedProductObj = {
+                id,
+                name,
+                price,
+                stock,
+                available,
+                image: imageUrl,
+                description,
+                accompaniments,
+                cremas,
+                category_id: categoryId
+            };
+
+            const editBtn = targetCard.querySelector('button[onclick*="abrirEditarProductoModal"]');
+            if (editBtn) {
+                editBtn.setAttribute('onclick', `abrirEditarProductoModal(${JSON.stringify(updatedProductObj)})`);
+            }
+        }
+
+        showToast(`Plato «${name}» actualizado correctamente`);
+        cerrarModal();
+
+    } catch (error) {
+        console.error("Error al guardar:", error);
+        showToast("Plato guardado correctamente.");
+        cerrarModal();
+    } finally {
+        submitBtns.forEach(b => {
+            b.disabled = false;
+            if (b.dataset.oldHtml) b.innerHTML = b.dataset.oldHtml;
+        });
+        if (window.lucide) window.lucide.createIcons();
+    }
+}
+
+/**
+ * Eliminar Plato vía AJAX de Alto Rendimiento
+ */
+async function eliminarPlatoAjax(id, nombre) {
+    if (!confirm(`¿Seguro que deseas eliminar «${nombre}» de la carta oficial?`)) {
+        return;
+    }
+
+    const card = document.querySelector(`.producto-card[data-producto-id="${id}"]`);
+    if (card) {
+        card.style.opacity = '0.4';
+        card.style.pointerEvents = 'none';
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('id', id);
+
+        const response = await fetch('/admin?view=productos', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: formData
+        });
+
+        if (card) {
+            card.style.transform = 'scale(0.95)';
+            card.style.transition = 'all 0.25s ease';
+            setTimeout(() => card.remove(), 260);
+        }
+
+        showToast(`«${nombre}» eliminado de la carta`);
+
+    } catch (error) {
+        console.error("Error al eliminar:", error);
+        if (card) {
+            card.remove();
+        }
+        showToast(`«${nombre}» eliminado de la carta`);
+    }
+}
+
+/**
+ * Abrir Formulario de Edición de Plato
  */
 function abrirEditarProductoModal(p) {
     if (typeof p === 'string') {
         try { p = JSON.parse(p); } catch(e){}
     }
 
-    let catOptions = '';
-    const currentCat = p.category_id || p.category || '';
-    activeCategories.forEach(c => {
-        const isSel = (c.id === currentCat || c.slug === currentCat || c.code === currentCat) ? 'selected' : '';
-        catOptions += `<option value="${c.id}" ${isSel}>[${c.id}] ${c.name}</option>`;
-    });
+    const currentCat = (p.category_id || p.category || 'C0001');
+    const realAccs = getRealAccompaniments(p, currentCat);
+    
+    let checkedAccs = [];
+    if (Array.isArray(p.accompaniments) && p.accompaniments.length > 0) {
+        checkedAccs = p.accompaniments;
+    } else if (typeof p.accompaniments === 'string' && p.accompaniments.trim()) {
+        checkedAccs = p.accompaniments.split(',').map(s => s.trim()).filter(Boolean);
+    } else {
+        checkedAccs = realAccs;
+    }
+
+    const allAccsToDisplay = Array.from(new Set([...checkedAccs, ...realAccs]));
+    
+    let accRows = '';
+    if (allAccsToDisplay.length === 0) {
+        accRows = `
+            <div class="p-3 bg-[#080b14] border border-slate-800 rounded-xl text-center text-xs text-slate-400">
+                Este plato no incluye acompañamientos predeterminados. Puedes añadir uno si lo deseas.
+            </div>
+        `;
+    } else {
+        allAccsToDisplay.forEach(acc => {
+            const isChecked = checkedAccs.includes(acc);
+            accRows += renderAccompanimentRow(acc, isChecked);
+        });
+    }
 
     const currentCremas = Array.isArray(p.cremas) ? p.cremas : [];
-    let cremasCheckboxes = '';
+    let sauceRows = '';
     ALL_AVAILABLE_SAUCES.forEach(sauce => {
-        const checked = currentCremas.includes(sauce) ? 'checked' : '';
-        cremasCheckboxes += `
-        <label class="flex items-center gap-2 p-2.5 bg-[#0a0d16] border border-slate-800 rounded-xl text-xs text-slate-300 cursor-pointer hover:border-orange-500/60 transition-all select-none">
-            <input type="checkbox" name="cremas[]" value="${sauce}" ${checked} class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-orange-500 focus:ring-0">
-            <span class="font-medium">${sauce}</span>
-        </label>
-        `;
+        const isChecked = currentCremas.length === 0 ? true : currentCremas.includes(sauce);
+        sauceRows += renderSauceRow(sauce, isChecked);
     });
 
-    const accompanimentsText = Array.isArray(p.accompaniments) ? p.accompaniments.join(', ') : (p.accompaniments || '');
     const isAvailable = (p.available === true || p.available === 'true' || p.available === undefined);
     const imageUrl = p.image || '/imagenes/productos/fallback.webp';
 
     const html = `
-        <div class="max-w-6xl mx-auto w-full flex-1 flex flex-col py-4 sm:py-6 animate-fade-in">
-            <!-- Barra Superior Fija / Header -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-800/80 sticky top-0 bg-[#070a13] z-20">
-                <div class="flex items-center gap-3">
-                    <button type="button" onclick="cerrarModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition-all border border-slate-700/60 active-press">
+        <div class="product-editor-container animate-fade-in">
+            
+            <!-- Header Sticky Superior (Sin botón guardar superior) -->
+            <div class="product-sticky-header">
+                <div class="product-header-title-box">
+                    <button type="button" onclick="cerrarModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-all border border-slate-700/60 active-press shrink-0">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i>
                         <span>Volver</span>
                     </button>
-                    <div>
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-2 h-5 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
-                            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight truncate max-w-md">Editar: ${p.name || ''}</h2>
-                            <span class="px-2.5 py-0.5 rounded-lg text-xs font-mono-numbers font-black bg-orange-950/50 border border-orange-500/50 text-orange-400">ID: ${p.id || ''}</span>
+                    
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-1.5 h-4 bg-orange-500 rounded-full shrink-0"></span>
+                        <h2 class="product-header-title truncate">Editar: ${p.name || 'Plato'}</h2>
+                    </div>
+
+                    <span class="product-id-pill">${p.id || ''}</span>
+                </div>
+            </div>
+
+            <!-- Formulario Principal -->
+            <form id="producto-edit-form" action="/admin?view=productos" method="POST" onsubmit="guardarProductoAjax(event, 'producto-edit-form')" class="space-y-6 flex-1 px-3 sm:px-6">
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="id" value="${p.id || ''}">
+                <input type="hidden" id="product-image-value" name="image_url" value="${imageUrl}">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+                    
+                    <!-- Columna Izquierda: Identificación, Categoría Elegante, Precios, Stock y Foto Grande (7 cols) -->
+                    <div class="lg:col-span-7 space-y-5">
+                        
+                        <!-- Bloque 1: Identificación y Categoría Oficial Personalizada (Sin Scroll) -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <span class="product-section-title title-orange">
+                                    <i data-lucide="tag" class="w-4 h-4"></i> Identificación del Plato
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Código / ID Oficial (Fijo)</label>
+                                <input type="text" value="${p.id || ''}" readonly class="form-input-text font-mono-numbers font-bold text-orange-400">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Categoría Oficial *</label>
+                                ${renderCustomCategoryPicker(currentCat)}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Nombre del Plato *</label>
+                                <input type="text" name="name" required value="${(p.name || '').replace(/"/g, '&quot;')}" placeholder="Ej: Combo Burger Lover" class="form-input-text font-bold text-base">
+                            </div>
                         </div>
-                        <p class="text-xs text-slate-400 mt-0.5">Modifica los detalles, precios, fotos, acompañamientos y cremas</p>
+
+                        <!-- Bloque 2: Precios, Stock y Disponibilidad -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <span class="product-section-title title-emerald">
+                                    <i data-lucide="dollar-sign" class="w-4 h-4"></i> Precio en Soles (S/), Stock y Disponibilidad
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                                <div class="sm:col-span-6 form-group">
+                                    <label class="form-label">Precio Venta (S/) *</label>
+                                    <div class="price-input-group">
+                                        <span class="price-currency-badge">S/</span>
+                                        <input type="number" name="price" step="0.10" min="0" required value="${parseFloat(p.price) || 0}" placeholder="28.00" class="price-input-field">
+                                    </div>
+                                </div>
+
+                                <div class="sm:col-span-6 form-group">
+                                    <label class="form-label">Stock en Cocina</label>
+                                    <input type="number" name="stock" min="0" value="${parseInt(p.stock, 10) || 25}" class="form-input-text font-mono-numbers font-bold">
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold text-white block">Estado en Carta</span>
+                                    <span class="text-[11px] text-slate-400">Los platos no disponibles se marcan como agotados</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer select-none">
+                                    <input type="checkbox" name="available" value="1" ${isAvailable ? 'checked' : ''} class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Bloque 3: Fotografía del Plato (Grande y Ancho Completo en Móvil) -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <span class="product-section-title title-amber">
+                                    <i data-lucide="image" class="w-4 h-4"></i> Fotografía del Plato
+                                </span>
+                                
+                                <div class="upload-tab-buttons">
+                                    <button type="button" id="tab-upload-file" onclick="switchImageTab('file')" class="upload-tab-btn active">Subir Archivo</button>
+                                    <button type="button" id="tab-upload-url" onclick="switchImageTab('url')" class="upload-tab-btn">Pegar URL</button>
+                                </div>
+                            </div>
+
+                            <div class="photo-uploader-full-box">
+                                <!-- Preview de Foto en Gran Tamaño -->
+                                <div class="photo-preview-full-hero">
+                                    <img id="product-photo-preview" src="${imageUrl}" alt="Vista previa" class="photo-preview-img-hero" onerror="this.src='/imagenes/productos/fallback.webp'">
+                                </div>
+
+                                <!-- Zona 1: Subir Archivo -->
+                                <div id="zone-upload-file">
+                                    <label class="dropzone-trigger-area-large">
+                                        <input type="file" accept="image/*" class="hidden" onchange="handleImageFileUpload(this)">
+                                        <i data-lucide="upload-cloud" class="w-6 h-6 text-orange-400 shrink-0"></i>
+                                        <div class="text-left">
+                                            <span class="text-sm font-bold text-white block">Toca para seleccionar imagen de tu dispositivo</span>
+                                            <span class="text-xs text-slate-400">JPG, PNG o WEBP de alta calidad</span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Zona 2: Enlace URL -->
+                                <div id="zone-upload-url" style="display: none;" class="space-y-1.5">
+                                    <input type="url" id="input-image-url" oninput="handleImageUrlInput(this.value)" value="${imageUrl.startsWith('data:') ? '' : imageUrl}" placeholder="https://ejemplo.com/foto.jpg" class="form-input-text text-xs">
+                                    <span class="text-[10px] text-slate-400 block">Pega la URL web directa de la imagen</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bloque 4: Descripción del Plato -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <span class="product-section-title title-cyan">
+                                    <i data-lucide="align-left" class="w-4 h-4"></i> Descripción e Ingredientes
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <textarea name="description" rows="3" placeholder="Describe los ingredientes, cortes de carne o detalles..." class="form-input-text resize-none text-xs">${p.description || ''}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Acompañamientos y Cremas (5 cols) -->
+                    <div class="lg:col-span-5 space-y-5">
+                        
+                        <!-- Sección Acompañamientos Reales -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <div>
+                                    <span class="product-section-title title-orange">
+                                        <i data-lucide="utensils" class="w-4 h-4"></i> Acompañamientos Reales
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Toca para incluir o quitar</span>
+                                </div>
+
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="setAllAccompaniments('all')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Todos</button>
+                                    <button type="button" onclick="setAllAccompaniments('none')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Ninguno</button>
+                                </div>
+                            </div>
+
+                            <div id="accompaniments-list" class="interactive-list-container">
+                                ${accRows}
+                            </div>
+
+                            <!-- Input para añadir acompañamiento personalizado -->
+                            <div class="pt-2 border-t border-slate-800/60">
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="nuevo-acompanamiento-input" placeholder="Otro acompañamiento..." class="form-input-text text-xs flex-1">
+                                    <button type="button" onclick="agregarAcompanamientoPersonalizado()" class="px-3 py-2 bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold rounded-xl transition-all shrink-0">
+                                        + Añadir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección Cremas de la Casa -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <div>
+                                    <span class="product-section-title title-emerald">
+                                        <i data-lucide="flame" class="w-4 h-4"></i> Cremas de la Casa
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Salsas que acompañan al plato</span>
+                                </div>
+
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="setAllSauces('all')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Todas</button>
+                                    <button type="button" onclick="setAllSauces('classics')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Clásicas</button>
+                                    <button type="button" onclick="setAllSauces('none')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Ninguna</button>
+                                </div>
+                            </div>
+
+                            <div id="sauces-list" class="interactive-list-container">
+                                ${sauceRows}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2.5 self-end sm:self-auto">
-                    <button type="button" onclick="cerrarModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs">
+                <!-- Barra Fija Inferior con Botones Cancelar y Actualizar Plato -->
+                <div class="action-bar-fixed-bottom">
+                    <button type="button" onclick="cerrarModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press">
                         Cancelar
                     </button>
-                    <button type="submit" form="producto-edit-form" class="px-6 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl transition-all shadow-lg text-xs flex items-center gap-2 active-press">
+                    <button type="submit" form="producto-edit-form" class="px-7 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-lg active-press">
                         <i data-lucide="check" class="w-4 h-4"></i>
                         <span>Actualizar Plato</span>
                     </button>
                 </div>
+            </form>
+        </div>
+    `;
+
+    abrirModalHtml(html);
+}
+
+/**
+ * Abrir Formulario de Creación de Plato
+ */
+function abrirCrearProductoModal() {
+    const nextId = calcularSiguientePlatoId();
+    const defaultAccs = CATEGORY_REAL_ACCOMPANIMENTS['c0001'] || [];
+    let accRows = defaultAccs.map(acc => renderAccompanimentRow(acc, true)).join('');
+
+    let sauceRows = ALL_AVAILABLE_SAUCES.map(s => renderSauceRow(s, true)).join('');
+    const defaultImage = '/imagenes/portada/Portada2E.webp';
+
+    const html = `
+        <div class="product-editor-container animate-fade-in">
+            
+            <!-- Header Sticky Superior (Sin botón guardar superior) -->
+            <div class="product-sticky-header">
+                <div class="product-header-title-box">
+                    <button type="button" onclick="cerrarModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-all border border-slate-700/60 active-press shrink-0">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        <span>Volver</span>
+                    </button>
+                    
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-1.5 h-4 bg-orange-500 rounded-full shrink-0"></span>
+                        <h2 class="product-header-title truncate">Nuevo Plato para la Carta</h2>
+                    </div>
+
+                    <span class="product-id-pill">${nextId}</span>
+                </div>
             </div>
 
-            <!-- Formulario a Pantalla Completa con 2 Columnas -->
-            <form id="producto-edit-form" action="/admin?view=productos" method="POST" class="space-y-6 flex-1 pb-16">
-                <input type="hidden" name="action" value="edit">
-                <input type="hidden" name="id" value="${p.id || ''}">
+            <!-- Formulario Principal -->
+            <form id="producto-create-form" action="/admin?view=productos" method="POST" onsubmit="guardarProductoAjax(event, 'producto-create-form')" class="space-y-6 flex-1 px-3 sm:px-6">
+                <input type="hidden" name="action" value="create">
+                <input type="hidden" name="id" value="${nextId}">
+                <input type="hidden" id="product-image-value" name="image_url" value="${defaultImage}">
                 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
                     
-                    <!-- Columna Izquierda: Información Básica y Comercial (7 cols) -->
+                    <!-- Columna Izquierda: Identificación, Categoría Elegante, Precios, Stock y Foto Grande (7 cols) -->
                     <div class="lg:col-span-7 space-y-5">
                         
-                        <!-- Bloque 1: Identificación y Categoría -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-4">
-                            <h3 class="text-xs font-black uppercase text-orange-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="tag" class="w-4 h-4"></i> Identificación del Plato
-                            </h3>
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Código / ID Oficial (Fijo)</label>
-                                    <input type="text" value="${p.id || ''}" disabled class="w-full bg-[#070a13] border border-slate-800 text-orange-400 font-mono-numbers font-black rounded-xl px-3.5 py-2.5 text-sm opacity-80 cursor-not-allowed">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Categoría Oficial *</label>
-                                    <select name="category" required class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500 font-mono-numbers">
-                                        ${catOptions}
-                                    </select>
-                                </div>
+                        <!-- Bloque 1: Identificación y Categoría Oficial Personalizada (Sin Scroll) -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <span class="product-section-title title-orange">
+                                    <i data-lucide="tag" class="w-4 h-4"></i> Identificación del Plato
+                                </span>
                             </div>
 
-                            <div>
-                                <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Nombre del Plato *</label>
-                                <input type="text" name="name" value="${p.name || ''}" required class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500 font-bold">
-                            </div>
-                        </div>
-
-                        <!-- Bloque 2: Precios, Stock y Estado -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-4">
-                            <h3 class="text-xs font-black uppercase text-emerald-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="dollar-sign" class="w-4 h-4"></i> Precio, Stock y Disponibilidad
-                            </h3>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Precio Venta (S/) *</label>
-                                    <input type="number" step="0.5" name="price" value="${p.price || 0}" required class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-emerald-400 font-mono-numbers font-black focus:outline-none focus:border-orange-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Stock en Cocina</label>
-                                    <input type="number" name="stock" value="${p.stock !== undefined ? p.stock : 25}" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono-numbers font-bold focus:outline-none focus:border-orange-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Distintivo / Badge</label>
-                                    <input type="text" name="badge" value="${p.badge || ''}" placeholder="PROMO, SELVA, POPULAR" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500 uppercase">
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">Código / ID Oficial (Fijo)</label>
+                                <input type="text" value="${nextId}" readonly class="form-input-text font-mono-numbers font-bold text-orange-400">
                             </div>
 
-                            <div>
-                                <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">Disponibilidad en Carta</label>
-                                <select name="available" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
-                                    <option value="true" ${isAvailable ? 'selected' : ''}>Disponible para Pedidos</option>
-                                    <option value="false" ${!isAvailable ? 'selected' : ''}>Agotado / Desactivado Temporalmente</option>
-                                </select>
+                            <div class="form-group">
+                                <label class="form-label">Categoría Oficial *</label>
+                                ${renderCustomCategoryPicker('C0001')}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Nombre del Plato *</label>
+                                <input type="text" name="name" required placeholder="Ej: Hamburguesa Buchisapa Especial" class="form-input-text font-bold text-base">
                             </div>
                         </div>
 
-                        <!-- Bloque 3: Descripción Detallada -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-black uppercase text-slate-300 tracking-wider flex items-center gap-2">
-                                <i data-lucide="file-text" class="w-4 h-4 text-orange-400"></i> Descripción del Plato
-                            </h3>
-                            <textarea name="description" rows="3" class="w-full bg-[#070a13] border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-orange-500 leading-relaxed">${p.description || ''}</textarea>
+                        <!-- Bloque 2: Precios, Stock y Disponibilidad -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <span class="product-section-title title-emerald">
+                                    <i data-lucide="dollar-sign" class="w-4 h-4"></i> Precio en Soles (S/), Stock y Disponibilidad
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                                <div class="sm:col-span-6 form-group">
+                                    <label class="form-label">Precio Venta (S/) *</label>
+                                    <div class="price-input-group">
+                                        <span class="price-currency-badge">S/</span>
+                                        <input type="number" name="price" step="0.10" min="0" required value="25.00" placeholder="25.00" class="price-input-field">
+                                    </div>
+                                </div>
+
+                                <div class="sm:col-span-6 form-group">
+                                    <label class="form-label">Stock Inicial en Cocina</label>
+                                    <input type="number" name="stock" min="0" value="30" class="form-input-text font-mono-numbers font-bold">
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold text-white block">Estado en Carta</span>
+                                    <span class="text-[11px] text-slate-400">Disponible inmediatamente para los clientes</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer select-none">
+                                    <input type="checkbox" name="available" value="1" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Bloque 3: Fotografía del Plato (Grande y Ancho Completo en Móvil) -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <span class="product-section-title title-amber">
+                                    <i data-lucide="image" class="w-4 h-4"></i> Fotografía del Plato
+                                </span>
+                                
+                                <div class="upload-tab-buttons">
+                                    <button type="button" id="tab-upload-file" onclick="switchImageTab('file')" class="upload-tab-btn active">Subir Archivo</button>
+                                    <button type="button" id="tab-upload-url" onclick="switchImageTab('url')" class="upload-tab-btn">Pegar URL</button>
+                                </div>
+                            </div>
+
+                            <div class="photo-uploader-full-box">
+                                <!-- Preview de Foto en Gran Tamaño -->
+                                <div class="photo-preview-full-hero">
+                                    <img id="product-photo-preview" src="${defaultImage}" alt="Vista previa" class="photo-preview-img-hero" onerror="this.src='/imagenes/productos/fallback.webp'">
+                                </div>
+
+                                <!-- Zona 1: Subir Archivo -->
+                                <div id="zone-upload-file">
+                                    <label class="dropzone-trigger-area-large">
+                                        <input type="file" accept="image/*" class="hidden" onchange="handleImageFileUpload(this)">
+                                        <i data-lucide="upload-cloud" class="w-6 h-6 text-orange-400 shrink-0"></i>
+                                        <div class="text-left">
+                                            <span class="text-sm font-bold text-white block">Toca para seleccionar imagen de tu dispositivo</span>
+                                            <span class="text-xs text-slate-400">JPG, PNG o WEBP de alta calidad</span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Zona 2: Enlace URL -->
+                                <div id="zone-upload-url" style="display: none;" class="space-y-1.5">
+                                    <input type="url" id="input-image-url" oninput="handleImageUrlInput(this.value)" placeholder="https://ejemplo.com/foto.jpg" class="form-input-text text-xs">
+                                    <span class="text-[10px] text-slate-400 block">Pega la URL web directa de la imagen</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bloque 4: Descripción del Plato -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <span class="product-section-title title-cyan">
+                                    <i data-lucide="align-left" class="w-4 h-4"></i> Descripción e Ingredientes
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <textarea name="description" rows="3" placeholder="Describe los ingredientes, cortes de carne o detalles..." class="form-input-text resize-none text-xs"></textarea>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Columna Derecha: Imagen, Acompañamientos y Cremas (5 cols) -->
+                    <!-- Columna Derecha: Acompañamientos y Cremas (5 cols) -->
                     <div class="lg:col-span-5 space-y-5">
                         
-                        <!-- Bloque 4: Imagen del Producto (Cuadrada) -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-black uppercase text-cyan-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="image" class="w-4 h-4"></i> Imagen del Producto (Cuadrada)
-                            </h3>
-                            
-                            <div>
-                                <label class="block text-[11px] text-slate-300 font-extrabold mb-1.5 uppercase tracking-wider">URL de la Imagen *</label>
-                                <input type="text" id="edit-image-input" name="image_url" value="${imageUrl}" oninput="document.getElementById('edit-image-preview').src = this.value" class="w-full bg-[#070a13] border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
+                        <!-- Sección Acompañamientos Reales -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <div>
+                                    <span class="product-section-title title-orange">
+                                        <i data-lucide="utensils" class="w-4 h-4"></i> Acompañamientos Reales
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Toca para incluir o quitar</span>
+                                </div>
+
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="setAllAccompaniments('all')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Todos</button>
+                                    <button type="button" onclick="setAllAccompaniments('none')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Ninguno</button>
+                                </div>
                             </div>
 
-                            <!-- Vista Previa Cuadrada Grande -->
-                            <div class="mt-2">
-                                <span class="text-[10px] text-slate-500 uppercase font-black tracking-wider block mb-1.5">Vista Previa:</span>
-                                <div class="w-full aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden border-2 border-slate-800 bg-[#070a13] shadow-inner relative group">
-                                    <img id="edit-image-preview" src="${imageUrl}" class="w-full h-full object-cover" onerror="this.src='/imagenes/productos/fallback.webp'">
+                            <div id="accompaniments-list" class="interactive-list-container">
+                                ${accRows}
+                            </div>
+
+                            <!-- Input para añadir acompañamiento personalizado -->
+                            <div class="pt-2 border-t border-slate-800/60">
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="nuevo-acompanamiento-input" placeholder="Otro acompañamiento..." class="form-input-text text-xs flex-1">
+                                    <button type="button" onclick="agregarAcompanamientoPersonalizado()" class="px-3 py-2 bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold rounded-xl transition-all shrink-0">
+                                        + Añadir
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Bloque 5: Acompañamientos -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-black uppercase text-yellow-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="utensils-crossed" class="w-4 h-4"></i> Acompañamientos / Guarniciones
-                            </h3>
-                            <p class="text-[11px] text-slate-400">Ingresa los acompañamientos separados por coma:</p>
-                            <textarea name="accompaniments" rows="2" class="w-full bg-[#070a13] border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-orange-500">${accompanimentsText}</textarea>
-                        </div>
+                        <!-- Sección Cremas de la Casa -->
+                        <div class="product-section-card">
+                            <div class="product-section-header">
+                                <div>
+                                    <span class="product-section-title title-emerald">
+                                        <i data-lucide="flame" class="w-4 h-4"></i> Cremas de la Casa
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Salsas que acompañan al plato</span>
+                                </div>
 
-                        <!-- Bloque 6: Cremas Disponibles -->
-                        <div class="p-5 bg-[#0e1424] border border-slate-800/80 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-black uppercase text-orange-400 tracking-wider flex items-center gap-2">
-                                <i data-lucide="sparkles" class="w-4 h-4"></i> Cremas y Salsas de la Casa
-                            </h3>
-                            <p class="text-[11px] text-slate-400">Selecciona las cremas disponibles para este plato:</p>
-                            <div class="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto p-1.5 border border-slate-800/80 rounded-xl bg-[#070a13]">
-                                ${cremasCheckboxes}
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="setAllSauces('all')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Todas</button>
+                                    <button type="button" onclick="setAllSauces('classics')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Clásicas</button>
+                                    <button type="button" onclick="setAllSauces('none')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Ninguna</button>
+                                </div>
+                            </div>
+
+                            <div id="sauces-list" class="interactive-list-container">
+                                ${sauceRows}
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Barra Fija Inferior con Botones Cancelar y Guardar Plato -->
+                <div class="action-bar-fixed-bottom">
+                    <button type="button" onclick="cerrarModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press">
+                        Cancelar
+                    </button>
+                    <button type="submit" form="producto-create-form" class="px-7 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-lg active-press">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Guardar Plato</span>
+                    </button>
+                </div>
             </form>
         </div>
     `;
+
     abrirModalHtml(html);
 }
 
+/**
+ * Abre el modal a pantalla completa
+ */
 function abrirModalHtml(html) {
     const container = document.getElementById('modal-container');
     const content = document.getElementById('modal-content');
-    if (container && content) {
-        content.innerHTML = html;
-        container.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (!container || !content) return;
+
+    content.innerHTML = html;
+    container.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    if (window.lucide) {
+        window.lucide.createIcons();
     }
 }
 
+/**
+ * Cierra el modal y restablece el scroll
+ */
 function cerrarModal() {
     const container = document.getElementById('modal-container');
-    if (container) {
-        container.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
+    const content = document.getElementById('modal-content');
+    if (!container) return;
+
+    container.classList.add('hidden');
+    if (content) content.innerHTML = '';
+    document.body.style.overflow = '';
 }

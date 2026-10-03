@@ -4246,16 +4246,16 @@ function renderOfficialPromotionsInApp(container) {
   const rawPromos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
     ? window.OFFICIAL_PROMOTIONS
     : [
-      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.', image: '/imagenes/portada/Portada2E.webp' },
-      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.', image: '/imagenes/portada/Portada1M.webp' },
-      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.', image: '/imagenes/portada/Portada3E.webp' },
-      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.', image: '/imagenes/portada/Portada4E.webp' }
+      { id: 'promo-1', name: 'PROMO BUCHI DUO', price: 22.00, fullDesc: 'Una experiencia pensada para dos. Disfruta de dos Hamburguesas Tipo Clásica elaboradas con nuestra hamburguesa artesanal premium, acompañadas de dos Gaseosas Personales Pepsi.', image: '/imagenes/portada/Portada2E.webp' },
+      { id: 'promo-2', name: 'PROMO BROASTER FAMILIAR', price: 38.00, fullDesc: 'La selección ideal para compartir en familia. Incluye un Broaster Presa Pecho, un Broaster Presa Pierna y un Broaster Presa Ala, con el sabor crujiente que nos caracteriza, más una Gaseosa Personal Inca Kola.', image: '/imagenes/portada/Portada1E.webp' },
+      { id: 'promo-3', name: 'PROMO SALCHI BURGER', price: 24.00, fullDesc: 'La fusión de nuestros dos clásicos más pedidos. Una Hamburguesa Tipo Cheese Burguer y una Salchipapa Tipo Salchipapa Clásica, acompañadas de una Gaseosa Personal Coca Cola.', image: '/imagenes/portada/Portada3E.webp' },
+      { id: 'promo-4', name: 'PROMO SELVA POWER', price: 29.00, fullDesc: 'Un homenaje a la Amazonía. Compuesto por un Plato Amazónico Tipo Tacacho con Cecina y un Salchibroaster Tipo Salchibroaster Pierna Presa Pierna, junto a una Gaseosa Personal Fanta.', image: '/imagenes/portada/Portada4E.webp' }
     ];
 
   const promoProducts = rawPromos.map(p => ({
     id: p.id,
-    name: p.name || p.nombre,
-    description: p.fullDesc || p.shortDesc || p.descripcion,
+    name: p.name || p.nombre || p.title,
+    description: p.fullDesc || p.shortDesc || p.description || p.descripcion,
     price: Number(p.price || p.precio || 0),
     image: p.image || p.imagen,
     category_id: 'promociones',
@@ -4269,10 +4269,10 @@ function openPromoOrProductModal(promoId) {
   const promos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
     ? window.OFFICIAL_PROMOTIONS
     : [
-      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoció...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.', image: '/imagenes/portada/Portada2E.webp', fallbackImg: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción in...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.', image: '/imagenes/portada/Portada1M.webp', fallbackImg: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoci...', fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.', image: '/imagenes/portada/Portada3E.webp', fallbackImg: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80' },
-      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción in...', fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.', image: '/imagenes/portada/Portada4E.webp', fallbackImg: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80' }
+      { id: 'promo-1', name: 'PROMO BUCHI DUO', price: 22.00, fullDesc: 'Una experiencia pensada para dos. Disfruta de dos Hamburguesas Tipo Clásica elaboradas con nuestra hamburguesa artesanal premium, acompañadas de dos Gaseosas Personales Pepsi.', image: '/imagenes/portada/Portada2E.webp' },
+      { id: 'promo-2', name: 'PROMO BROASTER FAMILIAR', price: 38.00, fullDesc: 'La selección ideal para compartir en familia. Incluye un Broaster Presa Pecho, un Broaster Presa Pierna y un Broaster Presa Ala, con el sabor crujiente que nos caracteriza, más una Gaseosa Personal Inca Kola.', image: '/imagenes/portada/Portada1E.webp' },
+      { id: 'promo-3', name: 'PROMO SALCHI BURGER', price: 24.00, fullDesc: 'La fusión de nuestros dos clásicos más pedidos. Una Hamburguesa Tipo Cheese Burguer y una Salchipapa Tipo Salchipapa Clásica, acompañadas de una Gaseosa Personal Coca Cola.', image: '/imagenes/portada/Portada3E.webp' },
+      { id: 'promo-4', name: 'PROMO SELVA POWER', price: 29.00, fullDesc: 'Un homenaje a la Amazonía. Compuesto por un Plato Amazónico Tipo Tacacho con Cecina y un Salchibroaster Tipo Salchibroaster Pierna Presa Pierna, junto a una Gaseosa Personal Fanta.', image: '/imagenes/portada/Portada4E.webp' }
     ];
 
   const promo = promos.find(p => p.id === promoId);
@@ -4281,9 +4281,9 @@ function openPromoOrProductModal(promoId) {
   if (typeof window.openProductDetailModal === 'function') {
     window.openProductDetailModal({
       id: promo.id,
-      name: promo.name,
+      name: promo.name || promo.title,
       price: promo.price,
-      description: promo.fullDesc || promo.shortDesc,
+      description: promo.fullDesc || promo.shortDesc || promo.description,
       image: promo.image,
       category: 'promociones',
       category_id: 'promociones',
@@ -4297,10 +4297,10 @@ function addPromoToCartFromApp(promoId) {
   const promos = (typeof window !== 'undefined' && Array.isArray(window.OFFICIAL_PROMOTIONS) && window.OFFICIAL_PROMOTIONS.length > 0)
     ? window.OFFICIAL_PROMOTIONS
     : [
-      { id: 'promo-1', name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.', price: 90.90, image: '/imagenes/portada/Portada2E.webp' },
-      { id: 'promo-2', name: 'Promoción Tu Chicha 1.5 LT.', price: 95.50, image: '/imagenes/portada/Portada1M.webp' },
-      { id: 'promo-3', name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.', price: 95.50, image: '/imagenes/portada/Portada3E.webp' },
-      { id: 'promo-4', name: 'Promoción Para 2', price: 57.90, image: '/imagenes/portada/Portada4E.webp' }
+      { id: 'promo-1', name: 'PROMO BUCHI DUO', price: 22.00, image: '/imagenes/portada/Portada2E.webp' },
+      { id: 'promo-2', name: 'PROMO BROASTER FAMILIAR', price: 38.00, image: '/imagenes/portada/Portada1E.webp' },
+      { id: 'promo-3', name: 'PROMO SALCHI BURGER', price: 24.00, image: '/imagenes/portada/Portada3E.webp' },
+      { id: 'promo-4', name: 'PROMO SELVA POWER', price: 29.00, image: '/imagenes/portada/Portada4E.webp' }
     ];
 
   const p = promos.find(item => item.id === promoId);
@@ -4941,23 +4941,22 @@ function getFallbackProducts() {
   return [
   {
     "id": "PL000001",
-    "name": "Promoción Tú Eliges con Gaseosa 1.5 LT.",
+    "name": "PROMO BUCHI DUO",
     "category_id": "C0001",
-    "price": 90.9,
-    "original_price": 105,
-    "description": "1 BuchiSapa Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoción incluye ensalada fresca o cocida a elección.",
-    "badge": "PROMO",
+    "price": 22,
+    "original_price": 26,
+    "description": "Una experiencia pensada para dos. Disfruta de dos Hamburguesas Tipo Clásica elaboradas con nuestra hamburguesa artesanal premium, acompañadas de dos Gaseosas Personales Pepsi.",
+    "badge": "DUO",
     "popular": true,
     "available": true,
     "stock": 50,
-    "image": "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80",
+    "image": "/imagenes/portada/Portada2E.webp",
     "includes_sauces": true,
     "category": "promociones",
     "accompaniments": [
-      "Papas fritas familiares",
-      "Ensalada fresca",
-      "Cremas Buchisapa",
-      "Bebida"
+      "Papa crocante",
+      "Hamburguesa artesanal",
+      "Ensalada fresca"
     ],
     "cremas": [
       "Mayonesa",
@@ -4971,23 +4970,22 @@ function getFallbackProducts() {
   },
   {
     "id": "PL000002",
-    "name": "Promoción Tu Chicha 1.5 LT.",
+    "name": "PROMO BROASTER FAMILIAR",
     "category_id": "C0001",
-    "price": 95.5,
-    "original_price": 110,
-    "description": "1 BuchiSapa Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción incluye ensalada fresca o cocida a elección.",
-    "badge": "PROMO",
+    "price": 38,
+    "original_price": 46,
+    "description": "La selección ideal para compartir en familia. Incluye un Broaster Presa Pecho, un Broaster Presa Pierna y un Broaster Presa Ala, con el sabor crujiente que nos caracteriza, más una Gaseosa Personal Inca Kola.",
+    "badge": "FAMILIAR",
     "popular": true,
     "available": true,
     "stock": 50,
-    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "image": "/imagenes/portada/Portada1E.webp",
     "includes_sauces": true,
     "category": "promociones",
     "accompaniments": [
-      "Papas fritas familiares",
+      "Papa crocante",
       "Ensalada fresca",
-      "Cremas Buchisapa",
-      "Bebida"
+      "Arroz"
     ],
     "cremas": [
       "Mayonesa",
@@ -5001,23 +4999,22 @@ function getFallbackProducts() {
   },
   {
     "id": "PL000003",
-    "name": "Promoción Tú Eliges con Gaseosa 2.25 LT.",
+    "name": "PROMO SALCHI BURGER",
     "category_id": "C0001",
-    "price": 95.5,
-    "original_price": 112,
-    "description": "1 BuchiSapa Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoción incluye ensalada fresca o cocida a elección.",
-    "badge": "PROMO",
+    "price": 24,
+    "original_price": 29,
+    "description": "La fusión de nuestros dos clásicos más pedidos. Una Hamburguesa Tipo Cheese Burguer y una Salchipapa Tipo Salchipapa Clásica, acompañadas de una Gaseosa Personal Coca Cola.",
+    "badge": "COMBO",
     "popular": true,
     "available": true,
     "stock": 50,
-    "image": "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80",
+    "image": "/imagenes/portada/Portada3E.webp",
     "includes_sauces": true,
     "category": "promociones",
     "accompaniments": [
-      "Papas fritas familiares",
-      "Ensalada fresca",
-      "Cremas Buchisapa",
-      "Bebida"
+      "Queso cheddar",
+      "Papa crocante",
+      "Ensalada fresca"
     ],
     "cremas": [
       "Mayonesa",
@@ -5031,23 +5028,23 @@ function getFallbackProducts() {
   },
   {
     "id": "PL000004",
-    "name": "Promoción Para 2",
+    "name": "PROMO SELVA POWER",
     "category_id": "C0001",
-    "price": 57.9,
-    "original_price": 68,
-    "description": "1/2 BuchiSapa Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción incluye cremas de la casa a elección.",
-    "badge": "PROMO",
+    "price": 29,
+    "original_price": 35,
+    "description": "Un homenaje a la Amazonía. Compuesto por un Plato Amazónico Tipo Tacacho con Cecina y un Salchibroaster Tipo Salchibroaster Pierna Presa Pierna, junto a una Gaseosa Personal Fanta.",
+    "badge": "AMAZÓNICO",
     "popular": true,
     "available": true,
     "stock": 50,
-    "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
+    "image": "/imagenes/portada/Portada4E.webp",
     "includes_sauces": true,
     "category": "promociones",
     "accompaniments": [
-      "Papas fritas familiares",
-      "Ensalada fresca",
-      "Cremas Buchisapa",
-      "Bebida"
+      "Maduros fritos",
+      "Sarza criolla",
+      "Papa crocante",
+      "Ensalada fresca"
     ],
     "cremas": [
       "Mayonesa",
@@ -5057,92 +5054,6 @@ function getFallbackProducts() {
       "Tártara"
     ],
     "code": "PL000004",
-    "category_code": "C0001"
-  },
-  {
-    "id": "PL000005",
-    "name": "Combo Familiar Broaster",
-    "category_id": "C0001",
-    "category": "promociones",
-    "price": 45,
-    "stock": 25,
-    "available": true,
-    "badge": "FAMILIAR",
-    "popular": true,
-    "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
-    "description": "1 Pollo broaster entero crocante + porción familiar de papas fritas + ensalada + chicha morada 1.5L.",
-    "accompaniments": [
-      "1 Pollo broaster entero crocante",
-      "Papas fritas familiares",
-      "Ensalada fresca",
-      "Chicha morada 1.5L"
-    ],
-    "cremas": [
-      "Mayonesa",
-      "Mostaza",
-      "Ketchup",
-      "Ají de Rocoto",
-      "Tártara"
-    ],
-    "includes_sauces": true,
-    "code": "PL000005",
-    "category_code": "C0001"
-  },
-  {
-    "id": "PL000006",
-    "name": "Combo Selvático Dúo",
-    "category_id": "C0001",
-    "category": "promociones",
-    "price": 32,
-    "stock": 25,
-    "available": true,
-    "badge": "DÚO",
-    "popular": true,
-    "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80",
-    "description": "1 Tacacho con cecina + 1 Arroz chaufa amazónico + 2 refrescos de cocona helados.",
-    "accompaniments": [
-      "1 Tacacho con cecina ahumada",
-      "1 Arroz chaufa amazónico con chorizo",
-      "2 Refrescos de cocona helados",
-      "Sarza criolla de cocona"
-    ],
-    "cremas": [
-      "Mayonesa",
-      "Mostaza",
-      "Ketchup",
-      "Ají de Rocoto",
-      "Tártara"
-    ],
-    "includes_sauces": true,
-    "code": "PL000006",
-    "category_code": "C0001"
-  },
-  {
-    "id": "PL000007",
-    "name": "Combo Burger Lover",
-    "category_id": "C0001",
-    "category": "promociones",
-    "price": 28,
-    "stock": 25,
-    "available": true,
-    "badge": "PARRILLERO",
-    "popular": true,
-    "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80",
-    "description": "2 Hamburguesas a lo Pobre + 2 porciones de papas crujientes + 2 Inca Kola 500ml.",
-    "accompaniments": [
-      "2 Hamburguesas a lo Pobre con huevo y plátano",
-      "2 Porciones de papas fritas crujientes",
-      "2 Gaseosas Inca Kola 500ml"
-    ],
-    "cremas": [
-      "Mayonesa",
-      "Mostaza",
-      "Ketchup",
-      "Ají de Rocoto",
-      "Tártara"
-    ],
-    "includes_sauces": true,
-    "code": "PL000007",
     "category_code": "C0001"
   },
   {

@@ -274,20 +274,15 @@ export function compileHtml() {
                       const accompaniments = Array.isArray(p.accompaniments) ? p.accompaniments : [];
                       const cremas = Array.isArray(p.cremas) ? p.cremas : [];
 
-                      const badgeHtml = badge 
-                          ? `<span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-orange-600/95 text-[9px] font-black text-white uppercase rounded-md tracking-wider shadow-md backdrop-blur-sm">${badge}</span>` 
-                          : '';
-
                       const pJsonStr = JSON.stringify(p).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 
                       return `
-                      <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
+                      <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-producto-id="${id}" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
                           <div class="space-y-3">
                               <!-- Imagen Grande y Cuadrada del Producto -->
                               <div class="relative w-full aspect-square rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
-                                  <img src="${image}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
-                                  ${badgeHtml}
-                                  <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md ${available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'}">
+                                  <img src="${image}" alt="${name}" class="producto-img-element w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
+                                  <span class="producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md ${available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'}">
                                       ${available ? 'Disponible' : 'Agotado'}
                                   </span>
                               </div>
@@ -295,12 +290,12 @@ export function compileHtml() {
                               <!-- Datos Principales: Nombre, Stock y Precio -->
                               <div>
                                   <div class="flex items-start justify-between gap-2">
-                                      <h4 class="font-black text-base text-white leading-snug line-clamp-2">${name}</h4>
-                                      <span class="font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
+                                      <h4 class="producto-title-text font-black text-base text-white leading-snug line-clamp-2">${name}</h4>
+                                      <span class="producto-price-text font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
                                   </div>
                                   <div class="flex items-center gap-2 mt-2">
                                       <span class="inline-flex items-center gap-1.5 text-xs font-mono-numbers font-bold ${isCrit ? 'text-red-400 animate-pulse' : 'text-slate-300'}">
-                                          <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: ${stock}
+                                          <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: <span class="producto-stock-text">${stock} un.</span>
                                       </span>
                                   </div>
                               </div>
@@ -318,13 +313,9 @@ export function compileHtml() {
                                       <i data-lucide="edit-3" class="w-3.5 h-3.5 text-orange-400"></i>
                                       <span>Editar</span>
                                   </button>
-                                  <form action="/admin?view=productos" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas eliminar este plato de la carta?');">
-                                      <input type="hidden" name="action" value="delete">
-                                      <input type="hidden" name="id" value="${id}">
-                                      <button type="submit" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
-                                          <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                      </button>
-                                  </form>
+                                  <button type="button" onclick="eliminarPlatoAjax('${id}', '${name.replace(/'/g, "\\'")}')" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
+                                      <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                  </button>
                               </div>
                           </div>
                       </div>

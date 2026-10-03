@@ -318,18 +318,13 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
                             $accompaniments = is_array($p['accompaniments'] ?? null) ? $p['accompaniments'] : [];
                             $cremas = is_array($p['cremas'] ?? null) ? $p['cremas'] : [];
                             ?>
-                            <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-search-target="<?php echo strtolower($name . ' ' . $desc . ' ' . implode(' ', $accompaniments) . ' ' . implode(' ', $cremas)); ?>">
+                            <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-producto-id="<?php echo htmlspecialchars($id); ?>" data-search-target="<?php echo strtolower($name . ' ' . $desc . ' ' . implode(' ', $accompaniments) . ' ' . implode(' ', $cremas)); ?>">
                                 
                                 <div class="space-y-3">
                                     <!-- 1. Imagen Grande y Cuadrada del Producto -->
                                     <div class="relative w-full aspect-square rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
-                                        <img src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($name); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
-                                        <?php if (!empty($badge)): ?>
-                                            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-orange-600/95 text-[9px] font-black text-white uppercase rounded-md tracking-wider shadow-md backdrop-blur-sm">
-                                                <?php echo htmlspecialchars($badge); ?>
-                                            </span>
-                                        <?php endif; ?>
-                                        <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md <?php echo $available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'; ?>">
+                                        <img src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($name); ?>" class="producto-img-element w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
+                                        <span class="producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md <?php echo $available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'; ?>">
                                             <?php echo $available ? 'Disponible' : 'Agotado'; ?>
                                         </span>
                                     </div>
@@ -337,13 +332,13 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
                                     <!-- 2. Datos Principales: Nombre, Stock y Precio -->
                                     <div>
                                         <div class="flex items-start justify-between gap-2">
-                                            <h4 class="font-black text-base text-white leading-snug line-clamp-2"><?php echo htmlspecialchars($name); ?></h4>
-                                            <span class="font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ <?php echo number_format($price, 2); ?></span>
+                                            <h4 class="producto-title-text font-black text-base text-white leading-snug line-clamp-2"><?php echo htmlspecialchars($name); ?></h4>
+                                            <span class="producto-price-text font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ <?php echo number_format($price, 2); ?></span>
                                         </div>
 
                                         <div class="flex items-center gap-2 mt-2">
                                             <span class="inline-flex items-center gap-1.5 text-xs font-mono-numbers font-bold <?php echo $isCrit ? 'text-red-400 animate-pulse' : 'text-slate-300'; ?>">
-                                                <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: <?php echo $stock; ?>
+                                                <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: <span class="producto-stock-text"><?php echo $stock; ?> un.</span>
                                             </span>
                                         </div>
                                     </div>
@@ -362,13 +357,9 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
                                             <span>Editar</span>
                                         </button>
 
-                                        <form action="/admin?view=productos" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas eliminar «<?php echo htmlspecialchars(addslashes($name)); ?>» de la carta?')">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($id); ?>">
-                                            <button type="submit" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
-                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" onclick="eliminarPlatoAjax('<?php echo htmlspecialchars($id); ?>', '<?php echo htmlspecialchars(addslashes($name)); ?>')" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
