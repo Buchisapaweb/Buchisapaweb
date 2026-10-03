@@ -30,6 +30,29 @@
   let availableAccompaniments = [];
   let selectedSauces = [];
 
+  const CATEGORY_CODE_TO_SLUG = {
+    'c0001': 'promociones',
+    'c0002': 'alitas',
+    'c0003': 'bebidas',
+    'c0004': 'broaster',
+    'c0005': 'hamburguesas',
+    'c0006': 'infusiones',
+    'c0007': 'platos-amazonicos',
+    'c0008': 'refrescos',
+    'c0009': 'salchipapas',
+    'c0010': 'adicional'
+  };
+
+  function getProductCategorySlug(product) {
+    if (!product) return '';
+    const rawId = String(product.category_id || '').toLowerCase().trim();
+    if (CATEGORY_CODE_TO_SLUG[rawId]) return CATEGORY_CODE_TO_SLUG[rawId];
+    const rawCode = String(product.category_code || '').toLowerCase().trim();
+    if (CATEGORY_CODE_TO_SLUG[rawCode]) return CATEGORY_CODE_TO_SLUG[rawCode];
+    const cat = String(product.category || product.categoryPill || '').toLowerCase().trim();
+    return CATEGORY_CODE_TO_SLUG[cat] || cat;
+  }
+
   /**
    * Obtiene los acompañamientos específicos según la carta oficial Buchisapa
    */
@@ -42,7 +65,7 @@
     }
 
     const name = (product.name || '').toLowerCase().trim();
-    const cat = (product.category_id || product.category || '').toLowerCase().trim();
+    const cat = getProductCategorySlug(product);
 
     // 6. BEBIDAS / 7. REFRESCOS / 8. INFUSIONES (No llevan acompañamiento, son bebidas solas)
     if (
@@ -338,7 +361,7 @@
    * Obtiene la categoría formateada para el badge superior
    */
   function getCategoryPillLabel(product) {
-    const cat = (product.category_id || product.category || '').toLowerCase();
+    const cat = getProductCategorySlug(product);
     if (cat.includes('hamburguesa') || cat.includes('burger')) return 'HAMBURGUESAS';
     if (cat.includes('amazon') || cat.includes('selva')) return 'PLATOS AMAZÓNICOS';
     if (cat.includes('broaster')) return 'BROASTER';
@@ -348,7 +371,9 @@
     if (cat.includes('refresco')) return 'REFRESCOS';
     if (cat.includes('bebida')) return 'BEBIDAS';
     if (cat.includes('infusion')) return 'INFUSIONES';
-    return (product.category_id || product.category || 'CARTA GENERAL').toUpperCase();
+    if (cat.includes('promo')) return 'PROMOCIONES';
+    if (cat.includes('adicion') || cat.includes('extra')) return 'ADICIONAL';
+    return (product.category || product.category_id || 'CARTA GENERAL').toUpperCase();
   }
 
   /**
@@ -459,7 +484,7 @@
     }
 
     const catBadge = String(product.categoryBadge || '').toLowerCase();
-    const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
+    const cat = getProductCategorySlug(product);
     const name = String(product.name || '').toLowerCase();
 
     // RECHAZO TOTAL DE CUALQUIER COMIDA / PLATO / HAMBURGUESA / POLLO / ETC.

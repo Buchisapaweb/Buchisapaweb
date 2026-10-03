@@ -14,12 +14,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     
     if ($action === 'create' || $action === 'edit') {
-        $id = $_POST['id'] ?? ($_POST['id_form'] ?? ('prod-' . time()));
+        $rawId = trim($_POST['id'] ?? ($_POST['id_form'] ?? ''));
+        $jsonPath = __DIR__ . '/../../data/products.json';
+        $productsList = file_exists($jsonPath) ? (json_decode(file_get_contents($jsonPath), true) ?: []) : [];
+
+        if ($action === 'create') {
+            if (!empty($rawId) && preg_match('/^PL\d{6}$/i', $rawId)) {
+                $id = strtoupper($rawId);
+            } else {
+                $maxNum = 0;
+                foreach ($productsList as $pItem) {
+                    if (preg_match('/^PL(\d+)$/i', $pItem['id'] ?? '', $m)) {
+                        $n = intval($m[1]);
+                        if ($n > $maxNum) $maxNum = $n;
+                    }
+                }
+                $id = sprintf('PL%06d', $maxNum + 1);
+            }
+        } else {
+            $id = $rawId;
+        }
+
         $name = trim($_POST['name'] ?? '');
         $description = trim($_POST['description'] ?? '');
         $price = floatval($_POST['price'] ?? 0);
         $stock = intval($_POST['stock'] ?? 25);
-        $category = trim($_POST['category'] ?? 'hamburguesas');
+        $rawCategory = strtolower(trim($_POST['category'] ?? 'hamburguesas'));
+
+        // Mapeo Canónico C0001 - C0010
+        $categoryMap = [
+            'c0001' => ['id' => 'C0001', 'code' => 'C0001', 'slug' => 'promociones'],
+            'promociones' => ['id' => 'C0001', 'code' => 'C0001', 'slug' => 'promociones'],
+            'c0002' => ['id' => 'C0002', 'code' => 'C0002', 'slug' => 'alitas'],
+            'alitas' => ['id' => 'C0002', 'code' => 'C0002', 'slug' => 'alitas'],
+            'c0003' => ['id' => 'C0003', 'code' => 'C0003', 'slug' => 'bebidas'],
+            'bebidas' => ['id' => 'C0003', 'code' => 'C0003', 'slug' => 'bebidas'],
+            'c0004' => ['id' => 'C0004', 'code' => 'C0004', 'slug' => 'broaster'],
+            'broaster' => ['id' => 'C0004', 'code' => 'C0004', 'slug' => 'broaster'],
+            'c0005' => ['id' => 'C0005', 'code' => 'C0005', 'slug' => 'hamburguesas'],
+            'hamburguesas' => ['id' => 'C0005', 'code' => 'C0005', 'slug' => 'hamburguesas'],
+            'c0006' => ['id' => 'C0006', 'code' => 'C0006', 'slug' => 'infusiones'],
+            'infusiones' => ['id' => 'C0006', 'code' => 'C0006', 'slug' => 'infusiones'],
+            'c0007' => ['id' => 'C0007', 'code' => 'C0007', 'slug' => 'platos-amazonicos'],
+            'platos-amazonicos' => ['id' => 'C0007', 'code' => 'C0007', 'slug' => 'platos-amazonicos'],
+            'c0008' => ['id' => 'C0008', 'code' => 'C0008', 'slug' => 'refrescos'],
+            'refrescos' => ['id' => 'C0008', 'code' => 'C0008', 'slug' => 'refrescos'],
+            'c0009' => ['id' => 'C0009', 'code' => 'C0009', 'slug' => 'salchipapas'],
+            'salchipapas' => ['id' => 'C0009', 'code' => 'C0009', 'slug' => 'salchipapas'],
+            'c0010' => ['id' => 'C0010', 'code' => 'C0010', 'slug' => 'adicional'],
+            'adicional' => ['id' => 'C0010', 'code' => 'C0010', 'slug' => 'adicional']
+        ];
+        $catResolved = $categoryMap[$rawCategory] ?? ['id' => 'C0005', 'code' => 'C0005', 'slug' => $rawCategory];
+
         $badge = trim($_POST['badge'] ?? '');
         $available = ($_POST['available'] ?? 'true') === 'true';
         $image = trim($_POST['image_url'] ?? '/imagenes/productos/fallback.webp');
@@ -47,12 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $payload = [
+            'id' => $id,
+            'code' => $id,
             'name' => $name,
             'description' => $description,
             'price' => $price,
             'stock' => $stock,
-            'category' => $category,
-            'category_id' => $category,
+            'category' => $catResolved['slug'],
+            'category_id' => $catResolved['id'],
+            'category_code' => $catResolved['code'],
             'badge' => !empty($badge) ? $badge : null,
             'image' => $image,
             'available' => $available,
@@ -105,18 +154,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Cargar catálogo de categorías oficial (10 categorías)
+// Cargar catálogo de categorías oficial (10 categorías con formato oficial C0001)
 $categoriasDefinidas = [
-    ['id' => 'promociones',       'name' => '⭐ PROMOCIONES',               'icon' => 'sparkles',  'color' => '#f59e0b', 'desc' => 'Combos especiales, ofertas de la semana y paquetes familiares.'],
-    ['id' => 'alitas',            'name' => 'ALITAS',                       'icon' => 'flame',     'color' => '#ef4444', 'desc' => 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.'],
-    ['id' => 'bebidas',           'name' => 'BEBIDAS',                      'icon' => 'cup-soda',  'color' => '#06b6d4', 'desc' => 'Gaseosas heladas, agua mineral y bebidas embotelladas.'],
-    ['id' => 'broaster',          'name' => 'BROASTER',                     'icon' => 'drumstick', 'color' => '#f97316', 'desc' => 'Pollo broaster ultra crocante con papas doradas y cremas.'],
-    ['id' => 'hamburguesas',      'name' => 'HAMBURGUESAS',                 'icon' => 'beef',      'color' => '#eab308', 'desc' => 'Hamburguesas artesanales, choripanes y sándwiches especiales.'],
-    ['id' => 'infusiones',        'name' => 'INFUSIONES',                   'icon' => 'coffee',    'color' => '#10b981', 'desc' => 'Infusiones calientes, café aromático pasado y manzanilla.'],
-    ['id' => 'platos-amazonicos', 'name' => 'PLATOS AMAZÓNICOS',            'icon' => 'utensils',  'color' => '#8b5cf6', 'desc' => 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.'],
-    ['id' => 'refrescos',         'name' => 'REFRESCOS',                    'icon' => 'glass-water','color' => '#3b82f6', 'desc' => 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.'],
-    ['id' => 'salchipapas',       'name' => 'SALCHIPAPAS Y SALCHIBROASTERS', 'icon' => 'layers',    'color' => '#ec4899', 'desc' => 'Papas crocantes, salchichas frankfurter y combinaciones broaster.'],
-    ['id' => 'adicional',         'name' => 'ADICIONAL',                    'icon' => 'plus-circle','color' => '#94a3b8', 'desc' => 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.']
+    ['id' => 'C0001', 'code' => 'C0001', 'slug' => 'promociones',       'name' => '⭐ PROMOCIONES',               'icon' => 'sparkles',  'color' => '#f59e0b', 'desc' => 'Combos especiales, ofertas de la semana y paquetes familiares.'],
+    ['id' => 'C0002', 'code' => 'C0002', 'slug' => 'alitas',            'name' => 'ALITAS',                       'icon' => 'flame',     'color' => '#ef4444', 'desc' => 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.'],
+    ['id' => 'C0003', 'code' => 'C0003', 'slug' => 'bebidas',           'name' => 'BEBIDAS',                      'icon' => 'cup-soda',  'color' => '#06b6d4', 'desc' => 'Gaseosas heladas, agua mineral y bebidas embotelladas.'],
+    ['id' => 'C0004', 'code' => 'C0004', 'slug' => 'broaster',          'name' => 'BROASTER',                     'icon' => 'drumstick', 'color' => '#f97316', 'desc' => 'Pollo broaster ultra crocante con papas doradas y cremas.'],
+    ['id' => 'C0005', 'code' => 'C0005', 'slug' => 'hamburguesas',      'name' => 'HAMBURGUESAS',                 'icon' => 'beef',      'color' => '#eab308', 'desc' => 'Hamburguesas artesanales, choripanes y sándwiches especiales.'],
+    ['id' => 'C0006', 'code' => 'C0006', 'slug' => 'infusiones',        'name' => 'INFUSIONES',                   'icon' => 'coffee',    'color' => '#10b981', 'desc' => 'Infusiones calientes, café aromático pasado y manzanilla.'],
+    ['id' => 'C0007', 'code' => 'C0007', 'slug' => 'platos-amazonicos', 'name' => 'PLATOS AMAZÓNICOS',            'icon' => 'utensils',  'color' => '#8b5cf6', 'desc' => 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.'],
+    ['id' => 'C0008', 'code' => 'C0008', 'slug' => 'refrescos',         'name' => 'REFRESCOS',                    'icon' => 'glass-water','color' => '#3b82f6', 'desc' => 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.'],
+    ['id' => 'C0009', 'code' => 'C0009', 'slug' => 'salchipapas',       'name' => 'SALCHIPAPAS Y SALCHIBROASTERS', 'icon' => 'layers',    'color' => '#ec4899', 'desc' => 'Papas crocantes, salchichas frankfurter y combinaciones broaster.'],
+    ['id' => 'C0010', 'code' => 'C0010', 'slug' => 'adicional',         'name' => 'ADICIONAL',                    'icon' => 'plus-circle','color' => '#94a3b8', 'desc' => 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.']
 ];
 
 // Cargar catálogo de productos: Supabase o respaldo local data/products.json
@@ -204,10 +253,15 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
             </button>
             <?php foreach ($categoriasDefinidas as $cat): ?>
                 <?php 
-                $countInCat = count(array_filter($productos, fn($p) => ($p['category_id'] ?? $p['category'] ?? '') === $cat['id']));
+                $countInCat = count(array_filter($productos, fn($p) => 
+                    ($p['category_id'] ?? '') === $cat['id'] || 
+                    ($p['category_id'] ?? '') === $cat['slug'] || 
+                    ($p['category'] ?? '') === $cat['id'] || 
+                    ($p['category'] ?? '') === $cat['slug']
+                ));
                 ?>
-                <button type="button" onclick="seleccionarFiltroCategoria('<?php echo $cat['id']; ?>')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="<?php echo $cat['id']; ?>">
-                    <?php echo $cat['name']; ?> (<?php echo $countInCat; ?>)
+                <button type="button" onclick="seleccionarFiltroCategoria('<?php echo $cat['id']; ?>')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="<?php echo $cat['id']; ?>" data-cat-slug="<?php echo $cat['slug']; ?>">
+                    <span class="font-mono-numbers text-[9px] text-orange-400/90 font-bold mr-1"><?php echo $cat['id']; ?></span> <?php echo $cat['name']; ?> (<?php echo $countInCat; ?>)
                 </button>
             <?php endforeach; ?>
         </div>
@@ -218,14 +272,21 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
         <?php foreach ($categoriasDefinidas as $cat): ?>
             <?php 
             $catId = $cat['id'];
-            $platosEnCat = array_values(array_filter($productos, fn($p) => ($p['category_id'] ?? $p['category'] ?? '') === $catId));
+            $catSlug = $cat['slug'];
+            $platosEnCat = array_values(array_filter($productos, fn($p) => 
+                ($p['category_id'] ?? '') === $catId || 
+                ($p['category_id'] ?? '') === $catSlug || 
+                ($p['category'] ?? '') === $catId || 
+                ($p['category'] ?? '') === $catSlug
+            ));
             ?>
-            <section class="category-block space-y-4" id="cat-section-<?php echo $catId; ?>" data-cat-id="<?php echo $catId; ?>">
+            <section class="category-block space-y-4" id="cat-section-<?php echo $catId; ?>" data-cat-id="<?php echo $catId; ?>" data-cat-slug="<?php echo $catSlug; ?>">
                 
-                <!-- Encabezado de la Categoría -->
+                <!-- Encabezado de la Categoría con Código Oficial C0001 -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
                     <div class="flex items-center gap-2.5">
                         <span class="w-3 h-3 rounded-full shrink-0" style="background-color: <?php echo $cat['color']; ?>; box-shadow: 0 0 10px <?php echo $cat['color']; ?>80;"></span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono-numbers font-extrabold bg-orange-950/40 border border-orange-500/40 text-orange-400 tracking-wider"><?php echo $cat['id']; ?></span>
                         <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
                             <?php echo $cat['name']; ?>
                         </h3>
@@ -330,7 +391,10 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
 
                                 <!-- Acciones del Plato -->
                                 <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-800/60">
-                                    <span class="text-[9px] font-mono-numbers text-slate-500 font-bold">ID: <?php echo htmlspecialchars($id); ?></span>
+                                    <span class="text-[9px] font-mono-numbers text-slate-400 font-bold bg-[#0a0d16] px-2 py-0.5 rounded border border-slate-800 flex items-center gap-1">
+                                        <span class="text-slate-500">ID:</span>
+                                        <span class="text-orange-400 font-extrabold tracking-wide"><?php echo htmlspecialchars($id); ?></span>
+                                    </span>
                                     
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick='abrirEditarProductoModal(<?php echo json_encode($p, JSON_HEX_APOS | JSON_HEX_QUOT); ?>)' class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1 active-press" title="Editar plato">

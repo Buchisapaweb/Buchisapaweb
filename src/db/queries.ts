@@ -1040,7 +1040,7 @@ function saveProductsToDisk(data?: Product[]) {
 }
 
 // IN-MEMORY STORES CON PERSISTENCIA
-const categoriesStore: Category[] = loadCategoriesFromDisk();
+let categoriesStore: Category[] = loadCategoriesFromDisk();
 let productsStore: Product[] = loadProductsFromDisk();
 const saucesStore = [...initialSauces];
 let promotionsStore: Promotion[] = loadPromotionsFromDisk();
@@ -1048,20 +1048,37 @@ let ordersStore: Order[] = loadOrdersFromDisk();
 const claimsStore: Claim[] = [];
 
 // CATEGORÍAS CRUD
+function generateNextCategoryId(): string {
+  categoriesStore = loadCategoriesFromDisk();
+  let maxNum = 0;
+  for (const c of categoriesStore) {
+    const match = (c.id || '').match(/^C(\d+)$/i);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNum) maxNum = num;
+    }
+  }
+  const nextNum = maxNum + 1;
+  return `C${String(nextNum).padStart(4, '0')}`;
+}
+
 export async function getCategories(): Promise<Category[]> {
+  categoriesStore = loadCategoriesFromDisk();
   return [...categoriesStore].sort((a, b) => {
-    const codeA = parseInt(a.code || a.id, 10) || 9999;
-    const codeB = parseInt(b.code || b.id, 10) || 9999;
+    const codeA = parseInt((a.code || a.id || '').replace(/\D/g, ''), 10) || 9999;
+    const codeB = parseInt((b.code || b.id || '').replace(/\D/g, ''), 10) || 9999;
     if (codeA !== codeB) return codeA - codeB;
     return a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
   });
 }
 
 export async function createCategory(data: Partial<Category>): Promise<Category> {
-  const code = data.code || String(1000 + categoriesStore.length + 1);
+  categoriesStore = loadCategoriesFromDisk();
+  const nextId = (data.id && data.id.startsWith('C')) ? data.id : generateNextCategoryId();
   const newCat: Category = {
-    id: data.id || data.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || `cat-${Date.now()}`,
-    code: code,
+    id: nextId,
+    code: nextId,
+    slug: data.slug || data.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || `cat-${nextId.toLowerCase()}`,
     name: (data.name || 'NUEVA CATEGORÍA').toUpperCase().trim(),
     icon: data.icon || 'Utensils',
     image: data.image || '',
@@ -1407,13 +1424,29 @@ export async function updateProductStock(id: string, available: boolean, stock?:
   return product;
 }
 
+export function generateNextProductId(): string {
+  productsStore = loadProductsFromDisk();
+  let maxNum = 0;
+  for (const p of productsStore) {
+    const match = (p.id || '').match(/^PL(\d+)$/i);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNum) maxNum = num;
+    }
+  }
+  const nextNum = maxNum + 1;
+  return `PL${String(nextNum).padStart(6, '0')}`;
+}
+
 export async function createProduct(data: Partial<Product>): Promise<Product> {
+  productsStore = loadProductsFromDisk();
+  const nextId = (data.id && data.id.startsWith('PL')) ? data.id : generateNextProductId();
   const newProduct: Product = {
-    id: data.id || `prod-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    code: data.code || String(100000 + productsStore.length + 1),
-    name: data.name || 'Nuevo Producto',
-    category_id: data.category_id || data.category || 'hamburguesas',
-    category: data.category || data.category_id || 'hamburguesas',
+    id: nextId,
+    code: nextId,
+    name: data.name || 'Nuevo Plato',
+    category_id: data.category_id || data.category || 'C0001',
+    category: data.category || data.category_id || 'promociones',
     price: Number(data.price) || 10,
     description: data.description || '',
     badge: data.badge || null,

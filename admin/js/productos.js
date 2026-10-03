@@ -1,7 +1,7 @@
 /**
  * BUCHISAPA BURGER & BROASTER - PRODUCTOS MODULE JS
  * admin/js/productos.js
- * Filtrado dinámico por categorías, búsqueda en tiempo real y modal avanzado de plato
+ * Filtrado dinámico por categorías oficiales C0001-C0010, búsqueda en tiempo real e IDs PL000001
  */
 
 const ALL_AVAILABLE_SAUCES = [
@@ -20,16 +20,16 @@ const ALL_AVAILABLE_SAUCES = [
 ];
 
 var activeCategories = (typeof window !== 'undefined' && window.activeCategories) ? window.activeCategories : [
-    { id: 'promociones',       name: '⭐ PROMOCIONES' },
-    { id: 'alitas',            name: 'ALITAS' },
-    { id: 'bebidas',           name: 'BEBIDAS' },
-    { id: 'broaster',          name: 'BROASTER' },
-    { id: 'hamburguesas',      name: 'HAMBURGUESAS' },
-    { id: 'infusiones',        name: 'INFUSIONES' },
-    { id: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS' },
-    { id: 'refrescos',         name: 'REFRESCOS' },
-    { id: 'salchipapas',       name: 'SALCHIPAPAS Y SALCHIBROASTERS' },
-    { id: 'adicional',         name: 'ADICIONAL' }
+    { id: 'C0001', code: 'C0001', slug: 'promociones',       name: '⭐ PROMOCIONES' },
+    { id: 'C0002', code: 'C0002', slug: 'alitas',            name: 'ALITAS' },
+    { id: 'C0003', code: 'C0003', slug: 'bebidas',           name: 'BEBIDAS' },
+    { id: 'C0004', code: 'C0004', slug: 'broaster',          name: 'BROASTER' },
+    { id: 'C0005', code: 'C0005', slug: 'hamburguesas',      name: 'HAMBURGUESAS' },
+    { id: 'C0006', code: 'C0006', slug: 'infusiones',        name: 'INFUSIONES' },
+    { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS' },
+    { id: 'C0008', code: 'C0008', slug: 'refrescos',         name: 'REFRESCOS' },
+    { id: 'C0009', code: 'C0009', slug: 'salchipapas',       name: 'SALCHIPAPAS Y SALCHIBROASTERS' },
+    { id: 'C0010', code: 'C0010', slug: 'adicional',         name: 'ADICIONAL' }
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error parsing categories data:', e);
         }
     }
-    console.log("🍔 Productos Module Initialized con 10 categorías");
+    console.log("🍔 Productos Module Initialized con IDs oficiales C0001 y PL000001");
 });
 
 /**
@@ -52,7 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 function seleccionarFiltroCategoria(catId) {
     document.querySelectorAll('.category-tab-btn').forEach(btn => {
-        if (btn.getAttribute('data-cat') === catId) {
+        const bCat = btn.getAttribute('data-cat');
+        const bSlug = btn.getAttribute('data-cat-slug');
+        if (bCat === catId || bSlug === catId) {
             btn.classList.add('active', 'bg-orange-600', 'text-white');
             btn.classList.remove('bg-[#0f1424]', 'text-slate-400');
         } else {
@@ -66,7 +68,9 @@ function seleccionarFiltroCategoria(catId) {
         if (catId === 'all') {
             block.style.display = '';
         } else {
-            block.style.display = block.getAttribute('data-cat-id') === catId ? '' : 'none';
+            const bCat = block.getAttribute('data-cat-id');
+            const bSlug = block.getAttribute('data-cat-slug');
+            block.style.display = (bCat === catId || bSlug === catId) ? '' : 'none';
         }
     });
 }
@@ -92,7 +96,9 @@ function filtrarPlatos() {
             block.style.display = 'none';
         } else {
             const currentTab = document.querySelector('.category-tab-btn.active')?.getAttribute('data-cat') || 'all';
-            if (currentTab === 'all' || block.getAttribute('data-cat-id') === currentTab) {
+            const bCat = block.getAttribute('data-cat-id');
+            const bSlug = block.getAttribute('data-cat-slug');
+            if (currentTab === 'all' || bCat === currentTab || bSlug === currentTab) {
                 block.style.display = '';
             }
         }
@@ -100,12 +106,31 @@ function filtrarPlatos() {
 }
 
 /**
+ * Calcula el siguiente ID con formato estándar PL000001
+ */
+function calcularSiguientePlatoId() {
+    let maxNum = 0;
+    document.querySelectorAll('.producto-card').forEach(card => {
+        const text = card.textContent || '';
+        const match = text.match(/PL(\d{6})/i);
+        if (match) {
+            const num = parseInt(match[1], 10);
+            if (num > maxNum) maxNum = num;
+        }
+    });
+    if (maxNum === 0) maxNum = 61;
+    const next = maxNum + 1;
+    return 'PL' + String(next).padStart(6, '0');
+}
+
+/**
  * Abrir Modal de Creación de Plato
  */
 function abrirCrearProductoModal() {
+    const nextPlatoId = calcularSiguientePlatoId();
     let catOptions = '';
     activeCategories.forEach(c => {
-        catOptions += `<option value="${c.id}">${c.name}</option>`;
+        catOptions += `<option value="${c.id}">[${c.id}] ${c.name}</option>`;
     });
 
     let cremasCheckboxes = '';
@@ -120,10 +145,13 @@ function abrirCrearProductoModal() {
 
     const html = `
         <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-            <h3 class="text-sm font-black uppercase text-white tracking-wider flex items-center gap-2">
+            <div class="flex items-center gap-2">
                 <span class="w-1.5 h-4 bg-orange-500 rounded-sm"></span>
-                Nuevo Plato de la Carta
-            </h3>
+                <h3 class="text-sm font-black uppercase text-white tracking-wider">
+                    Nuevo Plato de la Carta
+                </h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono-numbers font-bold bg-orange-950/40 border border-orange-500/40 text-orange-400">ID: ${nextPlatoId}</span>
+            </div>
             <button type="button" onclick="cerrarModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
         </div>
 
@@ -132,15 +160,20 @@ function abrirCrearProductoModal() {
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-[10px] text-slate-400 font-extrabold mb-1 uppercase tracking-wider">Nombre del Plato *</label>
-                    <input type="text" name="name" required placeholder="Ej: Tacacho con Cecina Especial" class="w-full bg-[#0a0d16] border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                    <label class="block text-[10px] text-slate-400 font-extrabold mb-1 uppercase tracking-wider">Código / ID del Plato (Formato PL000001) *</label>
+                    <input type="text" name="id" value="${nextPlatoId}" required pattern="^PL\\d{6}$" title="El ID debe seguir el formato PL seguido de 6 dígitos (ej: PL000062)" class="w-full bg-[#0a0d16] border border-orange-500/40 text-orange-400 font-mono-numbers font-black rounded-xl px-3 py-2 focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
-                    <label class="block text-[10px] text-slate-400 font-extrabold mb-1 uppercase tracking-wider">Categoría de la Carta *</label>
-                    <select name="category" required class="w-full bg-[#0a0d16] border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                    <label class="block text-[10px] text-slate-400 font-extrabold mb-1 uppercase tracking-wider">Categoría Oficial (C0001 - C0010) *</label>
+                    <select name="category" required class="w-full bg-[#0a0d16] border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500 font-mono-numbers">
                         ${catOptions}
                     </select>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-slate-400 font-extrabold mb-1 uppercase tracking-wider">Nombre del Plato *</label>
+                <input type="text" name="name" required placeholder="Ej: Tacacho con Cecina Especial" class="w-full bg-[#0a0d16] border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
             </div>
 
             <div class="grid grid-cols-3 gap-3">
@@ -209,8 +242,8 @@ function abrirEditarProductoModal(p) {
     let catOptions = '';
     const currentCat = p.category_id || p.category || '';
     activeCategories.forEach(c => {
-        const isSel = c.id === currentCat ? 'selected' : '';
-        catOptions += `<option value="${c.id}" ${isSel}>${c.name}</option>`;
+        const isSel = (c.id === currentCat || c.slug === currentCat || c.code === currentCat) ? 'selected' : '';
+        catOptions += `<option value="${c.id}" ${isSel}>[${c.id}] ${c.name}</option>`;
     });
 
     const currentCremas = Array.isArray(p.cremas) ? p.cremas : [];
@@ -230,10 +263,13 @@ function abrirEditarProductoModal(p) {
 
     const html = `
         <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-            <h3 class="text-sm font-black uppercase text-white tracking-wider flex items-center gap-2">
+            <div class="flex items-center gap-2">
                 <span class="w-1.5 h-4 bg-orange-500 rounded-sm"></span>
-                Editar Plato: ${p.name || ''}
-            </h3>
+                <h3 class="text-sm font-black uppercase text-white tracking-wider truncate max-w-xs sm:max-w-sm">
+                    Editar: ${p.name || ''}
+                </h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono-numbers font-bold bg-orange-950/40 border border-orange-500/40 text-orange-400">ID: ${p.id || ''}</span>
+            </div>
             <button type="button" onclick="cerrarModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
         </div>
 
@@ -247,8 +283,8 @@ function abrirEditarProductoModal(p) {
                     <input type="text" name="name" value="${p.name || ''}" required class="w-full bg-[#0a0d16] border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
-                    <label class="block text-[10px] text-slate-400 font-extrabold mb-1 uppercase tracking-wider">Categoría *</label>
-                    <select name="category" required class="w-full bg-[#0a0d16] border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                    <label class="block text-[10px] text-slate-400 font-extrabold mb-1 uppercase tracking-wider">Categoría Oficial *</label>
+                    <select name="category" required class="w-full bg-[#0a0d16] border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500 font-mono-numbers">
                         ${catOptions}
                     </select>
                 </div>

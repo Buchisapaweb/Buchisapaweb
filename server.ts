@@ -2725,12 +2725,45 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     
     if (view === 'productos') {
       if (action === 'create' || action === 'edit') {
-        const id = req.body.id || req.body.id_form || `prod-${Date.now()}`;
+        const rawId = String(req.body.id || req.body.id_form || '').trim();
+        const id = action === 'create'
+          ? (rawId && /^PL\d+$/i.test(rawId) ? rawId.toUpperCase() : generateNextProductId())
+          : rawId;
         const name = req.body.name || 'Sin nombre';
         const description = req.body.description || '';
         const price = parseFloat(req.body.price || '0');
         const stock = parseInt(req.body.stock || '25', 10);
-        const category = req.body.category || 'hamburguesas';
+        
+        // Mapeo canónico a códigos oficiales C0001 - C0010
+        const CATEGORY_MAP: Record<string, { id: string; code: string; slug: string; name: string }> = {
+          'c0001': { id: 'C0001', code: 'C0001', slug: 'promociones', name: '⭐ PROMOCIONES' },
+          'promociones': { id: 'C0001', code: 'C0001', slug: 'promociones', name: '⭐ PROMOCIONES' },
+          'c0002': { id: 'C0002', code: 'C0002', slug: 'alitas', name: 'ALITAS' },
+          'alitas': { id: 'C0002', code: 'C0002', slug: 'alitas', name: 'ALITAS' },
+          'c0003': { id: 'C0003', code: 'C0003', slug: 'bebidas', name: 'BEBIDAS' },
+          'bebidas': { id: 'C0003', code: 'C0003', slug: 'bebidas', name: 'BEBIDAS' },
+          'c0004': { id: 'C0004', code: 'C0004', slug: 'broaster', name: 'BROASTER' },
+          'broaster': { id: 'C0004', code: 'C0004', slug: 'broaster', name: 'BROASTER' },
+          'c0005': { id: 'C0005', code: 'C0005', slug: 'hamburguesas', name: 'HAMBURGUESAS' },
+          'hamburguesas': { id: 'C0005', code: 'C0005', slug: 'hamburguesas', name: 'HAMBURGUESAS' },
+          'c0006': { id: 'C0006', code: 'C0006', slug: 'infusiones', name: 'INFUSIONES' },
+          'infusiones': { id: 'C0006', code: 'C0006', slug: 'infusiones', name: 'INFUSIONES' },
+          'c0007': { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS' },
+          'platos-amazonicos': { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS' },
+          'c0008': { id: 'C0008', code: 'C0008', slug: 'refrescos', name: 'REFRESCOS' },
+          'refrescos': { id: 'C0008', code: 'C0008', slug: 'refrescos', name: 'REFRESCOS' },
+          'c0009': { id: 'C0009', code: 'C0009', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS' },
+          'salchipapas': { id: 'C0009', code: 'C0009', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS' },
+          'c0010': { id: 'C0010', code: 'C0010', slug: 'adicional', name: 'ADICIONAL' },
+          'adicional': { id: 'C0010', code: 'C0010', slug: 'adicional', name: 'ADICIONAL' }
+        };
+        const rawCat = String(req.body.category || req.body.category_id || 'hamburguesas').trim().toLowerCase();
+        const catMap = CATEGORY_MAP[rawCat] || { id: 'C0005', code: 'C0005', slug: rawCat, name: rawCat.toUpperCase() };
+        const category = catMap.slug;
+        const category_id = catMap.id;
+        const category_code = catMap.code;
+        const code = id;
+
         const badge = req.body.badge || null;
         const image = req.body.image_url || '/imagenes/productos/fallback.webp';
         const available = req.body.available === 'true' || req.body.available === true;
@@ -2755,7 +2788,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
           price,
           stock,
           category,
-          category_id: category,
+          category_id,
+          category_code,
+          code,
           badge,
           image,
           available,
@@ -2996,16 +3031,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         const totalCriticos = productos.filter(p => parseInt(String(p.stock || '0'), 10) <= 5).length;
 
         const CATEGORIAS_DEFINIDAS = [
-            { id: 'promociones',       name: '⭐ PROMOCIONES',               icon: 'sparkles',  color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
-            { id: 'alitas',            name: 'ALITAS',                       icon: 'flame',     color: '#ef4444', desc: 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.' },
-            { id: 'bebidas',           name: 'BEBIDAS',                      icon: 'cup-soda',  color: '#06b6d4', desc: 'Gaseosas heladas, agua mineral y bebidas embotelladas.' },
-            { id: 'broaster',          name: 'BROASTER',                     icon: 'drumstick', color: '#f97316', desc: 'Pollo broaster ultra crocante con papas doradas y cremas.' },
-            { id: 'hamburguesas',      name: 'HAMBURGUESAS',                 icon: 'beef',      color: '#eab308', desc: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
-            { id: 'infusiones',        name: 'INFUSIONES',                   icon: 'coffee',    color: '#10b981', desc: 'Infusiones calientes, café aromático pasado y manzanilla.' },
-            { id: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS',            icon: 'utensils',  color: '#8b5cf6', desc: 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.' },
-            { id: 'refrescos',         name: 'REFRESCOS',                    icon: 'glass-water',color: '#3b82f6', desc: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
-            { id: 'salchipapas',       name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'layers',    color: '#ec4899', desc: 'Papas crocantes, salchichas frankfurter y combinaciones broaster.' },
-            { id: 'adicional',         name: 'ADICIONAL',                    icon: 'plus-circle',color: '#94a3b8', desc: 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.' }
+            { id: 'C0001', code: 'C0001', slug: 'promociones',       name: '⭐ PROMOCIONES',               icon: 'sparkles',  color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
+            { id: 'C0002', code: 'C0002', slug: 'alitas',            name: 'ALITAS',                       icon: 'flame',     color: '#ef4444', desc: 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.' },
+            { id: 'C0003', code: 'C0003', slug: 'bebidas',           name: 'BEBIDAS',                      icon: 'cup-soda',  color: '#06b6d4', desc: 'Gaseosas heladas, agua mineral y bebidas embotelladas.' },
+            { id: 'C0004', code: 'C0004', slug: 'broaster',          name: 'BROASTER',                     icon: 'drumstick', color: '#f97316', desc: 'Pollo broaster ultra crocante con papas doradas y cremas.' },
+            { id: 'C0005', code: 'C0005', slug: 'hamburguesas',      name: 'HAMBURGUESAS',                 icon: 'beef',      color: '#eab308', desc: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
+            { id: 'C0006', code: 'C0006', slug: 'infusiones',        name: 'INFUSIONES',                   icon: 'coffee',    color: '#10b981', desc: 'Infusiones calientes, café aromático pasado y manzanilla.' },
+            { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS',            icon: 'utensils',  color: '#8b5cf6', desc: 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.' },
+            { id: 'C0008', code: 'C0008', slug: 'refrescos',         name: 'REFRESCOS',                    icon: 'glass-water',color: '#3b82f6', desc: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
+            { id: 'C0009', code: 'C0009', slug: 'salchipapas',       name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'layers',    color: '#ec4899', desc: 'Papas crocantes, salchichas frankfurter y combinaciones broaster.' },
+            { id: 'C0010', code: 'C0010', slug: 'adicional',         name: 'ADICIONAL',                    icon: 'plus-circle',color: '#94a3b8', desc: 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.' }
         ];
 
         // 1. Generar pestañas horizontales de categorías
@@ -3015,10 +3050,15 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
             </button>
         `;
         CATEGORIAS_DEFINIDAS.forEach(cat => {
-            const countInCat = productos.filter(p => (p.category_id || p.category) === cat.id).length;
+            const countInCat = productos.filter(p => (
+                (p.category_id || '') === cat.id || 
+                (p.category_id || '') === cat.slug || 
+                (p.category || '') === cat.id || 
+                (p.category || '') === cat.slug
+            )).length;
             filterTabsHtml += `
-            <button type="button" onclick="seleccionarFiltroCategoria('${cat.id}')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="${cat.id}">
-                ${cat.name} (${countInCat})
+            <button type="button" onclick="seleccionarFiltroCategoria('${cat.id}')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="${cat.id}" data-cat-slug="${cat.slug}">
+                <span class="font-mono-numbers text-[9px] text-orange-400/90 font-bold mr-1">${cat.id}</span> ${cat.name} (${countInCat})
             </button>
             `;
         });
@@ -3026,7 +3066,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         // 2. Generar bloques de categorías y tarjetas de platos
         let categoriesBlocksHtml = '';
         CATEGORIAS_DEFINIDAS.forEach(cat => {
-            const platosEnCat = productos.filter(p => (p.category_id || p.category) === cat.id);
+            const platosEnCat = productos.filter(p => (
+                (p.category_id || '') === cat.id || 
+                (p.category_id || '') === cat.slug || 
+                (p.category || '') === cat.id || 
+                (p.category || '') === cat.slug
+            ));
             
             let cardsHtml = '';
             if (platosEnCat.length === 0) {
@@ -3101,7 +3146,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
                         </div>
 
                         <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-800/60">
-                            <span class="text-[9px] font-mono-numbers text-slate-500 font-bold">ID: ${id}</span>
+                            <span class="text-[9px] font-mono-numbers text-slate-400 font-bold bg-[#0a0d16] px-2 py-0.5 rounded border border-slate-800 flex items-center gap-1">
+                                <span class="text-slate-500">ID:</span>
+                                <span class="text-orange-400 font-extrabold tracking-wide">${id}</span>
+                            </span>
                             <div class="flex items-center gap-2">
                                 <button type="button" onclick='abrirEditarProductoModal(${pJsonStr})' class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1 active-press" title="Editar plato">
                                     <i data-lucide="edit-3" class="w-3 h-3 text-orange-400"></i>
@@ -3122,10 +3170,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
             }
 
             categoriesBlocksHtml += `
-            <section class="category-block space-y-4" id="cat-section-${cat.id}" data-cat-id="${cat.id}">
+            <section class="category-block space-y-4" id="cat-section-${cat.id}" data-cat-id="${cat.id}" data-cat-slug="${cat.slug}">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
                     <div class="flex items-center gap-2.5">
                         <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color}80;"></span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono-numbers font-extrabold bg-orange-950/40 border border-orange-500/40 text-orange-400 tracking-wider">${cat.id}</span>
                         <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
                             ${cat.name}
                         </h3>
