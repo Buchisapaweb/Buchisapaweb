@@ -4,6 +4,7 @@ import path from 'path';
 export interface Category {
   id: string;
   code?: string;
+  slug?: string;
   name: string;
   icon?: string;
   image?: string;
@@ -1478,8 +1479,9 @@ export function generateNextProductId(): string {
       if (num > maxNum) maxNum = num;
     }
   }
+  if (maxNum === 0) maxNum = 57;
   const nextNum = maxNum + 1;
-  return `PL${String(nextNum).padStart(6, '0')}`;
+  return `PL${String(nextNum).padStart(4, '0')}`;
 }
 
 export async function createProduct(data: Partial<Product>): Promise<Product> {

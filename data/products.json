@@ -1,6 +1,6 @@
 [
   {
-    "id": "PL000001",
+    "id": "PL0001",
     "name": "PROMO BUCHI DUO",
     "category_id": "C0001",
     "category": "promociones",
@@ -24,14 +24,14 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000001",
+    "code": "PL0001",
     "category_code": "C0001"
   },
   {
-    "id": "PL000002",
+    "id": "PL0002",
     "name": "PROMO BROASTER FAMILIAR",
     "category_id": "C0001",
-    "category": "promociones",
+    "category": "C0001",
     "price": 38,
     "description": "La selección ideal para compartir en familia. Incluye un Broaster Presa Pecho, un Broaster Presa Pierna y un Broaster Presa Ala, con el sabor crujiente que nos caracteriza, más una Gaseosa Personal Inca Kola.",
     "badge": "FAMILIAR",
@@ -52,11 +52,12 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000002",
-    "category_code": "C0001"
+    "code": "PL0002",
+    "category_code": "C0001",
+    "action": "edit"
   },
   {
-    "id": "PL000003",
+    "id": "PL0003",
     "name": "PROMO SALCHI BURGER",
     "category_id": "C0001",
     "category": "promociones",
@@ -87,11 +88,11 @@
       "Aceituna",
       "Vinagreta"
     ],
-    "code": "PL000003",
+    "code": "PL0003",
     "category_code": "C0001"
   },
   {
-    "id": "PL000004",
+    "id": "PL0004",
     "name": "PROMO SELVA POWER",
     "category_id": "C0001",
     "category": "promociones",
@@ -116,11 +117,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000004",
+    "code": "PL0004",
     "category_code": "C0001"
   },
   {
-    "id": "PL000008",
+    "id": "PL0005",
     "name": "Acevichadas",
     "category_id": "C0002",
     "category": "alitas",
@@ -150,11 +151,11 @@
       "Aceituna",
       "Vinagreta"
     ],
-    "code": "PL000008",
+    "code": "PL0005",
     "category_code": "C0002"
   },
   {
-    "id": "PL000009",
+    "id": "PL0006",
     "name": "BBQ",
     "category_id": "C0002",
     "category": "alitas",
@@ -177,11 +178,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000009",
+    "code": "PL0006",
     "category_code": "C0002"
   },
   {
-    "id": "PL000010",
+    "id": "PL0007",
     "name": "Inca Kola",
     "category_id": "C0003",
     "category": "bebidas",
@@ -195,11 +196,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000010",
+    "code": "PL0007",
     "category_code": "C0003"
   },
   {
-    "id": "PL000011",
+    "id": "PL0008",
     "name": "Coca Cola",
     "category_id": "C0003",
     "category": "bebidas",
@@ -213,11 +214,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000011",
+    "code": "PL0008",
     "category_code": "C0003"
   },
   {
-    "id": "PL000012",
+    "id": "PL0009",
     "name": "Fanta",
     "category_id": "C0003",
     "category": "bebidas",
@@ -230,11 +231,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000012",
+    "code": "PL0009",
     "category_code": "C0003"
   },
   {
-    "id": "PL000013",
+    "id": "PL0010",
     "name": "Pepsi",
     "category_id": "C0003",
     "category": "bebidas",
@@ -247,11 +248,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000013",
+    "code": "PL0010",
     "category_code": "C0003"
   },
   {
-    "id": "PL000014",
+    "id": "PL0011",
     "name": "Agua Cielo",
     "category_id": "C0003",
     "category": "bebidas",
@@ -264,11 +265,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000014",
+    "code": "PL0011",
     "category_code": "C0003"
   },
   {
-    "id": "PL000015",
+    "id": "PL0012",
     "name": "Pecho",
     "category_id": "C0004",
     "category": "broaster",
@@ -292,11 +293,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000015",
+    "code": "PL0012",
     "category_code": "C0004"
   },
   {
-    "id": "PL000016",
+    "id": "PL0013",
     "name": "Pierna",
     "category_id": "C0004",
     "category": "broaster",
@@ -319,11 +320,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000016",
+    "code": "PL0013",
     "category_code": "C0004"
   },
   {
-    "id": "PL000017",
+    "id": "PL0014",
     "name": "Encuentro",
     "category_id": "C0004",
     "category": "broaster",
@@ -347,11 +348,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000017",
+    "code": "PL0014",
     "category_code": "C0004"
   },
   {
-    "id": "PL000018",
+    "id": "PL0015",
     "name": "Ala",
     "category_id": "C0004",
     "category": "broaster",
@@ -374,11 +375,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000018",
+    "code": "PL0015",
     "category_code": "C0004"
   },
   {
-    "id": "PL000019",
+    "id": "PL0016",
     "name": "Clásica",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -402,11 +403,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000019",
+    "code": "PL0016",
     "category_code": "C0005"
   },
   {
-    "id": "PL000020",
+    "id": "PL0017",
     "name": "Choripán",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -430,11 +431,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000020",
+    "code": "PL0017",
     "category_code": "C0005"
   },
   {
-    "id": "PL000021",
+    "id": "PL0018",
     "name": "Hawaiana Carne",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -462,11 +463,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000021",
+    "code": "PL0018",
     "category_code": "C0005"
   },
   {
-    "id": "PL000022",
+    "id": "PL0019",
     "name": "Hawaiana Pollo",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -493,11 +494,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000022",
+    "code": "PL0019",
     "category_code": "C0005"
   },
   {
-    "id": "PL000023",
+    "id": "PL0020",
     "name": "Pollo Deshilachado",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -519,11 +520,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000023",
+    "code": "PL0020",
     "category_code": "C0005"
   },
   {
-    "id": "PL000024",
+    "id": "PL0021",
     "name": "Filete de Pollo",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -545,11 +546,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000024",
+    "code": "PL0021",
     "category_code": "C0005"
   },
   {
-    "id": "PL000025",
+    "id": "PL0022",
     "name": "Cheese Burguer",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -571,11 +572,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000025",
+    "code": "PL0022",
     "category_code": "C0005"
   },
   {
-    "id": "PL000026",
+    "id": "PL0023",
     "name": "Bacon Burguer",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -599,11 +600,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000026",
+    "code": "PL0023",
     "category_code": "C0005"
   },
   {
-    "id": "PL000027",
+    "id": "PL0024",
     "name": "La Suprema",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -628,11 +629,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000027",
+    "code": "PL0024",
     "category_code": "C0005"
   },
   {
-    "id": "PL000028",
+    "id": "PL0025",
     "name": "Hamburguesa a lo Pobre",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -657,11 +658,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000028",
+    "code": "PL0025",
     "category_code": "C0005"
   },
   {
-    "id": "PL000029",
+    "id": "PL0026",
     "name": "Royal",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -686,11 +687,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000029",
+    "code": "PL0026",
     "category_code": "C0005"
   },
   {
-    "id": "PL000030",
+    "id": "PL0027",
     "name": "Royal a lo Pobre",
     "category_id": "C0005",
     "category": "hamburguesas",
@@ -718,11 +719,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000030",
+    "code": "PL0027",
     "category_code": "C0005"
   },
   {
-    "id": "PL000031",
+    "id": "PL0028",
     "name": "Anís",
     "category_id": "C0006",
     "category": "infusiones",
@@ -735,11 +736,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000031",
+    "code": "PL0028",
     "category_code": "C0006"
   },
   {
-    "id": "PL000032",
+    "id": "PL0029",
     "name": "Té",
     "category_id": "C0006",
     "category": "infusiones",
@@ -752,11 +753,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000032",
+    "code": "PL0029",
     "category_code": "C0006"
   },
   {
-    "id": "PL000033",
+    "id": "PL0030",
     "name": "Café",
     "category_id": "C0006",
     "category": "infusiones",
@@ -770,11 +771,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000033",
+    "code": "PL0030",
     "category_code": "C0006"
   },
   {
-    "id": "PL000034",
+    "id": "PL0031",
     "name": "Patacones con Chorizo",
     "category_id": "C0007",
     "category": "platos-amazonicos",
@@ -797,11 +798,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000034",
+    "code": "PL0031",
     "category_code": "C0007"
   },
   {
-    "id": "PL000035",
+    "id": "PL0032",
     "name": "Tacacho con Cecina",
     "category_id": "C0007",
     "category": "platos-amazonicos",
@@ -824,11 +825,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000035",
+    "code": "PL0032",
     "category_code": "C0007"
   },
   {
-    "id": "PL000036",
+    "id": "PL0033",
     "name": "Juanes",
     "category_id": "C0007",
     "category": "platos-amazonicos",
@@ -850,11 +851,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000036",
+    "code": "PL0033",
     "category_code": "C0007"
   },
   {
-    "id": "PL000037",
+    "id": "PL0034",
     "name": "Chilcano de Carachama o Pescado del Día",
     "category_id": "C0007",
     "category": "platos-amazonicos",
@@ -877,11 +878,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000037",
+    "code": "PL0034",
     "category_code": "C0007"
   },
   {
-    "id": "PL000038",
+    "id": "PL0035",
     "name": "Palometa Frita con Maduro o Plátano",
     "category_id": "C0007",
     "category": "platos-amazonicos",
@@ -904,11 +905,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000038",
+    "code": "PL0035",
     "category_code": "C0007"
   },
   {
-    "id": "PL000039",
+    "id": "PL0036",
     "name": "Caldo Amazónico",
     "category_id": "C0007",
     "category": "platos-amazonicos",
@@ -930,11 +931,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000039",
+    "code": "PL0036",
     "category_code": "C0007"
   },
   {
-    "id": "PL000040",
+    "id": "PL0037",
     "name": "Arroz Chaufa Amazónico",
     "category_id": "C0007",
     "category": "platos-amazonicos",
@@ -956,11 +957,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000040",
+    "code": "PL0037",
     "category_code": "C0007"
   },
   {
-    "id": "PL000041",
+    "id": "PL0038",
     "name": "Maracuyá",
     "category_id": "C0008",
     "category": "refrescos",
@@ -973,11 +974,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000041",
+    "code": "PL0038",
     "category_code": "C0008"
   },
   {
-    "id": "PL000042",
+    "id": "PL0039",
     "name": "Chicha",
     "category_id": "C0008",
     "category": "refrescos",
@@ -991,11 +992,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000042",
+    "code": "PL0039",
     "category_code": "C0008"
   },
   {
-    "id": "PL000043",
+    "id": "PL0040",
     "name": "Cocona",
     "category_id": "C0008",
     "category": "refrescos",
@@ -1009,11 +1010,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000043",
+    "code": "PL0040",
     "category_code": "C0008"
   },
   {
-    "id": "PL000044",
+    "id": "PL0041",
     "name": "Aguajina",
     "category_id": "C0008",
     "category": "refrescos",
@@ -1026,11 +1027,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000044",
+    "code": "PL0041",
     "category_code": "C0008"
   },
   {
-    "id": "PL000045",
+    "id": "PL0042",
     "name": "Camu Camu",
     "category_id": "C0008",
     "category": "refrescos",
@@ -1043,11 +1044,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000045",
+    "code": "PL0042",
     "category_code": "C0008"
   },
   {
-    "id": "PL000046",
+    "id": "PL0043",
     "name": "Salchipapa Clásica",
     "category_id": "C0009",
     "category": "salchipapas",
@@ -1070,11 +1071,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000046",
+    "code": "PL0043",
     "category_code": "C0009"
   },
   {
-    "id": "PL000047",
+    "id": "PL0044",
     "name": "Salchipapa a lo Pobre",
     "category_id": "C0009",
     "category": "salchipapas",
@@ -1097,11 +1098,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000047",
+    "code": "PL0044",
     "category_code": "C0009"
   },
   {
-    "id": "PL000048",
+    "id": "PL0045",
     "name": "Salchibroaster Pecho",
     "category_id": "C0009",
     "category": "salchipapas",
@@ -1124,11 +1125,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000048",
+    "code": "PL0045",
     "category_code": "C0009"
   },
   {
-    "id": "PL000049",
+    "id": "PL0046",
     "name": "Salchibroaster Pierna",
     "category_id": "C0009",
     "category": "salchipapas",
@@ -1151,11 +1152,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000049",
+    "code": "PL0046",
     "category_code": "C0009"
   },
   {
-    "id": "PL000050",
+    "id": "PL0047",
     "name": "Salchibroaster Encuentro",
     "category_id": "C0009",
     "category": "salchipapas",
@@ -1178,11 +1179,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000050",
+    "code": "PL0047",
     "category_code": "C0009"
   },
   {
-    "id": "PL000051",
+    "id": "PL0048",
     "name": "Salchibroaster Ala",
     "category_id": "C0009",
     "category": "salchipapas",
@@ -1204,11 +1205,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000051",
+    "code": "PL0048",
     "category_code": "C0009"
   },
   {
-    "id": "PL000052",
+    "id": "PL0049",
     "name": "Salchichorizo",
     "category_id": "C0009",
     "category": "salchipapas",
@@ -1231,11 +1232,11 @@
       "Ají de Rocoto",
       "Tártara"
     ],
-    "code": "PL000052",
+    "code": "PL0049",
     "category_code": "C0009"
   },
   {
-    "id": "PL000053",
+    "id": "PL0050",
     "name": "Huevo",
     "category_id": "C0010",
     "category": "adicional",
@@ -1248,11 +1249,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000053",
+    "code": "PL0050",
     "category_code": "C0010"
   },
   {
-    "id": "PL000054",
+    "id": "PL0051",
     "name": "Queso",
     "category_id": "C0010",
     "category": "adicional",
@@ -1265,11 +1266,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000054",
+    "code": "PL0051",
     "category_code": "C0010"
   },
   {
-    "id": "PL000055",
+    "id": "PL0052",
     "name": "Piña",
     "category_id": "C0010",
     "category": "adicional",
@@ -1282,11 +1283,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000055",
+    "code": "PL0052",
     "category_code": "C0010"
   },
   {
-    "id": "PL000056",
+    "id": "PL0053",
     "name": "Plátano",
     "category_id": "C0010",
     "category": "adicional",
@@ -1299,11 +1300,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000056",
+    "code": "PL0053",
     "category_code": "C0010"
   },
   {
-    "id": "PL000057",
+    "id": "PL0054",
     "name": "Jamón",
     "category_id": "C0010",
     "category": "adicional",
@@ -1316,11 +1317,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000057",
+    "code": "PL0054",
     "category_code": "C0010"
   },
   {
-    "id": "PL000058",
+    "id": "PL0055",
     "name": "Tocino",
     "category_id": "C0010",
     "category": "adicional",
@@ -1333,11 +1334,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000058",
+    "code": "PL0055",
     "category_code": "C0010"
   },
   {
-    "id": "PL000059",
+    "id": "PL0056",
     "name": "Pollo Broaster",
     "category_id": "C0010",
     "category": "adicional",
@@ -1350,11 +1351,11 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000059",
+    "code": "PL0056",
     "category_code": "C0010"
   },
   {
-    "id": "PL000060",
+    "id": "PL0057",
     "name": "Hamburguesa",
     "category_id": "C0010",
     "category": "adicional",
@@ -1367,7 +1368,7 @@
     "includes_sauces": false,
     "accompaniments": [],
     "cremas": [],
-    "code": "PL000060",
+    "code": "PL0057",
     "category_code": "C0010"
   }
 ]

@@ -138,14 +138,106 @@
    Selector de Categoría Oficial Personalizado (Sin Scroll / Una debajo de otra)
    ========================================================================== */
 
-.custom-category-picker-grid {
+/* ==========================================================================
+   Custom Category Dropdown Selector (Sin Scroll Interno, Despliegue Fluido)
+   ========================================================================== */
+
+.custom-category-dropdown {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.category-dropdown-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1.125rem;
+    background: #080b14;
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    border-radius: 0.875rem;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    text-align: left;
+    outline: none;
+}
+
+.category-dropdown-trigger:hover {
+    border-color: rgba(249, 115, 22, 0.7);
+    background: #0d1222;
+}
+
+.category-dropdown-trigger:focus,
+.category-dropdown-trigger.is-open {
+    border-color: #f97316;
+    background: #0d1222;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+.category-dropdown-trigger.is-open #cat-dropdown-chevron {
+    transform: rotate(180deg);
+    color: #f97316;
+}
+
+.cat-trigger-content {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.cat-name-selected {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cat-placeholder-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.category-dropdown-menu {
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
     width: 100%;
+    padding: 0.625rem;
+    background: #0a0e1a;
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    border-radius: 0.875rem;
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.6);
+    /* Despliegue sucesivo hacia abajo sin scroll interno */
+    overflow: visible;
+    animation: catDropdownSlideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.category-option-card {
+@keyframes catDropdownSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.category-dropdown-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -153,21 +245,22 @@
     padding: 0.75rem 1rem;
     background: #080b14;
     border: 1px solid rgba(51, 65, 85, 0.6);
-    border-radius: 0.875rem;
+    border-radius: 0.75rem;
     cursor: pointer;
     user-select: none;
     transition: all 0.15s ease;
 }
 
-.category-option-card:hover {
-    border-color: rgba(249, 115, 22, 0.5);
-    background: #0d1322;
+.category-dropdown-item:hover {
+    background: #111728;
+    border-color: rgba(249, 115, 22, 0.6);
+    transform: translateX(3px);
 }
 
-.category-option-card.is-selected {
-    background: rgba(249, 115, 22, 0.12);
+.category-dropdown-item.is-selected {
+    background: rgba(249, 115, 22, 0.14);
     border-color: #f97316;
-    box-shadow: 0 0 15px rgba(249, 115, 22, 0.15);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.15);
 }
 
 .cat-left-meta {
@@ -189,7 +282,7 @@
     flex-shrink: 0;
 }
 
-.category-option-card.is-selected .cat-code-badge {
+.category-dropdown-item.is-selected .cat-code-badge {
     background: #f97316;
     color: #ffffff;
     border-color: #ea580c;
@@ -202,7 +295,7 @@
     transition: color 0.15s ease;
 }
 
-.category-option-card.is-selected .cat-name-text {
+.category-dropdown-item.is-selected .cat-name-text {
     color: #ffffff;
     font-weight: 800;
 }
@@ -219,7 +312,7 @@
     transition: all 0.15s ease;
 }
 
-.category-option-card.is-selected .cat-status-indicator {
+.category-dropdown-item.is-selected .cat-status-indicator {
     border-color: #f97316;
     background: #f97316;
 }
@@ -233,7 +326,7 @@
     transition: all 0.15s ease;
 }
 
-.category-option-card.is-selected .cat-status-indicator::after {
+.category-dropdown-item.is-selected .cat-status-indicator::after {
     background: #ffffff;
 }
 
@@ -266,6 +359,27 @@
     transition: all 0.15s ease;
 }
 
+.form-textarea-no-scroll,
+.form-textarea {
+    width: 100%;
+    background: #080b14;
+    border: 1px solid rgba(51, 65, 85, 0.75);
+    border-radius: 0.75rem;
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #ffffff;
+    min-height: 110px;
+    height: auto;
+    resize: none !important;
+    overflow: hidden !important;
+    display: block;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-textarea-no-scroll:focus,
+.form-textarea:focus,
 .form-input-text:focus {
     outline: none;
     border-color: #f97316;
@@ -273,7 +387,9 @@
     box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 
-.form-input-text::placeholder {
+.form-input-text::placeholder,
+.form-textarea-no-scroll::placeholder,
+.form-textarea::placeholder {
     color: #475569;
 }
 
@@ -330,7 +446,7 @@
 }
 
 /* ==========================================================================
-   Fotografía del Plato Grande (Ancho Completo en Móvil)
+   Fotografía del Plato Cuadrada (1:1 Ratio Exacto)
    ========================================================================== */
 
 .photo-uploader-full-box {
@@ -342,7 +458,9 @@
 
 .photo-preview-full-hero {
     width: 100%;
-    height: 240px;
+    max-width: 280px;
+    aspect-ratio: 1 / 1;
+    height: auto;
     background: #060911;
     border: 2px dashed rgba(51, 65, 85, 0.8);
     border-radius: 1.25rem;
@@ -352,17 +470,20 @@
     align-items: center;
     justify-content: center;
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6);
+    margin: 0 auto;
 }
 
 @media (min-width: 640px) {
     .photo-preview-full-hero {
-        height: 280px;
+        max-width: 320px;
+        aspect-ratio: 1 / 1;
     }
 }
 
 .photo-preview-img-hero {
     width: 100%;
     height: 100%;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     display: block;
     transition: transform 0.3s ease;
@@ -422,13 +543,13 @@
 }
 
 /* ==========================================================================
-   Filas de Acompañamientos y Cremas (Uno debajo de otro de corrido)
+   Filas de Acompañamientos y Cremas (Con Botón Eliminar)
    ========================================================================== */
 
 .interactive-list-container {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.45rem;
     width: 100%;
 }
 
@@ -436,12 +557,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.65rem 0.875rem;
+    gap: 0.625rem;
+    padding: 0.6rem 0.75rem;
     background: #080b14;
     border: 1px solid rgba(51, 65, 85, 0.6);
     border-radius: 0.75rem;
-    cursor: pointer;
     user-select: none;
     transition: all 0.12s ease;
 }
@@ -476,10 +596,11 @@
 .row-status-pill {
     font-size: 0.7rem;
     font-weight: 800;
-    padding: 0.15rem 0.5rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 0.375rem;
     transition: all 0.12s ease;
     flex-shrink: 0;
+    cursor: pointer;
 }
 
 .row-status-pill.status-included {
@@ -492,6 +613,27 @@
     background: rgba(30, 41, 59, 0.5);
     color: #64748b;
     border: 1px solid rgba(51, 65, 85, 0.4);
+}
+
+.btn-delete-item {
+    padding: 0.35rem 0.45rem;
+    border-radius: 0.5rem;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #f87171;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.btn-delete-item:hover {
+    background: rgba(239, 68, 68, 0.25);
+    color: #ffffff;
+    border-color: #ef4444;
+    transform: scale(1.05);
 }
 
 /* ==========================================================================

@@ -23,8 +23,6 @@ export function compileHtml() {
     'PANEL_CARRITO': 'public/html/carrito.html',
     'RECOJO': 'public/html/recojo-modal.html',
     'VENTANA_UBICACION': 'public/html/recojo-modal.html',
-    'CHECKOUT': 'public/html/checkout.html',
-    'VENTANA_CARTA_COMPLETA': 'public/html/checkout.html',
     'AUTENTICACION_PERFIL': 'public/html/autenticacionPerfil.html',
     'VENTANA_AUTENTICACION': 'public/html/autenticacionPerfil.html',
     'FOOTER': 'public/html/footer.html',

@@ -19,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $productsList = file_exists($jsonPath) ? (json_decode(file_get_contents($jsonPath), true) ?: []) : [];
 
         if ($action === 'create') {
-            if (!empty($rawId) && preg_match('/^PL\d{6}$/i', $rawId)) {
-                $id = strtoupper($rawId);
+            if (!empty($rawId) && preg_match('/^PL\d{4,6}$/i', $rawId)) {
+                $id = 'PL' . str_pad(preg_replace('/^PL/i', '', $rawId), 4, '0', STR_PAD_LEFT);
             } else {
                 $maxNum = 0;
                 foreach ($productsList as $pItem) {
@@ -29,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if ($n > $maxNum) $maxNum = $n;
                     }
                 }
-                $id = sprintf('PL%06d', $maxNum + 1);
+                if ($maxNum === 0) $maxNum = 57;
+                $id = sprintf('PL%04d', $maxNum + 1);
             }
         } else {
             $id = $rawId;

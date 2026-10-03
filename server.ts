@@ -19,8 +19,6 @@ function getCompiledIndexHtml(): string {
     'PANEL_CARRITO': 'public/html/carrito.html',
     'RECOJO': 'public/html/recojo-modal.html',
     'VENTANA_UBICACION': 'public/html/recojo-modal.html',
-    'CHECKOUT': 'public/html/checkout.html',
-    'VENTANA_CARTA_COMPLETA': 'public/html/checkout.html',
     'AUTENTICACION_PERFIL': 'public/html/autenticacionPerfil.html',
     'VENTANA_AUTENTICACION': 'public/html/autenticacionPerfil.html',
     'FOOTER': 'public/html/footer.html',
@@ -2726,8 +2724,19 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     if (view === 'productos') {
       if (action === 'create' || action === 'edit') {
         const rawId = String(req.body.id || req.body.id_form || '').trim();
+        const allProds = await getProducts();
+        let maxNum = 0;
+        for (const pr of allProds) {
+          const m = String(pr.id || '').match(/^PL(\d+)$/i);
+          if (m) {
+            const n = parseInt(m[1], 10);
+            if (n > maxNum) maxNum = n;
+          }
+        }
+        if (maxNum === 0) maxNum = 57;
+        const fallbackNextId = `PL${String(maxNum + 1).padStart(4, '0')}`;
         const id = action === 'create'
-          ? (rawId && /^PL\d+$/i.test(rawId) ? rawId.toUpperCase() : generateNextProductId())
+          ? (rawId && /^PL\d+$/i.test(rawId) ? (rawId.startsWith('PL') ? 'PL' + String(parseInt(rawId.replace(/^PL/i, ''), 10) || 1).padStart(4, '0') : rawId.toUpperCase()) : fallbackNextId)
           : rawId;
         const name = req.body.name || 'Sin nombre';
         const description = req.body.description || '';

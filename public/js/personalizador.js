@@ -193,7 +193,6 @@
     if (cat.includes('adicion')) {
       return [];
     }
-    }
 
     // Fallback general
     return [
