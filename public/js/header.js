@@ -8,6 +8,7 @@
 (function() {
   if (!window.BuchisapaCart) {
     window.BuchisapaCart = {
+      init: function() {},
       openDrawer: function() {},
       closeDrawer: function() {},
       clear: function() {},

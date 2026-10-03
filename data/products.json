@@ -29,32 +29,30 @@
   },
   {
     "id": "PL0002",
-    "name": "PROMO BROASTER FAMILIAR",
+    "name": "PROMO BROASTER FAMILIAR EDITADO",
     "category_id": "C0001",
-    "category": "C0001",
+    "category": "promociones",
     "price": 38,
-    "description": "La selección ideal para compartir en familia. Incluye un Broaster Presa Pecho, un Broaster Presa Pierna y un Broaster Presa Ala, con el sabor crujiente que nos caracteriza, más una Gaseosa Personal Inca Kola.",
-    "badge": "FAMILIAR",
+    "description": "Acompañado de papas y cremas.",
+    "badge": null,
     "popular": true,
     "available": true,
-    "stock": 50,
-    "image": "/imagenes/portada/Portada1M.webp",
+    "stock": 15,
+    "image": "/imagenes/productos/fallback.webp",
     "includes_sauces": true,
     "accompaniments": [
-      "Papa crocante",
-      "Ensalada fresca",
-      "Arroz"
+      "Papas Fritas",
+      "Inca Kola 1.5L"
     ],
     "cremas": [
-      "Mayonesa",
       "Mostaza",
       "Ketchup",
-      "Ají de Rocoto",
-      "Tártara"
+      "Ají de Rocoto"
     ],
     "code": "PL0002",
     "category_code": "C0001",
-    "action": "edit"
+    "action": "edit",
+    "image_url": "/imagenes/productos/fallback.webp"
   },
   {
     "id": "PL0003",
@@ -125,12 +123,12 @@
     "name": "Acevichadas",
     "category_id": "C0002",
     "category": "alitas",
-    "price": 15,
+    "price": 29,
     "description": "5 alitas jugosas bañadas en cremosa salsa acevichada con toque marino, cítrico y picante.",
     "badge": "ACEVICHADAS",
     "popular": true,
     "available": true,
-    "stock": 25,
+    "stock": 30,
     "image": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80",
     "includes_sauces": true,
     "accompaniments": [
@@ -152,7 +150,8 @@
       "Vinagreta"
     ],
     "code": "PL0005",
-    "category_code": "C0002"
+    "category_code": "C0002",
+    "action": "edit"
   },
   {
     "id": "PL0006",

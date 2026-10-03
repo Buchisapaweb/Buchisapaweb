@@ -114,6 +114,7 @@ import {
   deletePortada,
   reorderPortadas,
   savePortadaImageBase64,
+  getProfiles,
 } from './src/db/queries';
 import { createCulqiRouter } from './src/culqi';
 
@@ -131,8 +132,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
   // --- SSE REAL-TIME PUSH NOTIFICATIONS EVENT BUS ---
   interface SSESubscriber {
@@ -2741,7 +2742,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         const name = req.body.name || 'Sin nombre';
         const description = req.body.description || '';
         const price = parseFloat(req.body.price || '0');
-        const stock = parseInt(req.body.stock || '25', 10);
+        const stock = parseInt(req.body.stock || '0', 10);
         
         // Mapeo canónico a códigos oficiales C0001 - C0010
         const CATEGORY_MAP: Record<string, { id: string; code: string; slug: string; name: string }> = {
@@ -2862,9 +2863,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.redirect(`/admin${viewQuery}${successQuery}${errorQuery}`);
   });
 
-  // 2. Compilar sobre la marcha y servir el Panel de Administración PHP real en HTML compatible con Vercel
+  // 2. Servir el Panel de Administración en HTML5 puro (sin PHP)
   app.get(['/admin', '/admin.html', '/admin/index.php', /^\/admin(?:\/.*)?$/, /^\/php-admin(?:\/.*)?$/], async (req: Request, res: Response, next) => {
-    // Interceptar la acción de logout en el emulador de desarrollo
+    // Interceptar la acción de logout
     if (req.query.action === 'logout') {
       res.setHeader('Set-Cookie', 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
       res.redirect('/index.html');
@@ -2882,15 +2883,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       view = 'dashboard';
     }
     
-    const successFlash = (req.query.success as string) || '';
-    const errorFlash = (req.query.error as string) || '';
-    
     try {
-      const headerPath = path.join(process.cwd(), 'admin/includes/header.php');
-      const sidebarPath = path.join(process.cwd(), 'admin/includes/sidebar.php');
-      const topbarPath = path.join(process.cwd(), 'admin/includes/topbar.php');
-      const footerPath = path.join(process.cwd(), 'admin/includes/footer.php');
-      const viewPath = path.join(process.cwd(), `admin/views/${view}.php`);
+      const headerPath = path.join(process.cwd(), 'admin/includes/header.html');
+      const sidebarPath = path.join(process.cwd(), 'admin/includes/sidebar.html');
+      const topbarPath = path.join(process.cwd(), 'admin/includes/topbar.html');
+      const footerPath = path.join(process.cwd(), 'admin/includes/footer.html');
+      const viewPath = path.join(process.cwd(), `admin/views/${view}.html`);
       
       let header = fs.readFileSync(headerPath, 'utf8');
       let sidebar = fs.readFileSync(sidebarPath, 'utf8');
@@ -2898,612 +2896,46 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       let footer = fs.readFileSync(footerPath, 'utf8');
       let viewContent = fs.readFileSync(viewPath, 'utf8');
       
-      // Limpiar etiquetas de apertura PHP y requires de inicialización para concatenar como una plantilla HTML limpia
-      header = header.replace(/<\?php[\s\S]*?\?>/g, '');
-      sidebar = sidebar.replace(/<\?php[\s\S]*?current_view\s*=\s*[\s\S]*?\?>/g, '');
-      topbar = topbar.replace(/<\?php[\s\S]*?\?>/g, '');
-      // Compile view-specific dynamic footer scripts rather than stripping them blindly
-      let footerScripts = '';
-      if (view === 'dashboard') {
-        footerScripts += '    <script src="/admin/js/chart.min.js"></script>\n';
-      }
-      const allowedScriptViews = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket', 'configuracion'];
-      if (allowedScriptViews.includes(view)) {
-        footerScripts += `    <script src="/admin/js/${view}.js"></script>`;
-      }
-      footer = footer.replace(/<\?php[\s\S]*?\?>/g, footerScripts);
-      
-      let html = header;
-      html += `
-      <div class="flex h-screen overflow-hidden">
-          ${sidebar}
-          <div class="flex-1 flex flex-col overflow-hidden">
-              ${topbar}
-              <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#0b0f19]">
-                  ${viewContent}
-              </main>
-          </div>
-      </div>
-      `;
-      html += footer;
-      
-      // Consultar datos reales de Supabase en caliente para renderizar el panel PHP en caliente
-      let clientes: any[] = [];
-      let productos: any[] = [];
-      let categorias: any[] = [];
-      let pedidos: any[] = [];
-      
-      if (view === 'clientes') {
-        const supRes = await querySupabase('GET', 'perfiles?select=*&order=created_at.desc');
-        clientes = Array.isArray(supRes.data) ? supRes.data : [];
-      } else if (view === 'productos') {
-        const supResProd = await querySupabase('GET', 'products?select=*&order=category.asc');
-        if (Array.isArray(supResProd.data) && supResProd.data.length > 0) {
-          productos = supResProd.data;
-        } else {
-          productos = await getProducts();
-        }
-        const supResCat = await querySupabase('GET', 'categories?select=id,name');
-        if (Array.isArray(supResCat.data) && supResCat.data.length > 0) {
-          categorias = supResCat.data;
-        } else {
-          categorias = await getCategories();
-        }
-      } else if (view === 'pedidos' || view === 'ticket') {
-        const supResOrd = await querySupabase('GET', 'orders?select=*&order=created_at.desc');
-        pedidos = Array.isArray(supResOrd.data) ? supResOrd.data : [];
-      } else if (view === 'dashboard') {
-        const supResCl = await querySupabase('GET', 'perfiles?select=id');
-        clientes = Array.isArray(supResCl.data) ? supResCl.data : [];
-        const supResProd = await querySupabase('GET', 'products?select=*');
-        if (Array.isArray(supResProd.data) && supResProd.data.length > 0) {
-          productos = supResProd.data;
-        } else {
-          productos = await getProducts();
-        }
-        const supResOrd = await querySupabase('GET', 'orders?select=*&order=created_at.desc');
-        pedidos = Array.isArray(supResOrd.data) ? supResOrd.data : [];
-      }
-      
-      // Construir notificaciones flotantes (reemplazando banners PHP vacíos)
-      let flashHtml = '';
-      if (successFlash) {
-        flashHtml += `
-        <div class="admin-flash-message p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-2 animate-fade-in shadow-lg">
-            <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
-            <span>${successFlash}</span>
-        </div>`;
-      }
-      if (errorFlash) {
-        flashHtml += `
-        <div class="admin-flash-message p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold rounded-xl flex items-center gap-2 animate-fade-in shadow-lg">
-            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
-            <span>${errorFlash}</span>
-        </div>`;
-      }
-      
-      // Inyectar alertas y remover cabeceras PHP redundantes
-      html = html.replace(/<\?php\s+if\s*\(!empty\(\$success\)\):\s*\?>[\s\S]*?<\?php\s+endif;\s*\?>/g, flashHtml);
-      html = html.replace(/<\?php\s+if\s*\(!empty\(\$error\)\):\s*\?>[\s\S]*?<\?php\s+endif;\s*\?>/g, '');
-      html = html.replace(/<\?php\s+if\s*\(session_status\(\)\s*===\s*PHP_SESSION_NONE\)\s*\{[\s\S]*?\}[\s\S]*?\?>/g, '');
-      html = html.replace(/<\?php[\s\S]*?require_once[\s\S]*?\?>/g, '');
-      html = html.replace(/<\?php[\s\S]*?\$pedidos_por_estado[\s\S]*?\?>/g, '');
-      html = html.replace(/<\?php[\s\S]*?\$allowed_views[\s\S]*?\?>/g, '');
-      html = html.replace(/<\?php[\s\S]*?\$current_view[\s\S]*?\?>/g, '');
-      html = html.replace(/<\?php[\s\S]*?\$active_view[\s\S]*?\?>/g, '');
-      html = html.replace(/<\?php[\s\S]*?checkAdminAuth\(\);[\s\S]*?\?>/g, '');
-      
-      // Formatear títulos y relojes
       const view_title = view === 'dashboard' ? 'Dashboard' : view === 'clientes' ? 'Clientes' : view === 'productos' ? 'Productos' : view === 'pedidos' ? 'Pedidos y Comandas' : view === 'ticket' ? 'Ticket' : 'Configuración';
-      html = html.replace(/<\?php\s+echo\s+\$active_title;\s*\?>/g, view_title);
-      html = html.replace(/<\?php\s+echo\s+htmlspecialchars\(\$active_title\);\s*\?>/g, view_title);
-      html = html.replace(/<\?php\s+echo\s+htmlspecialchars\(\$user_email\);\s*\?>/g, 'admin@buchisapa.pe');
-      html = html.replace(/<\?php\s+echo\s+substr\(\$user_email,\s*0,\s*2\);\s*\?>/g, 'AD');
-      html = html.replace(/<\?php\s+echo\s+date\('H:i:s'\);\s*\?>/g, new Date().toLocaleTimeString('es-PE', { hour12: false }));
       
-      // Resaltado de clases activas del Sidebar para todas las 6 pestañas
-      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'dashboard'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'dashboard' ? '$1' : '$2');
-      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'clientes'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'clientes' ? '$1' : '$2');
-      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'productos'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'productos' ? '$1' : '$2');
-      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'pedidos'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'pedidos' ? '$1' : '$2');
-      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'ticket'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'ticket' ? '$1' : '$2');
-      html = html.replace(/<\?php\s+echo\s+\$current_view\s*===\s*'configuracion'\s*\?\s*'([^']*)'\s*:\s*'([^']*)';\s*\?>/g, view === 'configuracion' ? '$1' : '$2');
+      topbar = topbar.replace('id="active-view-title">Dashboard<', `id="active-view-title">${view_title}<`);
       
-      // Renderizar loops basados en la base de datos de Supabase
-      if (view === 'clientes') {
-        html = html.replace(/<\?php\s+echo\s+count\(\$clientes\);\s*\?>/g, String(clientes.length));
-        
-        const renderLoop = (itemTemplate: string) => {
-          if (clientes.length === 0) {
-            return `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-semibold">No se encontraron clientes registrados en Supabase.</td></tr>`;
-          }
-          return clientes.map(c => {
-            const rawDate = c.created_at || c.createdAt || new Date().toISOString();
-            const dateStr = new Date(rawDate).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-            const docType = c.docType || 'DNI';
-            const docNumber = c.docNumber || 'No especificado';
-            const name = c.name || 'Usuario Sin Nombre';
-            const phone = c.phone || 'Sin teléfono registrado';
-            const email = c.email || 'Sin correo electrónico';
-            
-            let temp = itemTemplate;
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\(\$c\['docType'\]\s*\?\?\s*'DNI'\)\s*\.\s*'\s*:\s*'\s*\.\s*\(\$c\['docNumber'\]\s*\?\?\s*'No especificado'\)\);\s*\?>/g, `${docType} : ${docNumber}`);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['docType'\]\s*\?\?\s*'DNI'\);\s*\?>/g, docType);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['docNumber'\]\s*\?\?\s*'No registrado'\);\s*\?>/g, docNumber);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['name'\]\s*\?\?\s*'Usuario Sin Nombre'\);\s*\?>/g, name);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['phone'\]\s*\?\?\s*'Sin teléfono registrado'\);\s*\?>/g, phone);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['phone'\]\s*\?\?\s*'Sin registro'\);\s*\?>/g, phone);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['email'\]\s*\?\?\s*'Sin correo electrónico'\);\s*\?>/g, email);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$c\['email'\]\s*\?\?\s*'Sin registro'\);\s*\?>/g, email);
-            temp = temp.replace(/<\?php\s+echo\s+\$dateStr;\s*\?>/g, dateStr);
-            temp = temp.replace(/<\?php\s+echo\s+date\('d\/m\/Y',\s*strtotime\(\$rawDate\)\);\s*\?>/g, new Date(rawDate).toLocaleDateString('es-PE'));
-            return temp;
-          }).join('\n');
-        };
-        
-        html = html.replace(/<\?php\s+if\s*\(empty\(\$clientes\)\):[\s\S]*?<\?php\s+else:\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g, (m, content) => {
-          return renderLoop(content);
-        });
-      }
-      else if (view === 'productos') {
-        const totalProductos = productos.length;
-        const totalDisponibles = productos.filter(p => p.available !== false).length;
-        const totalCriticos = productos.filter(p => parseInt(String(p.stock || '0'), 10) <= 5).length;
-
-        const CATEGORIAS_DEFINIDAS = [
-            { id: 'C0001', code: 'C0001', slug: 'promociones',       name: 'PROMOCIONES',                  icon: 'sparkles',  color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
-            { id: 'C0002', code: 'C0002', slug: 'alitas',            name: 'ALITAS',                       icon: 'flame',     color: '#ef4444', desc: 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.' },
-            { id: 'C0003', code: 'C0003', slug: 'bebidas',           name: 'BEBIDAS',                      icon: 'cup-soda',  color: '#06b6d4', desc: 'Gaseosas heladas, agua mineral y bebidas embotelladas.' },
-            { id: 'C0004', code: 'C0004', slug: 'broaster',          name: 'BROASTER',                     icon: 'drumstick', color: '#f97316', desc: 'Pollo broaster ultra crocante con papas doradas y cremas.' },
-            { id: 'C0005', code: 'C0005', slug: 'hamburguesas',      name: 'HAMBURGUESAS',                 icon: 'beef',      color: '#eab308', desc: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
-            { id: 'C0006', code: 'C0006', slug: 'infusiones',        name: 'INFUSIONES',                   icon: 'coffee',    color: '#10b981', desc: 'Infusiones calientes, café aromático pasado y manzanilla.' },
-            { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS',            icon: 'utensils',  color: '#8b5cf6', desc: 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.' },
-            { id: 'C0008', code: 'C0008', slug: 'refrescos',         name: 'REFRESCOS',                    icon: 'glass-water',color: '#3b82f6', desc: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
-            { id: 'C0009', code: 'C0009', slug: 'salchipapas',       name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'layers',    color: '#ec4899', desc: 'Papas crocantes, salchichas frankfurter y combinaciones broaster.' },
-            { id: 'C0010', code: 'C0010', slug: 'adicional',         name: 'ADICIONAL',                    icon: 'plus-circle',color: '#94a3b8', desc: 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.' }
-        ];
-
-        // 1. Generar pestañas horizontales de categorías
-        let filterTabsHtml = `
-            <button type="button" onclick="seleccionarFiltroCategoria('all')" class="category-tab-btn active px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 bg-orange-600 text-white" data-cat="all">
-                Todos (${totalProductos})
-            </button>
-        `;
-        CATEGORIAS_DEFINIDAS.forEach(cat => {
-            const countInCat = productos.filter(p => (
-                (p.category_id || '') === cat.id || 
-                (p.category_id || '') === cat.slug || 
-                (p.category || '') === cat.id || 
-                (p.category || '') === cat.slug
-            )).length;
-            filterTabsHtml += `
-            <button type="button" onclick="seleccionarFiltroCategoria('${cat.id}')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="${cat.id}" data-cat-slug="${cat.slug}">
-                <span class="font-mono-numbers text-[9px] text-orange-400/90 font-bold mr-1">${cat.id}</span> ${cat.name} (${countInCat})
-            </button>
-            `;
-        });
-
-        // 2. Generar bloques de categorías y tarjetas de platos
-        let categoriesBlocksHtml = '';
-        CATEGORIAS_DEFINIDAS.forEach(cat => {
-            const platosEnCat = productos.filter(p => (
-                (p.category_id || '') === cat.id || 
-                (p.category_id || '') === cat.slug || 
-                (p.category || '') === cat.id || 
-                (p.category || '') === cat.slug
-            ));
-            
-            let cardsHtml = '';
-            if (platosEnCat.length === 0) {
-                cardsHtml = `<div class="p-6 text-center text-slate-500 text-xs font-semibold bg-[#101424] rounded-xl border border-slate-800/60 col-span-full">No hay platos registrados en esta categoría aún.</div>`;
-            } else {
-                cardsHtml = platosEnCat.map(p => {
-                    const id = p.id || '';
-                    const name = p.name || 'Sin nombre';
-                    const desc = p.description || 'Delicioso plato preparado con ingredientes frescos.';
-                    const price = parseFloat(p.price || '0');
-                    const stock = parseInt(String(p.stock || '25'), 10);
-                    const badge = p.badge || '';
-                    const image = p.image || '/imagenes/productos/fallback.webp';
-                    const available = p.available !== false;
-                    const isCrit = stock <= 5;
-                    const accompaniments = Array.isArray(p.accompaniments) ? p.accompaniments : [];
-                    const cremas = Array.isArray(p.cremas) ? p.cremas : [];
-
-                    const pJsonStr = JSON.stringify(p).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-
-                    return `
-                    <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-producto-id="${id}" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
-                        <div class="space-y-3">
-                            <!-- Imagen Grande y Cuadrada del Producto -->
-                            <div class="relative w-full aspect-square rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
-                                <img src="${image}" alt="${name}" class="producto-img-element w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
-                                <span class="producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md ${available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'}">
-                                    ${available ? 'Disponible' : 'Agotado'}
-                                </span>
-                            </div>
-
-                            <!-- Datos Principales: Nombre, Stock y Precio -->
-                            <div>
-                                <div class="flex items-start justify-between gap-2">
-                                    <h4 class="producto-title-text font-black text-base text-white leading-snug line-clamp-2">${name}</h4>
-                                    <span class="producto-price-text font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
-                                </div>
-                                <div class="flex items-center gap-2 mt-2">
-                                    <span class="inline-flex items-center gap-1.5 text-xs font-mono-numbers font-bold ${isCrit ? 'text-red-400 animate-pulse' : 'text-slate-300'}">
-                                        <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: <span class="producto-stock-text">${stock} un.</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Parte Inferior: ID, Botón Editar y Botón Eliminar -->
-                        <div class="flex items-center justify-between pt-3 mt-4 border-t border-slate-800/80">
-                            <span class="text-[10px] font-mono-numbers text-slate-400 font-bold bg-[#0a0d16] px-2.5 py-1 rounded-lg border border-slate-800 flex items-center gap-1">
-                                <span class="text-slate-500">ID:</span>
-                                <span class="text-orange-400 font-extrabold tracking-wide">${id}</span>
-                            </span>
-                            
-                            <div class="flex items-center gap-2">
-                                <button type="button" onclick='abrirEditarProductoModal(${pJsonStr})' class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 active-press shadow-sm" title="Editar plato">
-                                    <i data-lucide="edit-3" class="w-3.5 h-3.5 text-orange-400"></i>
-                                    <span>Editar</span>
-                                </button>
-                                <button type="button" onclick="eliminarPlatoAjax('${id}', '${name.replace(/'/g, "\\'")}')" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    `;
-                }).join('\n');
-            }
-
-            categoriesBlocksHtml += `
-            <section class="category-block space-y-4" id="cat-section-${cat.id}" data-cat-id="${cat.id}" data-cat-slug="${cat.slug}">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color}80;"></span>
-                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono-numbers font-extrabold bg-orange-950/40 border border-orange-500/40 text-orange-400 tracking-wider">${cat.id}</span>
-                        <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
-                            ${cat.name}
-                        </h3>
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase text-slate-300 bg-slate-800/60 border border-slate-700/60">
-                            ${platosEnCat.length} platos
-                        </span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 italic">${cat.desc}</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    ${cardsHtml}
-                </div>
-            </section>
-            `;
-        });
-
-        // Reemplazar contadores rápidos
-        html = html.replace(/<\?php\s+echo\s+\$totalProductos;\s*\?>/g, String(totalProductos));
-        html = html.replace(/<\?php\s+echo\s+\$totalDisponibles;\s*\?>/g, String(totalDisponibles));
-        html = html.replace(/<\?php\s+echo\s+\$totalCriticos;\s*\?>/g, String(totalCriticos));
-        html = html.replace(/<\?php\s+echo\s+\$totalCriticos\s*>\s*0\s*\?\s*'text-red-400'\s*:\s*'text-slate-400';\s*\?>/g, totalCriticos > 0 ? 'text-red-400' : 'text-slate-400');
-
-        // Reemplazar barra de filtros de categorías de forma robusta
-        const filterBarStart = html.indexOf('<div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">');
-        const filterBarEnd = html.indexOf('<!-- SECCIONES DIVIDIDAS POR CATEGORÍAS -->');
-        if (filterBarStart !== -1 && filterBarEnd !== -1) {
-            const pre = html.substring(0, filterBarStart);
-            const post = html.substring(filterBarEnd);
-            html = pre + `<div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">\n${filterTabsHtml}\n    </div>\n    </div>\n\n    ` + post;
-        }
-
-        // Reemplazar contenedor de bloques de categorías de forma robusta
-        const contStart = html.indexOf('<div class="space-y-10" id="productos-container">');
-        const contEnd = html.indexOf('<div id="modal-container"');
-        if (contStart !== -1 && contEnd !== -1) {
-            const pre = html.substring(0, contStart);
-            const post = html.substring(contEnd);
-            html = pre + `<div class="space-y-10" id="productos-container">\n${categoriesBlocksHtml}\n    </div>\n</div>\n\n` + post;
-        }
-
-        html = html.replace(/window\.activeCategories\s*=\s*<\?php[\s\S]*?\?>;/g, `window.activeCategories = ${JSON.stringify(CATEGORIAS_DEFINIDAS)};`);
-      }
-      else if (view === 'pedidos') {
-        const renderLoop = (itemTemplate: string) => {
-          if (pedidos.length === 0) {
-            return `<tr><td colspan="8" class="p-8 text-center text-slate-500 font-semibold">No se encontraron órdenes en Supabase.</td></tr>`;
-          }
-          
-          return pedidos.map(o => {
-            const orderNum = o.orderNumber || o.id || '';
-            const customerName = o.customerName || 'Cliente';
-            const customerPhone = o.customerPhone || 'Sin teléfono';
-            const total = parseFloat(o.total || '0');
-            const orderType = o.orderType || 'Delivery';
-            const paymentMethod = o.paymentMethod || 'Yape';
-            const status = (o.status || 'recibido').toLowerCase();
-            const created_at = o.created_at || new Date().toISOString();
-            const timeStr = new Date(created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
-            
-            let items: any[] = [];
-            try {
-              items = typeof o.items === 'string' ? JSON.parse(o.items || '[]') : (o.items || []);
-            } catch(e) {}
-            
-            let temp = itemTemplate;
-            
-            const subLoopRegex = /<\?php\s+if\s*\(is_array\(\$items\)\):\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g;
-            temp = temp.replace(subLoopRegex, (sm, subContent) => {
-              return items.map(it => {
-                let s = subContent;
-                s = s.replace(/<\?php\s+echo\s+\$it\['quantity'\]\s*\?\?\s*1;\s*\?>/g, String(it.quantity || 1));
-                s = s.replace(/<\?php\s+echo\s+htmlspecialchars\(\$it\['name'\]\s*\?\?\s*'Plato'\);\s*\?>/g, it.name || 'Plato');
-                return s;
-              }).join('\n');
-            });
-            
-            let actionHtml = '';
-            if (status === 'recibido') {
-              actionHtml = `<button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold h-11 lg:h-8 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="chef-hat" class="w-3.5 h-3.5"></i> Iniciar Cocina</button><input type="hidden" name="status" value="preparando">`;
-            } else if (status === 'preparando') {
-              actionHtml = `<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold h-11 lg:h-8 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Despachar</button><input type="hidden" name="status" value="en_camino">`;
-            } else if (status === 'en_camino') {
-              actionHtml = `<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold h-11 lg:h-8 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Entregado</button><input type="hidden" name="status" value="entregado">`;
-            } else {
-              actionHtml = `<span class="text-slate-500 text-[10px] block text-center font-black py-2 bg-slate-800/10 border border-slate-800/40 rounded-xl select-none uppercase tracking-widest"><i data-lucide="archive-restore" class="w-3 h-3 inline mr-1"></i> Despachado</span>`;
-            }
-            
-            temp = temp.replace(/<\?php\s+echo\s+\$actionHtml;\s*\?>/g, actionHtml);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$orderNum\);\s*\?>/g, orderNum);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerName'\]\s*\?\?\s*'Cliente'\);\s*\?>/g, customerName);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerPhone'\]\s*\?\?\s*'Sin teléfono'\);\s*\?>/g, customerPhone);
-            temp = temp.replace(/<\?php\s+echo\s+isset\(\$o\['created_at'\]\)\s*\?\s*date\('h:i A',\s*strtotime\(\$o\['created_at'\]\)\)\s*:\s*'Ahora';\s*\?>/g, timeStr);
-            temp = temp.replace(/<\?php\s+echo\s+number_format\(floatval\(\$o\['total'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, total.toFixed(2));
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['orderType'\]\s*\?\?\s*'Delivery'\);\s*\?>/g, orderType);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['paymentMethod'\]\s*\?\?\s*'Yape'\);\s*\?>/g, paymentMethod);
-            temp = temp.replace(/<\?php\s+echo\s+\$status;\s*\?>/g, status);
-            temp = temp.replace(/<\?php\s+echo\s+\$stateColor;\s*\?>/g, status === 'entregado' || status === 'completado' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400' : status === 'cancelado' ? 'bg-red-500/10 border-red-500/25 text-red-400' : status === 'preparando' ? 'bg-sky-500/10 border-sky-500/25 text-sky-400' : 'bg-amber-500/10 border-amber-500/25 text-amber-400');
-            temp = temp.replace(/<\?php\s+echo\s+\$o\['id'\];\s*\?>/g, o.id);
-            return temp;
-          }).join('\n');
-        };
-        
-        // Loops de comanda tradicionales y móviles
-        html = html.replace(/<\?php\s+if\s*\(empty\(\$pedidos\)\):[\s\S]*?<\?php\s+else:\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g, (m, content) => {
-          return renderLoop(content);
-        });
-        
-        // Inyectar columnas Kanban
-        const colsMeta = {
-          recibido: { title: 'Recibidos', badge: 'border-amber-500/20 bg-amber-500/5 text-amber-400' },
-          preparando: { title: 'Cocina', badge: 'border-sky-500/20 bg-sky-500/5 text-sky-400' },
-          en_camino: { title: 'En Camino', badge: 'border-indigo-500/20 bg-indigo-500/5 text-indigo-400' },
-          entregado: { title: 'Entregados', badge: 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400' }
-        };
-        
-        let colsHtml = '';
-        Object.entries(colsMeta).forEach(([col_id, meta]) => {
-          const orders_in_col = pedidos.filter(o => {
-            const ost = (o.status || 'recibido').toLowerCase();
-            return ost === col_id || (col_id === 'entregado' && ost === 'completado');
-          });
-          const count = orders_in_col.length;
-          
-          let cardsHtml = '';
-          if (count === 0) {
-            cardsHtml = `<div class="h-28 border border-dashed border-slate-800/60 rounded-xl flex flex-col items-center justify-center p-4 text-center select-none"><i data-lucide="inbox" class="w-5 h-5 text-slate-600 mb-1"></i><span class="text-[10px] font-bold text-slate-500">Sin comandas</span></div>`;
-          } else {
-            const matchCardTemplate = html.match(/<!-- Kanban Comanda Card -->[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>/);
-            const cardTemplate = matchCardTemplate ? matchCardTemplate[0] : '';
-            
-            if (cardTemplate) {
-              cardsHtml = orders_in_col.map(o => {
-                const orderNum = o.orderNumber || o.id || '';
-                const customerName = o.customerName || 'Cliente';
-                const total = parseFloat(o.total || '0');
-                const orderType = o.orderType || 'Delivery';
-                const status = (o.status || 'recibido').toLowerCase();
-                
-                let items: any[] = [];
-                try {
-                  items = typeof o.items === 'string' ? JSON.parse(o.items || '[]') : (o.items || []);
-                } catch(e) {}
-                
-                let ct = cardTemplate;
-                
-                const subLoopRegex = /<\?php\s+if\s*\(is_array\(\$items\)\):\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g;
-                ct = ct.replace(subLoopRegex, (sm, subContent) => {
-                  return items.map(it => {
-                    let s = subContent;
-                    s = s.replace(/<\?php\s+echo\s+\$it\['quantity'\]\s*\?\?\s*1;\s*\?>/g, String(it.quantity || 1));
-                    s = s.replace(/<\?php\s+echo\s+htmlspecialchars\(\$it\['name'\]\s*\?\?\s*'Plato'\);\s*\?>/g, it.name || 'Plato');
-                    return s;
-                  }).join('\n');
-                });
-                
-                let actionHtml = '';
-                if (status === 'recibido') {
-                  actionHtml = `<button type="submit" class="w-full bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="chef-hat" class="w-3.5 h-3.5"></i> Cocinar</button><input type="hidden" name="status" value="preparando">`;
-                } else if (status === 'preparando') {
-                  actionHtml = `<button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Despachar</button><input type="hidden" name="status" value="en_camino">`;
-                } else if (status === 'en_camino') {
-                  actionHtml = `<button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Entregar</button><input type="hidden" name="status" value="entregado">`;
-                } else {
-                  actionHtml = `<span class="text-slate-500 text-[10px] block text-center font-black py-2 bg-slate-800/10 border border-slate-800/40 rounded-xl select-none uppercase tracking-widest"><i data-lucide="archive-restore" class="w-3 h-3 inline mr-1"></i> Despachado</span>`;
-                }
-                
-                ct = ct.replace(/<\?php\s+echo\s+\$actionHtml;\s*\?>/g, actionHtml);
-                ct = ct.replace(/<\?php\s+echo\s+htmlspecialchars\(\$orderNum\);\s*\?>/g, orderNum);
-                ct = ct.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerName'\]\s*\?\?\s*'Cliente'\);\s*\?>/g, customerName);
-                ct = ct.replace(/<\?php\s+echo\s+number_format\(floatval\(\$o\['total'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, total.toFixed(2));
-                ct = ct.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['orderType'\]\s*\?\?\s*'Delivery'\);\s*\?>/g, orderType);
-                ct = ct.replace(/<\?php\s+echo\s+\$status;\s*\?>/g, status);
-                ct = ct.replace(/<\?php\s+echo\s+\$o\['id'\];\s*\?>/g, o.id);
-                return ct;
-              }).join('\n');
-            }
-          }
-          
-          colsHtml += `
-          <!-- Column Container -->
-          <div class="bg-[#0f1424]/40 rounded-2xl border border-slate-800/80 p-4 flex flex-col h-[calc(100vh-230px)] min-w-[270px] max-w-[320px] shrink-0 animate-fade-in">
-              <!-- Column Header -->
-              <div class="flex items-center justify-between mb-4 pb-3.5 border-b border-slate-800/60 shrink-0">
-                  <h3 class="font-extrabold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
-                      <span class="w-1.5 h-3 bg-orange-500 rounded-sm"></span>
-                      ${meta.title}
-                  </h3>
-                  <span class="px-2 py-0.5 border rounded-md text-[9px] font-black uppercase ${meta.badge}">
-                      ${count}
-                  </span>
-              </div>
-              
-              <!-- Cards scrollable region inside columns -->
-              <div class="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-none">
-                  ${cardsHtml}
-              </div>
-          </div>
-          `;
-        });
-        
-        const boardStartIdx = html.indexOf('<div id="desktop-kanban-board"');
-        const boardEndIdx = html.indexOf('<!-- ========================================================================= -->\n    <!-- MOBILE VIEW: TOUCH-FIRST CARDS');
-        if (boardStartIdx !== -1 && boardEndIdx !== -1) {
-          const preBoard = html.substring(0, boardStartIdx);
-          const postBoard = html.substring(boardEndIdx);
-          html = preBoard + `<div id="desktop-kanban-board" class="hidden lg:grid grid-cols-4 gap-4 overflow-x-auto pb-4 pt-1 animate-fade-in select-none">${colsHtml}</div>\n    ` + postBoard;
-        }
-      }
-      else if (view === 'dashboard') {
-        // Calcular métricas
-        let ventas_totales = 0;
-        let pedidos_atendidos = 0;
-        let ventas_por_dia = [0, 0, 0, 0, 0, 0, 0];
-        let categorias_stats: Record<string, number> = {
-          'promociones': 0,
-          'alitas': 0,
-          'bebidas': 0,
-          'broaster': 0,
-          'hamburguesas': 0,
-          'infusiones': 0,
-          'platos-amazonicos': 0,
-          'refrescos': 0,
-          'salchipapas': 0,
-          'adicional': 0
-        };
-
-        pedidos.forEach(o => {
-          const st = (o.status || 'recibido').toLowerCase();
-          if (st === 'entregado' || st === 'completado') {
-            const tot = parseFloat(o.total || '0');
-            ventas_totales += tot;
-            pedidos_atendidos++;
-
-            const created_at = o.created_at || new Date().toISOString();
-            const dayIndex = (new Date(created_at).getDay() + 6) % 7; // Lunes=0, Domingo=6
-            if (dayIndex >= 0 && dayIndex <= 6) {
-              ventas_por_dia[dayIndex] += tot;
-            }
-
-            const itemsStr = JSON.stringify(o.items || []).toLowerCase();
-            if (itemsStr.includes('promocion') || itemsStr.includes('combo')) {
-              categorias_stats['promociones'] += tot;
-            } else if (itemsStr.includes('alitas')) {
-              categorias_stats['alitas'] += tot;
-            } else if (itemsStr.includes('gaseosa') || itemsStr.includes('bebida') || itemsStr.includes('incka') || itemsStr.includes('agua')) {
-              categorias_stats['bebidas'] += tot;
-            } else if (itemsStr.includes('broaster') || itemsStr.includes('pollo') || itemsStr.includes('brasa')) {
-              categorias_stats['broaster'] += tot;
-            } else if (itemsStr.includes('hamburguesa') || itemsStr.includes('burger')) {
-              categorias_stats['hamburguesas'] += tot;
-            } else if (itemsStr.includes('infusion') || itemsStr.includes('cafe') || itemsStr.includes('te') || itemsStr.includes('manzanilla')) {
-              categorias_stats['infusiones'] += tot;
-            } else if (itemsStr.includes('amazon') || itemsStr.includes('tacacho') || itemsStr.includes('cecina') || itemsStr.includes('juane') || itemsStr.includes('patacon')) {
-              categorias_stats['platos-amazonicos'] += tot;
-            } else if (itemsStr.includes('refresco') || itemsStr.includes('cocona') || itemsStr.includes('chicha') || itemsStr.includes('maracuya')) {
-              categorias_stats['refrescos'] += tot;
-            } else if (itemsStr.includes('salchipapa') || itemsStr.includes('salchibroaster')) {
-              categorias_stats['salchipapas'] += tot;
-            } else {
-              categorias_stats['adicional'] += tot;
-            }
-          }
-        });
-        const productos_criticos = productos.filter(p => parseInt(p.stock || '0', 10) <= 5);
-        const stock_critico_count = productos_criticos.length;
-        
-        // Reemplazar métricas del Dashboard
-        html = html.replace(/<\?php\s+echo\s+number_format\(\$ventas_totales,\s*2\);\s*\?>/g, ventas_totales.toFixed(2));
-        html = html.replace(/<\?php\s+echo\s+\$pedidos_atendidos;\s*\?>/g, String(pedidos_atendidos));
-        html = html.replace(/<\?php\s+echo\s+count\(\$clientes\);\s*\?>/g, String(clientes.length));
-        html = html.replace(/<\?php\s+echo\s+\$stock_critico_count;\s*\?>/g, String(stock_critico_count));
-        html = html.replace(/<\?php\s+echo\s+\$stock_critico_count\s*>\s*0\s*\?\s*'text-red-400 font-black animate-pulse'\s*:\s*'text-white';\s*\?>/g, stock_critico_count > 0 ? 'text-red-400 font-black animate-pulse' : 'text-white');
-
-        // Reemplazar datos dinámicos de los gráficos
-        const jsonWeekly = JSON.stringify(ventas_por_dia);
-        const jsonCategories = JSON.stringify(categorias_stats);
-        html = html.replace(/data-weekly="[^"]*"/g, `data-weekly='${jsonWeekly}'`);
-        html = html.replace(/data-categories='[^']*'/g, `data-categories='${jsonCategories}'`);
-        html = html.replace(/window\.dashboardData\s*=\s*\{[\s\S]*?\};/g, `window.dashboardData = { weekly: ${jsonWeekly}, categories: ${jsonCategories} };`);
-      }
-      else if (view === 'ticket') {
-        const renderLoop = (itemTemplate: string) => {
-          if (pedidos.length === 0) {
-            return `<tr><td colspan="6" class="p-8 text-center text-slate-500 font-semibold select-none">No hay pedidos disponibles para emitir tickets.</td></tr>`;
-          }
-          return pedidos.map(o => {
-            const orderNum = o.orderNumber || o.id || '';
-            const customerName = o.customerName || 'Cliente';
-            const customerPhone = o.customerPhone || 'Sin teléfono';
-            const total = parseFloat(o.total || '0');
-            const orderType = o.orderType || 'Delivery';
-            
-            let items: any[] = [];
-            try {
-              items = typeof o.items === 'string' ? JSON.parse(o.items || '[]') : (o.items || []);
-            } catch(e) {}
-            
-            let briefStr = '';
-            if (items.length > 0) {
-              const sliceItems = items.slice(0, 2);
-              briefStr = sliceItems.map(it => `${it.quantity || 1}x ${it.name || 'Plato'}`).join(', ');
-              if (items.length > 2) {
-                briefStr += '...';
-              }
-            }
-            
-            let temp = itemTemplate;
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$orderNum\);\s*\?>/g, orderNum);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerName'\]\s*\?\?\s*'Cliente'\);\s*\?>/g, customerName);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerPhone'\]\s*\?\?\s*'Sin teléfono'\);\s*\?>/g, customerPhone);
-            temp = temp.replace(/<\?php\s+echo\s+number_format\(floatval\(\$o\['total'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, total.toFixed(2));
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['orderType'\]\s*\?\?\s*'Delivery'\);\s*\?>/g, orderType);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$itemsBrief\);\s*\?>/g, briefStr);
-            temp = temp.replace(/<\?php\s+echo\s+json_encode\(\$o,\s*JSON_HEX_APOS\s*\|\s*JSON_HEX_QUOT\);\s*\?>/g, JSON.stringify(o).replace(/'/g, '&#39;').replace(/"/g, '&quot;'));
-            return temp;
-          }).join('\n');
-        };
-        
-        html = html.replace(/<\?php\s+if\s*\(empty\(\$pedidos\)\):[\s\S]*?<\?php\s+else:\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g, (m, content) => {
-          return renderLoop(content);
-        });
+      sidebar = sidebar.replace(
+        `id="nav-${view}" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-slate-400 hover:bg-slate-800/50 hover:text-slate-100"`,
+        `id="nav-${view}" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20"`
+      );
+      
+      if (fs.existsSync(path.join(process.cwd(), `admin/css/${view}.css`)) && !header.includes(`/admin/css/${view}.css`)) {
+        header = header.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${view}.css">\n</head>`);
       }
       
-      // Inyectar CSS y JS específicos de la vista en el emulador Node/Vercel (evitando duplicados)
-      if (!html.includes(`/admin/css/${view}.css`)) {
-        html = html.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${view}.css">\n</head>`);
+      let extraJs = '';
+      if (view === 'dashboard' && fs.existsSync(path.join(process.cwd(), 'admin/js/chart.min.js'))) {
+        extraJs += '    <script src="/admin/js/chart.min.js"></script>\n';
       }
-      if (!html.includes(`/admin/js/${view}.js`)) {
-        html = html.replace('</body>', `  <script src="/admin/js/${view}.js"></script>\n</body>`);
+      if (fs.existsSync(path.join(process.cwd(), `admin/js/${view}.js`))) {
+        extraJs += `    <script src="/admin/js/${view}.js"></script>\n`;
       }
-
-      // Eliminar cualquier bloque de etiquetas PHP residuales que no hayan sido compiladas (para evitar que se impriman como texto en el navegador)
-      html = html.replace(/<\?php[\s\S]*?\?>/g, '');
-
+      
+      footer = footer.replace('</body>', `${extraJs}</body>`);
+      
+      let html = `${header}
+<div class="flex h-screen overflow-hidden">
+    ${sidebar}
+    <div class="flex-1 flex flex-col overflow-hidden">
+        ${topbar}
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#0b0f19]">
+            ${viewContent}
+        </main>
+    </div>
+</div>
+${footer}`;
+      
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
       res.send(html);
     } catch (e: any) {
-      res.status(500).send(`Error de emulación de panel PHP: ${e.message}`);
+      res.status(500).send(`Error al cargar el panel HTML5: ${e.message}`);
     }
   });
   app.use('/admin', express.static(path.join(process.cwd(), 'admin'), { ...staticOptions, index: false }));

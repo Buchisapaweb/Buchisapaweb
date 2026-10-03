@@ -1,0 +1,98 @@
+<div class="space-y-6 animate-fade-in pb-12">
+    <!-- Header Principal -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-800/40 select-none">
+        <div>
+            <div class="flex items-center gap-2.5">
+                <span class="w-1.5 h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
+                <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Platos y Menú (Productos)</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Gestión integral de la carta: categorías, acompañamientos, cremas, precios y stock en tiempo real</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <button onclick="abrirCrearProductoModal()" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white rounded-xl text-xs font-black transition-all shadow-lg active-press">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Agregar Producto</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Métricas Rápidas del Catálogo -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 select-none">
+        <div class="p-3.5 bg-[#0f1424] rounded-xl border border-slate-800/80">
+            <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Total de Platos</span>
+            <span class="text-lg font-black text-white font-mono block mt-0.5" id="stat-total-platos">Cargando...</span>
+        </div>
+        <div class="p-3.5 bg-[#0f1424] rounded-xl border border-slate-800/80">
+            <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Categorías</span>
+            <span class="text-lg font-black text-orange-400 font-mono block mt-0.5">10 líneas</span>
+        </div>
+        <div class="p-3.5 bg-[#0f1424] rounded-xl border border-slate-800/80">
+            <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Disponibles</span>
+            <span class="text-lg font-black text-emerald-400 font-mono block mt-0.5" id="stat-disponibles-platos">Activos</span>
+        </div>
+        <div class="p-3.5 bg-[#0f1424] rounded-xl border border-slate-800/80">
+            <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Stock Crítico (≤ 5)</span>
+            <span class="text-lg font-black text-slate-400 font-mono block mt-0.5" id="stat-criticos-platos">0</span>
+        </div>
+    </div>
+
+    <!-- Barra de Búsqueda y Filtros de Categorías -->
+    <div class="space-y-3 select-none">
+        <div class="relative max-w-lg">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
+                <i data-lucide="search" class="w-4 h-4"></i>
+            </span>
+            <input type="text" id="productos-search" oninput="filtrarPlatos()" placeholder="Buscar por nombre, acompañamiento, cremas o descripción..." class="w-full bg-[#121829] border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
+        </div>
+
+        <!-- Pestañas Horizontales de Categorías -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">
+            <button type="button" onclick="seleccionarFiltroCategoria('all')" class="category-tab-btn active px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 bg-orange-600 text-white" data-cat="all">
+                Todos
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0001')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0001">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0001</span> PROMOCIONES
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0002')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0002">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0002</span> ALITAS
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0003')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0003">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0003</span> BEBIDAS
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0004')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0004">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0004</span> BROASTER
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0005')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0005">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0005</span> HAMBURGUESAS
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0006')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0006">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0006</span> INFUSIONES
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0007')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0007">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0007</span> PLATOS AMAZÓNICOS
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0008')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0008">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0008</span> REFRESCOS
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0009')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0009">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0009</span> SALCHIPAPAS Y SALCHIBROASTERS
+            </button>
+            <button type="button" onclick="seleccionarFiltroCategoria('C0010')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="C0010">
+                <span class="font-mono text-[9px] text-orange-400 font-bold mr-1">C0010</span> ADICIONAL
+            </button>
+        </div>
+    </div>
+
+    <!-- SECCIONES DIVIDIDAS POR CATEGORÍAS -->
+    <div class="space-y-10" id="productos-container">
+        <!-- Renderizado dinámico instantáneo por productos.js -->
+    </div>
+</div>
+
+<!-- Modal Container Frame -->
+<div id="modal-container" class="fixed inset-0 bg-[#070a13] z-50 hidden transition-all duration-200 overflow-y-auto">
+    <div id="modal-content" class="min-h-screen w-full bg-[#070a13] flex flex-col">
+        <!-- Contenido dinámico a pantalla completa inyectado por productos.js -->
+    </div>
+</div>

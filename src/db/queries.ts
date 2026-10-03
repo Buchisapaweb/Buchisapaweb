@@ -1484,8 +1484,31 @@ export function generateNextProductId(): string {
   return `PL${String(nextNum).padStart(4, '0')}`;
 }
 
+export function normalizeName(str: string): string {
+  return String(str || '')
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "")
+    .trim();
+}
+
+export function isDuplicateProductName(name: string, excludeId?: string): boolean {
+  const norm = normalizeName(name);
+  if (!norm) return false;
+  productsStore = loadProductsFromDisk();
+  return productsStore.some(p => 
+    (excludeId ? (p.id !== excludeId && p.code !== excludeId) : true) && 
+    normalizeName(p.name) === norm
+  );
+}
+
 export async function createProduct(data: Partial<Product>): Promise<Product> {
   productsStore = loadProductsFromDisk();
+  const rawName = data.name || 'Nuevo Plato';
+  if (isDuplicateProductName(rawName, data.id)) {
+    throw new Error(`Ya existe un plato registrado con el nombre "${rawName}". Evita nombres duplicados.`);
+  }
   const nextId = (data.id && data.id.startsWith('PL')) ? data.id : generateNextProductId();
   const newProduct: Product = {
     id: nextId,
@@ -1493,12 +1516,12 @@ export async function createProduct(data: Partial<Product>): Promise<Product> {
     name: data.name || 'Nuevo Plato',
     category_id: data.category_id || data.category || 'C0001',
     category: data.category || data.category_id || 'promociones',
-    price: Number(data.price) || 10,
+    price: typeof data.price === 'number' ? data.price : (parseFloat(String(data.price || '0')) || 0),
     description: data.description || '',
     badge: data.badge || null,
     popular: Boolean(data.popular),
     available: data.available !== false,
-    stock: typeof data.stock === 'number' ? data.stock : 25,
+    stock: typeof data.stock === 'number' ? data.stock : (parseInt(String(data.stock || '0'), 10) || 0),
     image: data.image || '/imagenes/portada/Portada1E.webp',
     includes_sauces: Boolean(data.includes_sauces),
     accompaniments: Array.isArray(data.accompaniments) ? data.accompaniments : [],
@@ -1512,6 +1535,10 @@ export async function createProduct(data: Partial<Product>): Promise<Product> {
 export async function updateProduct(id: string, data: Partial<Product>): Promise<Product | null> {
   const index = productsStore.findIndex(p => p.id === id || p.code === id);
   if (index === -1) return null;
+  
+  if (data.name && isDuplicateProductName(data.name, id)) {
+    throw new Error(`Ya existe otro plato registrado con el nombre "${data.name}". Evita nombres duplicados.`);
+  }
   
   productsStore[index] = {
     ...productsStore[index],
@@ -2134,6 +2161,56 @@ export async function reorderPortadas(orderedIds: string[]): Promise<PortadaBann
   });
   savePortadasToDisk();
   return portadasStore.sort((a, b) => a.order - b.order);
+}
+
+export function loadProfilesFromDisk(): any[] {
+  try {
+    const file = path.join(process.cwd(), 'data', 'profiles.json');
+    if (fs.existsSync(file)) {
+      return JSON.parse(fs.readFileSync(file, 'utf-8'));
+    }
+  } catch(e) {}
+  return [
+    { id: '1', nombre: 'Juan Pérez', email: 'juan.perez@gmail.com', telefono: '987654321', created_at: '2026-09-20T10:00:00Z' },
+    { id: '2', nombre: 'Maria Garcia', email: 'maria.garcia@gmail.com', telefono: '912345678', created_at: '2026-09-22T14:30:00Z' },
+    { id: '3', nombre: 'Carlos López', email: 'carlos.lopez@gmail.com', telefono: '955443322', created_at: '2026-09-25T18:15:00Z' }
+  ];
+}
+
+function simpleHashCode(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+export async function getProfiles(): Promise<any[]> {
+  const orders = await getOrders();
+  const map = new Map<string, any>();
+
+  loadProfilesFromDisk().forEach(p => {
+    if (p.email) map.set(p.email.toLowerCase().trim(), p);
+    else if (p.id) map.set(p.id, p);
+  });
+
+  orders.forEach(o => {
+    if (o.customerEmail) {
+      const emailKey = o.customerEmail.toLowerCase().trim();
+      if (!map.has(emailKey)) {
+        map.set(emailKey, {
+          id: 'cl-' + simpleHashCode(emailKey),
+          nombre: o.customerName || 'Cliente Buchisapa',
+          email: o.customerEmail,
+          telefono: o.customerPhone || '987654321',
+          created_at: o.createdAt || new Date().toISOString()
+        });
+      }
+    }
+  });
+
+  return Array.from(map.values());
 }
 
 

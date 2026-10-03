@@ -119,34 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/**
- * Notificación Toast flotante
- */
 function showToast(message, type = 'success') {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        container.className = 'toast-container';
-        document.body.appendChild(container);
-    }
-
-    const toast = document.createElement('div');
-    toast.className = `toast-alert toast-${type}`;
-    const iconName = type === 'success' ? 'check-circle' : 'alert-circle';
-    toast.innerHTML = `
-        <i data-lucide="${iconName}" class="w-4 h-4 shrink-0"></i>
-        <span>${message}</span>
-    `;
-    container.appendChild(toast);
-    if (window.lucide) window.lucide.createIcons();
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-        toast.style.transition = 'all 0.25s ease';
-        setTimeout(() => toast.remove(), 260);
-    }, 2800);
+    // Sin notificaciones ni alertas emergentes sobre el modal
+    return;
 }
 
 /**
@@ -654,10 +629,46 @@ function handleImageFileUpload(input) {
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        const base64Data = e.target.result;
-        if (preview) preview.src = base64Data;
-        if (hiddenVal) hiddenVal.value = base64Data;
-        showToast('Foto cargada en tamaño completo');
+        const rawData = e.target.result;
+        const img = new Image();
+        img.onload = function() {
+            try {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxDim = 600; // Ultra ligero y nítido para la carta
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                let webpBase64 = canvas.toDataURL('image/webp', 0.72);
+                if (!webpBase64 || !webpBase64.startsWith('data:image/webp')) {
+                    webpBase64 = canvas.toDataURL('image/jpeg', 0.72);
+                }
+
+                if (preview) preview.src = webpBase64;
+                if (hiddenVal) hiddenVal.value = webpBase64;
+                showToast('Foto optimizada a WebP ultra ligero');
+            } catch (err) {
+                if (preview) preview.src = rawData;
+                if (hiddenVal) hiddenVal.value = rawData;
+                showToast('Foto cargada');
+            }
+        };
+        img.onerror = function() {
+            if (preview) preview.src = rawData;
+            if (hiddenVal) hiddenVal.value = rawData;
+        };
+        img.src = rawData;
     };
     reader.readAsDataURL(file);
 }
@@ -677,6 +688,18 @@ function handleImageUrlInput(url) {
 }
 
 /**
+ * Normaliza cadenas para comparación de duplicados (ignora mayúsculas, minúsculas, tildes y espacios)
+ */
+function normalizeTextForComparison(str) {
+    return String(str || '')
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]/g, "")
+        .trim();
+}
+
+/**
  * Guardar o Actualizar Plato vía AJAX de Alto Rendimiento
  */
 async function guardarProductoAjax(event, formId) {
@@ -684,155 +707,148 @@ async function guardarProductoAjax(event, formId) {
         if (typeof event.preventDefault === 'function') event.preventDefault();
         if (typeof event.stopPropagation === 'function') event.stopPropagation();
     }
+
     const form = document.getElementById(formId) || document.querySelector('form#' + formId) || document.querySelector('form');
     if (!form) {
         console.error("Form not found:", formId);
-        return;
+        return false;
     }
 
     const submitBtns = document.querySelectorAll('button[form="' + formId + '"], #' + formId + ' button, .action-bar-fixed-bottom button');
-    const saveBtn = Array.from(submitBtns).find(b => b.textContent.includes('Guardar') || b.textContent.includes('Actualizar') || b.type === 'submit');
+    const saveBtn = Array.from(submitBtns).find(b => 
+        b.textContent.includes('Guardar') || 
+        b.textContent.includes('Actualizar') || 
+        b.textContent.includes('Guardando') || 
+        b.type === 'submit'
+    );
+
     if (saveBtn) {
         saveBtn.disabled = true;
-        saveBtn.dataset.oldHtml = saveBtn.innerHTML;
+        if (!saveBtn.dataset.oldHtml) saveBtn.dataset.oldHtml = saveBtn.innerHTML;
         saveBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin shrink-0"></i> <span>Guardando...</span>`;
         if (window.lucide) window.lucide.createIcons();
     }
 
-    const id = (form.querySelector('input[name="id"]')?.value || '').trim();
-    const action = (form.querySelector('input[name="action"]')?.value || (formId.includes('create') ? 'create' : 'edit')).trim();
-    const name = (form.querySelector('input[name="name"]')?.value || '').trim();
-    const price = parseFloat(form.querySelector('input[name="price"]')?.value || '0') || 0;
-    const stock = parseInt(form.querySelector('input[name="stock"]')?.value || '25', 10) || 0;
-    const available = form.querySelector('input[name="available"]')?.checked ?? true;
-    const imageUrl = (form.querySelector('input[name="image_url"]')?.value || '/imagenes/productos/fallback.webp').trim();
-    const description = (form.querySelector('textarea[name="description"]')?.value || '').trim();
-    const categoryId = (form.querySelector('input[name="category_id"]')?.value || 'C0001').trim();
-
-    if (!name) {
-        showToast("Por favor ingresa un nombre para el plato");
-        if (saveBtn) {
-            saveBtn.disabled = false;
-            if (saveBtn.dataset.oldHtml) saveBtn.innerHTML = saveBtn.dataset.oldHtml;
-            if (window.lucide) window.lucide.createIcons();
-        }
-        return;
-    }
-
-    // Obtener acompañamientos marcados en el DOM
-    const accompaniments = [];
-    form.querySelectorAll('input[name="accompaniments[]"]:checked').forEach(input => {
-        if (input.value && input.value.trim()) accompaniments.push(input.value.trim());
-    });
-
-    // Obtener cremas marcadas en el DOM
-    const cremas = [];
-    form.querySelectorAll('input[name="cremas[]"]:checked').forEach(input => {
-        if (input.value && input.value.trim()) cremas.push(input.value.trim());
-    });
-
-    const payload = {
-        action,
-        id,
-        name,
-        price,
-        stock,
-        available,
-        image_url: imageUrl,
-        image: imageUrl,
-        description,
-        category_id: categoryId,
-        category: categoryId,
-        accompaniments,
-        cremas,
-        includes_sauces: cremas.length > 0
-    };
+    let timeoutId = null;
 
     try {
-        // 1. Guardar a través de la API REST para persistencia inmediata en disco y memoria
+        const id = (form.querySelector('input[name="id"]')?.value || '').trim();
+        const action = (form.querySelector('input[name="action"]')?.value || (formId.includes('create') ? 'create' : 'edit')).trim();
+        const name = (form.querySelector('input[name="name"]')?.value || '').trim();
+        
+        const priceInput = form.querySelector('input[name="price"]')?.value;
+        const price = priceInput !== undefined && priceInput !== '' ? (parseFloat(priceInput) || 0) : 0;
+        
+        const stockInput = form.querySelector('input[name="stock"]')?.value;
+        const stock = stockInput !== undefined && stockInput !== '' ? (parseInt(stockInput, 10) || 0) : 0;
+        
+        const available = form.querySelector('input[name="available"]')?.checked ?? true;
+        const imageUrl = (form.querySelector('input[name="image_url"]')?.value || '/imagenes/productos/fallback.webp').trim();
+        const description = (form.querySelector('textarea[name="description"]')?.value || '').trim();
+        const categoryId = (form.querySelector('input[name="category_id"]')?.value || 'C0001').trim();
+
+        if (!name) {
+            showToast("⚠️ Por favor ingresa un nombre para el plato");
+            return false;
+        }
+
+        // Validar duplicidad de plato (sin importar mayúsculas, minúsculas o tildes)
+        const normId = String(id || '').toUpperCase().trim();
+        const normName = normalizeTextForComparison(name);
+        let isDuplicateDish = false;
+        let duplicateDishName = '';
+
+        if (normName) {
+            document.querySelectorAll('.producto-card').forEach(card => {
+                const cardId = String(card.getAttribute('data-producto-id') || card.getAttribute('data-id') || '').toUpperCase().trim();
+                const titleEl = card.querySelector('.producto-title-text');
+                const cardName = titleEl ? titleEl.textContent.trim() : '';
+
+                // En edición, ignorar la tarjeta del propio plato que se está editando
+                if (action === 'edit' && normId && cardId === normId) return;
+
+                if (cardName && normalizeTextForComparison(cardName) === normName) {
+                    if (action === 'create' || (cardId && cardId !== normId)) {
+                        isDuplicateDish = true;
+                        duplicateDishName = cardName;
+                    }
+                }
+            });
+        }
+
+        if (isDuplicateDish) {
+            showToast(`⚠️ El plato «${duplicateDishName || name}» ya existe. No se permiten nombres duplicados.`);
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                if (saveBtn.dataset.oldHtml) saveBtn.innerHTML = saveBtn.dataset.oldHtml;
+                if (window.lucide) window.lucide.createIcons();
+            }
+            return false;
+        }
+
+        // Obtener acompañamientos marcados en el DOM
+        const accompaniments = [];
+        form.querySelectorAll('input[name="accompaniments[]"]:checked').forEach(input => {
+            if (input.value && input.value.trim()) accompaniments.push(input.value.trim());
+        });
+
+        // Obtener cremas marcadas en el DOM
+        const cremas = [];
+        form.querySelectorAll('input[name="cremas[]"]:checked').forEach(input => {
+            if (input.value && input.value.trim()) cremas.push(input.value.trim());
+        });
+
+        const payload = {
+            action,
+            id,
+            name,
+            price,
+            stock,
+            available,
+            image_url: imageUrl,
+            image: imageUrl,
+            description,
+            category_id: categoryId,
+            category: categoryId,
+            accompaniments,
+            cremas,
+            includes_sauces: cremas.length > 0
+        };
+
+        let response;
         if (action === 'create') {
-            await fetch('/api/products', {
+            response = await fetch('/api/products', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify(payload)
             });
         } else {
-            await fetch(`/api/products/${encodeURIComponent(id)}`, {
+            response = await fetch(`/api/products/${encodeURIComponent(id)}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify(payload)
             });
         }
 
-        // 2. Notificar al endpoint de admin
-        await fetch('/admin?view=productos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        }).catch(() => {});
+        const resData = await response.json().catch(() => ({}));
 
-        // 3. Actualizar la tarjeta en el DOM de forma reactiva instantánea
-        const targetCard = document.querySelector(`.producto-card[data-producto-id="${id}"]`);
-        if (targetCard) {
-            const nameEl = targetCard.querySelector('.producto-title-text');
-            if (nameEl) nameEl.textContent = name;
-
-            const priceEl = targetCard.querySelector('.producto-price-text');
-            if (priceEl) priceEl.textContent = `S/ ${price.toFixed(2)}`;
-
-            const imgEl = targetCard.querySelector('.producto-img-element');
-            if (imgEl) imgEl.src = imageUrl;
-
-            const stockEl = targetCard.querySelector('.producto-stock-text');
-            if (stockEl) stockEl.textContent = `${stock} un.`;
-
-            const availPill = targetCard.querySelector('.producto-avail-pill');
-            if (availPill) {
-                if (available) {
-                    availPill.className = 'producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md bg-emerald-950/80 border border-emerald-500/50 text-emerald-300';
-                    availPill.textContent = 'Disponible';
-                } else {
-                    availPill.className = 'producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md bg-red-950/80 border border-red-500/50 text-red-300';
-                    availPill.textContent = 'Agotado';
-                }
+        if (!response.ok || resData.success === false) {
+            console.error("Error al guardar el plato:", resData);
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                if (saveBtn.dataset.oldHtml) saveBtn.innerHTML = saveBtn.dataset.oldHtml;
+                if (window.lucide) window.lucide.createIcons();
             }
-
-            const updatedProductObj = {
-                id,
-                name,
-                price,
-                stock,
-                available,
-                image: imageUrl,
-                description,
-                accompaniments,
-                cremas,
-                category_id: categoryId
-            };
-
-            const editBtn = targetCard.querySelector('button[onclick*="abrirEditarProductoModal"]');
-            if (editBtn) {
-                editBtn.setAttribute('onclick', `abrirEditarProductoModal(${JSON.stringify(updatedProductObj)})`);
-            }
+            return false;
         }
 
-        showToast(`Plato «${name}» guardado con éxito`);
         cerrarModal();
-
-        if (action === 'create') {
-            setTimeout(() => {
-                window.location.reload();
-            }, 600);
-        }
+        await initProductosView();
 
     } catch (error) {
-        console.error("Error al guardar plato:", error);
-        showToast("Plato guardado correctamente.");
+        console.error("Error crítico al guardar plato:", error);
         cerrarModal();
+        await initProductosView();
     } finally {
         if (saveBtn) {
             saveBtn.disabled = false;
@@ -840,50 +856,36 @@ async function guardarProductoAjax(event, formId) {
         }
         if (window.lucide) window.lucide.createIcons();
     }
+    return false;
 }
 
 /**
  * Eliminar Plato vía AJAX de Alto Rendimiento
  */
 async function eliminarPlatoAjax(id, nombre) {
-    if (!confirm(`¿Seguro que deseas eliminar «${nombre}» de la carta oficial?`)) {
-        return;
-    }
+    if (!id) return;
 
-    const card = document.querySelector(`.producto-card[data-producto-id="${id}"]`);
-    if (card) {
-        card.style.opacity = '0.4';
+    const cards = document.querySelectorAll(`.producto-card[data-producto-id="${id}"], .producto-card[data-id="${id}"]`);
+    cards.forEach(card => {
+        card.style.opacity = '0.3';
         card.style.pointerEvents = 'none';
-    }
+    });
 
     try {
-        const formData = new FormData();
-        formData.append('action', 'delete');
-        formData.append('id', id);
+        cerrarModal();
 
-        const response = await fetch('/admin?view=productos', {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
-            body: formData
+        await fetch(`/api/products/${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
         });
 
-        if (card) {
-            card.style.transform = 'scale(0.95)';
-            card.style.transition = 'all 0.25s ease';
-            setTimeout(() => card.remove(), 260);
-        }
-
-        showToast(`«${nombre}» eliminado de la carta`);
+        cards.forEach(card => card.remove());
+        await initProductosView();
 
     } catch (error) {
-        console.error("Error al eliminar:", error);
-        if (card) {
-            card.remove();
-        }
-        showToast(`«${nombre}» eliminado de la carta`);
+        console.error("Error al eliminar plato:", error);
+        cards.forEach(card => card.remove());
+        await initProductosView();
     }
 }
 
@@ -936,25 +938,30 @@ function abrirEditarProductoModal(p) {
     const html = `
         <div class="product-editor-container animate-fade-in">
             
-            <!-- Header Sticky Superior (Sin botón guardar superior) -->
+            <!-- Header Sticky Superior -->
             <div class="product-sticky-header">
                 <div class="product-header-title-box">
-                    <button type="button" onclick="cerrarModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-all border border-slate-700/60 active-press shrink-0">
+                    <button type="button" onclick="cerrarModal()" class="product-back-btn">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i>
                         <span>Volver</span>
                     </button>
                     
-                    <div class="flex items-center gap-2 min-w-0">
-                        <span class="w-1.5 h-4 bg-orange-500 rounded-full shrink-0"></span>
-                        <h2 class="product-header-title truncate">Editar: ${p.name || 'Plato'}</h2>
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] shrink-0"></div>
+                        <div class="min-w-0">
+                            <h2 class="product-header-title truncate">${(p.name || 'Editar Plato').replace(/"/g, '&quot;')}</h2>
+                            <span class="text-[11px] text-slate-400 hidden sm:inline">Edición de carta y precios</span>
+                        </div>
                     </div>
 
-                    <span class="product-id-pill">${p.id || ''}</span>
+                    <div class="product-id-pill">
+                        <span>${p.id || ''}</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Formulario Principal -->
-            <form id="producto-edit-form" novalidate action="/admin?view=productos" method="POST" onsubmit="guardarProductoAjax(event, 'producto-edit-form')" class="space-y-6 flex-1 px-3 sm:px-6">
+            <form id="producto-edit-form" novalidate action="javascript:void(0)" onsubmit="event.preventDefault(); guardarProductoAjax(event, 'producto-edit-form'); return false;" class="space-y-6 flex-1 px-3 sm:px-6">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id" value="${p.id || ''}">
                 <input type="hidden" id="product-image-value" name="image_url" value="${imageUrl}">
@@ -1001,13 +1008,13 @@ function abrirEditarProductoModal(p) {
                                     <label class="form-label">Precio Venta (S/) *</label>
                                     <div class="price-input-group">
                                         <span class="price-currency-badge">S/</span>
-                                        <input type="number" name="price" step="any" min="0" required value="${parseFloat(p.price) || 0}" placeholder="28.00" class="price-input-field">
+                                        <input type="number" name="price" step="any" min="0" required value="${typeof p.price === 'number' ? p.price.toFixed(2) : (parseFloat(p.price) || 0).toFixed(2)}" placeholder="0.00" class="price-input-field">
                                     </div>
                                 </div>
 
                                 <div class="sm:col-span-6 form-group">
                                     <label class="form-label">Stock en Cocina</label>
-                                    <input type="number" name="stock" min="0" value="${parseInt(p.stock, 10) || 25}" class="form-input-text font-mono-numbers font-bold">
+                                    <input type="number" name="stock" min="0" value="${p.stock !== undefined ? p.stock : 0}" class="form-input-text font-mono-numbers font-bold">
                                 </div>
                             </div>
 
@@ -1134,14 +1141,14 @@ function abrirEditarProductoModal(p) {
                     </div>
                 </div>
 
-                <!-- Barra Fija Inferior con Botones Cancelar y Guardar Plato -->
-                <div class="action-bar-fixed-bottom">
-                    <button type="button" onclick="cerrarModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press cursor-pointer">
+                <!-- Barra Fija Inferior con Botones Cancelar y Guardar Producto -->
+                <div class="action-bar-fixed-bottom flex items-center justify-end gap-3">
+                    <button type="button" onclick="cerrarModal()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press cursor-pointer">
                         Cancelar
                     </button>
-                    <button type="button" onclick="guardarProductoAjax(event, 'producto-edit-form')" class="px-7 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-lg active-press cursor-pointer">
-                        <i data-lucide="check" class="w-4 h-4"></i>
-                        <span>Guardar Plato</span>
+                    <button type="button" onclick="guardarProductoAjax(event, 'producto-edit-form')" class="px-8 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-lg active-press cursor-pointer">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span>Guardar Producto</span>
                     </button>
                 </div>
             </form>
@@ -1168,25 +1175,30 @@ function abrirCrearProductoModal() {
     const html = `
         <div class="product-editor-container animate-fade-in">
             
-            <!-- Header Sticky Superior (Sin botón guardar superior) -->
+            <!-- Header Sticky Superior -->
             <div class="product-sticky-header">
                 <div class="product-header-title-box">
-                    <button type="button" onclick="cerrarModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-all border border-slate-700/60 active-press shrink-0">
+                    <button type="button" onclick="cerrarModal()" class="product-back-btn">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i>
                         <span>Volver</span>
                     </button>
                     
-                    <div class="flex items-center gap-2 min-w-0">
-                        <span class="w-1.5 h-4 bg-orange-500 rounded-full shrink-0"></span>
-                        <h2 class="product-header-title truncate">Nuevo Plato para la Carta</h2>
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <div class="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316] shrink-0"></div>
+                        <div class="min-w-0">
+                            <h2 class="product-header-title">Nuevo Plato</h2>
+                            <span class="text-[11px] text-slate-400 hidden sm:inline">Añadir plato a la carta</span>
+                        </div>
                     </div>
 
-                    <span class="product-id-pill">${nextId}</span>
+                    <div class="product-id-pill">
+                        <span>${nextId}</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Formulario Principal -->
-            <form id="producto-create-form" novalidate action="/admin?view=productos" method="POST" onsubmit="guardarProductoAjax(event, 'producto-create-form')" class="space-y-6 flex-1 px-3 sm:px-6">
+            <form id="producto-create-form" novalidate action="javascript:void(0)" onsubmit="event.preventDefault(); guardarProductoAjax(event, 'producto-create-form'); return false;" class="space-y-6 flex-1 px-3 sm:px-6">
                 <input type="hidden" name="action" value="create">
                 <input type="hidden" name="id" value="${nextId}">
                 <input type="hidden" id="product-image-value" name="image_url" value="${defaultImage}">
@@ -1233,13 +1245,13 @@ function abrirCrearProductoModal() {
                                     <label class="form-label">Precio Venta (S/) *</label>
                                     <div class="price-input-group">
                                         <span class="price-currency-badge">S/</span>
-                                        <input type="number" name="price" step="any" min="0" required value="25.00" placeholder="25.00" class="price-input-field">
+                                        <input type="number" name="price" step="any" min="0" required value="0.00" placeholder="0.00" class="price-input-field">
                                     </div>
                                 </div>
 
                                 <div class="sm:col-span-6 form-group">
                                     <label class="form-label">Stock Inicial en Cocina</label>
-                                    <input type="number" name="stock" min="0" value="30" class="form-input-text font-mono-numbers font-bold">
+                                    <input type="number" name="stock" min="0" value="0" placeholder="0" class="form-input-text font-mono-numbers font-bold">
                                 </div>
                             </div>
 
@@ -1366,14 +1378,14 @@ function abrirCrearProductoModal() {
                     </div>
                 </div>
 
-                <!-- Barra Fija Inferior con Botones Cancelar y Guardar Plato -->
-                <div class="action-bar-fixed-bottom">
-                    <button type="button" onclick="cerrarModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press cursor-pointer">
+                <!-- Barra Fija Inferior con Botones Cancelar y Guardar Producto -->
+                <div class="action-bar-fixed-bottom flex items-center justify-end gap-3">
+                    <button type="button" onclick="cerrarModal()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press cursor-pointer">
                         Cancelar
                     </button>
-                    <button type="button" onclick="guardarProductoAjax(event, 'producto-create-form')" class="px-7 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-lg active-press cursor-pointer">
+                    <button type="button" onclick="guardarProductoAjax(event, 'producto-create-form')" class="px-8 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-lg active-press cursor-pointer">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                        <span>Guardar Plato</span>
+                        <span>Guardar Producto</span>
                     </button>
                 </div>
             </form>
@@ -1440,3 +1452,168 @@ function cerrarModal() {
     if (content) content.innerHTML = '';
     document.body.style.overflow = '';
 }
+
+/**
+ * Inicialización y Renderizado Asíncrono Ultra Rápido (100% JS REST API, 0% PHP)
+ */
+async function initProductosView() {
+    const container = document.getElementById('productos-container');
+    if (!container) return;
+
+    try {
+        const prodRes = await fetch('/api/products').then(r => r.json()).catch(() => ({ data: [] }));
+        const productos = prodRes.data || [];
+        renderProductosDOM(productos);
+    } catch (err) {
+        console.error("Error cargando productos vía API:", err);
+    }
+}
+
+function renderProductosDOM(productos) {
+    const container = document.getElementById('productos-container');
+    if (!container) return;
+
+    const CATEGORIAS_DEFINIDAS = [
+        { id: 'C0001', code: 'C0001', slug: 'promociones',       name: 'PROMOCIONES',                  icon: 'sparkles',  color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
+        { id: 'C0002', code: 'C0002', slug: 'alitas',            name: 'ALITAS',                       icon: 'flame',     color: '#ef4444', desc: 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.' },
+        { id: 'C0003', code: 'C0003', slug: 'bebidas',           name: 'BEBIDAS',                      icon: 'cup-soda',  color: '#06b6d4', desc: 'Gaseosas heladas, agua mineral y bebidas embotelladas.' },
+        { id: 'C0004', code: 'C0004', slug: 'broaster',          name: 'BROASTER',                     icon: 'drumstick', color: '#f97316', desc: 'Pollo broaster ultra crocante con papas doradas y cremas.' },
+        { id: 'C0005', code: 'C0005', slug: 'hamburguesas',      name: 'HAMBURGUESAS',                 icon: 'beef',      color: '#eab308', desc: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
+        { id: 'C0006', code: 'C0006', slug: 'infusiones',        name: 'INFUSIONES',                   icon: 'coffee',    color: '#10b981', desc: 'Infusiones calientes, café aromático pasado y manzanilla.' },
+        { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS',            icon: 'utensils',  color: '#8b5cf6', desc: 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.' },
+        { id: 'C0008', code: 'C0008', slug: 'refrescos',         name: 'REFRESCOS',                    icon: 'glass-water',color: '#3b82f6', desc: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
+        { id: 'C0009', code: 'C0009', slug: 'salchipapas',       name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'layers',    color: '#ec4899', desc: 'Papas crocantes, salchichas frankfurter y combinaciones broaster.' },
+        { id: 'C0010', code: 'C0010', slug: 'adicional',         name: 'ADICIONAL',                    icon: 'plus-circle',color: '#94a3b8', desc: 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.' }
+    ];
+
+    const totalProductos = productos.length;
+
+    // 1. Barra de pestañas de categorías
+    const filterBar = document.getElementById('categories-filter-bar');
+    if (filterBar) {
+        let filterTabsHtml = `
+            <button type="button" onclick="seleccionarFiltroCategoria('all')" class="category-tab-btn active px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 bg-orange-600 text-white" data-cat="all">
+                Todos (${totalProductos})
+            </button>
+        `;
+        CATEGORIAS_DEFINIDAS.forEach(cat => {
+            const countInCat = productos.filter(p => (
+                (p.category_id || '').toUpperCase() === cat.id || 
+                (p.category_id || '').toLowerCase() === cat.slug || 
+                (p.category || '').toUpperCase() === cat.id || 
+                (p.category || '').toLowerCase() === cat.slug
+            )).length;
+            filterTabsHtml += `
+            <button type="button" onclick="seleccionarFiltroCategoria('${cat.id}')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="${cat.id}" data-cat-slug="${cat.slug}">
+                <span class="font-mono-numbers text-[9px] text-orange-400/90 font-bold mr-1">${cat.id}</span> ${cat.name} (${countInCat})
+            </button>
+            `;
+        });
+        filterBar.innerHTML = filterTabsHtml;
+    }
+
+    // 2. Render de bloques de categorías
+    let categoriesBlocksHtml = '';
+    CATEGORIAS_DEFINIDAS.forEach(cat => {
+        const platosEnCat = productos.filter(p => (
+            (p.category_id || '').toUpperCase() === cat.id || 
+            (p.category_id || '').toLowerCase() === cat.slug || 
+            (p.category || '').toUpperCase() === cat.id || 
+            (p.category || '').toLowerCase() === cat.slug
+        ));
+
+        let cardsHtml = '';
+        if (platosEnCat.length === 0) {
+            cardsHtml = `<div class="p-6 text-center text-slate-500 text-xs font-semibold bg-[#101424] rounded-xl border border-slate-800/60 col-span-full">No hay platos registrados en esta categoría aún.</div>`;
+        } else {
+            cardsHtml = platosEnCat.map(p => {
+                const id = p.id || '';
+                const name = p.name || 'Sin nombre';
+                const desc = p.description || 'Delicioso plato preparado con ingredientes frescos.';
+                const price = parseFloat(p.price || '0');
+                const stock = parseInt(String(p.stock || '25'), 10);
+                const image = p.image || '/imagenes/productos/fallback.webp';
+                const available = p.available !== false;
+                const isCrit = stock <= 5;
+                const accompaniments = Array.isArray(p.accompaniments) ? p.accompaniments : [];
+                const cremas = Array.isArray(p.cremas) ? p.cremas : [];
+
+                const pJsonStr = JSON.stringify(p).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+
+                return `
+                <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-producto-id="${id}" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
+                    <div class="space-y-3">
+                        <div class="relative w-full aspect-square rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
+                            <img src="${image}" alt="${name}" class="producto-img-element w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
+                            <span class="producto-avail-pill absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md ${available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'}">
+                                ${available ? 'Disponible' : 'Agotado'}
+                            </span>
+                        </div>
+
+                        <div>
+                            <div class="flex items-start justify-between gap-2">
+                                <h4 class="producto-title-text font-black text-base text-white leading-snug line-clamp-2">${name}</h4>
+                                <span class="producto-price-text font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="inline-flex items-center gap-1.5 text-xs font-mono-numbers font-bold ${isCrit ? 'text-red-400 animate-pulse' : 'text-slate-300'}">
+                                    <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: <span class="producto-stock-text">${stock} un.</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-3 mt-4 border-t border-slate-800/80">
+                        <span class="text-[10px] font-mono-numbers text-slate-400 font-bold bg-[#0a0d16] px-2.5 py-1 rounded-lg border border-slate-800 flex items-center gap-1">
+                            <span class="text-slate-500">ID:</span>
+                            <span class="text-orange-400 font-extrabold tracking-wide">${id}</span>
+                        </span>
+                        
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick='abrirEditarProductoModal(${pJsonStr})' class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 active-press shadow-sm">
+                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-orange-400"></i>
+                                <span>Editar</span>
+                            </button>
+                            <button type="button" onclick="eliminarPlatoAjax('${id}', '${name.replace(/'/g, "\\'")}')" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('\n');
+        }
+
+        categoriesBlocksHtml += `
+        <section class="category-block space-y-4" id="cat-section-${cat.id}" data-cat-id="${cat.id}" data-cat-slug="${cat.slug}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color}80;"></span>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-mono-numbers font-extrabold bg-orange-950/40 border border-orange-500/40 text-orange-400 tracking-wider">${cat.id}</span>
+                    <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+                        ${cat.name}
+                    </h3>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase text-slate-300 bg-slate-800/60 border border-slate-700/60">
+                        ${platosEnCat.length} platos
+                    </span>
+                </div>
+                <p class="text-[11px] text-slate-400 italic">${cat.desc}</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                ${cardsHtml}
+            </div>
+        </section>
+        `;
+    });
+
+    container.innerHTML = categoriesBlocksHtml;
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initProductosView();
+});
+

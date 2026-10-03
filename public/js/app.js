@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initLazyLoadingObserver();
 
   // 2. Inicializar carrito
-  if (window.BuchisapaCart) {
+  if (window.BuchisapaCart && typeof window.BuchisapaCart.init === 'function') {
     window.BuchisapaCart.init();
   }
 

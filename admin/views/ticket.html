@@ -1,0 +1,59 @@
+<div class="space-y-6 animate-fade-in">
+    <!-- Header Title -->
+    <div class="flex items-center justify-between pb-2 select-none">
+        <div>
+            <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                <span class="w-2 h-4 bg-orange-500 rounded-sm"></span>
+                Impresión de Tickets (POS Printer)
+            </h2>
+            <p class="text-xs text-slate-400">Emite boletas de venta, comandas de cocina y recibos de entrega formateados para impresoras térmicas (58mm / 80mm)</p>
+        </div>
+    </div>
+
+    <!-- Table of Orders ready to be printed -->
+    <div class="bg-[#121829] rounded-2xl border border-slate-800/80 overflow-hidden shadow-lg">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-[#0f1424]/60 border-b border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-wider select-none">
+                        <th class="p-4">Orden</th>
+                        <th class="p-4">Cliente / Contacto</th>
+                        <th class="p-4">Detalle Breve</th>
+                        <th class="p-4 text-right">Monto Total</th>
+                        <th class="p-4">Tipo</th>
+                        <th class="p-4 text-center">Imprimir Comprobante</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 text-xs text-slate-300" id="ticket-orders-tbody">
+                    <!-- Renderizado dinámico en vivo por ticket.js -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Overlay Modal for POS Receipt View -->
+<div id="ticket-modal-container" class="ticket-modal-overlay hidden">
+    <div id="ticket-modal-content" class="ticket-modal-card relative p-6 bg-[#121829] border border-slate-800 rounded-2xl max-w-md mx-auto">
+        <!-- Close Button -->
+        <button onclick="cerrarTicketModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white transition-colors" aria-label="Cerrar modal">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <h3 class="text-sm font-black uppercase text-slate-400 tracking-wider mb-4 flex items-center gap-2 select-none">
+            <span class="w-1.5 h-3 bg-orange-500 rounded-sm"></span>
+            Vista de Ticket Térmico
+        </h3>
+
+        <div id="pos-ticket-paper" class="bg-white text-black p-4 font-mono text-xs rounded-lg shadow-inner">
+            <!-- Ticket content populated by ticket.js -->
+        </div>
+
+        <div class="mt-4 flex justify-end gap-2">
+            <button onclick="window.print()" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-xs flex items-center gap-2">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+                Imprimir Ticket
+            </button>
+        </div>
+    </div>
+</div>
