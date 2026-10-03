@@ -30,37 +30,37 @@ $current_view = $_GET['view'] ?? 'dashboard';
             <p class="px-3 text-[10px] font-black uppercase text-slate-500 tracking-wider mb-2 select-none">Administración</p>
             
             <!-- 1. Dashboard Link -->
-            <a href="/admin/index.php?view=dashboard" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'dashboard' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
+            <a href="/admin?view=dashboard" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'dashboard' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                 <span>Dashboard</span>
             </a>
 
             <!-- 2. Clientes Link -->
-            <a href="/admin/index.php?view=clientes" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'clientes' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
+            <a href="/admin?view=clientes" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'clientes' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
                 <i data-lucide="users" class="w-4 h-4"></i>
                 <span>Cliente</span>
             </a>
 
             <!-- 3. Productos Link -->
-            <a href="/admin/index.php?view=productos" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'productos' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
+            <a href="/admin?view=productos" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'productos' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
                 <i data-lucide="chef-hat" class="w-4 h-4"></i>
                 <span>Productos</span>
             </a>
 
             <!-- 4. Pedidos Link -->
-            <a href="/admin/index.php?view=pedidos" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'pedidos' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
+            <a href="/admin?view=pedidos" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'pedidos' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
                 <i data-lucide="shopping-bag" class="w-4 h-4"></i>
                 <span>Pedidos</span>
             </a>
 
             <!-- 5. Ticket Link -->
-            <a href="/admin/index.php?view=ticket" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'ticket' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
+            <a href="/admin?view=ticket" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'ticket' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
                 <i data-lucide="ticket" class="w-4 h-4"></i>
                 <span>Ticket</span>
             </a>
 
             <!-- 6. Configuracion Link -->
-            <a href="/admin/index.php?view=configuracion" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'configuracion' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
+            <a href="/admin?view=configuracion" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 <?php echo $current_view === 'configuracion' ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'; ?>">
                 <i data-lucide="settings" class="w-4 h-4"></i>
                 <span>Configuración</span>
             </a>
@@ -69,7 +69,7 @@ $current_view = $_GET['view'] ?? 'dashboard';
 
     <!-- Sidebar Footer: Log Out button -->
     <div class="p-4 border-t border-slate-800/80 space-y-2 bg-[#0a0d1a]">
-        <a href="/admin/index.php?action=logout" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/15 text-xs font-bold text-red-400 hover:bg-red-600 hover:text-white transition-all text-center active-press shadow-sm shadow-red-500/5">
+        <a href="/admin?action=logout" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/15 text-xs font-bold text-red-400 hover:bg-red-600 hover:text-white transition-all text-center active-press shadow-sm shadow-red-500/5">
             <i data-lucide="log-out" class="w-4 h-4"></i>
             <span>Cerrar Sesión</span>
         </a>

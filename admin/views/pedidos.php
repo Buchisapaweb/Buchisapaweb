@@ -169,12 +169,12 @@ foreach ($pedidos as $o) {
                                 <td class="p-4"><span class="font-black text-[10px] uppercase tracking-wider <?php echo $stateColor; ?>"><?php echo $status; ?></span></td>
                                 <td class="p-4 space-y-1 w-32">
                                     <?php if ($status !== 'entregado' && $status !== 'cancelado'): ?>
-                                        <form action="/admin/index.php?view=pedidos" method="POST">
+                                        <form action="/admin?view=pedidos" method="POST">
                                             <input type="hidden" name="action" value="update_status">
                                             <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                                             <?php echo $actionHtml; ?>
                                         </form>
-                                        <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
+                                        <form action="/admin?view=pedidos" method="POST" class="w-full">
                                             <input type="hidden" name="action" value="update_status">
                                             <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                                             <input type="hidden" name="status" value="cancelado">
@@ -282,12 +282,12 @@ foreach ($pedidos as $o) {
                                     <div class="pt-1">
                                         <?php if ($status !== 'entregado' && $status !== 'cancelado'): ?>
                                             <div class="space-y-1.5">
-                                                <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
+                                                <form action="/admin?view=pedidos" method="POST" class="w-full">
                                                     <input type="hidden" name="action" value="update_status">
                                                     <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                                                     <?php echo $actionHtml; ?>
                                                 </form>
-                                                <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
+                                                <form action="/admin?view=pedidos" method="POST" class="w-full">
                                                     <input type="hidden" name="action" value="update_status">
                                                     <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                                                     <input type="hidden" name="status" value="cancelado">
@@ -366,12 +366,12 @@ foreach ($pedidos as $o) {
 
                     <?php if ($status !== 'entregado' && $status !== 'cancelado'): ?>
                         <div class="pt-2 space-y-2">
-                            <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
+                            <form action="/admin?view=pedidos" method="POST" class="w-full">
                                 <input type="hidden" name="action" value="update_status">
                                 <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                                 <?php echo $actionHtml; ?>
                             </form>
-                            <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
+                            <form action="/admin?view=pedidos" method="POST" class="w-full">
                                 <input type="hidden" name="action" value="update_status">
                                 <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                                 <input type="hidden" name="status" value="cancelado">

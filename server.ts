@@ -4,8 +4,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/auth';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = typeof import.meta?.url === 'string' ? fileURLToPath(import.meta.url) : '';
+const __dirname = __filename ? path.dirname(__filename) : process.cwd();
 
 function getCompiledIndexHtml(): string {
   const partials: Record<string, string> = {
@@ -2839,7 +2839,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     const viewQuery = view ? `?view=${view}` : '';
     const successQuery = successMsg ? `&success=${encodeURIComponent(successMsg)}` : '';
     const errorQuery = errorMsg ? `&error=${encodeURIComponent(errorMsg)}` : '';
-    res.redirect(`/admin/index.php${viewQuery}${successQuery}${errorQuery}`);
+    res.redirect(`/admin${viewQuery}${successQuery}${errorQuery}`);
   });
 
   // 2. Compilar sobre la marcha y servir el Panel de Administración PHP real en HTML compatible con Vercel

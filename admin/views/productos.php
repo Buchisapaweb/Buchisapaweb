@@ -402,7 +402,7 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
                                             <span>Editar</span>
                                         </button>
 
-                                        <form action="/admin/index.php?view=productos" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas eliminar «<?php echo htmlspecialchars(addslashes($name)); ?>» de la carta?')">
+                                        <form action="/admin?view=productos" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas eliminar «<?php echo htmlspecialchars(addslashes($name)); ?>» de la carta?')">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?php echo htmlspecialchars($id); ?>">
                                             <button type="submit" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">

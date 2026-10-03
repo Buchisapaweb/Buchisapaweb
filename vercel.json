@@ -5,15 +5,43 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index"
+      "source": "/admin/index.php",
+      "destination": "/admin/index.html"
     },
     {
-      "source": "/admin(.*)",
-      "destination": "/api/index"
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/admin/dashboard",
+      "destination": "/admin/dashboard.html"
+    },
+    {
+      "source": "/admin/productos",
+      "destination": "/admin/productos.html"
+    },
+    {
+      "source": "/admin/clientes",
+      "destination": "/admin/clientes.html"
+    },
+    {
+      "source": "/admin/pedidos",
+      "destination": "/admin/pedidos.html"
+    },
+    {
+      "source": "/admin/ticket",
+      "destination": "/admin/ticket.html"
+    },
+    {
+      "source": "/admin/configuracion",
+      "destination": "/admin/configuracion.html"
     },
     {
       "source": "/php-admin(.*)",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/api/(.*)",
       "destination": "/api/index"
     }
   ],

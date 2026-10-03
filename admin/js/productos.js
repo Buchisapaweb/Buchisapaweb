@@ -155,7 +155,7 @@ function abrirCrearProductoModal() {
             <button type="button" onclick="cerrarModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
         </div>
 
-        <form action="/admin/index.php?view=productos" method="POST" class="space-y-4 text-xs">
+        <form action="/admin?view=productos" method="POST" class="space-y-4 text-xs">
             <input type="hidden" name="action" value="create">
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -273,7 +273,7 @@ function abrirEditarProductoModal(p) {
             <button type="button" onclick="cerrarModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
         </div>
 
-        <form action="/admin/index.php?view=productos" method="POST" class="space-y-4 text-xs">
+        <form action="/admin?view=productos" method="POST" class="space-y-4 text-xs">
             <input type="hidden" name="action" value="edit">
             <input type="hidden" name="id" value="${p.id || ''}">
             
