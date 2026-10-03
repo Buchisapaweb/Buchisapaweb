@@ -67,45 +67,7 @@ export function compileHtml() {
   copyDirRecursive(path.join(ROOT_DIR, 'public'), DIST_DIR);
   console.log('✅ Archivos públicos copiados a dist/.');
 
-  // 3. Copiar módulo independiente /admin a dist/admin y compilar sus partials
-  const adminSrc = path.join(ROOT_DIR, 'admin');
-  const adminDest = path.join(DIST_DIR, 'admin');
-  copyDirRecursive(adminSrc, adminDest);
-
-  const adminPartials = {
-    'SIDEBAR': 'admin/partials/sidebar.html',
-    'TOPBAR': 'admin/partials/topbar.html',
-    'VIEW_DASHBOARD': 'admin/views/dashboard.html',
-    'VIEW_PRODUCTOS': 'admin/views/productos.html',
-    'VIEW_CATEGORIAS': 'admin/views/categorias.html',
-    'VIEW_PEDIDOS': 'admin/views/pedidos.html',
-    'VIEW_VENTAS': 'admin/views/ventas.html',
-    'VIEW_CAJA': 'admin/views/caja.html',
-    'VIEW_TICKET': 'admin/views/ticket.html',
-    'VIEW_PORTADA': 'admin/views/portada.html',
-    'VIEW_INSUMOS': 'admin/views/insumos.html',
-    'VIEW_UTENSILIOS': 'admin/views/utensilios.html',
-    'VIEW_DELIVERY': 'admin/views/delivery.html',
-    'VIEW_UBICACION': 'admin/views/ubicacion.html',
-    'VIEW_REPORTES': 'admin/views/reportes.html',
-    'VIEW_CONFIGURACION': 'admin/views/configuracion.html',
-    'MODALS': 'admin/partials/modals.html'
-  };
-
-  let adminTemplate = fs.readFileSync(path.join(ROOT_DIR, 'admin/index.html'), 'utf8');
-  for (const [key, relPath] of Object.entries(adminPartials)) {
-    const fullPath = path.join(ROOT_DIR, relPath);
-    if (fs.existsSync(fullPath)) {
-      const content = fs.readFileSync(fullPath, 'utf8');
-      adminTemplate = adminTemplate.replace(new RegExp(`<!-- PARTIAL: ${key} -->`, 'g'), content);
-    }
-  }
-
-  fs.writeFileSync(path.join(adminDest, 'index.html'), adminTemplate, 'utf8');
-  fs.writeFileSync(path.join(DIST_DIR, 'admin.html'), adminTemplate, 'utf8');
-  console.log('✅ dist/admin/index.html y dist/admin.html compilados con éxito.');
-
-  // 4. Asegurar rutas directas para Vercel y hosts estáticos
+  // 3. Asegurar rutas directas para Vercel y hosts estáticos
   const directPages = [
     { src: 'public/custom-checkout.html', outName: 'custom-checkout' },
     { src: 'public/html/checkout.html', outName: 'checkout' },
@@ -134,11 +96,7 @@ export function compileHtml() {
       fs.writeFileSync(path.join(pageDir, 'index.html'), content, 'utf8');
     }
   }
-  console.log('✅ Rutas estáticas limpias creadas (/kitchen, /ubicacion, /rastreo, /reclamaciones).');
-
-  // 5. Verificar carpeta de imágenes en dist/ para Vercel
-  const logoDist = path.join(DIST_DIR, 'imagenes', 'logo', 'logo-buchisapa.webp');
-  console.log(`✅ Archivos de imágenes verificados en dist/imagenes.`);
+  console.log('✅ Rutas estáticas limpias creadas.');
 }
 
 compileHtml();

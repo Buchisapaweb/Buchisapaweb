@@ -1,7 +1,11 @@
 import express, { type Request, type Response } from 'express';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/auth';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function getCompiledIndexHtml(): string {
   const partials: Record<string, string> = {

@@ -1292,10 +1292,10 @@ async function handleAuthRegisterSubmit(event) {
   try {
     const client = window.getSupabaseClient ? window.getSupabaseClient() : null;
 
-    // 1. Verificar si el DNI ya existe en la tabla 'public.profiles'
+    // 1. Verificar si el DNI ya existe en la tabla 'public.perfiles'
     if (client && docNumber) {
       const { data: existingDni, error: dniErr } = await client
-        .from('profiles')
+        .from('perfiles')
         .select('id, dni')
         .eq('dni', docNumber);
 
@@ -1993,7 +1993,7 @@ async function submitOtpVerification() {
       }
     }
 
-    // 3. Confirmar o generar un UUID válido e INSERTAR en public.profiles
+    // 3. Confirmar o generar un UUID válido e INSERTAR en public.perfiles
     if (!userId) {
       try {
         const { data: userData } = await client.auth.getUser();
@@ -2019,19 +2019,19 @@ async function submitOtpVerification() {
       fecha_nacimiento: payload.birthDate || payload.fecha_nacimiento || null
     };
 
-    console.log("📝 [INSERTING TO PUBLIC.PROFILES]:", profileRecord);
-    const { error: profileError } = await client.from('profiles').insert([profileRecord]);
+    console.log("📝 [INSERTING TO PUBLIC.PERFILES]:", profileRecord);
+    const { error: profileError } = await client.from('perfiles').insert([profileRecord]);
 
     if (profileError) {
-      console.warn("⚠️ Insert error in profiles, trying upsert:", profileError.message);
-      const { error: upsertErr } = await client.from('profiles').upsert([profileRecord]);
+      console.warn("⚠️ Insert error in perfiles, trying upsert:", profileError.message);
+      const { error: upsertErr } = await client.from('perfiles').upsert([profileRecord]);
       if (upsertErr) {
-        console.error("❌ Error in upsert profiles:", upsertErr.message);
+        console.error("❌ Error in upsert perfiles:", upsertErr.message);
       } else {
-        console.log("✅ Perfil guardado exitosamente en public.profiles vía upsert!");
+        console.log("✅ Perfil guardado exitosamente en public.perfiles vía upsert!");
       }
     } else {
-      console.log("✅ Perfil guardado automáticamente en public.profiles!");
+      console.log("✅ Perfil guardado automáticamente en public.perfiles!");
     }
 
     if (alertEl) {
@@ -2041,7 +2041,7 @@ async function submitOtpVerification() {
     }
 
     if (typeof window.showToast === 'function') {
-      window.showToast('¡Cuenta creada e insertada en profiles correctamente!', 'success');
+      window.showToast('¡Cuenta creada e insertada en perfiles correctamente!', 'success');
     }
 
     // 4. Redirigir a inicio de sesión
