@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initConfiguracionView() {
     const savedName = localStorage.getItem('admin_name') || 'Administrador';
-    const savedPhoto = localStorage.getItem('admin_photo') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop';
+    const savedPhoto = localStorage.getItem('admin_photo') || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=120&auto=format&fit=crop';
     
     // Set initial values
     selectedPhotoUrl = savedPhoto;

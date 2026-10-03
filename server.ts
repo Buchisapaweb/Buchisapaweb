@@ -2908,6 +2908,44 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
       if (fs.existsSync(path.join(process.cwd(), `admin/css/${view}.css`)) && !header.includes(`/admin/css/${view}.css`)) {
         header = header.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${view}.css">\n</head>`);
       }
+
+      // Pre-inyectar datos analíticos en tiempo real para carga de métricas sin retrasos ni parpadeos
+      try {
+        const orders = await getOrders();
+        const products = await getProducts();
+        const users = await getProfiles().catch(() => []);
+        
+        const validOrders = orders.filter((o: any) => String(o.status || '').toLowerCase() !== 'cancelado');
+        const totalSales = validOrders.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0);
+        const totalOrders = validOrders.length;
+        const averageTicket = totalOrders > 0 ? totalSales / totalOrders : 0;
+        const criticalStockCount = products.filter((p: any) => Number(p.stock || 0) <= 5).length;
+        const totalClients = Array.isArray(users) ? users.length : 0;
+
+        const weekly = [0, 0, 0, 0, 0, 0, 0];
+        validOrders.forEach((o: any) => {
+          const dateStr = o.createdAt || o.created_at || o.date;
+          if (dateStr) {
+            const d = new Date(dateStr);
+            let dayIdx = d.getDay() - 1;
+            if (dayIdx < 0) dayIdx = 6;
+            if (dayIdx >= 0 && dayIdx < 7) {
+              weekly[dayIdx] += (Number(o.total) || 0);
+            }
+          }
+        });
+
+        const dashData = {
+          totalSales,
+          totalOrders,
+          averageTicket,
+          totalClients,
+          criticalStockCount,
+          weekly,
+          categories: {}
+        };
+        header = header.replace('</head>', `  <script>window.dashboardData = ${JSON.stringify(dashData)};</script>\n</head>`);
+      } catch (err) {}
       
       let extraJs = '';
       if (view === 'dashboard' && fs.existsSync(path.join(process.cwd(), 'admin/js/chart.min.js'))) {

@@ -52,8 +52,25 @@ function initDashboardCharts() {
         'adicional':         0
     };
 
-    // Sincronizar con datos inyectados por PHP / Express Server
+    // Sincronizar con datos inyectados por Express Server
     if (window.dashboardData) {
+        const salesEl = document.getElementById('dash-metric-sales');
+        if (salesEl && typeof window.dashboardData.totalSales === 'number') {
+            salesEl.textContent = 'S/ ' + window.dashboardData.totalSales.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        const ordersEl = document.getElementById('dash-metric-orders');
+        if (ordersEl && typeof window.dashboardData.totalOrders === 'number') {
+            ordersEl.textContent = String(window.dashboardData.totalOrders);
+        }
+        const clientsEl = document.getElementById('dash-metric-clients');
+        if (clientsEl && typeof window.dashboardData.totalClients === 'number') {
+            clientsEl.textContent = String(window.dashboardData.totalClients);
+        }
+        const stockEl = document.getElementById('dash-metric-stock');
+        if (stockEl && typeof window.dashboardData.criticalStockCount === 'number') {
+            stockEl.textContent = String(window.dashboardData.criticalStockCount);
+        }
+
         if (Array.isArray(window.dashboardData.weekly) && window.dashboardData.weekly.length === 7) {
             weeklyData = window.dashboardData.weekly.map(v => parseFloat(v || 0));
         }

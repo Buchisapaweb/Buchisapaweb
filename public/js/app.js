@@ -4634,8 +4634,55 @@ async function loadCatalog() {
     window.currentProducts = currentProducts;
     window.allMenuProducts = allMenuProducts;
     if (typeof renderFeaturedProducts === 'function') renderFeaturedProducts();
+    if (typeof renderCategoryBanners === 'function') renderCategoryBanners();
   }
 }
+
+async function renderCategoryBanners() {
+  const catSec = document.getElementById('category-banners-section');
+  if (!catSec) return;
+
+  try {
+    const res = await fetch('/api/categories').then(r => r.json()).catch(() => null);
+    const categories = (res && res.data && Array.isArray(res.data) && res.data.length > 0) ? res.data : null;
+
+    if (!categories) return;
+
+    const defaultImgMap = {
+      'alitas': '/imagenes/categorias/alitas/banner.webp',
+      'bebidas': '/imagenes/categorias/bebidas/banner.webp',
+      'broaster': '/imagenes/categorias/broaster/banner.webp',
+      'hamburguesas': '/imagenes/categorias/hamburguesas/banner.webp',
+      'infusiones': '/imagenes/categorias/infusiones/banner.webp',
+      'platos-amazonicos': '/imagenes/categorias/platos-amazonicos/banner.webp',
+      'refrescos': '/imagenes/categorias/refrescos/banner.webp',
+      'salchipapas': '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp',
+      'promociones': 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
+      'adicional': 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=800&q=80'
+    };
+
+    let html = '';
+    categories.forEach(cat => {
+      const id = cat.id || cat.code || cat.slug;
+      const slug = cat.slug || id.toLowerCase();
+      const title = (cat.name || id).toUpperCase().trim();
+      const img = cat.image || defaultImgMap[slug] || defaultImgMap[id.toLowerCase()] || '/imagenes/categorias/hamburguesas/banner.webp';
+
+      html += `
+      <div class="category-banner-card cat-banner-dynamic" onclick="openCategoryView('${slug}', '${title.replace(/'/g, "\\'")}')" title="${title}" style="background-image: url('${img}');">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">${title}</h2>
+        </div>
+      </div>
+      `;
+    });
+
+    catSec.innerHTML = html;
+  } catch (err) {
+    console.warn("Error renderizando banners de categorías dinámicas:", err);
+  }
+}
+window.renderCategoryBanners = renderCategoryBanners;
 
 let isCatalogSyncStarted = false;
 function initRealtimeCatalogSync() {

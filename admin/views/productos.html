@@ -4,15 +4,19 @@
         <div>
             <div class="flex items-center gap-2.5">
                 <span class="w-1.5 h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
-                <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Platos y Menú (Productos)</h2>
+                <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Platos</h2>
             </div>
             <p class="text-xs text-slate-400 mt-1">Gestión integral de la carta: categorías, acompañamientos, cremas, precios y stock en tiempo real</p>
         </div>
         
-        <div class="flex items-center gap-3">
-            <button onclick="abrirCrearProductoModal()" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white rounded-xl text-xs font-black transition-all shadow-lg active-press">
+        <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+            <button onclick="abrirCrearProductoModal()" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-orange-600/20 active-press">
                 <i data-lucide="plus" class="w-4 h-4"></i>
                 <span>Agregar Producto</span>
+            </button>
+            <button onclick="abrirCrearCategoriaModal()" class="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/60 rounded-xl text-xs font-bold transition-all shadow-md active-press">
+                <i data-lucide="folder-plus" class="w-4 h-4 text-orange-400"></i>
+                <span>Crear Categoría</span>
             </button>
         </div>
     </div>
@@ -25,7 +29,7 @@
         </div>
         <div class="p-3.5 bg-[#0f1424] rounded-xl border border-slate-800/80">
             <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Categorías</span>
-            <span class="text-lg font-black text-orange-400 font-mono block mt-0.5">10 líneas</span>
+            <span class="text-lg font-black text-orange-400 font-mono block mt-0.5" id="stat-categorias-platos">10 líneas</span>
         </div>
         <div class="p-3.5 bg-[#0f1424] rounded-xl border border-slate-800/80">
             <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Disponibles</span>
