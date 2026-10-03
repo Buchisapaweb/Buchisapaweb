@@ -4599,8 +4599,14 @@ function renderCardsInContainer(items, container) {
 async function loadCatalog() {
   try {
     let products = [];
-    const res = await fetch('/api/products');
-    if (res.ok) {
+    let res = await fetch('/api/products').catch(() => null);
+    if (!res || !res.ok) {
+      res = await fetch('/data/products.json').catch(() => null);
+    }
+    if (!res || !res.ok) {
+      res = await fetch('/api/products.json').catch(() => null);
+    }
+    if (res && res.ok) {
       const data = await res.json();
       if (Array.isArray(data)) {
         products = data;
@@ -4618,12 +4624,16 @@ async function loadCatalog() {
     window.currentProducts = currentProducts;
     window.allMenuProducts = allMenuProducts;
     initRealtimeCatalogSync();
+
+    if (typeof renderFeaturedProducts === 'function') renderFeaturedProducts();
+    if (typeof renderCategoryBanners === 'function') renderCategoryBanners();
   } catch (err) {
     console.warn('Cargando menú predeterminado Buchisapa:', err);
     currentProducts = getFallbackProducts();
     allMenuProducts = currentProducts;
     window.currentProducts = currentProducts;
     window.allMenuProducts = allMenuProducts;
+    if (typeof renderFeaturedProducts === 'function') renderFeaturedProducts();
   }
 }
 

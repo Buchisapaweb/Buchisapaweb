@@ -69,6 +69,29 @@ export function compileHtml() {
   copyDirRecursive(path.join(ROOT_DIR, 'data'), path.join(DIST_DIR, 'data'));
   console.log('✅ Archivos públicos, admin y catálogo data copiados a dist/.');
 
+  // 2b. Generar endpoints JSON estáticos para que /api/products y /api/categories funcionen de inmediato en Vercel
+  const productsPath = path.join(ROOT_DIR, 'data/products.json');
+  const categoriesPath = path.join(ROOT_DIR, 'data/categories.json');
+  const productsRaw = fs.existsSync(productsPath) ? fs.readFileSync(productsPath, 'utf8') : '[]';
+  const categoriesRaw = fs.existsSync(categoriesPath) ? fs.readFileSync(categoriesPath, 'utf8') : '[]';
+
+  const apiDir = path.join(DIST_DIR, 'api');
+  if (!fs.existsSync(apiDir)) fs.mkdirSync(apiDir, { recursive: true });
+
+  fs.writeFileSync(path.join(apiDir, 'products.json'), productsRaw, 'utf8');
+  fs.writeFileSync(path.join(apiDir, 'categories.json'), categoriesRaw, 'utf8');
+  
+  // Archivo directo sin extensión como respaldo para static routing
+  const apiProductsDir = path.join(apiDir, 'products');
+  if (!fs.existsSync(apiProductsDir)) fs.mkdirSync(apiProductsDir, { recursive: true });
+  fs.writeFileSync(path.join(apiProductsDir, 'index.json'), productsRaw, 'utf8');
+
+  const apiCategoriesDir = path.join(apiDir, 'categories');
+  if (!fs.existsSync(apiCategoriesDir)) fs.mkdirSync(apiCategoriesDir, { recursive: true });
+  fs.writeFileSync(path.join(apiCategoriesDir, 'index.json'), categoriesRaw, 'utf8');
+
+  console.log('✅ API endpoints JSON estáticos generados en dist/api/.');
+
   // 3. Asegurar rutas directas para Vercel y hosts estáticos
   const directPages = [
     { src: 'public/custom-checkout.html', outName: 'custom-checkout' },
@@ -103,11 +126,8 @@ export function compileHtml() {
     const topbarPath = path.join(ROOT_DIR, 'admin/includes/topbar.php');
     const footerPath = path.join(ROOT_DIR, 'admin/includes/footer.php');
 
-    const productsPath = path.join(ROOT_DIR, 'data/products.json');
-    const categoriesPath = path.join(ROOT_DIR, 'data/categories.json');
-
-    const products = fs.existsSync(productsPath) ? JSON.parse(fs.readFileSync(productsPath, 'utf8')) : [];
-    const categories = fs.existsSync(categoriesPath) ? JSON.parse(fs.readFileSync(categoriesPath, 'utf8')) : [];
+    const products = JSON.parse(productsRaw);
+    const categories = JSON.parse(categoriesRaw);
 
     if (fs.existsSync(headerPath) && fs.existsSync(sidebarPath) && fs.existsSync(topbarPath) && fs.existsSync(footerPath)) {
       const rawHeader = fs.readFileSync(headerPath, 'utf8');
@@ -254,16 +274,8 @@ export function compileHtml() {
                       const accompaniments = Array.isArray(p.accompaniments) ? p.accompaniments : [];
                       const cremas = Array.isArray(p.cremas) ? p.cremas : [];
 
-                      const accHtml = accompaniments.length > 0 
-                          ? `<div class="flex flex-wrap gap-1">${accompaniments.map((a) => `<span class="text-[9px] font-bold px-1.5 py-0.5 bg-[#0a0d16] border border-slate-800 text-slate-300 rounded">${a}</span>`).join('')}</div>`
-                          : `<span class="text-[9px] text-slate-500 italic">Sin acompañamiento directo (Bebida / Individual)</span>`;
-
-                      const cremasHtml = cremas.length > 0
-                          ? `<div class="flex flex-wrap gap-1">${cremas.map((c) => `<span class="text-[9px] font-bold px-1.5 py-0.5 bg-orange-950/20 border border-orange-900/40 text-orange-300 rounded">${c}</span>`).join('')}</div>`
-                          : `<span class="text-[9px] text-slate-500 italic">No incluye cremas</span>`;
-
                       const badgeHtml = badge 
-                          ? `<span class="absolute top-1 left-1 px-1.5 py-0.5 bg-orange-600/90 text-[8px] font-black text-white uppercase rounded tracking-wider shadow">${badge}</span>` 
+                          ? `<span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-orange-600/95 text-[9px] font-black text-white uppercase rounded-md tracking-wider shadow-md backdrop-blur-sm">${badge}</span>` 
                           : '';
 
                       const pJsonStr = JSON.stringify(p).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
@@ -271,58 +283,46 @@ export function compileHtml() {
                       return `
                       <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
                           <div class="space-y-3">
-                              <div class="flex gap-3">
-                                  <div class="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
-                                      <img src="${image}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
-                                      ${badgeHtml}
-                                  </div>
-                                  <div class="flex-1 min-w-0">
-                                      <div class="flex items-start justify-between gap-1">
-                                          <h4 class="font-black text-sm text-white truncate leading-tight">${name}</h4>
-                                          <span class="font-mono-numbers font-black text-sm text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
-                                      </div>
-                                      <div class="flex items-center gap-2 mt-1">
-                                          <span class="inline-flex items-center gap-1 text-[10px] font-mono-numbers font-bold ${isCrit ? 'text-red-400 animate-pulse' : 'text-slate-400'}">
-                                              <i data-lucide="package" class="w-3 h-3"></i> Stock: ${stock}
-                                          </span>
-                                          <span class="text-slate-600">·</span>
-                                          <span class="text-[9px] font-black uppercase ${available ? 'text-emerald-400' : 'text-slate-500'}">
-                                              ${available ? 'Disponible' : 'Agotado'}
-                                          </span>
-                                      </div>
-                                      <p class="text-[11px] text-slate-400 line-clamp-2 mt-1.5 leading-relaxed">${desc}</p>
-                                  </div>
+                              <!-- Imagen Grande del Producto -->
+                              <div class="relative w-full h-44 sm:h-48 rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
+                                  <img src="${image}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
+                                  ${badgeHtml}
+                                  <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md ${available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'}">
+                                      ${available ? 'Disponible' : 'Agotado'}
+                                  </span>
                               </div>
 
-                              <div class="pt-2.5 border-t border-slate-800/60">
-                                  <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider block mb-1">
-                                      <i data-lucide="utensils-crossed" class="w-2.5 h-2.5 inline mr-1 text-orange-400"></i> Acompañamientos:
-                                  </span>
-                                  ${accHtml}
-                              </div>
-
-                              <div class="pt-2 border-t border-slate-800/60">
-                                  <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider block mb-1">
-                                      <i data-lucide="sparkles" class="w-2.5 h-2.5 inline mr-1 text-yellow-400"></i> Cremas incluidas:
-                                  </span>
-                                  ${cremasHtml}
+                              <!-- Datos Principales: Nombre, Stock y Precio -->
+                              <div>
+                                  <div class="flex items-start justify-between gap-2">
+                                      <h4 class="font-black text-base text-white leading-snug line-clamp-2">${name}</h4>
+                                      <span class="font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
+                                  </div>
+                                  <div class="flex items-center gap-2 mt-2">
+                                      <span class="inline-flex items-center gap-1.5 text-xs font-mono-numbers font-bold ${isCrit ? 'text-red-400 animate-pulse' : 'text-slate-300'}">
+                                          <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: ${stock}
+                                      </span>
+                                  </div>
                               </div>
                           </div>
 
-                          <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-800/60">
-                              <span class="text-[9px] font-mono-numbers text-slate-400 font-bold bg-[#0a0d16] px-2 py-0.5 rounded border border-slate-800 flex items-center gap-1">
+                          <!-- Parte Inferior: ID, Botón Editar y Botón Eliminar -->
+                          <div class="flex items-center justify-between pt-3 mt-4 border-t border-slate-800/80">
+                              <span class="text-[10px] font-mono-numbers text-slate-400 font-bold bg-[#0a0d16] px-2.5 py-1 rounded-lg border border-slate-800 flex items-center gap-1">
                                   <span class="text-slate-500">ID:</span>
-                                  <span class="text-orange-400 font-mono-numbers">${id}</span>
+                                  <span class="text-orange-400 font-extrabold tracking-wide">${id}</span>
                               </span>
-                              <div class="flex items-center gap-1.5">
-                                  <button type="button" onclick='abrirEditarProductoModal(${pJsonStr})' class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-[11px] font-black transition-all flex items-center gap-1">
-                                      <i data-lucide="edit-3" class="w-3 h-3"></i> Editar
+                              
+                              <div class="flex items-center gap-2">
+                                  <button type="button" onclick='abrirEditarProductoModal(${pJsonStr})' class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 active-press shadow-sm" title="Editar plato">
+                                      <i data-lucide="edit-3" class="w-3.5 h-3.5 text-orange-400"></i>
+                                      <span>Editar</span>
                                   </button>
-                                  <form method="POST" action="/admin?view=productos" onsubmit="return confirm('¿Seguro que deseas eliminar este plato?');" class="inline">
+                                  <form action="/admin?view=productos" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas eliminar este plato de la carta?');">
                                       <input type="hidden" name="action" value="delete">
                                       <input type="hidden" name="id" value="${id}">
-                                      <button type="submit" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all">
-                                          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                      <button type="submit" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
+                                          <i data-lucide="trash-2" class="w-4 h-4"></i>
                                       </button>
                                   </form>
                               </div>
@@ -333,25 +333,19 @@ export function compileHtml() {
               }
 
               categoriesBlocksHtml += `
-              <section class="category-block space-y-4 pt-2" id="category-section-${cat.id}" data-category-id="${cat.id}" data-category-slug="${cat.slug}">
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 bg-[#0f1424] border border-slate-800/80 rounded-2xl">
-                      <div class="flex items-center gap-3">
-                          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background-color: ${cat.color}20; border: 1px solid ${cat.color}40; color: ${cat.color};">
-                              <i data-lucide="${cat.icon}" class="w-5 h-5"></i>
-                          </div>
-                          <div>
-                              <div class="flex items-center gap-2">
-                                  <span class="font-mono-numbers text-[10px] font-black px-2 py-0.5 rounded" style="background-color: ${cat.color}25; color: ${cat.color}; border: 1px solid ${cat.color}50;">
-                                      ${cat.id}
-                                  </span>
-                                  <h3 class="text-base font-black text-white tracking-tight">${cat.name}</h3>
-                              </div>
-                              <p class="text-xs text-slate-400 mt-0.5">${cat.desc}</p>
-                          </div>
+              <section class="category-block space-y-4" id="cat-section-${cat.id}" data-cat-id="${cat.id}" data-cat-slug="${cat.slug}">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                      <div class="flex items-center gap-2.5">
+                          <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color}80;"></span>
+                          <span class="px-1.5 py-0.5 rounded text-[10px] font-mono-numbers font-extrabold bg-orange-950/40 border border-orange-500/40 text-orange-400 tracking-wider">${cat.id}</span>
+                          <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+                              ${cat.name}
+                          </h3>
+                          <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase text-slate-300 bg-slate-800/60 border border-slate-700/60 font-mono-numbers">
+                              ${platosEnCat.length} platos
+                          </span>
                       </div>
-                      <span class="text-xs font-bold text-slate-400 px-3 py-1 bg-[#090d18] rounded-xl border border-slate-800 self-start sm:self-auto shrink-0 font-mono-numbers">
-                          ${platosEnCat.length} ${platosEnCat.length === 1 ? 'plato' : 'platos'}
-                      </span>
+                      <p class="text-[11px] text-slate-400 italic">${cat.desc}</p>
                   </div>
                   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                       ${cardsHtml}
@@ -364,9 +358,11 @@ export function compileHtml() {
           viewHtml = viewHtml.replace(/<\?php\s+echo\s+\$total_disponibles;\s*\?>/g, String(totalDisponibles));
           viewHtml = viewHtml.replace(/<\?php\s+echo\s+\$total_criticos;\s*\?>/g, String(totalCriticos));
 
+          viewHtml = viewHtml.replace(/<\?php[\s\S]*?foreach\s*\(\$categoriasDefinidas\s+as\s+\$cat\)[\s\S]*?endforeach;\s*\?>/g, filterTabsHtml);
           viewHtml = viewHtml.replace(/<\?php[\s\S]*?foreach\s*\(\$CATEGORIAS_DEFINIDAS\s+as\s+\$cat\)[\s\S]*?endforeach;\s*\?>/g, filterTabsHtml);
-          viewHtml = viewHtml.replace(/<!-- CATEGORIAS_BLOCKS_PLACEHOLDER -->/g, categoriesBlocksHtml);
-          viewHtml = viewHtml.replace(/<div id="categorias-blocks-container">[\s\S]*?<\/div>\s*<\/div>\s*<!-- Fin catálogo -->/g, `<div id="categorias-blocks-container">${categoriesBlocksHtml}</div></div><!-- Fin catálogo -->`);
+          
+          viewHtml = viewHtml.replace(/<div class="space-y-10" id="productos-container">[\s\S]*?<\/div>\s*<\/div>\s*<!-- Fin catálogo -->/g, `<div class="space-y-10" id="productos-container">${categoriesBlocksHtml}</div></div><!-- Fin catálogo -->`);
+          viewHtml = viewHtml.replace(/<div class="space-y-10" id="productos-container">[\s\S]*?<!-- Modal de Creación\/Edición de Producto -->/g, `<div class="space-y-10" id="productos-container">${categoriesBlocksHtml}</div>\n\n    <!-- Modal de Creación/Edición de Producto -->`);
           
           viewHtml = viewHtml.replace(/data-categories='[^']*'/g, `data-categories='${JSON.stringify(CATEGORIAS_DEFINIDAS)}'`);
         } else if (view === 'clientes') {

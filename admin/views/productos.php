@@ -321,84 +321,44 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
                             <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-search-target="<?php echo strtolower($name . ' ' . $desc . ' ' . implode(' ', $accompaniments) . ' ' . implode(' ', $cremas)); ?>">
                                 
                                 <div class="space-y-3">
-                                    <!-- Cabecera de la Tarjeta: Imagen + Datos Principales -->
-                                    <div class="flex gap-3">
-                                        <div class="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
-                                            <img src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($name); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
-                                            <?php if (!empty($badge)): ?>
-                                                <span class="absolute top-1 left-1 px-1.5 py-0.5 bg-orange-600/90 text-[8px] font-black text-white uppercase rounded tracking-wider shadow">
-                                                    <?php echo htmlspecialchars($badge); ?>
-                                                </span>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-start justify-between gap-1">
-                                                <h4 class="font-black text-sm text-white truncate leading-tight"><?php echo htmlspecialchars($name); ?></h4>
-                                                <span class="font-mono-numbers font-black text-sm text-emerald-400 shrink-0">S/ <?php echo number_format($price, 2); ?></span>
-                                            </div>
-
-                                            <div class="flex items-center gap-2 mt-1">
-                                                <span class="inline-flex items-center gap-1 text-[10px] font-mono-numbers font-bold <?php echo $isCrit ? 'text-red-400 animate-pulse' : 'text-slate-400'; ?>">
-                                                    <i data-lucide="package" class="w-3 h-3"></i> Stock: <?php echo $stock; ?>
-                                                </span>
-                                                <span class="text-slate-600">·</span>
-                                                <span class="text-[9px] font-black uppercase <?php echo $available ? 'text-emerald-400' : 'text-slate-500'; ?>">
-                                                    <?php echo $available ? 'Disponible' : 'Agotado'; ?>
-                                                </span>
-                                            </div>
-
-                                            <p class="text-[11px] text-slate-400 line-clamp-2 mt-1.5 leading-relaxed"><?php echo htmlspecialchars($desc); ?></p>
-                                        </div>
+                                    <!-- 1. Imagen Grande del Producto -->
+                                    <div class="relative w-full h-44 sm:h-48 rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
+                                        <img src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($name); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
+                                        <?php if (!empty($badge)): ?>
+                                            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-orange-600/95 text-[9px] font-black text-white uppercase rounded-md tracking-wider shadow-md backdrop-blur-sm">
+                                                <?php echo htmlspecialchars($badge); ?>
+                                            </span>
+                                        <?php endif; ?>
+                                        <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black uppercase backdrop-blur-md <?php echo $available ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300' : 'bg-red-950/80 border border-red-500/50 text-red-300'; ?>">
+                                            <?php echo $available ? 'Disponible' : 'Agotado'; ?>
+                                        </span>
                                     </div>
 
-                                    <!-- Acompañamientos -->
-                                    <div class="pt-2.5 border-t border-slate-800/60">
-                                        <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider block mb-1">
-                                            <i data-lucide="utensils-crossed" class="w-2.5 h-2.5 inline mr-1 text-orange-400"></i> Acompañamientos:
-                                        </span>
-                                        <?php if (!empty($accompaniments)): ?>
-                                            <div class="flex flex-wrap gap-1">
-                                                <?php foreach ($accompaniments as $acc): ?>
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.5 bg-[#0a0d16] border border-slate-800 text-slate-300 rounded">
-                                                        <?php echo htmlspecialchars($acc); ?>
-                                                    </span>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        <?php else: ?>
-                                            <span class="text-[9px] text-slate-500 italic">Sin acompañamiento directo (Bebida / Individual)</span>
-                                        <?php endif; ?>
-                                    </div>
+                                    <!-- 2. Datos Principales: Nombre, Stock y Precio -->
+                                    <div>
+                                        <div class="flex items-start justify-between gap-2">
+                                            <h4 class="font-black text-base text-white leading-snug line-clamp-2"><?php echo htmlspecialchars($name); ?></h4>
+                                            <span class="font-mono-numbers font-black text-base text-emerald-400 shrink-0">S/ <?php echo number_format($price, 2); ?></span>
+                                        </div>
 
-                                    <!-- Cremas de la Casa -->
-                                    <div class="pt-2 border-t border-slate-800/60">
-                                        <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider block mb-1">
-                                            <i data-lucide="sparkles" class="w-2.5 h-2.5 inline mr-1 text-yellow-400"></i> Cremas incluidas:
-                                        </span>
-                                        <?php if (!empty($cremas)): ?>
-                                            <div class="flex flex-wrap gap-1">
-                                                <?php foreach ($cremas as $crema): ?>
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.5 bg-orange-950/20 border border-orange-900/40 text-orange-300 rounded">
-                                                        <?php echo htmlspecialchars($crema); ?>
-                                                    </span>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        <?php else: ?>
-                                            <span class="text-[9px] text-slate-500 italic">No incluye cremas</span>
-                                        <?php endif; ?>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <span class="inline-flex items-center gap-1.5 text-xs font-mono-numbers font-bold <?php echo $isCrit ? 'text-red-400 animate-pulse' : 'text-slate-300'; ?>">
+                                                <i data-lucide="package" class="w-3.5 h-3.5 text-slate-400"></i> Stock: <?php echo $stock; ?>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Acciones del Plato -->
-                                <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-800/60">
-                                    <span class="text-[9px] font-mono-numbers text-slate-400 font-bold bg-[#0a0d16] px-2 py-0.5 rounded border border-slate-800 flex items-center gap-1">
+                                <!-- 3. Acciones del Plato: ID, Editar y Eliminar -->
+                                <div class="flex items-center justify-between pt-3 mt-4 border-t border-slate-800/80">
+                                    <span class="text-[10px] font-mono-numbers text-slate-400 font-bold bg-[#0a0d16] px-2.5 py-1 rounded-lg border border-slate-800 flex items-center gap-1">
                                         <span class="text-slate-500">ID:</span>
                                         <span class="text-orange-400 font-extrabold tracking-wide"><?php echo htmlspecialchars($id); ?></span>
                                     </span>
                                     
                                     <div class="flex items-center gap-2">
-                                        <button type="button" onclick='abrirEditarProductoModal(<?php echo json_encode($p, JSON_HEX_APOS | JSON_HEX_QUOT); ?>)' class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1 active-press" title="Editar plato">
-                                            <i data-lucide="edit-3" class="w-3 h-3 text-orange-400"></i>
+                                        <button type="button" onclick='abrirEditarProductoModal(<?php echo json_encode($p, JSON_HEX_APOS | JSON_HEX_QUOT); ?>)' class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 active-press shadow-sm" title="Editar plato">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5 text-orange-400"></i>
                                             <span>Editar</span>
                                         </button>
 
@@ -406,7 +366,7 @@ $totalCriticos = count(array_filter($productos, fn($p) => intval($p['stock'] ?? 
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?php echo htmlspecialchars($id); ?>">
                                             <button type="submit" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
-                                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                                             </button>
                                         </form>
                                     </div>
