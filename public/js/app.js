@@ -4130,145 +4130,96 @@ function openCategoryView(catId, catTitle) {
   if (titleEl) titleEl.textContent = displayTitle;
 
   // Renderizar los productos correspondientes a la categoría elegida
-  if (isPromo) {
-    const rawPromos = [
-      {
-        id: 'promo-1',
-        name: 'Promoción Tú Eliges con Gaseosa 1.5 LT.',
-        price: 90.90,
-        shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT.',
-        fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.',
-        description: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5 LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.',
-        image: '/imagenes/portada/Portada2E.webp',
-        category: 'promociones',
-        category_id: 'promociones',
-        categoryLabel: 'PROMOCIONES',
-        includes_sauces: true
-      },
-      {
-        id: 'promo-2',
-        name: 'Promoción Tu Chicha 1.5 LT.',
-        price: 95.50,
-        shortDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT.',
-        fullDesc: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.',
-        description: '1 Pardos Brasa + papas fritas + guarnición + botella de chicha morada natural de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.',
-        image: '/imagenes/portada/Portada1M.webp',
-        category: 'promociones',
-        category_id: 'promociones',
-        categoryLabel: 'PROMOCIONES',
-        includes_sauces: true
-      },
-      {
-        id: 'promo-3',
-        name: 'Promoción Tú Eliges con Gaseosa 2.25 LT.',
-        price: 95.50,
-        shortDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT.',
-        fullDesc: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.',
-        description: '1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.',
-        image: '/imagenes/portada/Portada3E.webp',
-        category: 'promociones',
-        category_id: 'promociones',
-        categoryLabel: 'PROMOCIONES',
-        includes_sauces: true
-      },
-      {
-        id: 'promo-4',
-        name: 'Promoción Para 2',
-        price: 57.90,
-        shortDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales.',
-        fullDesc: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.',
-        description: '1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales heladas. Incluye cremas caseras.',
-        image: '/imagenes/portada/Portada4E.webp',
-        category: 'promociones',
-        category_id: 'promociones',
-        categoryLabel: 'PROMOCIONES',
-        includes_sauces: true
-      }
-    ];
+  const items = getAllProducts();
+  const rawTarget = normalizeText(catId || catTitle || '');
 
-    window.OFFICIAL_PROMOTIONS = rawPromos;
-    renderCardsInContainer(rawPromos, container);
-  } else {
-    const items = getAllProducts();
-    const rawTarget = normalizeText(catId || catTitle || '');
+  const filtered = items.filter(p => {
+    const pCatId = normalizeText(p.category_id || '');
+    const pCatName = normalizeText(p.category || '');
+    const pName = normalizeText(p.name || '');
 
-    const filtered = items.filter(p => {
-      const pCatId = normalizeText(p.category_id || '');
-      const pCatName = normalizeText(p.category || '');
-      const pName = normalizeText(p.name || '');
-
-      // Coincidencia exacta o directa
-      if (pCatId === rawTarget || pCatName === rawTarget) return true;
-
-      // Promociones y Combos
-      if (rawTarget.includes('promo') || rawTarget.includes('combo')) {
-        return pCatId.includes('promo') || pCatName.includes('promo') || 
-               pCatId.includes('combo') || pCatName.includes('combo') ||
-               p.is_promo === true || (typeof p.discount === 'number' && p.discount > 0);
-      }
-
-      // Platos Amazónicos / Selva
-      if (rawTarget.includes('amazon') || rawTarget.includes('selva')) {
-        return pCatId.includes('amazon') || pCatId.includes('selva') || 
-               pCatName.includes('amazon') || pCatName.includes('selva') ||
-               pName.includes('tacacho') || pName.includes('cecina') || pName.includes('juane') || pName.includes('patacon') || pName.includes('chilcano') || pName.includes('palometa');
-      }
-
-      // Hamburguesas
-      if (rawTarget.includes('hamburg') || rawTarget.includes('burger')) {
-        return pCatId.includes('hamburg') || pCatId.includes('burger') || 
-               pCatName.includes('hamburg') || pCatName.includes('burger');
-      }
-
-      // Broaster
-      if (rawTarget.includes('broaster') && !rawTarget.includes('salchi')) {
-        return (pCatId.includes('broaster') || pCatName.includes('broaster') || pCatName.includes('pollo')) && !pCatName.includes('salchi');
-      }
-
-      // Salchipapas y Salchibroasters
-      if (rawTarget.includes('salchi')) {
-        return pCatId.includes('salchi') || pCatName.includes('salchi');
-      }
-
-      // Alitas
-      if (rawTarget.includes('alita')) {
-        return pCatId.includes('alita') || pCatName.includes('alita');
-      }
-
-      // Bebidas / Gaseosas
-      if (rawTarget.includes('bebida') || rawTarget.includes('gaseosa')) {
-        return pCatId.includes('bebida') || pCatId.includes('gaseosa') || 
-               pCatName.includes('bebida') || pCatName.includes('gaseosa');
-      }
-
-      // Refrescos
-      if (rawTarget.includes('refresco')) {
-        return pCatId.includes('refresco') || pCatName.includes('refresco');
-      }
-
-      // Infusiones / Calientes
-      if (rawTarget.includes('infusion') || rawTarget.includes('caliente')) {
-        return pCatId.includes('infusion') || pCatName.includes('infusion') || 
-               pCatId.includes('caliente') || pCatName.includes('caliente');
-      }
-
-      // Fallback
-      return pCatId.includes(rawTarget) || pCatName.includes(rawTarget) || rawTarget.includes(pCatId);
-    });
-
-    if (filtered.length === 0) {
-      if (container) {
-        container.innerHTML = `
-          <div class="empty-results-box" style="padding: 40px 16px; text-align: center; grid-column: 1 / -1;">
-            <div style="font-size: 36px; margin-bottom: 8px;">🍽️</div>
-            <div style="font-weight: 800; font-size: 16px; color: #1e293b; margin-bottom: 4px;">Platos de ${displayTitle}</div>
-            <div style="font-size: 13px; color: #64748b;">Estamos preparando nuevas delicias y combos para esta categoría.</div>
-          </div>
-        `;
-      }
-    } else {
-      renderCardsInContainer(filtered, container);
+    // Promociones y Combos
+    if (isPromo || rawTarget.includes('promo') || rawTarget.includes('combo')) {
+      return pCatId === 'promociones' || pCatName === 'promociones' || 
+             pCatId.includes('promo') || pCatName.includes('promo') || 
+             pCatId.includes('combo') || pCatName.includes('combo') ||
+             p.is_promo === true || (typeof p.discount === 'number' && p.discount > 0);
     }
+
+    // Coincidencia exacta o directa
+    if (pCatId === rawTarget || pCatName === rawTarget) return true;
+
+    // Platos Amazónicos / Selva
+    if (rawTarget.includes('amazon') || rawTarget.includes('selva')) {
+      return pCatId.includes('amazon') || pCatId.includes('selva') || 
+             pCatName.includes('amazon') || pCatName.includes('selva') ||
+             pName.includes('tacacho') || pName.includes('cecina') || pName.includes('juane') || pName.includes('patacon') || pName.includes('chilcano') || pName.includes('palometa');
+    }
+
+    // Hamburguesas
+    if (rawTarget.includes('hamburg') || rawTarget.includes('burger')) {
+      return pCatId.includes('hamburg') || pCatId.includes('burger') || 
+             pCatName.includes('hamburg') || pCatName.includes('burger');
+    }
+
+    // Broaster
+    if (rawTarget.includes('broaster') && !rawTarget.includes('salchi')) {
+      return (pCatId.includes('broaster') || pCatName.includes('broaster') || pCatName.includes('pollo')) && !pCatName.includes('salchi');
+    }
+
+    // Salchipapas y Salchibroasters
+    if (rawTarget.includes('salchi')) {
+      return pCatId.includes('salchi') || pCatName.includes('salchi');
+    }
+
+    // Alitas
+    if (rawTarget.includes('alita')) {
+      return pCatId.includes('alita') || pCatName.includes('alita');
+    }
+
+    // Bebidas / Gaseosas
+    if (rawTarget.includes('bebida') || rawTarget.includes('gaseosa')) {
+      return pCatId.includes('bebida') || pCatId.includes('gaseosa') || 
+             pCatName.includes('bebida') || pCatName.includes('gaseosa');
+    }
+
+    // Refrescos
+    if (rawTarget.includes('refresco')) {
+      return pCatId.includes('refresco') || pCatName.includes('refresco');
+    }
+
+    // Infusiones / Calientes
+    if (rawTarget.includes('infusion') || rawTarget.includes('caliente')) {
+      return pCatId.includes('infusion') || pCatName.includes('infusion') || 
+             pCatId.includes('caliente') || pCatName.includes('caliente');
+    }
+
+    // Adicionales / Extras
+    if (rawTarget.includes('adicion') || rawTarget.includes('extra')) {
+      return pCatId.includes('adicion') || pCatName.includes('adicion') ||
+             pCatId.includes('extra') || pCatName.includes('extra');
+    }
+
+    // Fallback
+    return pCatId.includes(rawTarget) || pCatName.includes(rawTarget) || rawTarget.includes(pCatId);
+  });
+
+  if (isPromo) {
+    window.OFFICIAL_PROMOTIONS = filtered;
+  }
+
+  if (filtered.length === 0) {
+    if (container) {
+      container.innerHTML = `
+        <div class="empty-results-box" style="padding: 40px 16px; text-align: center; grid-column: 1 / -1;">
+          <div style="font-size: 36px; margin-bottom: 8px;">🍽️</div>
+          <div style="font-weight: 800; font-size: 16px; color: #1e293b; margin-bottom: 4px;">Platos de ${displayTitle}</div>
+          <div style="font-size: 13px; color: #64748b;">Estamos preparando nuevas delicias y combos para esta categoría.</div>
+        </div>
+      `;
+    }
+  } else {
+    renderCardsInContainer(filtered, container);
   }
 
   // Redireccionar / Desplazar suavemente a la sección de productos para tabletas, computadoras y teléfonos
@@ -4978,575 +4929,1455 @@ async function submitOrder(e) {
    ========================================================= */
 function getFallbackProducts() {
   return [
-    {
-      id: "promo-1",
-      name: "Promoción Tú Eliges con Gaseosa 1.5 LT.",
-      category_id: "promociones",
-      category: "promociones",
-      price: 90.90,
-      description: "1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/portada/Portada2E.webp"
-    },
-    {
-      id: "promo-2",
-      name: "Promoción Tu Chicha 1.5 LT.",
-      category_id: "promociones",
-      category: "promociones",
-      price: 95.50,
-      description: "1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/portada/Portada1E.webp"
-    },
-    {
-      id: "promo-3",
-      name: "Promoción Tú Eliges con Gaseosa 2.25 LT.",
-      category_id: "promociones",
-      category: "promociones",
-      price: 95.50,
-      description: "1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/portada/Portada3E.webp"
-    },
-    {
-      id: "promo-4",
-      name: "Promoción Para 2",
-      category_id: "promociones",
-      category: "promociones",
-      price: 57.90,
-      description: "1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Incluye cremas caseras.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/portada/Portada4E.webp"
-    },
-    {
-      id: "ama-1",
-      name: "Patacones con Chorizo",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 12.00,
-      description: "Patacones crujientes dorados con chorizo ahumado jugoso y crema selvática irresistible tradicional",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-2",
-      name: "Tacacho con Cecina",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 12.00,
-      description: "Tacacho suave amazónico con cecina ahumada jugosa plátano dulce y sarza criolla",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-3",
-      name: "Juanes",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 15.00,
-      description: "Juane tradicional jugoso con arroz selvático gallina tierna huevo y maduro frito",
-      popular: true,
-      image: "/imagenes/categorias/platos-amazonicos/banner.webp"
-    },
-    {
-      id: "ama-4",
-      name: "Chilcano de Carachama o Pescado del Día",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 15.00,
-      description: "Chilcano caliente selvático con carachama fresca jugosa yuca suave y culantro aromático",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-5",
-      name: "Palometa Frita con Maduro o Plátano",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 15.00,
-      description: "Palometa frita crujiente dorada con arroz blanco maduros dulces y salsa criolla",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-6",
-      name: "Caldo Amazónico",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 12.00,
-      description: "Caldo amazónico verde aromático con pescado fresco culantro yuca y sabor revitalizante",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-7",
-      name: "Arroz Chaufa Amazónico",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 15.00,
-      description: "Arroz chaufa amazónico salteado con cecina ahumada chorizo jugoso y toque selvático",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-1",
-      name: "Clásica",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 10.00,
-      description: "Hamburguesa clásica jugosa artesanal con papas crujientes ensalada fresca y cremas caseras",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-2",
-      name: "Choripan",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 10.00,
-      description: "Choripan jugoso artesanal con chorizo parrillero papas crujientes ensalada fresca y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-3",
-      name: "Hawaiana Carne",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 14.00,
-      description: "Hamburguesa hawaiana con carne artesanal jugosa piña dulce queso jamón y crema",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-4",
-      name: "Hawaiana Pollo",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 13.00,
-      description: "Hamburguesa hawaiana con pollo crispy crujiente piña jugosa queso jamón y crema",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1521305916504-4a1121188589?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-5",
-      name: "Pollo Deshilachado",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 9.00,
-      description: "Hamburguesa suave con pollo deshilachado jugoso papas doradas ensalada fresca y cremas",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-6",
-      name: "Filete de Pollo",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 11.00,
-      description: "Filete pollo dorado crujiente jugoso con papas ensalada fresca y cremas caseras",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1525164286253-04e68b9d94c6?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-7",
-      name: "Cheese Burguer",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 11.00,
-      description: "Hamburguesa casera jugosa con doble queso cheddar derretido cremoso y pan suave",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-8",
-      name: "Bacon Burguer",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 12.00,
-      description: "Hamburguesa jugosa con tocino ahumado crujiente papas doradas queso derretido y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-9",
-      name: "La Suprema",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 15.00,
-      description: "Hamburguesa suprema gigante con tocino queso huevo frito jamón y papas crujientes",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-10",
-      name: "Hamburguesa a lo Pobre",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 14.00,
-      description: "Hamburguesa completa pobre con huevo jamón queso plátano frito y cremas caseras",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-11",
-      name: "Royal",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 13.00,
-      description: "Hamburguesa royal mixta con carnes selectas chorizo pollo y sabores selváticos únicos",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-12",
-      name: "Royal a lo Pobre",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 14.00,
-      description: "Hamburguesa royal pobre con carne artesanal huevo jamón queso plátano y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "bro-1",
-      name: "Pecho",
-      category_id: "broaster",
-      category: "broaster",
-      price: 18.00,
-      description: "Pecho broaster gigante crujiente jugoso con arroz blanco papas y ensalada fresca",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "bro-2",
-      name: "Pierna",
-      category_id: "broaster",
-      category: "broaster",
-      price: 12.00,
-      description: "Pierna broaster dorada crujiente jugosa con arroz graneado papas y ensalada fresca",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "bro-3",
-      name: "Encuentro",
-      category_id: "broaster",
-      category: "broaster",
-      price: 13.00,
-      description: "Encuentro broaster mixto crujiente con pecho pierna arroz papas y ensalada completa",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "bro-4",
-      name: "Ala",
-      category_id: "broaster",
-      category: "broaster",
-      price: 10.00,
-      description: "Ala broaster crujiente dorada jugosa con arroz blanco papas y ensalada fresca",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-1",
-      name: "Salchipapa Clásica",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 10.00,
-      description: "Salchipapa clásica tradicional con papas crujientes salchicha dorada y cremas caseras abundantes",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-2",
-      name: "Salchipapa a lo Pobre",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 13.00,
-      description: "Salchipapa pobre con papas huevo frito plátano maduro salchicha y cremas caseras",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-3",
-      name: "Salchibroaster Pecho",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 20.00,
-      description: "Salchibroaster pecho con pollo crujiente jugoso papas doradas ensalada fresca y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-4",
-      name: "Salchibroaster Pierna",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 14.00,
-      description: "Salchibroaster pierna con pollo jugoso dorado papas crujientes ensalada fresca y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-5",
-      name: "Salchibroaster Encuentro",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 16.00,
-      description: "Salchibroaster encuentro mixto con pollo broaster variado papas crujientes y cremas abundantes",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-6",
-      name: "Salchibroaster Ala",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 13.00,
-      description: "Salchibroaster ala con pollo crujiente dorado papas fritas ensalada fresca y cremas",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-7",
-      name: "Salchichorizo",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 13.00,
-      description: "Salchichorizo potente con chorizo parrillero jugoso papas crujientes y cremas selváticas picantes",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ali-1",
-      name: "Acevichadas",
-      category_id: "alitas",
-      category: "alitas",
-      price: 15.00,
-      description: "Alitas acevichadas jugosas con salsa marina cremosa papas doradas y toque cítrico",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ali-2",
-      name: "BBQ",
-      category_id: "alitas",
-      category: "alitas",
-      price: 15.00,
-      description: "Alitas BBQ jugosas ahumadas con salsa dulce intensa papas doradas y limón",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-1",
-      name: "Inca Cola",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 5.00,
-      description: "Gaseosa dorada peruana dulce refrescante burbujeante ideal para acompañar cualquier comida diaria",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-2",
-      name: "Coca Cola",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 5.00,
-      description: "Gaseosa negra clásica mundial refrescante burbujeante helada perfecta para hamburguesas y broaster",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-3",
-      name: "Fanta",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 3.50,
-      description: "Gaseosa naranja dulce burbujeante refrescante helada perfecta para días calurosos intensos siempre",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-4",
-      name: "Pepsi",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 2.00,
-      description: "Gaseosa cola refrescante ligera burbujeante helada ideal para acompañar hamburguesas y salchipapas",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-5",
-      name: "Agua Cielo",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 2.50,
-      description: "Agua pura cristalina sin gas natural refrescante saludable ideal para hidratarte diariamente",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-1",
-      name: "Maracuyá",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco tropical maracuyá dulce ácido natural refrescante amazónico energizante y muy revitalizante",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-2",
-      name: "Chicha",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco morado tradicional dulce andino refrescante natural casero perfecto para platos amazónicos",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-3",
-      name: "Cocona",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco amazónico cocona cítrico exótico refrescante natural revitalizante ideal para calores intensos",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1556881286-fc6915169721?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-4",
-      name: "Aguajina",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco amazónico aguaje dulce cremoso refrescante natural nutritivo perfecto para días calurosos",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-5",
-      name: "Camu Camu",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco camu camu ácido vitamínico refrescante amazónico energizante ideal para defensas diarias",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "inf-1",
-      name: "Anís",
-      category_id: "infusiones",
-      category: "infusiones",
-      price: 2.50,
-      description: "Infusión caliente anís aromática digestiva relajante suave perfecta después de comidas pesadas",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "inf-2",
-      name: "Té",
-      category_id: "infusiones",
-      category: "infusiones",
-      price: 2.50,
-      description: "Infusión caliente té reconfortante aromático suave ideal para cualquier momento del día",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "inf-3",
-      name: "Manzanilla",
-      category_id: "infusiones",
-      category: "infusiones",
-      price: 2.50,
-      description: "Flores de manzanilla seleccionadas. Calma, descanso y aroma herbal que reconforta el alma.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "com-1",
-      name: "Combo Familiar Broaster",
-      category_id: "combos",
-      category: "combos",
-      price: 45.00,
-      description: "1 Pollo broaster entero crocante + porción familiar de papas fritas + ensalada + chicha morada 1.5L.",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "com-2",
-      name: "Combo Selvático Dúo",
-      category_id: "combos",
-      category: "combos",
-      price: 32.00,
-      description: "1 Tacacho con cecina + 1 Arroz chaufa amazónico + 2 refrescos de cocona helados.",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "com-3",
-      name: "Combo Burger Lover",
-      category_id: "combos",
-      category: "combos",
-      price: 28.00,
-      description: "2 Hamburguesas a lo Pobre + 2 porciones de papas crujientes + 2 Inca Cola 500ml.",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ext-1",
-      name: "Porción de Papas Fritas",
-      category_id: "extras",
-      category: "extras",
-      price: 6.00,
-      description: "Papas amarillas crocantes saladas al punto, doradas al momento.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ext-2",
-      name: "Porción Extra de Cecina",
-      category_id: "extras",
-      category: "extras",
-      price: 8.00,
-      description: "Láminas jugosas de cecina ahumada artesanal de la selva.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ext-3",
-      name: "Porción de Tacacho",
-      category_id: "extras",
-      category: "extras",
-      price: 6.00,
-      description: "Bolas de plátano majado con chicharrón y sazón amazónica.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ext-4",
-      name: "Porción de Cremas de la Casa",
-      category_id: "extras",
-      category: "extras",
-      price: 3.00,
-      description: "Variedad de salsas caseras: ají pollero, tártara, mayonesa y rocoto.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80"
-    }
-  ];
+  {
+    "id": "ama-1",
+    "name": "Patacones con Chorizo",
+    "category_id": "platos-amazonicos",
+    "price": 12,
+    "description": "Dorados y crujientes patacones artesanales con chorizo amazónico jugoso y salsa cremosa de la casa.",
+    "badge": "SELVA",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Patacones de plátano verde fritos",
+      "Chorizo frito en bolitas",
+      "Salsa criolla / Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ama-2",
+    "name": "Tacacho con Cecina",
+    "category_id": "platos-amazonicos",
+    "price": 12,
+    "description": "El abrazo de la selva. Tacacho ahumado en leña con cecina premium y madurito caramelizado.",
+    "badge": "TÍPICO",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Tacacho con plátano asado",
+      "Cecina ahumada de la selva",
+      "Chorizo amazónico",
+      "Plátano maduro frito",
+      "Sarza criolla / ají de cocona"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ama-3",
+    "name": "Juanes",
+    "category_id": "platos-amazonicos",
+    "price": 15,
+    "description": "Tradición envuelta en hoja de bijao. Arroz selvático jugoso con gallina de chacra y su toque de huevo.",
+    "badge": "TRADICIONAL",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "/imagenes/categorias/platos-amazonicos/banner.webp",
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Juane de arroz con gallina",
+      "Huevo duro",
+      "Aceituna de botija",
+      "Plátano maduro frito",
+      "Ensalada de cocona / ají de cocona"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ama-4",
+    "name": "Chilcano de Carachama o Pescado del Día",
+    "category_id": "platos-amazonicos",
+    "price": 15,
+    "description": "Caldo ancestral que revive. Pescado fresco de río, yuca nativa y culantro amazónico bien cargado.",
+    "badge": "RECONSTITUYENTE",
+    "popular": false,
+    "available": true,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Carachama / pescado del día entero",
+      "Yuca sancochada",
+      "Caldo chilcano"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ama-5",
+    "name": "Palometa Frita con Maduro o Plátano",
+    "category_id": "platos-amazonicos",
+    "price": 15,
+    "description": "Palometa entera crocante y dorada, con arroz blanco graneado y plátanos maduros dulces.",
+    "badge": "FRESCO",
+    "popular": true,
+    "available": true,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Palometa frita entera",
+      "Arroz blanco",
+      "Plátano maduro frito",
+      "Salsa criolla / ají"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ama-6",
+    "name": "Caldo Amazónico",
+    "category_id": "platos-amazonicos",
+    "price": 12,
+    "description": "Nuestra sopa bandera. Potente, aromático y humeante, con pescado fresco y hierbas de la selva.",
+    "badge": "CALIENTE",
+    "popular": false,
+    "available": true,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Caldo verde amazónico",
+      "Culantro y hierbas selváticas",
+      "Yuca sancochada"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ama-7",
+    "name": "Arroz Chaufa Amazónico",
+    "category_id": "platos-amazonicos",
+    "price": 15,
+    "description": "El chaufa selvático salteado al fuego con cecina ahumada, chorizo y aroma a selva profunda.",
+    "badge": "FAVORITO",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Arroz chaufa con cecina",
+      "Chorizo amazónico en trozos",
+      "Huevo salteado"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-1",
+    "name": "Clásica",
+    "category_id": "hamburguesas",
+    "price": 10,
+    "description": "La clásica que nunca falla. Carne artesanal jugosa, pan suave, papas doradas y ensalada fresca.",
+    "badge": "CLÁSICA",
+    "popular": true,
+    "available": true,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Papas fritas",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-2",
+    "name": "Choripan",
+    "category_id": "hamburguesas",
+    "price": 10,
+    "description": "Chorizo a la parrilla chispeante con papas crujientes y cremas. Sabor callejero elevado a premium.",
+    "badge": "PARRILLERO",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papas fritas",
+      "Chorizo parrillero",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-3",
+    "name": "Hawaiana Carne",
+    "category_id": "hamburguesas",
+    "price": 14,
+    "description": "Fusión tropical irresistible. Carne jugosa, piña asada dulce, jamón ahumado y queso fundido.",
+    "badge": "ESPECIAL",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papa frita",
+      "Carne artesanal",
+      "Huevo frito",
+      "Jamón",
+      "Queso fundido",
+      "Piña a la plancha",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-4",
+    "name": "Hawaiana Pollo",
+    "category_id": "hamburguesas",
+    "price": 13,
+    "description": "Pollo crispy extra crujiente con piña jugosa y queso derretido. Dulce, salado y adictivo.",
+    "badge": "CRISPY",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1521305916504-4a1121188589?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papa frita",
+      "Pollo crispy",
+      "Huevo frito",
+      "Jamón",
+      "Queso fundido",
+      "Piña a la plancha",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-5",
+    "name": "Pollo Deshilachado",
+    "category_id": "hamburguesas",
+    "price": 9,
+    "description": "Pollo jugoso deshilachado a fuego lento, sazonado con nuestra receta secreta de la casa.",
+    "badge": "ECONÓMICO",
+    "popular": false,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papas fritas",
+      "Pollo deshilachado con mayonesa casera",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-6",
+    "name": "Filete de Pollo",
+    "category_id": "hamburguesas",
+    "price": 11,
+    "description": "Filete empanizado dorado, crujiente por fuera y tierno por dentro. Ligero pero contundente.",
+    "popular": false,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1525164286253-04e68b9d94c6?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papas fritas",
+      "Filete de pollo a la plancha",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-7",
+    "name": "Cheese Burguer",
+    "category_id": "hamburguesas",
+    "price": 11,
+    "description": "Para los queseros de corazón. Carne jugosa bañada en abundante cheddar derretido cremoso.",
+    "badge": "CHEDDAR",
+    "popular": true,
+    "available": true,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Papas fritas",
+      "Queso cheddar"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-8",
+    "name": "Bacon Burguer",
+    "category_id": "hamburguesas",
+    "price": 12,
+    "description": "Pura tentación. Tocino ahumado crujiente, queso fundido y carne jugosa en cada mordida.",
+    "badge": "TOCINO",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Papas fritas",
+      "Tocino crocante",
+      "Queso cheddar"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-9",
+    "name": "La Suprema",
+    "category_id": "hamburguesas",
+    "price": 15,
+    "description": "La más imponente. Carne, tocino, jamón, queso y huevo frito. Creada para paladares exigentes.",
+    "badge": "MÁXIMA",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Tocino crocante",
+      "Queso fundido",
+      "Huevo frito",
+      "Jamón",
+      "Papas fritas",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-10",
+    "name": "Hamburguesa a lo Pobre",
+    "category_id": "hamburguesas",
+    "price": 14,
+    "description": "Sabor 100% peruano. Con huevo frito, plátano maduro, jamón y queso sobre carne jugosa.",
+    "badge": "A LO POBRE",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Huevo frito",
+      "Queso fundido",
+      "Jamón",
+      "Plátano maduro frito",
+      "Papas fritas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-11",
+    "name": "Royal",
+    "category_id": "hamburguesas",
+    "price": 13,
+    "description": "La mixtura perfecta. Carne artesanal, chorizo, pollo deshilachado y pollo crispy en una sola.",
+    "badge": "ROYAL",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Carne casera o pollo",
+      "Papas fritas",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ham-12",
+    "name": "Royal a lo Pobre",
+    "category_id": "hamburguesas",
+    "price": 14,
+    "description": "La Royal llevada al extremo con huevo, plátano frito y jamón. Grande, completa y poderosa.",
+    "badge": "COMPLETA",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papa frita",
+      "Carne artesanal",
+      "Huevo frito",
+      "Jamón",
+      "Queso fundido",
+      "Plátano maduro frito",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "bro-1",
+    "name": "Pecho",
+    "category_id": "broaster",
+    "price": 18,
+    "description": "Pieza gigante extra crujiente y jugosa, con arroz graneado, papas doradas y ensalada fresca.",
+    "badge": "PECHUGA",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "broaster",
+    "accompaniments": [
+      "Papas fritas doradas",
+      "Ensalada fresca de la casa",
+      "Arroz blanco",
+      "Cremas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "bro-2",
+    "name": "Pierna",
+    "category_id": "broaster",
+    "price": 12,
+    "description": "Dorada, crujiente y suculenta. Nuestra pierna broaster más pedida, jugosa hasta el hueso.",
+    "badge": "JUGOSO",
+    "popular": true,
+    "available": true,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "broaster",
+    "accompaniments": [
+      "Papas fritas doradas",
+      "Ensalada fresca de la casa",
+      "Arroz blanco",
+      "Cremas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "bro-3",
+    "name": "Encuentro",
+    "category_id": "broaster",
+    "price": 13,
+    "description": "El dúo perfecto de muslo y pierna en un encuentro crujiente que no podrás olvidar.",
+    "badge": "FAVORITO",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "broaster",
+    "accompaniments": [
+      "Papas fritas doradas",
+      "Ensalada fresca de la casa",
+      "Arroz blanco",
+      "Cremas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "bro-4",
+    "name": "Ala",
+    "category_id": "broaster",
+    "price": 10,
+    "description": "Ideal para picar. Alita dorada, súper crujiente y sazonada con toque secreto amazónico.",
+    "badge": "CLÁSICO",
+    "popular": false,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "broaster",
+    "accompaniments": [
+      "Papas fritas doradas",
+      "Ensalada fresca de la casa",
+      "Arroz blanco",
+      "Cremas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "sal-1",
+    "name": "Salchipapa Clásica",
+    "category_id": "salchipapas",
+    "price": 10,
+    "description": "Papas doradas premium con salchicha crocante y lluvia de cremas caseras. La clásica infalible.",
+    "badge": "CLÁSICA",
+    "popular": true,
+    "available": true,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Salchicha en rodajas",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "sal-2",
+    "name": "Salchipapa a lo Pobre",
+    "category_id": "salchipapas",
+    "price": 13,
+    "description": "La clásica con poder extra: huevo frito y plátano maduro dulce para un sabor criollo total.",
+    "badge": "A LO POBRE",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Huevo frito",
+      "Queso fundido",
+      "Jamón",
+      "Plátano maduro frito",
+      "Papas fritas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "sal-3",
+    "name": "Salchibroaster Pecho",
+    "category_id": "salchipapas",
+    "price": 20,
+    "description": "Montaña de papas con pecho broaster gigante, crujiente por fuera y jugoso por dentro.",
+    "badge": "CONTUNDENTE",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Presa broaster crujiente",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "sal-4",
+    "name": "Salchibroaster Pierna",
+    "category_id": "salchipapas",
+    "price": 14,
+    "description": "Pierna broaster dorada sobre papas crujientes. Contundente, jugoso y perfecto para compartir.",
+    "badge": "BROASTER",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Presa broaster crujiente",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "sal-5",
+    "name": "Salchibroaster Encuentro",
+    "category_id": "salchipapas",
+    "price": 16,
+    "description": "Mix broaster generoso con papas doradas y cremas. Porción grande para hambre grande.",
+    "badge": "POPULAR",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Presa broaster crujiente",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "sal-6",
+    "name": "Salchibroaster Ala",
+    "category_id": "salchipapas",
+    "price": 13,
+    "description": "Ala broaster crujiente sobre base de papas doradas, con ensalada fresca y cremas.",
+    "popular": false,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Presa broaster crujiente",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "sal-7",
+    "name": "Salchichorizo",
+    "category_id": "salchipapas",
+    "price": 13,
+    "description": "Explosión de sabor con chorizo parrillero ahumado, papas crujientes y cremas picantitas.",
+    "badge": "AMAZÓNICO",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Chorizo amazónico en rodajas",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ali-1",
+    "name": "Acevichadas",
+    "category_id": "alitas",
+    "price": 15,
+    "description": "5 alitas jugosas bañadas en cremosa salsa acevichada con toque marino, cítrico y picante.",
+    "badge": "ACEVICHADAS",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "alitas",
+    "accompaniments": [
+      "5 alitas crocantes",
+      "Papas fritas doradas",
+      "Salsa de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "ali-2",
+    "name": "BBQ",
+    "category_id": "alitas",
+    "price": 15,
+    "description": "5 alitas glaseadas en salsa BBQ ahumada, dulce y jugosa con un toque ahumado irresistible.",
+    "badge": "BBQ",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "alitas",
+    "accompaniments": [
+      "5 alitas crocantes",
+      "Papas fritas doradas",
+      "Salsa de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "beb-1",
+    "name": "Inca Cola",
+    "category_id": "bebidas",
+    "price": 5,
+    "description": "La doradita peruana bien heladita. Burbujeante, dulce y perfecta para tu broaster crujiente.",
+    "badge": "HELADA",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "beb-2",
+    "name": "Coca Cola",
+    "category_id": "bebidas",
+    "price": 5,
+    "description": "Clásica mundial, helada al punto. Refrescancia burbujeante que combina con todo.",
+    "badge": "HELADA",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "beb-3",
+    "name": "Fanta",
+    "category_id": "bebidas",
+    "price": 3.5,
+    "description": "Naranja vibrante, dulce y chispeante. Ultra refrescante para el calor de la selva.",
+    "popular": false,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "beb-4",
+    "name": "Pepsi",
+    "category_id": "bebidas",
+    "price": 2,
+    "description": "Ligera, refrescante y burbujeante. Ideal para acompañar tus hamburguesas artesanales.",
+    "popular": false,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "beb-5",
+    "name": "Agua Cielo",
+    "category_id": "bebidas",
+    "price": 2.5,
+    "description": "Pura y cristalina. Natural, sin gas, perfecta para hidratarte de forma saludable.",
+    "badge": "NATURAL",
+    "popular": false,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "ref-1",
+    "name": "Maracuyá",
+    "category_id": "refrescos",
+    "price": 3,
+    "description": "Tropical y vibrante. Dulce y ácido a la vez, 100% fruta natural amazónica bien helado.",
+    "badge": "100% NATURAL",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "ref-2",
+    "name": "Chicha",
+    "category_id": "refrescos",
+    "price": 3,
+    "description": "Nuestra chicha morada casera, dulce, aromática y refrescante con receta tradicional andina.",
+    "badge": "CASERA",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "ref-3",
+    "name": "Cocona",
+    "category_id": "refrescos",
+    "price": 3,
+    "description": "Exótico de la selva. Cítrico, refrescante y revitalizante. Un sabor amazónico que enamora.",
+    "badge": "AMAZÓNICO",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "ref-4",
+    "name": "Aguajina",
+    "category_id": "refrescos",
+    "price": 3,
+    "description": "Dulce y cremosa del aguaje amazónico. Nutritiva, suave y refrescante. Pura selva.",
+    "badge": "TÍPICO",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "ref-5",
+    "name": "Camu Camu",
+    "category_id": "refrescos",
+    "price": 3,
+    "description": "El shot natural de vitamina C. Ácido, refrescante y energizante. Directo de la Amazonía.",
+    "badge": "VITAMINA C",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "inf-1",
+    "name": "Anís",
+    "category_id": "infusiones",
+    "price": 2.5,
+    "description": "Calientita y aromática. Digestiva, suave y relajante. El cierre perfecto después de comer.",
+    "badge": "CALIENTE",
+    "popular": false,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "infusiones",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "inf-2",
+    "name": "Té",
+    "category_id": "infusiones",
+    "price": 2.5,
+    "description": "Clásico reconfortante y aromático. Calientito, equilibrado y perfecto para cerrar la velada.",
+    "badge": "CALIENTE",
+    "popular": false,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "infusiones",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "inf-3",
+    "name": "Manzanilla",
+    "category_id": "infusiones",
+    "price": 2.5,
+    "description": "Flores de manzanilla seleccionadas. Calma, descanso y aroma herbal que reconforta el alma.",
+    "badge": "RELAJANTE",
+    "popular": false,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "infusiones",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "promo-1",
+    "name": "Promoción Tú Eliges con Gaseosa 1.5 LT.",
+    "category_id": "promociones",
+    "price": 90.9,
+    "original_price": 105,
+    "description": "1 BuchiSapa Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Esta Promoción incluye ensalada fresca o cocida a elección.",
+    "badge": "PROMO",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "promociones",
+    "accompaniments": [
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Cremas Buchisapa",
+      "Bebida"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "promo-2",
+    "name": "Promoción Tu Chicha 1.5 LT.",
+    "category_id": "promociones",
+    "price": 95.5,
+    "original_price": 110,
+    "description": "1 BuchiSapa Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Esta Promoción incluye ensalada fresca o cocida a elección.",
+    "badge": "PROMO",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "promociones",
+    "accompaniments": [
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Cremas Buchisapa",
+      "Bebida"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "promo-3",
+    "name": "Promoción Tú Eliges con Gaseosa 2.25 LT.",
+    "category_id": "promociones",
+    "price": 95.5,
+    "original_price": 112,
+    "description": "1 BuchiSapa Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Esta Promoción incluye ensalada fresca o cocida a elección.",
+    "badge": "PROMO",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "promociones",
+    "accompaniments": [
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Cremas Buchisapa",
+      "Bebida"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "promo-4",
+    "name": "Promoción Para 2",
+    "category_id": "promociones",
+    "price": 57.9,
+    "original_price": 68,
+    "description": "1/2 BuchiSapa Brasa + papas fritas + ensalada regular + 2 bebidas personales. Esta Promoción incluye cremas de la casa a elección.",
+    "badge": "PROMO",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "promociones",
+    "accompaniments": [
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Cremas Buchisapa",
+      "Bebida"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
+  },
+  {
+    "id": "adic-1",
+    "name": "Porción de Papas Fritas BuchiSapa",
+    "category_id": "adicional",
+    "price": 7,
+    "description": "Porción generosa de papas crocantes doradas al punto perfecto.",
+    "badge": "EXTRA",
+    "popular": true,
+    "available": true,
+    "stock": 100,
+    "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "adic-2",
+    "name": "Porción de Tacacho Extra",
+    "category_id": "adicional",
+    "price": 8,
+    "description": "Bolas de plátano machacado con cecina y chicharrón crujiente.",
+    "badge": "SELVA",
+    "popular": true,
+    "available": true,
+    "stock": 80,
+    "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "adic-3",
+    "name": "Salsa Acevichada Especial (Pote)",
+    "category_id": "adicional",
+    "price": 3.5,
+    "description": "Pote adicional de la icónica salsa acevichada de la casa.",
+    "badge": "CREMA",
+    "popular": true,
+    "available": true,
+    "stock": 150,
+    "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "adic-4",
+    "name": "Huevo Frito a la Montada Extra",
+    "category_id": "adicional",
+    "price": 2.5,
+    "description": "Huevo fresco frito con yema blanda para acompañar tu plato o hamburguesa.",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 100,
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "adic-5",
+    "name": "Porción de Arroz Amazónico Chaufa",
+    "category_id": "adicional",
+    "price": 6.5,
+    "description": "Arroz chaufa salteado al wók con finos toques aromáticos de la selva.",
+    "badge": "GUARNICIÓN",
+    "popular": false,
+    "available": true,
+    "stock": 90,
+    "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "com-1",
+    "name": "Combo Familiar Broaster",
+    "category_id": "promociones",
+    "category": "promociones",
+    "price": 45,
+    "stock": 25,
+    "available": true,
+    "badge": "FAMILIAR",
+    "popular": true,
+    "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
+    "description": "1 Pollo broaster entero crocante + porción familiar de papas fritas + ensalada + chicha morada 1.5L.",
+    "accompaniments": [
+      "1 Pollo broaster entero crocante",
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Chicha morada 1.5L"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "com-2",
+    "name": "Combo Selvático Dúo",
+    "category_id": "promociones",
+    "category": "promociones",
+    "price": 32,
+    "stock": 25,
+    "available": true,
+    "badge": "DÚO",
+    "popular": true,
+    "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80",
+    "description": "1 Tacacho con cecina + 1 Arroz chaufa amazónico + 2 refrescos de cocona helados.",
+    "accompaniments": [
+      "1 Tacacho con cecina ahumada",
+      "1 Arroz chaufa amazónico con chorizo",
+      "2 Refrescos de cocona helados",
+      "Sarza criolla de cocona"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "com-3",
+    "name": "Combo Burger Lover",
+    "category_id": "promociones",
+    "category": "promociones",
+    "price": 28,
+    "stock": 25,
+    "available": true,
+    "badge": "PARRILLERO",
+    "popular": true,
+    "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80",
+    "description": "2 Hamburguesas a lo Pobre + 2 porciones de papas crujientes + 2 Inca Kola 500ml.",
+    "accompaniments": [
+      "2 Hamburguesas a lo Pobre con huevo y plátano",
+      "2 Porciones de papas fritas crujientes",
+      "2 Gaseosas Inca Kola 500ml"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "ext-1",
+    "name": "Porción de Papas Fritas Clásica",
+    "category_id": "adicional",
+    "category": "adicional",
+    "price": 6,
+    "stock": 50,
+    "available": true,
+    "badge": "EXTRA",
+    "popular": false,
+    "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80",
+    "description": "Papas amarillas crocantes saladas al punto, doradas al momento de servir.",
+    "accompaniments": [
+      "Porción generosa de papas fritas doradas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "ext-2",
+    "name": "Porción Extra de Cecina",
+    "category_id": "adicional",
+    "category": "adicional",
+    "price": 8,
+    "stock": 35,
+    "available": true,
+    "badge": "SELVA",
+    "popular": false,
+    "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80",
+    "description": "Láminas jugosas de cecina ahumada artesanal de la selva traída directamente de Tarapoto.",
+    "accompaniments": [
+      "Porción de cecina ahumada de la selva",
+      "Plátano maduro frito"
+    ],
+    "cremas": [
+      "Ají de Rocoto",
+      "Tártara"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "ext-3",
+    "name": "Porción de Tacacho Amazónico",
+    "category_id": "adicional",
+    "category": "adicional",
+    "price": 6,
+    "stock": 35,
+    "available": true,
+    "badge": "TÍPICO",
+    "popular": false,
+    "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80",
+    "description": "Bolas de plátano verde majado con chicharrón crujiente y sazón amazónica.",
+    "accompaniments": [
+      "2 Bolas de tacacho con chicharrón",
+      "Ají de cocona"
+    ],
+    "cremas": [
+      "Ají de Rocoto"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "ext-4",
+    "name": "Porción de Cremas de la Casa (Pack)",
+    "category_id": "adicional",
+    "category": "adicional",
+    "price": 3,
+    "stock": 100,
+    "available": true,
+    "badge": "SALSAS",
+    "popular": false,
+    "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+    "description": "Pack variado con potes de salsas caseras: ají charapita, tártara, mayonesa, rocoto y BBQ.",
+    "accompaniments": [
+      "Potes herméticos de salsas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara",
+      "Ají Charapita",
+      "Acevichada",
+      "Salsa BBQ"
+    ],
+    "includes_sauces": true
+  }
+];
 }
 
 /* =========================================================

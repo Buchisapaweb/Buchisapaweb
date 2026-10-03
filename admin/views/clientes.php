@@ -1,6 +1,7 @@
 <?php
 /**
  * BUCHISAPAWEB - Vista Clientes (public.perfiles)
+ * admin/views/clientes.php
  */
 require_once __DIR__ . '/../config/supabase.php';
 
@@ -23,8 +24,8 @@ $clientes = $res['data'] ?? [];
         </div>
     </div>
 
-    <!-- Real-time Interactive Filter Search Bar -->
-    <div class="relative max-w-md animate-fade-in select-none">
+    <!-- Search Bar -->
+    <div class="cliente-search-wrapper animate-fade-in">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
             <i data-lucide="search" class="w-4 h-4"></i>
         </span>
@@ -91,10 +92,10 @@ $clientes = $res['data'] ?? [];
                 $rawDate = $c['created_at'] ?? $c['createdAt'] ?? 'now';
                 $dateStr = date('d/m/Y h:i A', strtotime($rawDate));
                 ?>
-                <div class="mobile-cliente-card bg-[#121829] p-5 rounded-2xl border border-slate-800/80 space-y-3.5 shadow-md premium-card">
+                <div class="mobile-cliente-card cliente-mobile-card space-y-3.5">
                     <div class="flex justify-between items-start">
                         <div class="min-w-0">
-                            <span class="text-[9px] font-mono font-black text-orange-400 bg-orange-500/10 border border-orange-500/15 px-2 py-0.5 rounded uppercase tracking-wider">
+                            <span class="cliente-doc-badge">
                                 <?php echo htmlspecialchars($c['docType'] ?? 'DNI'); ?>: <?php echo htmlspecialchars($c['docNumber'] ?? 'No registrado'); ?>
                             </span>
                             <h3 class="font-extrabold text-sm text-white mt-2.5 truncate"><?php echo htmlspecialchars($c['name'] ?? 'Usuario Sin Nombre'); ?></h3>

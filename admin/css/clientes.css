@@ -3,7 +3,34 @@
  * admin/css/clientes.css
  */
 
-.doc-badge-dni {
+.cliente-search-wrapper {
+    position: relative;
+    max-width: 28rem;
+    user-select: none;
+}
+
+.cliente-doc-badge {
+    font-size: 9px;
+    font-family: monospace;
+    font-weight: 900;
+    color: #fb923c;
     background-color: rgba(249, 115, 22, 0.1);
-    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.15);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cliente-mobile-card {
+    background-color: #121829;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s ease;
+}
+
+.cliente-mobile-card:hover {
+    border-color: rgba(71, 85, 105, 0.8);
 }

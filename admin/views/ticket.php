@@ -71,7 +71,7 @@ $pedidos = Array.isArray($ordersRes['data']) ? $ordersRes['data'] : [];
                                 <td class="p-4 text-right font-black text-emerald-400 font-mono-numbers">S/ <?php echo number_format(floatval($o['total'] ?? 0), 2); ?></td>
                                 <td class="p-4 text-[10px] font-black uppercase tracking-wider text-slate-500 select-none"><?php echo htmlspecialchars($o['orderType'] ?? 'Delivery'); ?></td>
                                 <td class="p-4 text-center">
-                                    <button onclick='abrirGeneradorTicket(<?php echo json_encode($o, JSON_HEX_APOS | JSON_HEX_QUOT); ?>)' class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white rounded-xl text-xs font-extrabold transition-all shadow-md active-press">
+                                    <button onclick='abrirGeneradorTicket(<?php echo json_encode($o, JSON_HEX_APOS | JSON_HEX_QUOT); ?>)' class="ticket-btn-pos active-press">
                                         <i data-lucide="printer" class="w-3.5 h-3.5"></i>
                                         <span>Ver Ticket POS</span>
                                     </button>
@@ -86,8 +86,8 @@ $pedidos = Array.isArray($ordersRes['data']) ? $ordersRes['data'] : [];
 </div>
 
 <!-- Dynamic Overlay Modal for POS Receipt View -->
-<div id="ticket-modal-container" class="fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-150">
-    <div id="ticket-modal-content" class="bg-[#121829] border border-slate-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl relative flex flex-col h-[90vh] max-h-[680px]">
+<div id="ticket-modal-container" class="ticket-modal-overlay hidden">
+    <div id="ticket-modal-content" class="ticket-modal-card">
         <!-- Close Button -->
         <button onclick="cerrarTicketModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white transition-colors" aria-label="Cerrar modal">
             <i data-lucide="x" class="w-5 h-5"></i>
@@ -99,21 +99,17 @@ $pedidos = Array.isArray($ordersRes['data']) ? $ordersRes['data'] : [];
         </h3>
 
         <!-- Scrollable receipt frame mimicking actual POS paper roll -->
-        <div class="flex-1 overflow-y-auto bg-white p-6 rounded-xl border border-slate-200 text-black font-mono shadow-inner select-text select-none scrollbar-none" id="thermal-receipt-container">
-            <!-- Render dynamic thermal ticket markup -->
-        </div>
+        <div class="ticket-receipt-scroll" id="thermal-receipt-container"></div>
 
-        <!-- Action panel fixed to the bottom of the sheet for natural touch reach -->
+        <!-- Action panel fixed to the bottom -->
         <div class="pt-4 border-t border-slate-800/80 mt-4 flex gap-3 shrink-0">
-            <button onclick="imprimirTicketFisico()" class="flex-1 py-2.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-md active-press">
+            <button onclick="imprimirTicketFisico()" class="ticket-print-action active-press">
                 <i data-lucide="printer" class="w-4 h-4"></i>
                 <span>Imprimir Recibo</span>
             </button>
-            <button onclick="cerrarTicketModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white font-bold rounded-xl text-xs active-press">
+            <button onclick="cerrarTicketModal()" class="ticket-close-action active-press">
                 Cerrar
             </button>
         </div>
     </div>
 </div>
-
-

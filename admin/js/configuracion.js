@@ -3,7 +3,7 @@
  * admin/js/configuracion.js
  */
 
-let selectedPhotoUrl = "";
+var selectedPhotoUrl = (typeof window !== 'undefined' && window.selectedPhotoUrl) ? window.selectedPhotoUrl : "";
 
 document.addEventListener('DOMContentLoaded', () => {
     initConfiguracionView();

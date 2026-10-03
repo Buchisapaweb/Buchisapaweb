@@ -26,6 +26,9 @@ export interface Product {
   image: string;
   options?: any;
   includes_sauces?: boolean;
+  category?: string;
+  accompaniments?: string[];
+  cremas?: string[];
 }
 
 export interface Sauce {
@@ -1092,14 +1095,16 @@ export async function deleteCategory(id: string): Promise<boolean> {
 }
 
 export async function getProducts(categoryId?: string): Promise<Product[]> {
+  productsStore = loadProductsFromDisk();
   let list = productsStore;
   if (categoryId) {
-    list = list.filter(p => p.category_id === categoryId);
+    list = list.filter(p => p.category_id === categoryId || p.category === categoryId);
   }
   return [...list].sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
+  productsStore = loadProductsFromDisk();
   const product = productsStore.find(p => p.id === id);
   return product || null;
 }
@@ -1407,7 +1412,8 @@ export async function createProduct(data: Partial<Product>): Promise<Product> {
     id: data.id || `prod-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     code: data.code || String(100000 + productsStore.length + 1),
     name: data.name || 'Nuevo Producto',
-    category_id: data.category_id || 'hamburguesas',
+    category_id: data.category_id || data.category || 'hamburguesas',
+    category: data.category || data.category_id || 'hamburguesas',
     price: Number(data.price) || 10,
     description: data.description || '',
     badge: data.badge || null,
@@ -1415,7 +1421,9 @@ export async function createProduct(data: Partial<Product>): Promise<Product> {
     available: data.available !== false,
     stock: typeof data.stock === 'number' ? data.stock : 25,
     image: data.image || '/imagenes/portada/Portada1E.webp',
-    includes_sauces: Boolean(data.includes_sauces)
+    includes_sauces: Boolean(data.includes_sauces),
+    accompaniments: Array.isArray(data.accompaniments) ? data.accompaniments : [],
+    cremas: Array.isArray(data.cremas) ? data.cremas : []
   };
   productsStore.unshift(newProduct);
   saveProductsToDisk();
@@ -1430,7 +1438,11 @@ export async function updateProduct(id: string, data: Partial<Product>): Promise
     ...productsStore[index],
     ...data,
     price: data.price !== undefined ? Number(data.price) : productsStore[index].price,
-    stock: data.stock !== undefined ? Number(data.stock) : productsStore[index].stock
+    stock: data.stock !== undefined ? Number(data.stock) : productsStore[index].stock,
+    category_id: data.category_id || data.category || productsStore[index].category_id,
+    category: data.category || data.category_id || productsStore[index].category,
+    accompaniments: Array.isArray(data.accompaniments) ? data.accompaniments : productsStore[index].accompaniments,
+    cremas: Array.isArray(data.cremas) ? data.cremas : productsStore[index].cremas
   };
   saveProductsToDisk();
   return productsStore[index];

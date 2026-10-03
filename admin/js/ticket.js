@@ -6,7 +6,7 @@
 console.log("🎫 Ticket Module Initialized");
 
 // Global active ticket variable
-let pedidoImpresionActivo = null;
+var pedidoImpresionActivo = (typeof window !== 'undefined' && window.pedidoImpresionActivo) ? window.pedidoImpresionActivo : null;
 
 function abrirGeneradorTicket(o) {
     pedidoImpresionActivo = o;
@@ -42,7 +42,7 @@ function abrirGeneradorTicket(o) {
             <div><strong>TELÉFONO:</strong> ${o.customerPhone || 'Sin registrar'}</div>
             <div><strong>TIPO:</strong> ${o.orderType || 'Delivery'}</div>
             <div><strong>MÉTODO PAGO:</strong> ${o.paymentMethod || 'Yape'}</div>
-            ${o.address ? `<div><strong>DIRECCIÓN:</strong> ${o.address}</div>` : ''}
+            ${o.deliveryAddress || o.address ? `<div><strong>DIRECCIÓN:</strong> ${o.deliveryAddress || o.address}</div>` : ''}
         </div>
 
         <div class="border-t border-dashed border-black/30 my-3"></div>
@@ -73,137 +73,62 @@ function abrirGeneradorTicket(o) {
         </div>
     `;
 
-    document.getElementById('thermal-receipt-container').innerHTML = markup;
-    document.getElementById('ticket-modal-container').classList.remove('hidden');
+    const container = document.getElementById('thermal-receipt-container');
+    if (container) {
+        container.innerHTML = markup;
+    }
+    const modal = document.getElementById('ticket-modal-container');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
 }
 
 function cerrarTicketModal() {
-    document.getElementById('ticket-modal-container').classList.add('hidden');
+    const modal = document.getElementById('ticket-modal-container');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
 }
 
 function imprimirTicketFisico() {
     if (!pedidoImpresionActivo) return;
     
-    const win = window.open('', '_blank', 'width=380,height=600');
-    if (!win) {
-        alert("Por favor habilita las ventanas emergentes en tu navegador para imprimir.");
+    // Si BuchisapaPrinter está disponible globalmente, usar su método robusto
+    if (typeof BuchisapaPrinter !== 'undefined' && typeof BuchisapaPrinter.printTicketNative === 'function') {
+        BuchisapaPrinter.printTicketNative(pedidoImpresionActivo);
         return;
     }
-    
-    const receiptMarkup = document.getElementById('thermal-receipt-container').innerHTML;
-    
-    win.document.write(`
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <title>Imprimir Ticket - Buchisapa POS</title>
-        <style>
-            @page {
-                size: 80mm auto;
-                margin: 0;
-            }
-            body {
-                font-family: 'Courier New', Courier, monospace;
-                width: 72mm;
-                margin: 0 auto;
-                padding: 10px;
-                color: #000;
-                background-color: #fff;
-            }
-            strong {
-                font-weight: bold;
-            }
-            .text-center {
-                text-align: center;
-            }
-            .text-right {
-                text-align: right;
-            }
-            .flex {
-                display: flex;
-            }
-            .flex-1 {
-                flex: 1;
-            }
-            .justify-between {
-                justify-content: space-between;
-            }
-            .items-start {
-                align-items: flex-start;
-            }
-            .border-t {
-                border-top: 1px dashed #000;
-            }
-            .my-3 {
-                margin-top: 12px;
-                margin-bottom: 12px;
-            }
-            .mb-1 {
-                margin-bottom: 4px;
-            }
-            .mb-1\\.5 {
-                margin-bottom: 6px;
-            }
-            .mt-0\\.5 {
-                margin-top: 2px;
-            }
-            .mt-1\\.5 {
-                margin-top: 6px;
-            }
-            .text-[10px] {
-                font-size: 11px;
-            }
-            .text-[9px] {
-                font-size: 10px;
-            }
-            .text-[8px] {
-                font-size: 9px;
-            }
-            .text-xs {
-                font-size: 12px;
-            }
-            .text-sm {
-                font-size: 14px;
-            }
-            .text-base {
-                font-size: 16px;
-            }
-            .font-bold {
-                font-weight: bold;
-            }
-            .font-extrabold {
-                font-weight: 900;
-            }
-            .italic {
-                font-style: italic;
-            }
-            @media print {
-                body {
-                    width: 72mm;
-                }
-                .no-print {
-                    display: none;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        ${receiptMarkup}
-        <script>
-            window.onload = function() {
-                window.print();
-                setTimeout(function() {
-                    window.close();
-                }, 100);
-            }
-        <\/script>
-    </body>
-    </html>
-    `);
-    
-    win.document.close();
+
+    try {
+        const frame = document.getElementById('print_hidden');
+        if (frame && frame.contentWindow) {
+            const receiptMarkup = document.getElementById('thermal-receipt-container')?.innerHTML || '';
+            frame.contentWindow.document.open();
+            frame.contentWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Imprimir Ticket</title>
+                    <style>
+                        @page { size: 80mm auto; margin: 0; }
+                        body { font-family: 'Courier New', monospace; width: 72mm; margin: 0 auto; padding: 10px; color: #000; }
+                    </style>
+                </head>
+                <body>
+                    ${receiptMarkup}
+                    <script>window.onload = function() { window.print(); };<\/script>
+                </body>
+                </html>
+            `);
+            frame.contentWindow.document.close();
+            return;
+        }
+    } catch (e) {
+        console.warn('Iframe printing fallback to window.print', e);
+    }
+
+    window.print();
 }

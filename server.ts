@@ -2725,42 +2725,65 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     
     if (view === 'productos') {
       if (action === 'create' || action === 'edit') {
-        const id = req.body.id;
-        const payload = {
-          name: req.body.name,
-          description: req.body.description,
-          price: parseFloat(req.body.price || '0'),
-          stock: parseInt(req.body.stock || '0', 10),
-          category: req.body.category,
-          image: req.body.image_url || '/imagenes/productos/fallback.webp',
-          available: req.body.available === 'true'
+        const id = req.body.id || req.body.id_form || `prod-${Date.now()}`;
+        const name = req.body.name || 'Sin nombre';
+        const description = req.body.description || '';
+        const price = parseFloat(req.body.price || '0');
+        const stock = parseInt(req.body.stock || '25', 10);
+        const category = req.body.category || 'hamburguesas';
+        const badge = req.body.badge || null;
+        const image = req.body.image_url || '/imagenes/productos/fallback.webp';
+        const available = req.body.available === 'true' || req.body.available === true;
+
+        let accompaniments: string[] = [];
+        if (Array.isArray(req.body.accompaniments)) {
+          accompaniments = req.body.accompaniments;
+        } else if (typeof req.body.accompaniments === 'string') {
+          accompaniments = req.body.accompaniments.split('\n').map((l: string) => l.split(',')).flat().map((s: string) => s.trim()).filter(Boolean);
+        }
+
+        let cremas: string[] = [];
+        if (Array.isArray(req.body.cremas)) {
+          cremas = req.body.cremas;
+        } else if (typeof req.body.cremas === 'string') {
+          cremas = req.body.cremas.split(',').map((s: string) => s.trim()).filter(Boolean);
+        }
+
+        const productPayload = {
+          name,
+          description,
+          price,
+          stock,
+          category,
+          category_id: category,
+          badge,
+          image,
+          available,
+          accompaniments,
+          cremas,
+          includes_sauces: cremas.length > 0
         };
-        
+
         if (action === 'create') {
-          const idForm = req.body.id_form;
-          const supRes = await querySupabase('POST', 'products', { id: idForm, ...payload });
-          if (supRes.code >= 200 && supRes.code < 300) {
-            successMsg = 'Plato creado con éxito en Supabase';
-          } else {
-            errorMsg = `Error al crear producto: Code ${supRes.code}`;
-          }
+          const created = await createProduct({ id, ...productPayload });
+          broadcastProductStockUpdate(created);
+          querySupabase('POST', 'products', { id, ...productPayload }).catch(() => {});
+          successMsg = '¡Plato agregado a la carta con éxito!';
         } else {
-          const supRes = await querySupabase('PATCH', `products?id=eq.${id}`, payload);
-          if (supRes.code >= 200 && supRes.code < 300) {
-            successMsg = 'Plato actualizado con éxito en Supabase';
-          } else {
-            errorMsg = `Error al actualizar producto: Code ${supRes.code}`;
+          const updated = await updateProduct(id, productPayload);
+          if (updated) {
+            broadcastProductStockUpdate(updated);
           }
+          querySupabase('PATCH', `products?id=eq.${id}`, productPayload).catch(() => {});
+          successMsg = '¡Plato actualizado con éxito!';
         }
       } else if (action === 'delete') {
         const id = req.body.id;
         if (id) {
-          const supRes = await querySupabase('DELETE', `products?id=eq.${id}`);
-          if (supRes.code >= 200 && supRes.code < 300) {
-            successMsg = 'Plato eliminado de la carta con éxito';
-          } else {
-            errorMsg = `Error al eliminar de la base de datos: Code ${supRes.code}`;
-          }
+          await deleteProduct(id);
+          broadcastProductStockUpdate({ id, deleted: true, available: false, stock: 0 });
+          querySupabase('DELETE', `products?id=eq.${id}`).catch(() => {});
+          successMsg = '¡Plato eliminado de la carta con éxito!';
         }
       }
     } else if (view === 'pedidos') {
@@ -2860,9 +2883,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         clientes = Array.isArray(supRes.data) ? supRes.data : [];
       } else if (view === 'productos') {
         const supResProd = await querySupabase('GET', 'products?select=*&order=category.asc');
-        productos = Array.isArray(supResProd.data) ? supResProd.data : [];
+        if (Array.isArray(supResProd.data) && supResProd.data.length > 0) {
+          productos = supResProd.data;
+        } else {
+          productos = await getProducts();
+        }
         const supResCat = await querySupabase('GET', 'categories?select=id,name');
-        categorias = Array.isArray(supResCat.data) ? supResCat.data : [];
+        if (Array.isArray(supResCat.data) && supResCat.data.length > 0) {
+          categorias = supResCat.data;
+        } else {
+          categorias = await getCategories();
+        }
       } else if (view === 'pedidos' || view === 'ticket') {
         const supResOrd = await querySupabase('GET', 'orders?select=*&order=created_at.desc');
         pedidos = Array.isArray(supResOrd.data) ? supResOrd.data : [];
@@ -2870,7 +2901,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         const supResCl = await querySupabase('GET', 'perfiles?select=id');
         clientes = Array.isArray(supResCl.data) ? supResCl.data : [];
         const supResProd = await querySupabase('GET', 'products?select=*');
-        productos = Array.isArray(supResProd.data) ? supResProd.data : [];
+        if (Array.isArray(supResProd.data) && supResProd.data.length > 0) {
+          productos = supResProd.data;
+        } else {
+          productos = await getProducts();
+        }
         const supResOrd = await querySupabase('GET', 'orders?select=*&order=created_at.desc');
         pedidos = Array.isArray(supResOrd.data) ? supResOrd.data : [];
       }
@@ -2956,42 +2991,182 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         });
       }
       else if (view === 'productos') {
-        html = html.replace(/const activeCategories = <\?php echo json_encode\(\$categorias\); \?>;/g, `const activeCategories = ${JSON.stringify(categorias)};`);
-        
-        const renderLoop = (itemTemplate: string) => {
-          if (productos.length === 0) {
-            return `<tr><td colspan="7" class="p-8 text-center text-slate-500 font-semibold">No hay productos en el catálogo de Supabase.</td></tr>`;
-          }
-          return productos.map(p => {
-            const id = p.id || '';
-            const name = p.name || 'Sin nombre';
-            const description = p.description || 'Sin guarnición descrita';
-            const category = p.category || 'broaster';
-            const price = parseFloat(p.price || '0');
-            const stock = parseInt(p.stock || '0', 10);
-            const image = p.image || '/imagenes/productos/fallback.webp';
-            const available = p.available === undefined ? true : Boolean(p.available);
-            
-            let temp = itemTemplate;
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['image'\]\s*\?\?\s*'\/imagenes\/productos\/fallback\.webp'\);\s*\?>/g, image);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['name'\]\s*\?\?\s*''\);\s*\?>/g, name);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['description'\]\s*\?\?\s*'Sin guarniciones descritas'\);\s*\?>/g, description);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['category'\]\s*\?\?\s*'broaster'\);\s*\?>/g, category);
-            temp = temp.replace(/<\?php\s+echo\s+number_format\(floatval\(\$p\['price'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, price.toFixed(2));
-            temp = temp.replace(/<\?php\s+echo\s+\$stock;\s*\?>/g, String(stock));
-            temp = temp.replace(/<\?php\s+echo\s+\$available\s*\?\s*'Disponible'\s*:\s*'Agotado';\s*\?>/g, available ? 'Disponible' : 'Agotado');
-            temp = temp.replace(/<\?php\s+echo\s+\$available\s*\?\s*'text-emerald-400'\s*:\s*'text-slate-500';\s*\?>/g, available ? 'text-emerald-400' : 'text-slate-500');
-            temp = temp.replace(/<\?php\s+echo\s+\$isCrit\s*\?\s*'text-red-400 font-black'\s*:\s*'text-slate-300 font-bold';\s*\?>/g, stock <= 5 ? 'text-red-400 font-black' : 'text-slate-300 font-bold');
-            temp = temp.replace(/<\?php\s+echo\s+\$isCrit\s*\?\s*'text-red-400 font-black animate-pulse'\s*:\s*'text-slate-400 font-bold';\s*\?>/g, stock <= 5 ? 'text-red-400 font-black animate-pulse' : 'text-slate-400 font-bold');
-            temp = temp.replace(/<\?php\s+echo\s+json_encode\(\$p,\s*JSON_HEX_APOS\s*\|\s*JSON_HEX_QUOT\);\s*\?>/g, JSON.stringify(p).replace(/'/g, '&#39;').replace(/"/g, '&quot;'));
-            temp = temp.replace(/<\?php\s+echo\s+\$p\['id'\];\s*\?>/g, id);
-            return temp;
-          }).join('\n');
-        };
-        
-        html = html.replace(/<\?php\s+if\s*\(empty\(\$productos\)\):[\s\S]*?<\?php\s+else:\s*\?>([\s\S]*?)<\?php\s+endif;\s*\?>/g, (m, content) => {
-          return renderLoop(content);
+        const totalProductos = productos.length;
+        const totalDisponibles = productos.filter(p => p.available !== false).length;
+        const totalCriticos = productos.filter(p => parseInt(String(p.stock || '0'), 10) <= 5).length;
+
+        const CATEGORIAS_DEFINIDAS = [
+            { id: 'promociones',       name: '⭐ PROMOCIONES',               icon: 'sparkles',  color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
+            { id: 'alitas',            name: 'ALITAS',                       icon: 'flame',     color: '#ef4444', desc: 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.' },
+            { id: 'bebidas',           name: 'BEBIDAS',                      icon: 'cup-soda',  color: '#06b6d4', desc: 'Gaseosas heladas, agua mineral y bebidas embotelladas.' },
+            { id: 'broaster',          name: 'BROASTER',                     icon: 'drumstick', color: '#f97316', desc: 'Pollo broaster ultra crocante con papas doradas y cremas.' },
+            { id: 'hamburguesas',      name: 'HAMBURGUESAS',                 icon: 'beef',      color: '#eab308', desc: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
+            { id: 'infusiones',        name: 'INFUSIONES',                   icon: 'coffee',    color: '#10b981', desc: 'Infusiones calientes, café aromático pasado y manzanilla.' },
+            { id: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS',            icon: 'utensils',  color: '#8b5cf6', desc: 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.' },
+            { id: 'refrescos',         name: 'REFRESCOS',                    icon: 'glass-water',color: '#3b82f6', desc: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
+            { id: 'salchipapas',       name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'layers',    color: '#ec4899', desc: 'Papas crocantes, salchichas frankfurter y combinaciones broaster.' },
+            { id: 'adicional',         name: 'ADICIONAL',                    icon: 'plus-circle',color: '#94a3b8', desc: 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.' }
+        ];
+
+        // 1. Generar pestañas horizontales de categorías
+        let filterTabsHtml = `
+            <button type="button" onclick="seleccionarFiltroCategoria('all')" class="category-tab-btn active px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 bg-orange-600 text-white" data-cat="all">
+                Todos (${totalProductos})
+            </button>
+        `;
+        CATEGORIAS_DEFINIDAS.forEach(cat => {
+            const countInCat = productos.filter(p => (p.category_id || p.category) === cat.id).length;
+            filterTabsHtml += `
+            <button type="button" onclick="seleccionarFiltroCategoria('${cat.id}')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="${cat.id}">
+                ${cat.name} (${countInCat})
+            </button>
+            `;
         });
+
+        // 2. Generar bloques de categorías y tarjetas de platos
+        let categoriesBlocksHtml = '';
+        CATEGORIAS_DEFINIDAS.forEach(cat => {
+            const platosEnCat = productos.filter(p => (p.category_id || p.category) === cat.id);
+            
+            let cardsHtml = '';
+            if (platosEnCat.length === 0) {
+                cardsHtml = `<div class="p-6 text-center text-slate-500 text-xs font-semibold bg-[#101424] rounded-xl border border-slate-800/60 col-span-full">No hay platos registrados en esta categoría aún.</div>`;
+            } else {
+                cardsHtml = platosEnCat.map(p => {
+                    const id = p.id || '';
+                    const name = p.name || 'Sin nombre';
+                    const desc = p.description || 'Delicioso plato preparado con ingredientes frescos.';
+                    const price = parseFloat(p.price || '0');
+                    const stock = parseInt(String(p.stock || '25'), 10);
+                    const badge = p.badge || '';
+                    const image = p.image || '/imagenes/productos/fallback.webp';
+                    const available = p.available !== false;
+                    const isCrit = stock <= 5;
+                    const accompaniments = Array.isArray(p.accompaniments) ? p.accompaniments : [];
+                    const cremas = Array.isArray(p.cremas) ? p.cremas : [];
+
+                    const accHtml = accompaniments.length > 0 
+                        ? `<div class="flex flex-wrap gap-1">${accompaniments.map((a: string) => `<span class="text-[9px] font-bold px-1.5 py-0.5 bg-[#0a0d16] border border-slate-800 text-slate-300 rounded">${a}</span>`).join('')}</div>`
+                        : `<span class="text-[9px] text-slate-500 italic">Sin acompañamiento directo (Bebida / Individual)</span>`;
+
+                    const cremasHtml = cremas.length > 0
+                        ? `<div class="flex flex-wrap gap-1">${cremas.map((c: string) => `<span class="text-[9px] font-bold px-1.5 py-0.5 bg-orange-950/20 border border-orange-900/40 text-orange-300 rounded">${c}</span>`).join('')}</div>`
+                        : `<span class="text-[9px] text-slate-500 italic">No incluye cremas</span>`;
+
+                    const badgeHtml = badge 
+                        ? `<span class="absolute top-1 left-1 px-1.5 py-0.5 bg-orange-600/90 text-[8px] font-black text-white uppercase rounded tracking-wider shadow">${badge}</span>` 
+                        : '';
+
+                    const pJsonStr = JSON.stringify(p).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+
+                    return `
+                    <div class="producto-card bg-[#111728] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all duration-200 shadow-md relative overflow-hidden group select-none" data-search-target="${(name + ' ' + desc + ' ' + accompaniments.join(' ') + ' ' + cremas.join(' ')).toLowerCase()}">
+                        <div class="space-y-3">
+                            <div class="flex gap-3">
+                                <div class="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-800 bg-[#0a0d16]">
+                                    <img src="${image}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/imagenes/productos/fallback.webp'">
+                                    ${badgeHtml}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-start justify-between gap-1">
+                                        <h4 class="font-black text-sm text-white truncate leading-tight">${name}</h4>
+                                        <span class="font-mono-numbers font-black text-sm text-emerald-400 shrink-0">S/ ${price.toFixed(2)}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-mono-numbers font-bold ${isCrit ? 'text-red-400 animate-pulse' : 'text-slate-400'}">
+                                            <i data-lucide="package" class="w-3 h-3"></i> Stock: ${stock}
+                                        </span>
+                                        <span class="text-slate-600">·</span>
+                                        <span class="text-[9px] font-black uppercase ${available ? 'text-emerald-400' : 'text-slate-500'}">
+                                            ${available ? 'Disponible' : 'Agotado'}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-400 line-clamp-2 mt-1.5 leading-relaxed">${desc}</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-2.5 border-t border-slate-800/60">
+                                <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider block mb-1">
+                                    <i data-lucide="utensils-crossed" class="w-2.5 h-2.5 inline mr-1 text-orange-400"></i> Acompañamientos:
+                                </span>
+                                ${accHtml}
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800/60">
+                                <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider block mb-1">
+                                    <i data-lucide="sparkles" class="w-2.5 h-2.5 inline mr-1 text-yellow-400"></i> Cremas incluidas:
+                                </span>
+                                ${cremasHtml}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-800/60">
+                            <span class="text-[9px] font-mono-numbers text-slate-500 font-bold">ID: ${id}</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick='abrirEditarProductoModal(${pJsonStr})' class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1 active-press" title="Editar plato">
+                                    <i data-lucide="edit-3" class="w-3 h-3 text-orange-400"></i>
+                                    <span>Editar</span>
+                                </button>
+                                <form action="/admin/index.php?view=productos" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas eliminar este plato de la carta?')">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="${id}">
+                                    <button type="submit" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all active-press" title="Eliminar plato">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('\n');
+            }
+
+            categoriesBlocksHtml += `
+            <section class="category-block space-y-4" id="cat-section-${cat.id}" data-cat-id="${cat.id}">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color}80;"></span>
+                        <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+                            ${cat.name}
+                        </h3>
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase text-slate-300 bg-slate-800/60 border border-slate-700/60">
+                            ${platosEnCat.length} platos
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 italic">${cat.desc}</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    ${cardsHtml}
+                </div>
+            </section>
+            `;
+        });
+
+        // Reemplazar contadores rápidos
+        html = html.replace(/<\?php\s+echo\s+\$totalProductos;\s*\?>/g, String(totalProductos));
+        html = html.replace(/<\?php\s+echo\s+\$totalDisponibles;\s*\?>/g, String(totalDisponibles));
+        html = html.replace(/<\?php\s+echo\s+\$totalCriticos;\s*\?>/g, String(totalCriticos));
+        html = html.replace(/<\?php\s+echo\s+\$totalCriticos\s*>\s*0\s*\?\s*'text-red-400'\s*:\s*'text-slate-400';\s*\?>/g, totalCriticos > 0 ? 'text-red-400' : 'text-slate-400');
+
+        // Reemplazar barra de filtros de categorías
+        const filterBarStart = html.indexOf('<div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">');
+        const filterBarEnd = html.indexOf('</div>\n    </div>\n\n    <!-- SECCIONES DIVIDIDAS POR CATEGORÍAS -->');
+        if (filterBarStart !== -1 && filterBarEnd !== -1) {
+            const pre = html.substring(0, filterBarStart);
+            const post = html.substring(filterBarEnd);
+            html = pre + `<div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none" id="categories-filter-bar">\n${filterTabsHtml}\n` + post;
+        }
+
+        // Reemplazar contenedor de bloques de categorías
+        const contStart = html.indexOf('<div class="space-y-10" id="productos-container">');
+        const contEnd = html.indexOf('<!-- Modal Container Frame -->');
+        if (contStart !== -1 && contEnd !== -1) {
+            const pre = html.substring(0, contStart);
+            const post = html.substring(contEnd);
+            html = pre + `<div class="space-y-10" id="productos-container">\n${categoriesBlocksHtml}\n    </div>\n</div>\n\n` + post;
+        }
+
+        html = html.replace(/window\.activeCategories\s*=\s*<\?php[\s\S]*?\?>;/g, `window.activeCategories = ${JSON.stringify(CATEGORIAS_DEFINIDAS)};`);
       }
       else if (view === 'pedidos') {
         const renderLoop = (itemTemplate: string) => {
@@ -3163,14 +3338,57 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         // Calcular métricas
         let ventas_totales = 0;
         let pedidos_atendidos = 0;
+        let ventas_por_dia = [0, 0, 0, 0, 0, 0, 0];
+        let categorias_stats: Record<string, number> = {
+          'promociones': 0,
+          'alitas': 0,
+          'bebidas': 0,
+          'broaster': 0,
+          'hamburguesas': 0,
+          'infusiones': 0,
+          'platos-amazonicos': 0,
+          'refrescos': 0,
+          'salchipapas': 0,
+          'adicional': 0
+        };
+
         pedidos.forEach(o => {
           const st = (o.status || 'recibido').toLowerCase();
           if (st === 'entregado' || st === 'completado') {
-            ventas_totales += parseFloat(o.total || '0');
+            const tot = parseFloat(o.total || '0');
+            ventas_totales += tot;
             pedidos_atendidos++;
+
+            const created_at = o.created_at || new Date().toISOString();
+            const dayIndex = (new Date(created_at).getDay() + 6) % 7; // Lunes=0, Domingo=6
+            if (dayIndex >= 0 && dayIndex <= 6) {
+              ventas_por_dia[dayIndex] += tot;
+            }
+
+            const itemsStr = JSON.stringify(o.items || []).toLowerCase();
+            if (itemsStr.includes('promocion') || itemsStr.includes('combo')) {
+              categorias_stats['promociones'] += tot;
+            } else if (itemsStr.includes('alitas')) {
+              categorias_stats['alitas'] += tot;
+            } else if (itemsStr.includes('gaseosa') || itemsStr.includes('bebida') || itemsStr.includes('incka') || itemsStr.includes('agua')) {
+              categorias_stats['bebidas'] += tot;
+            } else if (itemsStr.includes('broaster') || itemsStr.includes('pollo') || itemsStr.includes('brasa')) {
+              categorias_stats['broaster'] += tot;
+            } else if (itemsStr.includes('hamburguesa') || itemsStr.includes('burger')) {
+              categorias_stats['hamburguesas'] += tot;
+            } else if (itemsStr.includes('infusion') || itemsStr.includes('cafe') || itemsStr.includes('te') || itemsStr.includes('manzanilla')) {
+              categorias_stats['infusiones'] += tot;
+            } else if (itemsStr.includes('amazon') || itemsStr.includes('tacacho') || itemsStr.includes('cecina') || itemsStr.includes('juane') || itemsStr.includes('patacon')) {
+              categorias_stats['platos-amazonicos'] += tot;
+            } else if (itemsStr.includes('refresco') || itemsStr.includes('cocona') || itemsStr.includes('chicha') || itemsStr.includes('maracuya')) {
+              categorias_stats['refrescos'] += tot;
+            } else if (itemsStr.includes('salchipapa') || itemsStr.includes('salchibroaster')) {
+              categorias_stats['salchipapas'] += tot;
+            } else {
+              categorias_stats['adicional'] += tot;
+            }
           }
         });
-        
         const productos_criticos = productos.filter(p => parseInt(p.stock || '0', 10) <= 5);
         const stock_critico_count = productos_criticos.length;
         
@@ -3180,59 +3398,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         html = html.replace(/<\?php\s+echo\s+count\(\$clientes\);\s*\?>/g, String(clientes.length));
         html = html.replace(/<\?php\s+echo\s+\$stock_critico_count;\s*\?>/g, String(stock_critico_count));
         html = html.replace(/<\?php\s+echo\s+\$stock_critico_count\s*>\s*0\s*\?\s*'text-red-400 font-black animate-pulse'\s*:\s*'text-white';\s*\?>/g, stock_critico_count > 0 ? 'text-red-400 font-black animate-pulse' : 'text-white');
-        
-        // Loop de pedidos recientes
-        const recentOrdersTemplateRegex = /<\?php\s+foreach\s*\(\$recent_orders\s+as\s+\$o\):\s*\*?\?>([\s\S]*?)<\?php\s+endforeach;\s*\?>/g;
-        html = html.replace(recentOrdersTemplateRegex, (m, template) => {
-          const recent_orders = pedidos.slice(0, 5);
-          if (recent_orders.length === 0) {
-            return `<div class="py-12 text-center text-slate-500 font-semibold text-xs select-none">No hay comandas todavía.</div>`;
-          }
-          return recent_orders.map(o => {
-            const orderNum = o.orderNumber || o.id || '';
-            const status = (o.status || 'recibido').toLowerCase();
-            const customerName = o.customerName || 'Cliente';
-            const total = parseFloat(o.total || '0');
-            const created_at = o.created_at || new Date().toISOString();
-            const timeStr = new Date(created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
-            
-            let temp = template;
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$orderNum\);\s*\?>/g, orderNum);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$o\['customerName'\]\s*\?\?\s*'Cliente'\);\s*\?>/g, customerName);
-            temp = temp.replace(/<\?php\s+echo\s+number_format\(floatval\(\$o\['total'\]\s*\?\?\s*0\),\s*2\);\s*\?>/g, total.toFixed(2));
-            temp = temp.replace(/<\?php\s+echo\s+isset\(\$o\['created_at'\]\)\s*\?\s*date\('h:i A',\s*strtotime\(\$o\['created_at'\]\)\)\s*:\s*'Ahora';\s*\?>/g, timeStr);
-            temp = temp.replace(/<\?php\s+echo\s+\$status;\s*\?>/g, status);
-            temp = temp.replace(/<\?php\s+echo\s+\$stateColor;\s*\?>/g, status === 'entregado' || status === 'completado' ? 'text-emerald-400 bg-emerald-500/5 border-emerald-500/10' : status === 'cancelado' ? 'text-red-400 bg-red-500/5 border-red-500/10' : status === 'preparando' ? 'text-sky-400 bg-sky-500/5 border-sky-500/10' : 'text-amber-400 bg-amber-500/5 border-amber-500/10');
-            return temp;
-          }).join('\n');
-        });
-        
-        // Loop de productos críticos
-        const productsCritTemplateRegex = /<\?php\s+foreach\s*\(\$productos_criticos\s+as\s+\$p\):\s*\*?\?>([\s\S]*?)<\?php\s+endforeach;\s*\?>/g;
-        html = html.replace(productsCritTemplateRegex, (m, template) => {
-          const recent_crit = productos_criticos.slice(0, 5);
-          if (recent_crit.length === 0) {
-            return `<div class="py-12 text-center text-slate-500 font-semibold text-xs select-none">No hay productos en stock crítico.</div>`;
-          }
-          return recent_crit.map(p => {
-            const name = p.name || '';
-            const category = p.category || 'broaster';
-            const stock = parseInt(p.stock || '0', 10);
-            const image = p.image || '/imagenes/productos/fallback.webp';
-            
-            let temp = template;
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['image'\]\s*\?\?\s*'\/imagenes\/productos\/fallback\.webp'\);\s*\?>/g, image);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['name'\]\s*\?\?\s*''\);\s*\?>/g, name);
-            temp = temp.replace(/<\?php\s+echo\s+htmlspecialchars\(\$p\['category'\]\s*\?\?\s*'broaster'\);\s*\?>/g, category);
-            temp = temp.replace(/<\?php\s+echo\s+\$stk;\s*\?>/g, String(stock));
-            return temp;
-          }).join('\n');
-        });
-        
-        // Limpiar condicionales vacíos redundantes de PHP
-        html = html.replace(/<\?php\s+if\s*\(empty\(\$recent_orders\)\):[\s\S]*?<\?php\s+else:[\s\S]*?\?>/g, '');
-        html = html.replace(/<\?php\s+if\s*\(empty\(\$productos_criticos\)\):[\s\S]*?<\?php\s+else:[\s\S]*?\?>/g, '');
-        html = html.replace(/<\?php\s+endif;\s*\?>/g, '');
+
+        // Reemplazar datos dinámicos de los gráficos
+        const jsonWeekly = JSON.stringify(ventas_por_dia);
+        const jsonCategories = JSON.stringify(categorias_stats);
+        html = html.replace(/data-weekly="[^"]*"/g, `data-weekly='${jsonWeekly}'`);
+        html = html.replace(/data-categories='[^']*'/g, `data-categories='${jsonCategories}'`);
+        html = html.replace(/window\.dashboardData\s*=\s*\{[\s\S]*?\};/g, `window.dashboardData = { weekly: ${jsonWeekly}, categories: ${jsonCategories} };`);
       }
       else if (view === 'ticket') {
         const renderLoop = (itemTemplate: string) => {
@@ -3277,9 +3449,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         });
       }
       
-      // Inyectar CSS y JS específicos de la vista en el emulador Node/Vercel
-      html = html.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${view}.css">\n</head>`);
-      html = html.replace('</body>', `  <script src="/admin/js/${view}.js"></script>\n</body>`);
+      // Inyectar CSS y JS específicos de la vista en el emulador Node/Vercel (evitando duplicados)
+      if (!html.includes(`/admin/css/${view}.css`)) {
+        html = html.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${view}.css">\n</head>`);
+      }
+      if (!html.includes(`/admin/js/${view}.js`)) {
+        html = html.replace('</body>', `  <script src="/admin/js/${view}.js"></script>\n</body>`);
+      }
 
       // Eliminar cualquier bloque de etiquetas PHP residuales que no hayan sido compiladas (para evitar que se impriman como texto en el navegador)
       html = html.replace(/<\?php[\s\S]*?\?>/g, '');

@@ -3,11 +3,70 @@
  * admin/css/productos.css
  */
 
-.product-image-ratio {
+.producto-image-ratio {
     aspect-ratio: 1 / 1;
 }
 
 .stock-warning-border {
     border-color: rgba(239, 68, 68, 0.4);
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}
+
+.producto-mobile-card {
+    background-color: #121829;
+    padding: 1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s ease;
+}
+
+.producto-mobile-card:hover {
+    border-color: rgba(71, 85, 105, 0.8);
+}
+
+.producto-thumb-img {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 0.75rem;
+    object-fit: cover;
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    flex-shrink: 0;
+    user-select: none;
+    background-color: #0a0d16;
+}
+
+.btn-icon-action {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-icon-edit {
+    background: rgba(30, 41, 59, 0.8);
+    color: #cbd5e1;
+}
+
+.btn-icon-edit:hover {
+    background: #334155;
+    color: #ffffff;
+}
+
+.btn-icon-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+}
+
+.btn-icon-delete:hover {
+    background: #ef4444;
+    color: #ffffff;
 }

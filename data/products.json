@@ -10,7 +10,20 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Patacones de plátano verde fritos",
+      "Chorizo frito en bolitas",
+      "Salsa criolla / Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ama-2",
@@ -23,7 +36,22 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Tacacho con plátano asado",
+      "Cecina ahumada de la selva",
+      "Chorizo amazónico",
+      "Plátano maduro frito",
+      "Sarza criolla / ají de cocona"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ama-3",
@@ -36,7 +64,22 @@
     "available": true,
     "stock": 25,
     "image": "/imagenes/categorias/platos-amazonicos/banner.webp",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Juane de arroz con gallina",
+      "Huevo duro",
+      "Aceituna de botija",
+      "Plátano maduro frito",
+      "Ensalada de cocona / ají de cocona"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ama-4",
@@ -49,7 +92,20 @@
     "available": true,
     "stock": 20,
     "image": "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Carachama / pescado del día entero",
+      "Yuca sancochada",
+      "Caldo chilcano"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ama-5",
@@ -62,7 +118,21 @@
     "available": true,
     "stock": 20,
     "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Palometa frita entera",
+      "Arroz blanco",
+      "Plátano maduro frito",
+      "Salsa criolla / ají"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ama-6",
@@ -75,7 +145,20 @@
     "available": true,
     "stock": 20,
     "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Caldo verde amazónico",
+      "Culantro y hierbas selváticas",
+      "Yuca sancochada"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ama-7",
@@ -88,7 +171,20 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "platos-amazonicos",
+    "accompaniments": [
+      "Arroz chaufa con cecina",
+      "Chorizo amazónico en trozos",
+      "Huevo salteado"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-1",
@@ -101,7 +197,21 @@
     "available": true,
     "stock": 35,
     "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Papas fritas",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-2",
@@ -114,7 +224,21 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papas fritas",
+      "Chorizo parrillero",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-3",
@@ -127,7 +251,25 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papa frita",
+      "Carne artesanal",
+      "Huevo frito",
+      "Jamón",
+      "Queso fundido",
+      "Piña a la plancha",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-4",
@@ -140,7 +282,25 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1521305916504-4a1121188589?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papa frita",
+      "Pollo crispy",
+      "Huevo frito",
+      "Jamón",
+      "Queso fundido",
+      "Piña a la plancha",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-5",
@@ -153,7 +313,21 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papas fritas",
+      "Pollo deshilachado con mayonesa casera",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-6",
@@ -165,7 +339,21 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1525164286253-04e68b9d94c6?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papas fritas",
+      "Filete de pollo a la plancha",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-7",
@@ -178,7 +366,20 @@
     "available": true,
     "stock": 35,
     "image": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Papas fritas",
+      "Queso cheddar"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-8",
@@ -191,7 +392,21 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Papas fritas",
+      "Tocino crocante",
+      "Queso cheddar"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-9",
@@ -204,7 +419,25 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Tocino crocante",
+      "Queso fundido",
+      "Huevo frito",
+      "Jamón",
+      "Papas fritas",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-10",
@@ -217,7 +450,23 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Huevo frito",
+      "Queso fundido",
+      "Jamón",
+      "Plátano maduro frito",
+      "Papas fritas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-11",
@@ -230,7 +479,21 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Carne casera o pollo",
+      "Papas fritas",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ham-12",
@@ -243,7 +506,25 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "hamburguesas",
+    "accompaniments": [
+      "Papa frita",
+      "Carne artesanal",
+      "Huevo frito",
+      "Jamón",
+      "Queso fundido",
+      "Plátano maduro frito",
+      "Ensalada fresca",
+      "Crema"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "bro-1",
@@ -256,7 +537,21 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "broaster",
+    "accompaniments": [
+      "Papas fritas doradas",
+      "Ensalada fresca de la casa",
+      "Arroz blanco",
+      "Cremas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "bro-2",
@@ -269,7 +564,21 @@
     "available": true,
     "stock": 35,
     "image": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "broaster",
+    "accompaniments": [
+      "Papas fritas doradas",
+      "Ensalada fresca de la casa",
+      "Arroz blanco",
+      "Cremas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "bro-3",
@@ -282,7 +591,21 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "broaster",
+    "accompaniments": [
+      "Papas fritas doradas",
+      "Ensalada fresca de la casa",
+      "Arroz blanco",
+      "Cremas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "bro-4",
@@ -295,7 +618,21 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "broaster",
+    "accompaniments": [
+      "Papas fritas doradas",
+      "Ensalada fresca de la casa",
+      "Arroz blanco",
+      "Cremas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "sal-1",
@@ -308,7 +645,21 @@
     "available": true,
     "stock": 35,
     "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Salchicha en rodajas",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "sal-2",
@@ -321,7 +672,23 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Hamburguesa artesanal",
+      "Huevo frito",
+      "Queso fundido",
+      "Jamón",
+      "Plátano maduro frito",
+      "Papas fritas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "sal-3",
@@ -334,7 +701,21 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Presa broaster crujiente",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "sal-4",
@@ -347,7 +728,21 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Presa broaster crujiente",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "sal-5",
@@ -360,7 +755,21 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Presa broaster crujiente",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "sal-6",
@@ -372,7 +781,21 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Presa broaster crujiente",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "sal-7",
@@ -385,7 +808,21 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "salchipapas",
+    "accompaniments": [
+      "Papas fritas",
+      "Chorizo amazónico en rodajas",
+      "Ensalada fresca",
+      "Cremas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ali-1",
@@ -398,7 +835,20 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "alitas",
+    "accompaniments": [
+      "5 alitas crocantes",
+      "Papas fritas doradas",
+      "Salsa de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "ali-2",
@@ -411,7 +861,20 @@
     "available": true,
     "stock": 25,
     "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "alitas",
+    "accompaniments": [
+      "5 alitas crocantes",
+      "Papas fritas doradas",
+      "Salsa de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "beb-1",
@@ -424,7 +887,10 @@
     "available": true,
     "stock": 50,
     "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "beb-2",
@@ -437,7 +903,10 @@
     "available": true,
     "stock": 50,
     "image": "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "beb-3",
@@ -449,7 +918,10 @@
     "available": true,
     "stock": 40,
     "image": "https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "beb-4",
@@ -461,7 +933,10 @@
     "available": true,
     "stock": 40,
     "image": "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "beb-5",
@@ -474,7 +949,10 @@
     "available": true,
     "stock": 40,
     "image": "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "bebidas",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "ref-1",
@@ -487,7 +965,10 @@
     "available": true,
     "stock": 40,
     "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "ref-2",
@@ -500,7 +981,10 @@
     "available": true,
     "stock": 40,
     "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "ref-3",
@@ -513,7 +997,10 @@
     "available": true,
     "stock": 40,
     "image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "ref-4",
@@ -526,7 +1013,10 @@
     "available": true,
     "stock": 40,
     "image": "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "ref-5",
@@ -539,7 +1029,10 @@
     "available": true,
     "stock": 40,
     "image": "https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "refrescos",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "inf-1",
@@ -552,7 +1045,10 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "infusiones",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "inf-2",
@@ -565,7 +1061,10 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "infusiones",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "inf-3",
@@ -578,7 +1077,10 @@
     "available": true,
     "stock": 30,
     "image": "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "infusiones",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "promo-1",
@@ -592,7 +1094,21 @@
     "available": true,
     "stock": 50,
     "image": "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "promociones",
+    "accompaniments": [
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Cremas Buchisapa",
+      "Bebida"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "promo-2",
@@ -606,7 +1122,21 @@
     "available": true,
     "stock": 50,
     "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "promociones",
+    "accompaniments": [
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Cremas Buchisapa",
+      "Bebida"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "promo-3",
@@ -620,7 +1150,21 @@
     "available": true,
     "stock": 50,
     "image": "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "promociones",
+    "accompaniments": [
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Cremas Buchisapa",
+      "Bebida"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "promo-4",
@@ -634,7 +1178,21 @@
     "available": true,
     "stock": 50,
     "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "promociones",
+    "accompaniments": [
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Cremas Buchisapa",
+      "Bebida"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ]
   },
   {
     "id": "adic-1",
@@ -647,7 +1205,10 @@
     "available": true,
     "stock": 100,
     "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": true
+    "includes_sauces": true,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "adic-2",
@@ -660,7 +1221,10 @@
     "available": true,
     "stock": 80,
     "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "adic-3",
@@ -673,7 +1237,10 @@
     "available": true,
     "stock": 150,
     "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "adic-4",
@@ -686,7 +1253,10 @@
     "available": true,
     "stock": 100,
     "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
   },
   {
     "id": "adic-5",
@@ -699,6 +1269,182 @@
     "available": true,
     "stock": 90,
     "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80",
-    "includes_sauces": false
+    "includes_sauces": false,
+    "category": "adicional",
+    "accompaniments": [],
+    "cremas": []
+  },
+  {
+    "id": "com-1",
+    "name": "Combo Familiar Broaster",
+    "category_id": "promociones",
+    "category": "promociones",
+    "price": 45,
+    "stock": 25,
+    "available": true,
+    "badge": "FAMILIAR",
+    "popular": true,
+    "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
+    "description": "1 Pollo broaster entero crocante + porción familiar de papas fritas + ensalada + chicha morada 1.5L.",
+    "accompaniments": [
+      "1 Pollo broaster entero crocante",
+      "Papas fritas familiares",
+      "Ensalada fresca",
+      "Chicha morada 1.5L"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "com-2",
+    "name": "Combo Selvático Dúo",
+    "category_id": "promociones",
+    "category": "promociones",
+    "price": 32,
+    "stock": 25,
+    "available": true,
+    "badge": "DÚO",
+    "popular": true,
+    "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80",
+    "description": "1 Tacacho con cecina + 1 Arroz chaufa amazónico + 2 refrescos de cocona helados.",
+    "accompaniments": [
+      "1 Tacacho con cecina ahumada",
+      "1 Arroz chaufa amazónico con chorizo",
+      "2 Refrescos de cocona helados",
+      "Sarza criolla de cocona"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "com-3",
+    "name": "Combo Burger Lover",
+    "category_id": "promociones",
+    "category": "promociones",
+    "price": 28,
+    "stock": 25,
+    "available": true,
+    "badge": "PARRILLERO",
+    "popular": true,
+    "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80",
+    "description": "2 Hamburguesas a lo Pobre + 2 porciones de papas crujientes + 2 Inca Kola 500ml.",
+    "accompaniments": [
+      "2 Hamburguesas a lo Pobre con huevo y plátano",
+      "2 Porciones de papas fritas crujientes",
+      "2 Gaseosas Inca Kola 500ml"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "ext-1",
+    "name": "Porción de Papas Fritas Clásica",
+    "category_id": "adicional",
+    "category": "adicional",
+    "price": 6,
+    "stock": 50,
+    "available": true,
+    "badge": "EXTRA",
+    "popular": false,
+    "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80",
+    "description": "Papas amarillas crocantes saladas al punto, doradas al momento de servir.",
+    "accompaniments": [
+      "Porción generosa de papas fritas doradas"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "ext-2",
+    "name": "Porción Extra de Cecina",
+    "category_id": "adicional",
+    "category": "adicional",
+    "price": 8,
+    "stock": 35,
+    "available": true,
+    "badge": "SELVA",
+    "popular": false,
+    "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80",
+    "description": "Láminas jugosas de cecina ahumada artesanal de la selva traída directamente de Tarapoto.",
+    "accompaniments": [
+      "Porción de cecina ahumada de la selva",
+      "Plátano maduro frito"
+    ],
+    "cremas": [
+      "Ají de Rocoto",
+      "Tártara"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "ext-3",
+    "name": "Porción de Tacacho Amazónico",
+    "category_id": "adicional",
+    "category": "adicional",
+    "price": 6,
+    "stock": 35,
+    "available": true,
+    "badge": "TÍPICO",
+    "popular": false,
+    "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80",
+    "description": "Bolas de plátano verde majado con chicharrón crujiente y sazón amazónica.",
+    "accompaniments": [
+      "2 Bolas de tacacho con chicharrón",
+      "Ají de cocona"
+    ],
+    "cremas": [
+      "Ají de Rocoto"
+    ],
+    "includes_sauces": true
+  },
+  {
+    "id": "ext-4",
+    "name": "Porción de Cremas de la Casa (Pack)",
+    "category_id": "adicional",
+    "category": "adicional",
+    "price": 3,
+    "stock": 100,
+    "available": true,
+    "badge": "SALSAS",
+    "popular": false,
+    "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+    "description": "Pack variado con potes de salsas caseras: ají charapita, tártara, mayonesa, rocoto y BBQ.",
+    "accompaniments": [
+      "Potes herméticos de salsas de la casa"
+    ],
+    "cremas": [
+      "Mayonesa",
+      "Mostaza",
+      "Ketchup",
+      "Ají de Rocoto",
+      "Tártara",
+      "Ají Charapita",
+      "Acevichada",
+      "Salsa BBQ"
+    ],
+    "includes_sauces": true
   }
 ]

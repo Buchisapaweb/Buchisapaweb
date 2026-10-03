@@ -34,6 +34,13 @@
    * Obtiene los acompañamientos específicos según la carta oficial Buchisapa
    */
   function getProductAccompaniments(product) {
+    if (!product) return [];
+
+    // 0. Prioridad máxima: acompañamientos configurados directamente en el admin / base de datos
+    if (Array.isArray(product.accompaniments)) {
+      return [...product.accompaniments];
+    }
+
     const name = (product.name || '').toLowerCase().trim();
     const cat = (product.category_id || product.category || '').toLowerCase().trim();
 
@@ -399,6 +406,8 @@
     // Inicializar salsas (NUNCA para bebidas, infusiones, refrescos o postres)
     if (isDrinkOrNoSauceItem(product)) {
       selectedSauces = [];
+    } else if (Array.isArray(product.cremas) && product.cremas.length > 0) {
+      selectedSauces = [...product.cremas];
     } else {
       selectedSauces = ALL_SAUCES.filter(s => s.default).map(s => s.name);
     }
@@ -443,6 +452,11 @@
 
   function isDrinkOrNoSauceItem(product) {
     if (!product) return false;
+
+    // Si explícitamente se configuró en el admin que NO incluye salsas o que no tiene cremas asignadas
+    if (product.includes_sauces === false || (Array.isArray(product.cremas) && product.cremas.length === 0)) {
+      return true;
+    }
 
     const catBadge = String(product.categoryBadge || '').toLowerCase();
     const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
@@ -734,7 +748,14 @@
   }
 
   function renderSaucesList() {
-    return ALL_SAUCES.map(s => {
+    let sauceList = ALL_SAUCES;
+    if (currentProduct && Array.isArray(currentProduct.cremas) && currentProduct.cremas.length > 0) {
+      sauceList = currentProduct.cremas.map(cName => {
+        const found = ALL_SAUCES.find(s => s.name.toLowerCase() === cName.toLowerCase());
+        return found || { id: cName.toLowerCase().replace(/\s+/g, '-'), name: cName, default: true };
+      });
+    }
+    return sauceList.map(s => {
       const isSelected = selectedSauces.includes(s.name);
       return `
         <div class="product-item-toggle-card ${isSelected ? 'active' : ''}" onclick="window.customizerToggleSauce('${escapeHtmlAttr(s.name)}')">
@@ -784,10 +805,15 @@
   };
 
   window.customizerSetSaucesPreset = function (preset) {
+    let availableList = ALL_SAUCES.map(s => s.name);
+    if (currentProduct && Array.isArray(currentProduct.cremas) && currentProduct.cremas.length > 0) {
+      availableList = [...currentProduct.cremas];
+    }
+
     if (preset === 'all') {
-      selectedSauces = ALL_SAUCES.map(s => s.name);
+      selectedSauces = [...availableList];
     } else if (preset === 'classics') {
-      selectedSauces = ['Mayonesa', 'Mostaza', 'Ketchup', 'Ají de Rocoto'];
+      selectedSauces = ['Mayonesa', 'Mostaza', 'Ketchup', 'Ají de Rocoto'].filter(s => availableList.includes(s));
     } else if (preset === 'none') {
       selectedSauces = [];
     }

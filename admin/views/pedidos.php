@@ -41,7 +41,6 @@ $pedidos_por_estado = [
 
 foreach ($pedidos as $o) {
     $st = strtolower($o['status'] ?? 'recibido');
-    // Mapear completado a entregado para simplicidad del flujo
     if ($st === 'completado') $st = 'entregado';
     if (array_key_exists($st, $pedidos_por_estado)) {
         $pedidos_por_estado[$st][] = $o;
@@ -49,7 +48,7 @@ foreach ($pedidos as $o) {
 }
 ?>
 <div class="space-y-6">
-    <!-- Header Area conforming to Top Bar breadcrumb style but as view headline -->
+    <!-- Header Area -->
     <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 animate-fade-in">
         <div>
             <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
@@ -59,24 +58,24 @@ foreach ($pedidos as $o) {
             <p class="text-xs text-slate-400">Controla las comandas, despacha entregas y monitorea la cocina en tiempo real</p>
         </div>
         
-        <!-- Controls panel (Responsive layout) -->
+        <!-- Controls panel -->
         <div class="flex flex-wrap items-center gap-3">
             <!-- 1. Horizontal Scrollable Status Swiper -->
-            <div class="flex items-center gap-1.5 bg-[#121829] p-1 rounded-xl border border-slate-800/80 overflow-x-auto whitespace-nowrap scrollbar-none max-w-full sm:max-w-none select-none">
-                <button onclick="filterPHPOrders('all')" class="order-php-btn px-4 py-2 bg-orange-600 text-white rounded-lg text-xs font-bold transition-all shadow shrink-0 active-press">Todos</button>
-                <button onclick="filterPHPOrders('recibido')" class="order-php-btn px-4 py-2 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all shrink-0 active-press">Recibidos</button>
-                <button onclick="filterPHPOrders('preparando')" class="order-php-btn px-4 py-2 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all shrink-0 active-press">Cocina</button>
-                <button onclick="filterPHPOrders('en_camino')" class="order-php-btn px-4 py-2 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all shrink-0 active-press">En Camino</button>
-                <button onclick="filterPHPOrders('entregado')" class="order-php-btn px-4 py-2 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all shrink-0 active-press">Entregados</button>
+            <div class="flex items-center gap-1.5 bg-[#121829] p-1 rounded-xl border border-slate-800/80 overflow-x-auto whitespace-nowrap scrollbar-none select-none">
+                <button onclick="filterPHPOrders('all')" class="order-tab-btn active active-press">Todos</button>
+                <button onclick="filterPHPOrders('recibido')" class="order-tab-btn active-press">Recibidos</button>
+                <button onclick="filterPHPOrders('preparando')" class="order-tab-btn active-press">Cocina</button>
+                <button onclick="filterPHPOrders('en_camino')" class="order-tab-btn active-press">En Camino</button>
+                <button onclick="filterPHPOrders('entregado')" class="order-tab-btn active-press">Entregados</button>
             </div>
 
-            <!-- 2. Desktop View Selector (Table vs Kanban) - Conforming to Interactive Filter tab rules -->
-            <div class="hidden lg:flex items-center bg-[#121829] p-1 rounded-xl border border-slate-800/80 gap-1 select-none text-xs shrink-0">
-                <button onclick="toggleDesktopView('table')" id="btn-view-table" class="px-3.5 py-1.5 rounded-lg font-bold transition-all text-white bg-slate-800 flex items-center gap-1.5 active-press shadow-sm">
+            <!-- 2. Desktop View Selector (Table vs Kanban) -->
+            <div class="hidden lg:flex items-center bg-[#121829] p-1 rounded-xl border border-slate-800/80 gap-1 select-none shrink-0">
+                <button onclick="toggleDesktopView('table')" id="btn-view-table" class="view-selector-btn active active-press">
                     <i data-lucide="list" class="w-3.5 h-3.5"></i>
                     <span>Tabla</span>
                 </button>
-                <button onclick="toggleDesktopView('kanban')" id="btn-view-kanban" class="px-3.5 py-1.5 rounded-lg font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1.5 active-press">
+                <button onclick="toggleDesktopView('kanban')" id="btn-view-kanban" class="view-selector-btn active-press">
                     <i data-lucide="kanban" class="w-3.5 h-3.5"></i>
                     <span>Tablero KDS</span>
                 </button>
@@ -136,16 +135,15 @@ foreach ($pedidos as $o) {
                             elseif ($status === 'cancelado') $stateColor = 'text-red-400';
                             elseif ($status === 'preparando') $stateColor = 'text-sky-400';
                             
-                            // Action controls
                             $actionHtml = '';
                             if ($status === 'recibido') {
-                                $actionHtml = '<button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold py-1.5 px-3 rounded-xl text-[10px] transition-all">Iniciar Cocina</button><input type="hidden" name="status" value="preparando">';
+                                $actionHtml = '<button type="submit" class="btn-kds-cook"><i data-lucide="chef-hat" class="w-3.5 h-3.5"></i> Cocinar</button><input type="hidden" name="status" value="preparando">';
                             } elseif ($status === 'preparando') {
-                                $actionHtml = '<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-1.5 px-3 rounded-xl text-[10px] transition-all">Despachar</button><input type="hidden" name="status" value="en_camino">';
+                                $actionHtml = '<button type="submit" class="btn-kds-dispatch"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Despachar</button><input type="hidden" name="status" value="en_camino">';
                             } elseif ($status === 'en_camino') {
-                                $actionHtml = '<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-1.5 px-3 rounded-xl text-[10px] transition-all">Entregado</button><input type="hidden" name="status" value="entregado">';
+                                $actionHtml = '<button type="submit" class="btn-kds-deliver"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Entregar</button><input type="hidden" name="status" value="entregado">';
                             } else {
-                                $actionHtml = '<span class="text-slate-500 text-[10px] block text-center font-bold">Despachado</span>';
+                                $actionHtml = '<span class="badge-dispatched"><i data-lucide="archive-restore" class="w-3 h-3 inline mr-1"></i> Despachado</span>';
                             }
                             ?>
                             <tr class="hover:bg-slate-800/20 transition-colors order-row" data-status="<?php echo $status; ?>">
@@ -180,7 +178,7 @@ foreach ($pedidos as $o) {
                                             <input type="hidden" name="action" value="update_status">
                                             <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                                             <input type="hidden" name="status" value="cancelado">
-                                            <button type="submit" class="w-full mt-1 bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white font-bold py-1 px-3 rounded-lg text-[9px] transition-all">Cancelar</button>
+                                            <button type="submit" class="btn-kds-cancel">Cancelar</button>
                                         </form>
                                     <?php else: ?>
                                         <?php echo $actionHtml; ?>
@@ -211,10 +209,10 @@ foreach ($pedidos as $o) {
             $count = count($orders_in_col);
         ?>
             <!-- Column Container -->
-            <div class="bg-[#0f1424]/40 rounded-2xl border border-slate-800/80 p-4 flex flex-col h-[calc(100vh-230px)] min-w-[270px] max-w-[320px] shrink-0">
+            <div class="kds-column">
                 <!-- Column Header -->
-                <div class="flex items-center justify-between mb-4 pb-3.5 border-b border-slate-800/60 shrink-0">
-                    <h3 class="font-extrabold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                <div class="kds-column-header">
+                    <h3 class="kds-column-title">
                         <span class="w-1.5 h-3 bg-orange-500 rounded-sm"></span>
                         <?php echo $col_meta['title']; ?>
                     </h3>
@@ -241,17 +239,17 @@ foreach ($pedidos as $o) {
                             $status = strtolower($o['status'] ?? 'recibido');
                             $actionHtml = '';
                             if ($status === 'recibido') {
-                                $actionHtml = '<button type="submit" class="w-full bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="chef-hat" class="w-3.5 h-3.5"></i> Cocinar</button><input type="hidden" name="status" value="preparando">';
+                                $actionHtml = '<button type="submit" class="btn-kds-cook"><i data-lucide="chef-hat" class="w-3.5 h-3.5"></i> Cocinar</button><input type="hidden" name="status" value="preparando">';
                             } elseif ($status === 'preparando') {
-                                $actionHtml = '<button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Despachar</button><input type="hidden" name="status" value="en_camino">';
+                                $actionHtml = '<button type="submit" class="btn-kds-dispatch"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Despachar</button><input type="hidden" name="status" value="en_camino">';
                             } elseif ($status === 'en_camino') {
-                                $actionHtml = '<button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-extrabold py-2 px-3 rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 shadow-md active-press"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Entregar</button><input type="hidden" name="status" value="entregado">';
+                                $actionHtml = '<button type="submit" class="btn-kds-deliver"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Entregar</button><input type="hidden" name="status" value="entregado">';
                             } else {
-                                $actionHtml = '<span class="text-slate-500 text-[10px] block text-center font-black py-2 bg-slate-800/10 border border-slate-800/40 rounded-xl select-none uppercase tracking-widest"><i data-lucide="archive-restore" class="w-3 h-3 inline mr-1"></i> Despachado</span>';
+                                $actionHtml = '<span class="badge-dispatched"><i data-lucide="archive-restore" class="w-3 h-3 inline mr-1"></i> Despachado</span>';
                             }
                         ?>
                             <!-- Kanban Comanda Card -->
-                            <div class="bg-[#121829] border border-slate-800/80 p-4 rounded-xl space-y-3.5 shadow-md hover:border-slate-700/80 transition-colors">
+                            <div class="kds-card space-y-3.5">
                                 <div class="flex justify-between items-start gap-2">
                                     <div class="min-w-0">
                                         <span class="font-mono-numbers font-black text-white text-xs block">#<?php echo htmlspecialchars($orderNum); ?></span>
@@ -293,7 +291,7 @@ foreach ($pedidos as $o) {
                                                     <input type="hidden" name="action" value="update_status">
                                                     <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                                                     <input type="hidden" name="status" value="cancelado">
-                                                    <button type="submit" class="w-full bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white font-extrabold py-1 rounded-lg text-[9px] transition-all active-press">Cancelar</button>
+                                                    <button type="submit" class="btn-kds-cancel">Cancelar</button>
                                                 </form>
                                             </div>
                                         <?php else: ?>
@@ -325,93 +323,64 @@ foreach ($pedidos as $o) {
                     $items = json_decode($o['items'] ?? '[]', true);
                 } catch(Exception $e) {}
                 
-                $stateColor = 'bg-amber-500/10 border-amber-500/25 text-amber-400';
-                if ($status === 'entregado' || $status === 'completado') $stateColor = 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400';
-                elseif ($status === 'cancelado') $stateColor = 'bg-red-500/10 border-red-500/25 text-red-400';
-                elseif ($status === 'preparando') $stateColor = 'bg-sky-500/10 border-sky-500/25 text-sky-400';
+                $stateColor = 'text-amber-400';
+                if ($status === 'entregado' || $status === 'completado') $stateColor = 'text-emerald-400';
+                elseif ($status === 'cancelado') $stateColor = 'text-red-400';
+                elseif ($status === 'preparando') $stateColor = 'text-sky-400';
                 
-                // Action controls for mobile (generous hitboxes for rapid tapping)
                 $actionHtml = '';
                 if ($status === 'recibido') {
-                    $actionHtml = '<button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold h-11 rounded-xl text-xs transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-1.5"><i data-lucide="chef-hat" class="w-4 h-4"></i> Iniciar Cocina</button><input type="hidden" name="status" value="preparando">';
+                    $actionHtml = '<button type="submit" class="btn-kds-cook"><i data-lucide="chef-hat" class="w-3.5 h-3.5"></i> Cocinar</button><input type="hidden" name="status" value="preparando">';
                 } elseif ($status === 'preparando') {
-                    $actionHtml = '<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold h-11 rounded-xl text-xs transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-1.5"><i data-lucide="truck" class="w-4 h-4"></i> Despachar</button><input type="hidden" name="status" value="en_camino">';
+                    $actionHtml = '<button type="submit" class="btn-kds-dispatch"><i data-lucide="truck" class="w-3.5 h-3.5"></i> Despachar</button><input type="hidden" name="status" value="en_camino">';
                 } elseif ($status === 'en_camino') {
-                    $actionHtml = '<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold h-11 rounded-xl text-xs transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i> Entregado</button><input type="hidden" name="status" value="entregado">';
+                    $actionHtml = '<button type="submit" class="btn-kds-deliver"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Entregar</button><input type="hidden" name="status" value="entregado">';
                 } else {
-                    $actionHtml = '<span class="text-slate-500 text-xs block text-center font-bold py-2.5 border border-slate-800/80 bg-slate-800/25 rounded-xl select-none">Completado</span>';
+                    $actionHtml = '<span class="badge-dispatched"><i data-lucide="archive-restore" class="w-3 h-3 inline mr-1"></i> Despachado</span>';
                 }
                 ?>
                 <div class="bg-[#121829] p-5 rounded-2xl border border-slate-800/80 space-y-4 shadow-md order-row-mobile" data-status="<?php echo $status; ?>">
                     <div class="flex justify-between items-start">
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="font-mono-numbers font-black text-white text-base">#<?php echo htmlspecialchars($orderNum); ?></span>
-                                <span class="px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-wider <?php echo $stateColor; ?>">
-                                    <?php echo $status; ?>
-                                </span>
-                            </div>
-                            <h3 class="font-extrabold text-sm text-white mt-2 truncate"><?php echo htmlspecialchars($o['customerName'] ?? 'Cliente'); ?></h3>
-                            <p class="text-[10px] text-slate-500 font-medium mt-0.5 flex items-center gap-1">
-                                <span class="font-mono-numbers"><?php echo htmlspecialchars($o['customerPhone'] ?? 'Sin teléfono'); ?></span>
-                                <span class="text-slate-700 font-bold">&bull;</span>
-                                <span><?php echo isset($o['created_at']) ? date('h:i A', strtotime($o['created_at'])) : 'Ahora'; ?></span>
-                            </p>
+                        <div>
+                            <span class="font-mono-numbers font-black text-white text-base">#<?php echo htmlspecialchars($orderNum); ?></span>
+                            <h4 class="font-extrabold text-sm text-slate-200 mt-1"><?php echo htmlspecialchars($o['customerName'] ?? 'Cliente'); ?></h4>
                         </div>
-                        <div class="text-right shrink-0 select-none">
-                            <span class="text-[9px] font-black uppercase tracking-wider text-slate-500 block"><?php echo htmlspecialchars($o['orderType'] ?? 'Delivery'); ?></span>
-                            <span class="text-[9px] font-mono text-slate-400 block mt-0.5"><?php echo htmlspecialchars($o['paymentMethod'] ?? 'Yape'); ?></span>
-                        </div>
+                        <span class="font-black text-[10px] uppercase tracking-wider <?php echo $stateColor; ?>"><?php echo $status; ?></span>
                     </div>
 
-                    <!-- Items List -->
-                    <div class="bg-[#0f1424]/60 p-3 rounded-xl border border-slate-800/50 space-y-2">
+                    <div class="space-y-1.5 py-2 border-y border-slate-800/50">
                         <?php if (is_array($items)): ?>
                             <?php foreach ($items as $it): ?>
-                                <div class="flex justify-between items-center text-xs gap-4">
-                                    <span class="text-slate-300 font-bold truncate"><?php echo htmlspecialchars($it['name'] ?? 'Plato'); ?></span>
-                                    <span class="font-mono-numbers font-black text-orange-400 shrink-0 bg-orange-500/5 px-2 py-0.5 border border-orange-500/10 rounded-md">
-                                        <?php echo $it['quantity'] ?? 1; ?>x
-                                    </span>
+                                <div class="flex justify-between text-xs text-slate-300">
+                                    <span><?php echo htmlspecialchars($it['name'] ?? 'Plato'); ?></span>
+                                    <span class="font-bold font-mono-numbers">x<?php echo $it['quantity'] ?? 1; ?></span>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
 
-                    <!-- Price & Actions footer (Thumb-Zone action stack) -->
-                    <div class="flex justify-between items-center pt-3.5 border-t border-slate-800/60 gap-4">
-                        <div class="shrink-0">
-                            <span class="text-[9px] text-slate-500 block uppercase tracking-wider font-extrabold mb-0.5">Total Pago</span>
-                            <span class="font-black text-emerald-400 text-sm font-mono-numbers">S/ <?php echo number_format(floatval($o['total'] ?? 0), 2); ?></span>
-                        </div>
-                        
-                        <div class="flex-1 flex items-center gap-2 justify-end max-w-[200px]">
-                            <?php if ($status !== 'entregado' && $status !== 'cancelado'): ?>
-                                <div class="flex flex-col gap-1.5 w-full">
-                                    <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
-                                        <input type="hidden" name="action" value="update_status">
-                                        <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
-                                        <?php echo $actionHtml; ?>
-                                    </form>
-                                    <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
-                                        <input type="hidden" name="action" value="update_status">
-                                        <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
-                                        <input type="hidden" name="status" value="cancelado">
-                                        <button type="submit" class="w-full h-8 flex items-center justify-center bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white font-extrabold rounded-lg text-[10px] transition-all active:scale-[0.98]">
-                                            <i data-lucide="slash" class="w-3.5 h-3.5 mr-1"></i> Cancelar
-                                        </button>
-                                    </form>
-                                </div>
-                            <?php else: ?>
-                                <div class="w-full">
-                                    <?php echo $actionHtml; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400 font-bold">Total a Pagar</span>
+                        <span class="text-sm font-black text-emerald-400 font-mono-numbers">S/ <?php echo number_format(floatval($o['total'] ?? 0), 2); ?></span>
                     </div>
+
+                    <?php if ($status !== 'entregado' && $status !== 'cancelado'): ?>
+                        <div class="pt-2 space-y-2">
+                            <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
+                                <input type="hidden" name="action" value="update_status">
+                                <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
+                                <?php echo $actionHtml; ?>
+                            </form>
+                            <form action="/admin/index.php?view=pedidos" method="POST" class="w-full">
+                                <input type="hidden" name="action" value="update_status">
+                                <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
+                                <input type="hidden" name="status" value="cancelado">
+                                <button type="submit" class="btn-kds-cancel">Cancelar</button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
 </div>
-
