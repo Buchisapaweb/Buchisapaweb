@@ -31,18 +31,26 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab }) => 
               onClick={() => setCurrentTab('home')}
               className="flex items-center gap-2.5 text-left group"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 p-0.5 shadow-md shadow-orange-500/20 flex items-center justify-center">
-                <Flame className="w-5 h-5 text-white animate-pulse" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 p-0.5 shadow-md shadow-orange-500/20 flex items-center justify-center overflow-hidden shrink-0">
+                <img
+                  src="/imagenes/logo/logo-buchisapa.webp"
+                  alt="BuchiSapa Logo"
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    // Fallback to icon if image fails to render
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
               </div>
               <div>
                 <h1 className="font-extrabold text-base text-white leading-tight tracking-tight flex items-center gap-1">
                   BuchiSapa
                   <span className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                    Tarapoto
+                    Santa Clara
                   </span>
                 </h1>
                 <p className="text-[10px] font-semibold text-amber-400 leading-none mt-0.5">
-                  Pollería & Sabor Amazónico
+                  Burger & Broaster Amazónico
                 </p>
               </div>
             </button>
