@@ -2,8 +2,8 @@ import express, { type Request, type Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/auth.ts';
-import { saveAsWebP, autoProcessWebPImage } from './src/lib/image-utils.ts';
+import { optionalAuth, requireAuth, type AuthRequest } from './src/middlewares/auth.ts';
+import { saveAsWebP, autoProcessWebPImage } from './src/helpers/image-utils.ts';
 
 const __filename = typeof import.meta?.url === 'string' ? fileURLToPath(import.meta.url) : '';
 const __dirname = __filename ? path.dirname(__filename) : process.cwd();

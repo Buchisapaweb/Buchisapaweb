@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Category } from './types.js';
 import { syncCategoryToSupabase } from './supabase-sync.js';
-import { autoProcessWebPImage } from '../lib/image-utils.js';
+import { autoProcessWebPImage } from '../helpers/image-utils.js';
 
 export const initialCategories: Category[] = [
   { id: 'C0001', code: 'C0001', slug: 'promociones', name: 'PROMOCIONES', icon: 'BadgePercent', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80' },

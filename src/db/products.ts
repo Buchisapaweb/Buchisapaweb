@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Product, Sauce } from './types.js';
 import { syncProductToSupabase } from './supabase-sync.js';
-import { autoProcessWebPImage } from '../lib/image-utils.js';
+import { autoProcessWebPImage } from '../helpers/image-utils.js';
 
 export const initialSauces: Sauce[] = [
   { id: 1, name: 'Ají de Pollería Clásico', is_signature: true },
