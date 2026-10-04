@@ -18,12 +18,6 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src/main.tsx",
-    "src/App.tsx",
-    "src/types/**/*",
-    "src/context/**/*",
-    "src/components/**/*",
-    "src/pages/**/*",
-    "src/data/**/*"
+    "src/**/*"
   ]
 }
