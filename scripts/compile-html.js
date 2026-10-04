@@ -67,13 +67,27 @@ export function compileHtml() {
   copyDirRecursive(path.join(ROOT_DIR, 'data'), path.join(DIST_DIR, 'data'));
   console.log('✅ Archivos públicos, admin y catálogo data copiados a dist/.');
 
-  // 2b. Generar endpoints JSON estáticos para que /api/products, /api/categories y /api/portadas funcionen de inmediato en Vercel
-  const productsPath = path.join(ROOT_DIR, 'data/products.json');
-  const categoriesPath = path.join(ROOT_DIR, 'data/categories.json');
-  const portadasPath = path.join(ROOT_DIR, 'data/portadas.json');
-  const productsRaw = fs.existsSync(productsPath) ? fs.readFileSync(productsPath, 'utf8') : '[]';
-  const categoriesRaw = fs.existsSync(categoriesPath) ? fs.readFileSync(categoriesPath, 'utf8') : '[]';
-  const portadasRaw = fs.existsSync(portadasPath) ? fs.readFileSync(portadasPath, 'utf8') : '[]';
+  // 2b. Generar endpoints JSON estáticos para que /api/products, /api/categories y /api/portadas funcionen de inmediato en Vercel leyendo las carpetas individuales
+  function loadArrayFromDir(dirPath) {
+    if (!fs.existsSync(dirPath)) return [];
+    const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.json'));
+    const items = [];
+    for (const f of files) {
+      try {
+        const raw = fs.readFileSync(path.join(dirPath, f), 'utf8');
+        items.push(JSON.parse(raw));
+      } catch (e) {}
+    }
+    return items;
+  }
+
+  const productsList = loadArrayFromDir(path.join(ROOT_DIR, 'data/products'));
+  const categoriesList = loadArrayFromDir(path.join(ROOT_DIR, 'data/categories'));
+  const portadasList = loadArrayFromDir(path.join(ROOT_DIR, 'data/portadas')).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  const productsRaw = JSON.stringify(productsList, null, 2);
+  const categoriesRaw = JSON.stringify(categoriesList, null, 2);
+  const portadasRaw = JSON.stringify(portadasList, null, 2);
 
   const apiDir = path.join(DIST_DIR, 'api');
   if (!fs.existsSync(apiDir)) fs.mkdirSync(apiDir, { recursive: true });

@@ -1,10 +1,22 @@
 import fs from 'fs';
 import path from 'path';
 
-const cats = JSON.parse(fs.readFileSync('data/categories.json', 'utf8'));
-const prods = JSON.parse(fs.readFileSync('data/products.json', 'utf8'));
-const promos = JSON.parse(fs.readFileSync('data/promociones.json', 'utf8'));
-const portadas = fs.existsSync('data/portadas.json') ? JSON.parse(fs.readFileSync('data/portadas.json', 'utf8')) : [];
+function loadArrayFromDir(dirPath: string) {
+  if (!fs.existsSync(dirPath)) return [];
+  const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.json'));
+  const items = [];
+  for (const f of files) {
+    try {
+      const raw = fs.readFileSync(path.join(dirPath, f), 'utf8');
+      items.push(JSON.parse(raw));
+    } catch (e) {}
+  }
+  return items;
+}
+
+const cats = loadArrayFromDir('data/categories').sort((a: any, b: any) => (a.id || '').localeCompare(b.id || ''));
+const prods = loadArrayFromDir('data/products').sort((a: any, b: any) => (a.id || '').localeCompare(b.id || ''));
+const portadas = loadArrayFromDir('data/portadas').sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
 
 function stripEmojis(val: any): any {
   if (typeof val === 'string') {
@@ -246,13 +258,7 @@ prods.forEach((p: any) => {
   sql += `INSERT INTO public.products (id, name, category_id, category, price, description, available, stock, image, includes_sauces, accompaniments, cremas) VALUES (${escapeSql(p.id)}, ${escapeSql(p.name)}, ${escapeSql(p.category_id)}, ${escapeSql(p.category)}, ${p.price || 0}, ${escapeSql(p.description)}, ${p.available !== false ? 'TRUE' : 'FALSE'}, ${p.stock || 50}, ${escapeSql(p.image)}, ${p.includes_sauces ? 'TRUE' : 'FALSE'}, ${escapeSql(p.accompaniments || [])}, ${escapeSql(p.cremas || [])}) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, price = EXCLUDED.price, stock = EXCLUDED.stock, available = EXCLUDED.available, image = EXCLUDED.image, accompaniments = EXCLUDED.accompaniments, cremas = EXCLUDED.cremas;\n`;
 });
 
-sql += `\n-- C. PROMOCIONES OFICIALES (4) - IDs: promo-1 a promo-4\n`;
-promos.forEach((pr: any) => {
-  const cleanBadge = stripEmojis(pr.badge);
-  sql += `INSERT INTO public.promotions (id, title, description, price, original_price, image, badge, active, order_num, features, accompaniments) VALUES (${escapeSql(pr.id)}, ${escapeSql(pr.title)}, ${escapeSql(pr.description)}, ${pr.price || 0}, ${pr.originalPrice || 'NULL'}, ${escapeSql(pr.image)}, ${escapeSql(cleanBadge)}, ${pr.active !== false ? 'TRUE' : 'FALSE'}, ${pr.order || 0}, ${escapeSql(pr.features || [])}, ${escapeSql(pr.accompaniments || [])}) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, price = EXCLUDED.price, image = EXCLUDED.image, active = EXCLUDED.active, features = EXCLUDED.features;\n`;
-});
-
-sql += `\n-- D. PORTADAS Y BANNERS DEL HERO SLIDER (5) - IDs: portada-1 a portada-5\n`;
+sql += `\n-- C. PORTADAS Y BANNERS DEL HERO SLIDER (5) - IDs: PT001 a PT005\n`;
 portadas.forEach((pt: any) => {
   const cleanBadge = stripEmojis(pt.badge);
   sql += `INSERT INTO public.portadas (id, title, highlight, subtitle, badge, badge_type, image, image_mobile, button_text, button_category, features, active, order_num) VALUES (${escapeSql(pt.id)}, ${escapeSql(pt.title)}, ${escapeSql(pt.highlight || null)}, ${escapeSql(pt.subtitle || null)}, ${escapeSql(cleanBadge || null)}, ${escapeSql(pt.badgeType || null)}, ${escapeSql(pt.image)}, ${escapeSql(pt.imageMobile || null)}, ${escapeSql(pt.buttonText || null)}, ${escapeSql(pt.buttonCategory || null)}, ${escapeSql(pt.features || [])}, ${pt.active !== false ? 'TRUE' : 'FALSE'}, ${pt.order || 0}) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, image = EXCLUDED.image, image_mobile = EXCLUDED.image_mobile, active = EXCLUDED.active, order_num = EXCLUDED.order_num;\n`;

@@ -1,0 +1,10 @@
+{
+  "id": "PT002",
+  "title": "Portada PT002",
+  "image": "/imagenes/portada/Portada2E.webp",
+  "imageMobile": "/imagenes/portada/Portada2M.webp",
+  "active": true,
+  "order": 2,
+  "createdAt": "2026-09-26T18:42:48.366Z",
+  "updatedAt": "2026-10-04T08:40:00.000Z"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "PT005",
+  "title": "Portada PT005",
+  "image": "/imagenes/portada/Portada5E.webp",
+  "imageMobile": "/imagenes/portada/Portada5M.webp",
+  "active": true,
+  "order": 5,
+  "createdAt": "2026-09-28T10:11:43.395Z",
+  "updatedAt": "2026-10-04T08:40:00.000Z"
+}
