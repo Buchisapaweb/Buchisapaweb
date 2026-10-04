@@ -1866,12 +1866,12 @@ function abrirCrearCategoriaModal(editCatId) {
 
                     <!-- Botones de Acción Debajo de la Imagen y Datos de la Categoría -->
                     <div class="pt-4 border-t border-slate-800/80 flex items-center justify-end gap-3 w-full">
-                        <button type="button" onclick="cerrarModal()" class="flex-1 sm:flex-none text-center justify-center px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press cursor-pointer border border-slate-700/50">
+                        <button type="button" onclick="cerrarModal()" class="flex-1 sm:flex-initial h-11 px-7 bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition-all active-press cursor-pointer border border-slate-700/60 flex items-center justify-center">
                             Cancelar
                         </button>
-                        <button type="submit" class="flex-1 sm:flex-none text-center justify-center px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-extrabold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20 active-press cursor-pointer">
-                            <i data-lucide="check" class="w-4 h-4"></i>
-                            <span>Guardar Categoría</span>
+                        <button type="submit" class="flex-1 sm:flex-initial h-11 px-7 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-extrabold rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg shadow-orange-500/25 transition-all active-press cursor-pointer border border-orange-400/30">
+                            <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                            <span>Guardar</span>
                         </button>
                     </div>
                 </div>
