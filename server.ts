@@ -2,7 +2,7 @@ import express, { type Request, type Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/auth';
+import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/auth.ts';
 
 const __filename = typeof import.meta?.url === 'string' ? fileURLToPath(import.meta.url) : '';
 const __dirname = __filename ? path.dirname(__filename) : process.cwd();
@@ -61,7 +61,7 @@ function getCompiledIndexHtml(): string {
 }
 
 // Las vistas administrativas se compilan y emulan dinámicamente en caliente desde la carpeta /admin utilizando PHP en tiempo de ejecución.
-import { sendVerificationEmail, verifyCode } from './src/services/emailVerification';
+import { sendVerificationEmail, verifyCode } from './src/services/emailVerification.ts';
 import {
   getOrCreateUser,
   getUserByUid,
@@ -70,7 +70,7 @@ import {
   getAllUsers,
   getUserByEmail,
   verifyUserPassword
-} from './src/db/users';
+} from './src/db/users.ts';
 import {
   getCategories,
   createCategory,
@@ -115,8 +115,8 @@ import {
   reorderPortadas,
   savePortadaImageBase64,
   getProfiles,
-} from './src/db/queries';
-import { createCulqiRouter } from './src/culqi';
+} from './src/db/queries.ts';
+import { createCulqiRouter } from './src/culqi/index.ts';
 
 export const app = express();
 const PORT = 3000;

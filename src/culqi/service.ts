@@ -1,5 +1,5 @@
-import { getActivePublicKey, getActiveSecretKey, getPaymentSettings } from './config';
-import type { CulqiTokenRequest, CulqiChargeRequest, CulqiChargeResponse } from './types';
+import { getActivePublicKey, getActiveSecretKey, getPaymentSettings } from './config.ts';
+import type { CulqiTokenRequest, CulqiChargeRequest, CulqiChargeResponse } from './types.ts';
 
 const CULQI_API_BASE = 'https://api.culqi.com/v2';
 

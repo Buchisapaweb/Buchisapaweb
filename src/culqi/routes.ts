@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from 'express';
-import { getPaymentSettings, savePaymentSettings, getActivePublicKey } from './config';
-import { createCulqiToken, createCulqiCharge, createCulqiOrder } from './service';
-import { optionalAuth, type AuthRequest } from '../middleware/auth';
-import { createOrder, deductCartStock } from '../db/queries';
+import { getPaymentSettings, savePaymentSettings, getActivePublicKey } from './config.ts';
+import { createCulqiToken, createCulqiCharge, createCulqiOrder } from './service.ts';
+import { optionalAuth, type AuthRequest } from '../middleware/auth.ts';
+import { createOrder, deductCartStock } from '../db/queries.ts';
 
 export interface CulqiRouterDependencies {
   broadcastNewOrder?: (order: any) => void;

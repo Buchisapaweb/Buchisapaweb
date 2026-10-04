@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type { CulqiSettings } from './types';
+import type { CulqiSettings } from './types.ts';
 
 const PAYMENT_SETTINGS_FILE = path.join(process.cwd(), 'data', 'payment_settings.json');
 

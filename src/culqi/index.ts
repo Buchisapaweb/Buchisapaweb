@@ -3,7 +3,7 @@
  * BuchiSapa Restaurante
  */
 
-export * from './types';
-export * from './config';
-export * from './service';
-export * from './routes';
+export * from './types.ts';
+export * from './config.ts';
+export * from './service.ts';
+export * from './routes.ts';
