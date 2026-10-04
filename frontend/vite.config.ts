@@ -8,6 +8,7 @@ export default defineConfig({
     allowedHosts: true,
   },
   build: {
+    outDir: '../dist',
     target: ['es2015', 'chrome60', 'edge79', 'firefox60', 'safari12'],
   },
 })

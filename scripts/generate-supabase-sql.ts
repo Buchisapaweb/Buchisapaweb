@@ -14,9 +14,9 @@ function loadArrayFromDir(dirPath: string) {
   return items;
 }
 
-const cats = loadArrayFromDir('data/categories').sort((a: any, b: any) => (a.id || '').localeCompare(b.id || ''));
-const prods = loadArrayFromDir('data/products').sort((a: any, b: any) => (a.id || '').localeCompare(b.id || ''));
-const portadas = loadArrayFromDir('data/portadas').sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+const cats = loadArrayFromDir('backend/data/categories').sort((a: any, b: any) => (a.id || '').localeCompare(b.id || ''));
+const prods = loadArrayFromDir('backend/data/products').sort((a: any, b: any) => (a.id || '').localeCompare(b.id || ''));
+const portadas = loadArrayFromDir('backend/data/portadas').sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
 
 function stripEmojis(val: any): any {
   if (typeof val === 'string') {

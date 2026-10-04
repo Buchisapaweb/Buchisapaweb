@@ -10,28 +10,31 @@ const __dirname = __filename ? path.dirname(__filename) : process.cwd();
 
 function getCompiledIndexHtml(): string {
   const partials: Record<string, string> = {
-    'HEADER': 'public/html/header.html',
-    'PORTADA': 'public/html/portada.html',
-    'CARRUSEL_PORTADA': 'public/html/portada.html',
-    'CATEGORIA': 'public/html/categoria.html',
-    'PRODUCTO': 'public/html/producto.html',
-    'DESCRIPCION_PRODUCTO': 'public/html/descripcionProducto.html',
-    'CARRITO': 'public/html/carrito.html',
-    'PANEL_CARRITO': 'public/html/carrito.html',
-    'RECOJO': 'public/html/recojo-modal.html',
-    'VENTANA_UBICACION': 'public/html/recojo-modal.html',
-    'AUTENTICACION_PERFIL': 'public/html/autenticacionPerfil.html',
-    'VENTANA_AUTENTICACION': 'public/html/autenticacionPerfil.html',
-    'FOOTER': 'public/html/footer.html',
-    'PIE_PAGINA': 'public/html/footer.html'
+    'HEADER': 'frontend/public/html/header.html',
+    'PORTADA': 'frontend/public/html/portada.html',
+    'CARRUSEL_PORTADA': 'frontend/public/html/portada.html',
+    'CATEGORIA': 'frontend/public/html/categoria.html',
+    'PRODUCTO': 'frontend/public/html/producto.html',
+    'DESCRIPCION_PRODUCTO': 'frontend/public/html/descripcionProducto.html',
+    'CARRITO': 'frontend/public/html/carrito.html',
+    'PANEL_CARRITO': 'frontend/public/html/carrito.html',
+    'RECOJO': 'frontend/public/html/recojo-modal.html',
+    'VENTANA_UBICACION': 'frontend/public/html/recojo-modal.html',
+    'AUTENTICACION_PERFIL': 'frontend/public/html/autenticacionPerfil.html',
+    'VENTANA_AUTENTICACION': 'frontend/public/html/autenticacionPerfil.html',
+    'FOOTER': 'frontend/public/html/footer.html',
+    'PIE_PAGINA': 'frontend/public/html/footer.html'
   };
 
   const rutas = [
     path.join(__dirname, 'index.html'),
     path.join(__dirname, '../index.html'),
+    path.join(__dirname, 'frontend/index.html'),
+    path.join(__dirname, '../frontend/index.html'),
     path.join(__dirname, 'dist/index.html'),
     path.join(__dirname, '../dist/index.html'),
     path.join(process.cwd(), 'index.html'),
+    path.join(process.cwd(), 'frontend/index.html'),
     path.join(process.cwd(), 'dist/index.html'),
     '/app/index.html',
     '/app/dist/index.html',
@@ -2632,7 +2635,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
   // POST /api/admin/supabase-sync: Pase de datos completo hacia Supabase
   app.post('/api/admin/supabase-sync', async (req: Request, res: Response) => {
     try {
-      const { syncAllToSupabase } = await import('./scripts/sync-supabase.ts');
+      const { syncAllToSupabase } = await import('../scripts/sync-supabase.ts');
       const result = await syncAllToSupabase();
       return res.json({
         success: true,
@@ -2708,7 +2711,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
   app.get('/sw.js', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
     res.setHeader('Service-Worker-Allowed', '/');
-    res.sendFile(path.join(process.cwd(), 'public/sw.js'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/sw.js'));
   });
 
   // --- SERVIR ARCHIVOS ESTÁTICOS HTML5, CSS, JS Y RUTAS ---
@@ -2956,11 +2959,11 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     const canonicalView = view === 'portada' ? 'portadas' : view;
     
     try {
-      const headerPath = path.join(process.cwd(), 'admin/includes/header.html');
-      const sidebarPath = path.join(process.cwd(), 'admin/includes/sidebar.html');
-      const topbarPath = path.join(process.cwd(), 'admin/includes/topbar.html');
-      const footerPath = path.join(process.cwd(), 'admin/includes/footer.html');
-      const viewPath = path.join(process.cwd(), `admin/views/${canonicalView}.html`);
+      const headerPath = path.join(process.cwd(), 'frontend/admin/includes/header.html');
+      const sidebarPath = path.join(process.cwd(), 'frontend/admin/includes/sidebar.html');
+      const topbarPath = path.join(process.cwd(), 'frontend/admin/includes/topbar.html');
+      const footerPath = path.join(process.cwd(), 'frontend/admin/includes/footer.html');
+      const viewPath = path.join(process.cwd(), `frontend/admin/views/${canonicalView}.html`);
       
       let header = fs.readFileSync(headerPath, 'utf8');
       let sidebar = fs.readFileSync(sidebarPath, 'utf8');
@@ -2977,7 +2980,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
         `id="nav-${canonicalView}" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20"`
       );
       
-      if (fs.existsSync(path.join(process.cwd(), `admin/css/${canonicalView}.css`)) && !header.includes(`/admin/css/${canonicalView}.css`)) {
+      if (fs.existsSync(path.join(process.cwd(), `frontend/admin/css/${canonicalView}.css`)) && !header.includes(`/admin/css/${canonicalView}.css`)) {
         header = header.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${canonicalView}.css">\n</head>`);
       }
 
@@ -3020,10 +3023,10 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
       } catch (err) {}
       
       let extraJs = '';
-      if (view === 'dashboard' && fs.existsSync(path.join(process.cwd(), 'admin/js/chart.min.js'))) {
+      if (view === 'dashboard' && fs.existsSync(path.join(process.cwd(), 'frontend/admin/js/chart.min.js'))) {
         extraJs += '    <script src="/admin/js/chart.min.js"></script>\n';
       }
-      if (fs.existsSync(path.join(process.cwd(), `admin/js/${view}.js`))) {
+      if (fs.existsSync(path.join(process.cwd(), `frontend/admin/js/${view}.js`))) {
         extraJs += `    <script src="/admin/js/${view}.js"></script>\n`;
       }
       
@@ -3048,50 +3051,50 @@ ${footer}`;
       res.status(500).send(`Error al cargar el panel HTML5: ${e.message}`);
     }
   });
-  app.use('/admin', express.static(path.join(process.cwd(), 'admin'), { ...staticOptions, index: false }));
+  app.use('/admin', express.static(path.join(process.cwd(), 'frontend/admin'), { ...staticOptions, index: false }));
 
   // 2. Archivos estáticos de css, js, html y raíz pública (todos dentro de public/)
-  app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
-  app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
+  app.use(express.static(path.join(process.cwd(), 'frontend/public'), staticOptions));
+  app.use('/public', express.static(path.join(process.cwd(), 'frontend/public'), staticOptions));
 
   app.get(['/reclamaciones', '/reclamaciones.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/reclamaciones.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/reclamaciones.html'));
   });
 
   app.get(['/nosotros', '/nosotros.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/nosotros.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/nosotros.html'));
   });
 
   app.get(['/historia', '/historia.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/historia.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/historia.html'));
   });
 
   app.get(['/vision', '/vision.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/vision.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/vision.html'));
   });
 
   app.get(['/mision', '/mision.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/mision.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/mision.html'));
   });
 
   app.get(['/politicas-privacidad', '/politicas-privacidad.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/politicas-privacidad.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/politicas-privacidad.html'));
   });
 
   app.get(['/terminos', '/terminos.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/terminos.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/terminos.html'));
   });
 
   app.get(['/contactanos', '/contactanos.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/contactanos.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/contactanos.html'));
   });
 
   app.get(['/recojo', '/recojo.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/recojo.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/recojo.html'));
   });
 
   app.get(['/checkout', '/checkout.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public/html/checkout.html'));
+    res.sendFile(path.join(process.cwd(), 'frontend/public/html/checkout.html'));
   });
 
   // 3. Página de Inicio (HTML5 con parciales compilados)

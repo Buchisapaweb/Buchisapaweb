@@ -5,7 +5,7 @@
   "cleanUrls": true,
   "functions": {
     "api/index.ts": {
-      "includeFiles": "data/**"
+      "includeFiles": "backend/data/**"
     }
   },
   "rewrites": [

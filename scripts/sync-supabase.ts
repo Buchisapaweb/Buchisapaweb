@@ -24,7 +24,7 @@ export async function syncAllToSupabase() {
 
   // 1. Sincronizar Categorías
   try {
-    const cats = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'data/categories.json'), 'utf8'));
+    const cats = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'backend/data/categories.json'), 'utf8'));
     console.log(`📦 Sincronizando ${cats.length} categorías...`);
     const { data, error } = await supabase
       .from('categories')
@@ -48,7 +48,7 @@ export async function syncAllToSupabase() {
 
   // 2. Sincronizar Productos
   try {
-    const prods = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'data/products.json'), 'utf8'));
+    const prods = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'backend/data/products.json'), 'utf8'));
     console.log(`🍔 Sincronizando ${prods.length} productos...`);
     const { data, error } = await supabase
       .from('products')
@@ -80,7 +80,7 @@ export async function syncAllToSupabase() {
 
   // 3. Sincronizar Promociones
   try {
-    const promos = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'data/promociones.json'), 'utf8'));
+    const promos = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'backend/data/promociones.json'), 'utf8'));
     console.log(`🔥 Sincronizando ${promos.length} promociones...`);
     const { data, error } = await supabase
       .from('promotions')
@@ -111,7 +111,7 @@ export async function syncAllToSupabase() {
 
   // 4. Sincronizar Portadas / Hero Banners
   try {
-    const portadasFile = path.join(process.cwd(), 'data/portadas.json');
+    const portadasFile = path.join(process.cwd(), 'backend/data/portadas.json');
     if (fs.existsSync(portadasFile)) {
       const portadas = JSON.parse(fs.readFileSync(portadasFile, 'utf8'));
       console.log(`🖼️ Sincronizando ${portadas.length} portadas...`);
@@ -173,7 +173,7 @@ export async function syncAllToSupabase() {
 
   // 6. Sincronizar Pedidos si existen
   try {
-    const ordersFile = path.join(process.cwd(), 'data/orders.json');
+    const ordersFile = path.join(process.cwd(), 'backend/data/orders.json');
     if (fs.existsSync(ordersFile)) {
       const orders = JSON.parse(fs.readFileSync(ordersFile, 'utf8'));
       if (Array.isArray(orders) && orders.length > 0) {

@@ -13,23 +13,23 @@ export function compileHtml() {
 
   // 1. Compilar index.html con todos sus partials
   const partials = {
-    'HEADER': 'public/html/header.html',
-    'PORTADA': 'public/html/portada.html',
-    'CARRUSEL_PORTADA': 'public/html/portada.html',
-    'CATEGORIA': 'public/html/categoria.html',
-    'PRODUCTO': 'public/html/producto.html',
-    'DESCRIPCION_PRODUCTO': 'public/html/descripcionProducto.html',
-    'CARRITO': 'public/html/carrito.html',
-    'PANEL_CARRITO': 'public/html/carrito.html',
-    'RECOJO': 'public/html/recojo-modal.html',
-    'VENTANA_UBICACION': 'public/html/recojo-modal.html',
-    'AUTENTICACION_PERFIL': 'public/html/autenticacionPerfil.html',
-    'VENTANA_AUTENTICACION': 'public/html/autenticacionPerfil.html',
-    'FOOTER': 'public/html/footer.html',
-    'PIE_PAGINA': 'public/html/footer.html'
+    'HEADER': 'frontend/public/html/header.html',
+    'PORTADA': 'frontend/public/html/portada.html',
+    'CARRUSEL_PORTADA': 'frontend/public/html/portada.html',
+    'CATEGORIA': 'frontend/public/html/categoria.html',
+    'PRODUCTO': 'frontend/public/html/producto.html',
+    'DESCRIPCION_PRODUCTO': 'frontend/public/html/descripcionProducto.html',
+    'CARRITO': 'frontend/public/html/carrito.html',
+    'PANEL_CARRITO': 'frontend/public/html/carrito.html',
+    'RECOJO': 'frontend/public/html/recojo-modal.html',
+    'VENTANA_UBICACION': 'frontend/public/html/recojo-modal.html',
+    'AUTENTICACION_PERFIL': 'frontend/public/html/autenticacionPerfil.html',
+    'VENTANA_AUTENTICACION': 'frontend/public/html/autenticacionPerfil.html',
+    'FOOTER': 'frontend/public/html/footer.html',
+    'PIE_PAGINA': 'frontend/public/html/footer.html'
   };
 
-  let indexTemplate = fs.readFileSync(path.join(ROOT_DIR, 'index.html'), 'utf8');
+  let indexTemplate = fs.readFileSync(path.join(ROOT_DIR, 'frontend/index.html'), 'utf8');
 
   for (const [key, relPath] of Object.entries(partials)) {
     const fullPath = path.join(ROOT_DIR, relPath);
@@ -62,9 +62,9 @@ export function compileHtml() {
     }
   }
 
-  copyDirRecursive(path.join(ROOT_DIR, 'public'), DIST_DIR);
-  copyDirRecursive(path.join(ROOT_DIR, 'admin'), path.join(DIST_DIR, 'admin'));
-  copyDirRecursive(path.join(ROOT_DIR, 'data'), path.join(DIST_DIR, 'data'));
+  copyDirRecursive(path.join(ROOT_DIR, 'frontend/public'), DIST_DIR);
+  copyDirRecursive(path.join(ROOT_DIR, 'frontend/admin'), path.join(DIST_DIR, 'admin'));
+  copyDirRecursive(path.join(ROOT_DIR, 'backend/data'), path.join(DIST_DIR, 'data'));
   console.log('✅ Archivos públicos, admin y catálogo data copiados a dist/.');
 
   // 2b. Generar endpoints JSON estáticos para que /api/products, /api/categories y /api/portadas funcionen de inmediato en Vercel leyendo las carpetas individuales
@@ -81,9 +81,9 @@ export function compileHtml() {
     return items;
   }
 
-  const productsList = loadArrayFromDir(path.join(ROOT_DIR, 'data/products'));
-  const categoriesList = loadArrayFromDir(path.join(ROOT_DIR, 'data/categories'));
-  const portadasList = loadArrayFromDir(path.join(ROOT_DIR, 'data/portadas')).sort((a, b) => (a.order || 0) - (b.order || 0));
+  const productsList = loadArrayFromDir(path.join(ROOT_DIR, 'backend/data/products'));
+  const categoriesList = loadArrayFromDir(path.join(ROOT_DIR, 'backend/data/categories'));
+  const portadasList = loadArrayFromDir(path.join(ROOT_DIR, 'backend/data/portadas')).sort((a, b) => (a.order || 0) - (b.order || 0));
 
   const productsRaw = JSON.stringify(productsList, null, 2);
   const categoriesRaw = JSON.stringify(categoriesList, null, 2);
