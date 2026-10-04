@@ -1,5 +1,53 @@
 import fs from 'fs';
 import path from 'path';
+import { createClient } from '@supabase/supabase-js';
+import { autoProcessWebPImage } from '../lib/image-utils.js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ckgvgfpcxeqyilfphnsu.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+async function syncCategoryToSupabase(category: { id: string; slug?: string; name: string; image?: string }, action: 'upsert' | 'delete') {
+  try {
+    if (action === 'delete') {
+      await supabase.from('categories').delete().eq('id', category.id);
+    } else {
+      await supabase.from('categories').upsert({
+        id: category.id,
+        slug: category.slug,
+        name: category.name,
+        image: category.image || ''
+      }, { onConflict: 'id' });
+    }
+  } catch (err: any) {
+    console.warn('⚠️ Error sincronizando categoría a Supabase:', err.message);
+  }
+}
+
+async function syncProductToSupabase(product: Product, action: 'upsert' | 'delete') {
+  try {
+    if (action === 'delete') {
+      await supabase.from('products').delete().eq('id', product.id);
+    } else {
+      await supabase.from('products').upsert({
+        id: product.id,
+        name: product.name,
+        category_id: product.category_id,
+        category: product.category || '',
+        price: product.price,
+        description: product.description || '',
+        available: product.available !== false,
+        stock: product.stock || 50,
+        image: product.image,
+        includes_sauces: Boolean(product.includes_sauces),
+        accompaniments: product.accompaniments || [],
+        cremas: product.cremas || []
+      }, { onConflict: 'id' });
+    }
+  } catch (err: any) {
+    console.warn('⚠️ Error sincronizando producto a Supabase:', err.message);
+  }
+}
 
 export interface Category {
   id: string;
@@ -1040,7 +1088,29 @@ function loadCategoriesFromDisk(): Category[] {
     if (fs.existsSync(CATEGORIES_FILE)) {
       const raw = fs.readFileSync(CATEGORIES_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Desduplicación estricta por ID y por nombre normalizado
+        const seenIds = new Set<string>();
+        const seenNames = new Set<string>();
+        const cleanList: Category[] = [];
+
+        for (const item of parsed) {
+          if (!item || !item.name) continue;
+          const normName = String(item.name).trim().toUpperCase();
+          const cleanId = String(item.id || item.code || '').trim().toUpperCase();
+          if (!seenNames.has(normName) && (!cleanId || !seenIds.has(cleanId))) {
+            if (cleanId) seenIds.add(cleanId);
+            seenNames.add(normName);
+            cleanList.push({
+              ...item,
+              id: cleanId || item.id,
+              name: normName,
+              code: item.code || cleanId || item.id
+            });
+          }
+        }
+        return cleanList;
+      }
     }
   } catch (err) {
     console.error('Error al cargar categorías desde disco:', err);
@@ -1098,7 +1168,7 @@ function generateNextCategoryId(): string {
   categoriesStore = loadCategoriesFromDisk();
   let maxNum = 0;
   for (const c of categoriesStore) {
-    const match = (c.id || '').match(/^C(\d+)$/i);
+    const match = (c.id || c.code || '').match(/^C(\d+)$/i);
     if (match) {
       const num = parseInt(match[1], 10);
       if (num > maxNum) maxNum = num;
@@ -1111,28 +1181,57 @@ function generateNextCategoryId(): string {
 export async function getCategories(): Promise<Category[]> {
   categoriesStore = loadCategoriesFromDisk();
   return [...categoriesStore].sort((a, b) => {
-    const codeA = parseInt((a.code || a.id || '').replace(/\D/g, ''), 10) || 9999;
-    const codeB = parseInt((b.code || b.id || '').replace(/\D/g, ''), 10) || 9999;
-    if (codeA !== codeB) return codeA - codeB;
+    // Mantener C0001 PROMOCIONES al inicio si existe, luego ordenar alfabéticamente
+    const isPromoA = (a.slug === 'promociones' || a.id === 'C0001');
+    const isPromoB = (b.slug === 'promociones' || b.id === 'C0001');
+    if (isPromoA && !isPromoB) return -1;
+    if (!isPromoA && isPromoB) return 1;
     return a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
   });
 }
 
 export async function createCategory(data: Partial<Category>): Promise<Category> {
   categoriesStore = loadCategoriesFromDisk();
-  const nextId = (data.id && data.id.startsWith('C')) ? data.id : generateNextCategoryId();
   const nameUpper = (data.name || 'NUEVA CATEGORÍA').toUpperCase().trim();
+  const slug = data.slug || nameUpper.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '-') || `cat-${Date.now()}`;
+
+  // Verificar si ya existe una categoría con el mismo nombre o slug o id
+  const existingIndex = categoriesStore.findIndex(c => 
+    c.name.trim().toUpperCase() === nameUpper || 
+    (c.slug && c.slug.toLowerCase() === slug.toLowerCase()) ||
+    (data.id && (c.id === data.id || c.code === data.id))
+  );
+
+  if (existingIndex !== -1) {
+    const processedImage = data.image ? await autoProcessWebPImage(data.image, 'categorias', categoriesStore[existingIndex].slug || slug) : categoriesStore[existingIndex].image;
+    categoriesStore[existingIndex] = {
+      ...categoriesStore[existingIndex],
+      name: nameUpper,
+      slug: categoriesStore[existingIndex].slug || slug,
+      image: processedImage || categoriesStore[existingIndex].image,
+      icon: data.icon || categoriesStore[existingIndex].icon || 'Utensils',
+      description: data.description || categoriesStore[existingIndex].description || `Especialidades de ${nameUpper}`
+    };
+    saveCategoriesToDisk();
+    syncCategoryToSupabase(categoriesStore[existingIndex], 'upsert');
+    return categoriesStore[existingIndex];
+  }
+
+  const nextId = (data.id && data.id.startsWith('C')) ? data.id : generateNextCategoryId();
+  const processedImage = await autoProcessWebPImage(data.image, 'categorias', slug);
+
   const newCat: Category = {
     id: nextId,
     code: nextId,
-    slug: data.slug || nameUpper.toLowerCase().replace(/[^a-z0-9]+/g, '-') || `cat-${nextId.toLowerCase()}`,
+    slug,
     name: nameUpper,
     icon: data.icon || 'Utensils',
-    image: data.image || '',
-    description: `Especialidades de ${nameUpper}`
+    image: processedImage || '/imagenes/categorias/postres/banner.webp',
+    description: data.description || `Especialidades de ${nameUpper}`
   };
   categoriesStore.push(newCat);
   saveCategoriesToDisk();
+  syncCategoryToSupabase(newCat, 'upsert');
   return newCat;
 }
 
@@ -1146,13 +1245,18 @@ export async function updateCategory(id: string, data: Partial<Category>): Promi
   );
   if (index === -1) return null;
   const nameUpper = data.name ? data.name.toUpperCase().trim() : categoriesStore[index].name;
+  const slug = data.slug || nameUpper.toLowerCase().replace(/[^a-z0-9]+/g, '-') || categoriesStore[index].slug;
+  const processedImage = data.image !== undefined ? await autoProcessWebPImage(data.image, 'categorias', slug) : (categoriesStore[index].image || '');
+
   categoriesStore[index] = {
     ...categoriesStore[index],
     name: nameUpper,
-    slug: data.slug || nameUpper.toLowerCase().replace(/[^a-z0-9]+/g, '-') || categoriesStore[index].slug,
-    image: data.image !== undefined ? data.image : (categoriesStore[index].image || '')
+    slug,
+    image: processedImage
   };
   saveCategoriesToDisk();
+  // Sincronización en tiempo real a Supabase (asíncrona)
+  syncCategoryToSupabase(categoriesStore[index], 'upsert');
   return categoriesStore[index];
 }
 
@@ -1160,6 +1264,11 @@ export async function deleteCategory(id: string): Promise<boolean> {
   categoriesStore = loadCategoriesFromDisk();
   const searchId = (id || '').trim().toLowerCase();
   const initialLen = categoriesStore.length;
+  const target = categoriesStore.find(c => 
+    (c.id || '').toLowerCase() === searchId || 
+    (c.code || '').toLowerCase() === searchId || 
+    (c.slug || '').toLowerCase() === searchId
+  );
   const filtered = categoriesStore.filter(c => 
     (c.id || '').toLowerCase() !== searchId && 
     (c.code || '').toLowerCase() !== searchId && 
@@ -1168,6 +1277,9 @@ export async function deleteCategory(id: string): Promise<boolean> {
   categoriesStore.length = 0;
   categoriesStore.push(...filtered);
   saveCategoriesToDisk();
+  if (target) {
+    syncCategoryToSupabase(target, 'delete');
+  }
   return categoriesStore.length < initialLen;
 }
 
@@ -1481,6 +1593,7 @@ export async function updateProductStock(id: string, available: boolean, stock?:
     }
   }
   saveProductsToDisk();
+  syncProductToSupabase(product, 'upsert');
   return product;
 }
 
@@ -1525,6 +1638,8 @@ export async function createProduct(data: Partial<Product>): Promise<Product> {
     throw new Error(`Ya existe un plato registrado con el nombre "${rawName}". Evita nombres duplicados.`);
   }
   const nextId = (data.id && data.id.startsWith('PL')) ? data.id : generateNextProductId();
+  const processedImage = await autoProcessWebPImage(data.image, 'productos', nextId);
+
   const newProduct: Product = {
     id: nextId,
     code: nextId,
@@ -1537,13 +1652,14 @@ export async function createProduct(data: Partial<Product>): Promise<Product> {
     popular: Boolean(data.popular),
     available: data.available !== false,
     stock: typeof data.stock === 'number' ? data.stock : (parseInt(String(data.stock || '0'), 10) || 0),
-    image: data.image || '/imagenes/portada/Portada1E.webp',
+    image: processedImage,
     includes_sauces: Boolean(data.includes_sauces),
     accompaniments: Array.isArray(data.accompaniments) ? data.accompaniments : [],
     cremas: Array.isArray(data.cremas) ? data.cremas : []
   };
   productsStore.unshift(newProduct);
   saveProductsToDisk();
+  syncProductToSupabase(newProduct, 'upsert');
   return newProduct;
 }
 
@@ -1555,9 +1671,12 @@ export async function updateProduct(id: string, data: Partial<Product>): Promise
     throw new Error(`Ya existe otro plato registrado con el nombre "${data.name}". Evita nombres duplicados.`);
   }
   
+  const processedImage = data.image !== undefined ? await autoProcessWebPImage(data.image, 'productos', id) : productsStore[index].image;
+
   productsStore[index] = {
     ...productsStore[index],
     ...data,
+    image: processedImage,
     price: data.price !== undefined ? Number(data.price) : productsStore[index].price,
     stock: data.stock !== undefined ? Number(data.stock) : productsStore[index].stock,
     category_id: data.category_id || data.category || productsStore[index].category_id,
@@ -1566,13 +1685,18 @@ export async function updateProduct(id: string, data: Partial<Product>): Promise
     cremas: Array.isArray(data.cremas) ? data.cremas : productsStore[index].cremas
   };
   saveProductsToDisk();
+  syncProductToSupabase(productsStore[index], 'upsert');
   return productsStore[index];
 }
 
 export async function deleteProduct(id: string): Promise<boolean> {
   const initialLen = productsStore.length;
+  const target = productsStore.find(p => p.id === id || p.code === id);
   productsStore = productsStore.filter(p => p.id !== id && p.code !== id);
   saveProductsToDisk();
+  if (target) {
+    syncProductToSupabase(target, 'delete');
+  }
   return productsStore.length < initialLen;
 }
 

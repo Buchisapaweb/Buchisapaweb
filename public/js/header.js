@@ -129,6 +129,45 @@
     }, 60);
   }
 
+  // 3.1 SINCRONIZACIÓN Y RENDERIZADO DINÁMICO DE CATEGORÍAS EN DRAWER Y DROPDOWN
+  function updateHeaderCategoriesNav(categories) {
+    if (!categories || !Array.isArray(categories) || categories.length === 0) return;
+    
+    const drawerList = document.getElementById('mobile-categories-drawer-list');
+    const desktopList = document.getElementById('desktop-categories-dropdown-menu');
+
+    let drawerHtml = '';
+    let desktopHtml = '';
+
+    categories.forEach(cat => {
+      const id = cat.id || cat.code || cat.slug;
+      const slug = cat.slug || id.toLowerCase();
+      const title = (cat.name || id).toUpperCase().trim();
+      const isHighlight = slug === 'promociones';
+
+      drawerHtml += `<a href="javascript:void(0)" onclick="selectCategoryFromDrawer('${slug}', '${title.replace(/'/g, "\\'")}')" class="sub-nav-link ${isHighlight ? 'sub-nav-link-highlight' : ''}">${title}</a>`;
+      desktopHtml += `<button class="dropdown-item ${isHighlight ? 'dropdown-item-highlight' : ''}" type="button" onclick="openCategoryView('${slug}', '${title.replace(/'/g, "\\'")}')">${title}</button>`;
+    });
+
+    if (drawerList) {
+      drawerList.innerHTML = drawerHtml;
+    }
+    if (desktopList) {
+      desktopList.innerHTML = desktopHtml;
+    }
+  }
+  window.updateHeaderCategoriesNav = updateHeaderCategoriesNav;
+
+  // Cargar categorías dinámicamente al iniciar
+  async function loadHeaderCategories() {
+    try {
+      const res = await fetch('/api/categories').then(r => r.json()).catch(() => null);
+      if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+        updateHeaderCategoriesNav(res.data);
+      }
+    } catch (e) {}
+  }
+
   function selectCategoryFromDrawer(catId, catName) {
     closeMobileDrawer();
     openCategoryView(catId, catName);
@@ -272,10 +311,15 @@
     }
   });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDesktopDropdowns);
-  } else {
+  function initHeader() {
     initDesktopDropdowns();
+    loadHeaderCategories();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeader);
+  } else {
+    initHeader();
   }
 
   // 7. EXPOSICIÓN GLOBAL

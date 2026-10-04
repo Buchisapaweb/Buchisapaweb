@@ -2892,7 +2892,9 @@ window.exitSearchMode = exitSearchMode;
 window.closeCategoryModal = exitSearchMode;
 window.moveCarousel = moveCarousel;
 window.goToSlide = goToSlide;
-window.closeCheckoutModal = closeCheckoutModal;
+if (!window.closeCheckoutModal) {
+  window.closeCheckoutModal = closeCheckoutModal;
+}
 window.submitOrder = submitOrder;
 
 function openFullMenuModal() {
@@ -4644,9 +4646,33 @@ async function renderCategoryBanners() {
 
   try {
     const res = await fetch('/api/categories').then(r => r.json()).catch(() => null);
-    const categories = (res && res.data && Array.isArray(res.data) && res.data.length > 0) ? res.data : null;
+    const rawCategories = (res && res.data && Array.isArray(res.data) && res.data.length > 0) ? res.data : null;
 
-    if (!categories) return;
+    if (!rawCategories) return;
+
+    // Desduplicación estricta por nombre normalizado
+    const seen = new Set();
+    const categories = [];
+    for (const c of rawCategories) {
+      const key = (c.name || '').trim().toUpperCase();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        categories.push(c);
+      }
+    }
+
+    // Ordenar: PROMOCIONES al inicio, luego alfabéticamente
+    categories.sort((a, b) => {
+      const isPromoA = (a.slug === 'promociones' || a.id === 'C0001');
+      const isPromoB = (b.slug === 'promociones' || b.id === 'C0001');
+      if (isPromoA && !isPromoB) return -1;
+      if (!isPromoA && isPromoB) return 1;
+      return (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' });
+    });
+
+    if (typeof window.updateHeaderCategoriesNav === 'function') {
+      window.updateHeaderCategoriesNav(categories);
+    }
 
     const defaultImgMap = {
       'alitas': '/imagenes/categorias/alitas/banner.webp',
@@ -4761,11 +4787,22 @@ async function openCheckoutModal() {
   }
 }
 
+// Delegar en el módulo oficial checkout.js si existe
 function closeCheckoutModal() {
+  if (typeof window !== 'undefined' && window.closeCheckoutModal && window.closeCheckoutModal !== closeCheckoutModal) {
+    return window.closeCheckoutModal();
+  }
   const modal = document.getElementById('checkout-modal');
   if (modal) {
-    modal.classList.remove('open');
-    modal.style.display = 'none';
+    modal.classList.remove('open', 'active');
+    setTimeout(() => {
+      if (!modal.classList.contains('open')) {
+        modal.style.display = 'none';
+        document.body.classList.remove('cart-drawer-open');
+        document.documentElement.classList.remove('cart-drawer-open');
+        document.body.style.overflow = '';
+      }
+    }, 280);
   }
 }
 

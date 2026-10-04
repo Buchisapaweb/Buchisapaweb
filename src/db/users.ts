@@ -104,7 +104,16 @@ export async function getUserByUid(uid: string): Promise<UserProfile | null> {
 }
 
 export async function getAllUsers(): Promise<UserProfile[]> {
-  return Array.from(usersStore.values());
+  const seen = new Set<string>();
+  const uniqueUsers: UserProfile[] = [];
+  for (const user of usersStore.values()) {
+    const key = (user.email || user.id || user.uid || '').toLowerCase().trim();
+    if (key && !seen.has(key)) {
+      seen.add(key);
+      uniqueUsers.push(user);
+    }
+  }
+  return uniqueUsers;
 }
 
 export async function registerCustomer(data: any): Promise<UserProfile> {

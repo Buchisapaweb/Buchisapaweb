@@ -32,7 +32,7 @@
             <path d="m6 9 6 6 6-6"/>
           </svg>
         </button>
-        <div class="desktop-dropdown-menu">
+        <div class="desktop-dropdown-menu" id="desktop-categories-dropdown-menu">
           <button class="dropdown-item dropdown-item-highlight" type="button" onclick="openCategoryView('promociones', 'PROMOCIONES')">PROMOCIONES</button>
           <button class="dropdown-item" type="button" onclick="openCategoryView('alitas', 'ALITAS')">ALITAS</button>
           <button class="dropdown-item" type="button" onclick="openCategoryView('bebidas', 'BEBIDAS')">BEBIDAS</button>
@@ -41,8 +41,9 @@
           <button class="dropdown-item" type="button" onclick="openCategoryView('infusiones', 'INFUSIONES')">INFUSIONES</button>
           <button class="dropdown-item" type="button" onclick="openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS')">PLATOS AMAZÓNICOS</button>
           <button class="dropdown-item" type="button" onclick="openCategoryView('refrescos', 'REFRESCOS')">REFRESCOS</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('salchipapas-y-salchibroasters', 'SALCHIPAPAS Y SALCHIBROASTERS')">SALCHIPAPAS Y SALCHIBROASTERS</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('salchipapas', 'SALCHIPAPAS Y SALCHIBROASTERS')">SALCHIPAPAS Y SALCHIBROASTERS</button>
           <button class="dropdown-item" type="button" onclick="openCategoryView('adicional', 'ADICIONAL')">ADICIONAL</button>
+          <button class="dropdown-item" type="button" onclick="openCategoryView('postre', 'POSTRE')">POSTRE</button>
         </div>
       </div>
 
@@ -158,7 +159,7 @@
               <path d="m6 9 6 6 6-6"/>
             </svg>
           </button>
-          <div class="nav-collapsible-content">
+          <div class="nav-collapsible-content" id="mobile-categories-drawer-list">
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('promociones', 'PROMOCIONES')" class="sub-nav-link sub-nav-link-highlight">PROMOCIONES</a>
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('alitas', 'ALITAS')" class="sub-nav-link">ALITAS</a>
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('bebidas', 'BEBIDAS')" class="sub-nav-link">BEBIDAS</a>
@@ -169,6 +170,7 @@
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('refrescos', 'REFRESCOS')" class="sub-nav-link">REFRESCOS</a>
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('salchipapas', 'SALCHIPAPAS Y SALCHIBROASTERS')" class="sub-nav-link">SALCHIPAPAS Y SALCHIBROASTERS</a>
             <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('adicional', 'ADICIONAL')" class="sub-nav-link">ADICIONAL</a>
+            <a href="javascript:void(0)" onclick="selectCategoryFromDrawer('postre', 'POSTRE')" class="sub-nav-link">POSTRE</a>
           </div>
         </div>
 

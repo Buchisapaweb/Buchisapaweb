@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { optionalAuth, requireAuth, type AuthRequest } from './src/middleware/auth.ts';
+import { saveAsWebP, autoProcessWebPImage } from './src/lib/image-utils.ts';
 
 const __filename = typeof import.meta?.url === 'string' ? fileURLToPath(import.meta.url) : '';
 const __dirname = __filename ? path.dirname(__filename) : process.cwd();
@@ -607,6 +608,24 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
       }
       const savedPath = savePortadaImageBase64(file, num, typeCode);
       res.json({ success: true, url: savedPath });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Endpoint universal para procesar y guardar imágenes en formato .webp nativo
+  app.post(['/api/upload-image', '/api/admin/upload-image'], async (req: Request, res: Response) => {
+    try {
+      const { image, file, folder = 'uploads', filename } = req.body;
+      const rawImage = image || file;
+      if (!rawImage) {
+        return res.status(400).json({ success: false, error: 'No se recibió ninguna imagen' });
+      }
+      
+      const cleanFolder = ['productos', 'categorias', 'portadas', 'uploads'].includes(folder) ? folder : 'uploads';
+      const result = await saveAsWebP(rawImage, cleanFolder, filename, { quality: 82 });
+      
+      res.json({ success: true, url: result.url, format: 'webp', size: result.size });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
@@ -1582,13 +1601,33 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     }
   });
 
-  // Users List endpoint for Admin Panel
-  app.get('/api/users', async (req: Request, res: Response) => {
+  // Endpoint de lista de usuarios y perfiles para el Panel Admin y API
+  app.get(['/api/users', '/api/profiles', '/api/perfiles'], async (req: Request, res: Response) => {
     try {
       const users = await getAllUsers();
-      res.json({ success: true, users, data: users });
+      const profiles = await getProfiles().catch(() => []);
+      const mergedMap = new Map();
+      users.forEach(u => mergedMap.set((u.email || u.id).toLowerCase(), u));
+      profiles.forEach(p => {
+        const key = (p.email || p.id).toLowerCase();
+        if (!mergedMap.has(key)) {
+          mergedMap.set(key, {
+            id: p.id,
+            uid: p.id,
+            name: p.nombre || p.name || 'Cliente Buchisapa',
+            email: p.email,
+            phone: p.telefono || p.phone || '987 654 321',
+            docType: p.docType || 'DNI',
+            docNumber: p.docNumber || '45678901',
+            role: 'customer',
+            createdAt: p.created_at || new Date().toISOString()
+          });
+        }
+      });
+      const finalData = Array.from(mergedMap.values());
+      res.json({ success: true, users: finalData, data: finalData });
     } catch (error: any) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users/perfiles:', error);
       res.status(500).json({ success: false, error: error.message || 'Error al obtener usuarios' });
     }
   });
@@ -2578,6 +2617,25 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     }
   });
 
+  // POST /api/admin/supabase-sync: Pase de datos completo hacia Supabase
+  app.post('/api/admin/supabase-sync', async (req: Request, res: Response) => {
+    try {
+      const { syncAllToSupabase } = await import('./scripts/sync-supabase.ts');
+      const result = await syncAllToSupabase();
+      return res.json({
+        success: true,
+        message: 'Sincronización a Supabase completada',
+        result
+      });
+    } catch (err: any) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error al sincronizar con Supabase',
+        error: err.message
+      });
+    }
+  });
+
   // --- DIAGNÓSTICO DE IMPRESORA TÉRMICA (PING A 192.168.8.100 O IP CONFIGURADA) ---
   app.get('/api/printer/ping', async (req: Request, res: Response) => {
     const rawIp = (req.query.ip as string) || '192.168.8.100';
@@ -2775,7 +2833,8 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
         const code = id;
 
         const badge = req.body.badge || null;
-        const image = req.body.image_url || req.body.image || '/imagenes/productos/fallback.webp';
+        const rawImage = req.body.image_url || req.body.image || '/imagenes/productos/fallback.webp';
+        const image = await autoProcessWebPImage(rawImage, 'productos', id);
         const available = req.body.available === 'true' || req.body.available === true || req.body.available === '1' || req.body.available === 'on' || req.body.available === 1;
 
         let accompaniments: string[] = [];

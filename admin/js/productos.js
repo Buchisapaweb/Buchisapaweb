@@ -650,51 +650,64 @@ function setImagePreview(src) {
 }
 
 /**
- * Subida de archivo local de imagen con vista previa instantánea en foto grande
+ * Convierte cualquier archivo de imagen a formato WebP optimizado y ultra ligero
  */
-function handleImageFileUpload(input) {
+function convertImageFileToWebP(file, maxDim = 800, quality = 0.80) {
+    return new Promise((resolve) => {
+        if (!file) return resolve('');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const rawData = e.target.result;
+            const img = new Image();
+            img.onload = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    let webpData = canvas.toDataURL('image/webp', quality);
+                    if (!webpData.startsWith('data:image/webp')) {
+                        webpData = canvas.toDataURL('image/jpeg', quality);
+                    }
+                    resolve(webpData);
+                } catch (err) {
+                    resolve(rawData);
+                }
+            };
+            img.onerror = function() {
+                resolve(rawData);
+            };
+            img.src = rawData;
+        };
+        reader.onerror = function() {
+            resolve('');
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+/**
+ * Subida de archivo local de imagen con conversión automática a WebP
+ */
+async function handleImageFileUpload(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const rawData = e.target.result;
-        const img = new Image();
-        img.onload = function() {
-            try {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                const maxDim = 600; // Ultra ligero y nítido para la carta
-                if (width > maxDim || height > maxDim) {
-                    if (width > height) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else {
-                        width = Math.round((width * maxDim) / height);
-                        height = maxDim;
-                    }
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                let webpBase64 = canvas.toDataURL('image/webp', 0.72);
-                if (!webpBase64 || !webpBase64.startsWith('data:image/webp')) {
-                    webpBase64 = canvas.toDataURL('image/jpeg', 0.72);
-                }
-
-                setImagePreview(webpBase64);
-            } catch (err) {
-                setImagePreview(rawData);
-            }
-        };
-        img.onerror = function() {
-            setImagePreview(rawData);
-        };
-        img.src = rawData;
-    };
-    reader.readAsDataURL(file);
+    const webpBase64 = await convertImageFileToWebP(file, 800, 0.82);
+    if (webpBase64) {
+        setImagePreview(webpBase64);
+    }
 }
 
 /**
@@ -1495,7 +1508,13 @@ async function initProductosView() {
     if (!container) return;
 
     try {
-        const prodRes = await fetch('/api/products').then(r => r.json()).catch(() => ({ data: [] }));
+        const [prodRes, catRes] = await Promise.all([
+            fetch('/api/products').then(r => r.json()).catch(() => ({ data: [] })),
+            fetch('/api/categories').then(r => r.json()).catch(() => ({ data: [] }))
+        ]);
+        if (catRes.data && Array.isArray(catRes.data) && catRes.data.length > 0) {
+            activeCategories = catRes.data;
+        }
         const productos = prodRes.data || [];
         renderProductosDOM(productos);
     } catch (err) {
@@ -1507,29 +1526,40 @@ function renderProductosDOM(productos) {
     const container = document.getElementById('productos-container');
     if (!container) return;
 
-    const CATEGORIAS_DEFINIDAS = [
-        { id: 'C0001', code: 'C0001', slug: 'promociones',       name: 'PROMOCIONES',                  icon: 'sparkles',  color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
-        { id: 'C0002', code: 'C0002', slug: 'alitas',            name: 'ALITAS',                       icon: 'flame',     color: '#ef4444', desc: 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.' },
-        { id: 'C0003', code: 'C0003', slug: 'bebidas',           name: 'BEBIDAS',                      icon: 'cup-soda',  color: '#06b6d4', desc: 'Gaseosas heladas, agua mineral y bebidas embotelladas.' },
-        { id: 'C0004', code: 'C0004', slug: 'broaster',          name: 'BROASTER',                     icon: 'drumstick', color: '#f97316', desc: 'Pollo broaster ultra crocante con papas doradas y cremas.' },
-        { id: 'C0005', code: 'C0005', slug: 'hamburguesas',      name: 'HAMBURGUESAS',                 icon: 'beef',      color: '#eab308', desc: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
-        { id: 'C0006', code: 'C0006', slug: 'infusiones',        name: 'INFUSIONES',                   icon: 'coffee',    color: '#10b981', desc: 'Infusiones calientes, café aromático pasado y manzanilla.' },
-        { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS',            icon: 'utensils',  color: '#8b5cf6', desc: 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.' },
-        { id: 'C0008', code: 'C0008', slug: 'refrescos',         name: 'REFRESCOS',                    icon: 'glass-water',color: '#3b82f6', desc: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
-        { id: 'C0009', code: 'C0009', slug: 'salchipapas',       name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'layers',    color: '#ec4899', desc: 'Papas crocantes, salchichas frankfurter y combinaciones broaster.' },
-        { id: 'C0010', code: 'C0010', slug: 'adicional',         name: 'ADICIONAL',                    icon: 'plus-circle',color: '#94a3b8', desc: 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.' }
-    ];
+    // Colores y descripciones por defecto para íconos
+    const CAT_ICONS_COLORS = {
+        'promociones':       { icon: 'sparkles',   color: '#f59e0b', desc: 'Combos especiales, ofertas de la semana y paquetes familiares.' },
+        'alitas':            { icon: 'flame',      color: '#ef4444', desc: 'Alitas crujientes en salsa acevichada, BBQ y cremas de la casa.' },
+        'bebidas':           { icon: 'cup-soda',   color: '#06b6d4', desc: 'Gaseosas heladas, agua mineral y bebidas embotelladas.' },
+        'broaster':          { icon: 'drumstick',  color: '#f97316', desc: 'Pollo broaster ultra crocante con papas doradas y cremas.' },
+        'hamburguesas':      { icon: 'beef',       color: '#eab308', desc: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
+        'infusiones':        { icon: 'coffee',     color: '#10b981', desc: 'Infusiones calientes, café aromático pasado y manzanilla.' },
+        'platos-amazonicos': { icon: 'utensils',   color: '#8b5cf6', desc: 'Auténticos sabores de la selva: tacacho, cecina, chorizo y patacones.' },
+        'refrescos':         { icon: 'glass-water',color: '#3b82f6', desc: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
+        'salchipapas':       { icon: 'layers',     color: '#ec4899', desc: 'Papas crocantes, salchichas frankfurter y combinaciones broaster.' },
+        'adicional':         { icon: 'plus-circle',color: '#94a3b8', desc: 'Porciones extra, salsas especiales, cremas adicionales y guarniciones.' },
+        'postre':            { icon: 'cake',       color: '#ec4899', desc: 'Postres artesanales, delicias dulces y especialidades de la casa.' }
+    };
+
+    // Ordenar categorías: PROMOCIONES al inicio, luego alfabéticamente
+    activeCategories.sort((a, b) => {
+        const isPromoA = (a.slug === 'promociones' || a.id === 'C0001');
+        const isPromoB = (b.slug === 'promociones' || b.id === 'C0001');
+        if (isPromoA && !isPromoB) return -1;
+        if (!isPromoA && isPromoB) return 1;
+        return (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' });
+    });
 
     const totalProductos = productos.length;
     const disponiblesCount = productos.filter(p => p.available !== false && p.available !== 'false').length;
     const criticosCount = productos.filter(p => parseInt(String(p.stock || '0'), 10) <= 5).length;
 
-    // Actualizar Tarjetas de Métricas Rápidas al instante
+    // Actualizar Tarjetas de Métricas Rápidas dinámicamente
     const statTotalEl = document.getElementById('stat-total-platos');
     if (statTotalEl) statTotalEl.textContent = `${totalProductos} platos`;
 
     const statCatEl = document.getElementById('stat-categorias-platos');
-    if (statCatEl) statCatEl.textContent = `${CATEGORIAS_DEFINIDAS.length} líneas`;
+    if (statCatEl) statCatEl.textContent = `${activeCategories.length} líneas`;
 
     const statDispEl = document.getElementById('stat-disponibles-platos');
     if (statDispEl) statDispEl.textContent = `${disponiblesCount} activos`;
@@ -1545,16 +1575,19 @@ function renderProductosDOM(productos) {
                 Todos (${totalProductos})
             </button>
         `;
-        CATEGORIAS_DEFINIDAS.forEach(cat => {
+        activeCategories.forEach(cat => {
+            const cid = (cat.id || cat.code || '').toUpperCase();
+            const cslug = (cat.slug || cid.toLowerCase()).toLowerCase();
+            const cname = (cat.name || cid).toUpperCase().trim();
             const countInCat = productos.filter(p => (
-                (p.category_id || '').toUpperCase() === cat.id || 
-                (p.category_id || '').toLowerCase() === cat.slug || 
-                (p.category || '').toUpperCase() === cat.id || 
-                (p.category || '').toLowerCase() === cat.slug
+                (p.category_id || '').toUpperCase() === cid || 
+                (p.category_id || '').toLowerCase() === cslug || 
+                (p.category || '').toUpperCase() === cid || 
+                (p.category || '').toLowerCase() === cslug
             )).length;
             filterTabsHtml += `
-            <button type="button" onclick="seleccionarFiltroCategoria('${cat.id}')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="${cat.id}" data-cat-slug="${cat.slug}">
-                <span class="font-mono-numbers text-[9px] text-orange-400/90 font-bold mr-1">${cat.id}</span> ${cat.name} (${countInCat})
+            <button type="button" onclick="seleccionarFiltroCategoria('${cid}')" class="category-tab-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all shrink-0 text-slate-400 hover:text-white bg-[#0f1424] border border-slate-800" data-cat="${cid}" data-cat-slug="${cslug}">
+                <span class="font-mono-numbers text-[9px] text-orange-400/90 font-bold mr-1">${cid}</span> ${cname} (${countInCat})
             </button>
             `;
         });
@@ -1563,13 +1596,23 @@ function renderProductosDOM(productos) {
 
     // 2. Render de bloques de categorías
     let categoriesBlocksHtml = '';
-    CATEGORIAS_DEFINIDAS.forEach(cat => {
+    activeCategories.forEach(cat => {
+        const cid = (cat.id || cat.code || '').toUpperCase();
+        const cslug = (cat.slug || cid.toLowerCase()).toLowerCase();
+        const cname = (cat.name || cid).toUpperCase().trim();
+        const iconInfo = CAT_ICONS_COLORS[cslug] || CAT_ICONS_COLORS[cid.toLowerCase()] || { icon: 'utensils', color: '#f97316', desc: `Especialidades de ${cname}` };
+        const catColor = cat.color || iconInfo.color;
+        const catDesc = cat.description || cat.phrase || iconInfo.desc;
+
         const platosEnCat = productos.filter(p => (
-            (p.category_id || '').toUpperCase() === cat.id || 
-            (p.category_id || '').toLowerCase() === cat.slug || 
-            (p.category || '').toUpperCase() === cat.id || 
-            (p.category || '').toLowerCase() === cat.slug
+            (p.category_id || '').toUpperCase() === cid || 
+            (p.category_id || '').toLowerCase() === cslug || 
+            (p.category || '').toUpperCase() === cid || 
+            (p.category || '').toLowerCase() === cslug
         ));
+
+        // Ordenar productos alfabéticamente
+        platosEnCat.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' }));
 
         let cardsHtml = '';
         if (platosEnCat.length === 0) {
@@ -1634,19 +1677,19 @@ function renderProductosDOM(productos) {
         }
 
         categoriesBlocksHtml += `
-        <section class="category-block space-y-4" id="cat-section-${cat.id}" data-cat-id="${cat.id}" data-cat-slug="${cat.slug}">
+        <section class="category-block space-y-4" id="cat-section-${cid}" data-cat-id="${cid}" data-cat-slug="${cslug}">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
                 <div class="flex items-center gap-2.5">
-                    <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color}80;"></span>
-                    <span class="px-1.5 py-0.5 rounded text-[10px] font-mono-numbers font-extrabold bg-orange-950/40 border border-orange-500/40 text-orange-400 tracking-wider">${cat.id}</span>
+                    <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${catColor}; box-shadow: 0 0 10px ${catColor}80;"></span>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-mono-numbers font-extrabold bg-orange-950/40 border border-orange-500/40 text-orange-400 tracking-wider">${cid}</span>
                     <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
-                        ${cat.name}
+                        ${cname}
                     </h3>
                     <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase text-slate-300 bg-slate-800/60 border border-slate-700/60">
                         ${platosEnCat.length} platos
                     </span>
                 </div>
-                <p class="text-[11px] text-slate-400 italic">${cat.desc}</p>
+                <p class="text-[11px] text-slate-400 italic">${catDesc}</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 ${cardsHtml}
@@ -1713,15 +1756,13 @@ function setCatPhotoPreview(src) {
     }
 }
 
-function handleCatImageUpload(input) {
+async function handleCatImageUpload(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const rawData = e.target.result;
-        setCatPhotoPreview(rawData);
-    };
-    reader.readAsDataURL(file);
+    const webpBase64 = await convertImageFileToWebP(file, 800, 0.82);
+    if (webpBase64) {
+        setCatPhotoPreview(webpBase64);
+    }
 }
 
 function handleCatUrlInput(url) {

@@ -55,18 +55,45 @@ function initConfiguracionView() {
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                // Ensure size is under 2MB
-                if (file.size > 2 * 1024 * 1024) {
-                    alert('El archivo seleccionado supera el límite de 2MB. Por favor, selecciona una imagen más liviana.');
-                    return;
-                }
-                
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    const base64Str = event.target.result;
-                    selectedPhotoUrl = base64Str;
-                    if (previewImg) previewImg.src = base64Str;
-                    if (urlInput) urlInput.value = ''; // clear url input since file is loaded
+                    const rawData = event.target.result;
+                    const img = new Image();
+                    img.onload = function() {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            const maxDim = 400;
+                            let width = img.width;
+                            let height = img.height;
+                            if (width > maxDim || height > maxDim) {
+                                if (width > height) {
+                                    height = Math.round((height * maxDim) / width);
+                                    width = maxDim;
+                                } else {
+                                    width = Math.round((width * maxDim) / height);
+                                    height = maxDim;
+                                }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            const webpStr = canvas.toDataURL('image/webp', 0.85);
+                            selectedPhotoUrl = webpStr;
+                            if (previewImg) previewImg.src = webpStr;
+                            if (urlInput) urlInput.value = '';
+                        } catch (err) {
+                            selectedPhotoUrl = rawData;
+                            if (previewImg) previewImg.src = rawData;
+                            if (urlInput) urlInput.value = '';
+                        }
+                    };
+                    img.onerror = function() {
+                        selectedPhotoUrl = rawData;
+                        if (previewImg) previewImg.src = rawData;
+                        if (urlInput) urlInput.value = '';
+                    };
+                    img.src = rawData;
                 };
                 reader.readAsDataURL(file);
             }
