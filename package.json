@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx backend/server.ts",
-    "build": "vite build frontend && node scripts/compile-html.js && esbuild backend/server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "build": "node scripts/prebuild.js && vite build frontend && node scripts/compile-html.js && esbuild backend/server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "start": "node backend/server.ts",
     "lint": "tsc --noEmit",
     "supabase:sync": "tsx scripts/sync-supabase.ts",
