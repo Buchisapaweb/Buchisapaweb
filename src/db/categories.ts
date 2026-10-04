@@ -5,16 +5,16 @@ import { syncCategoryToSupabase } from './supabase-sync.js';
 import { autoProcessWebPImage } from '../lib/image-utils.js';
 
 export const initialCategories: Category[] = [
-  { id: 'alitas', code: '1001', name: 'ALITAS', icon: 'Drumstick', image: '/imagenes/categorias/alitas/banner.webp' },
-  { id: 'bebidas', code: '1002', name: 'BEBIDAS', icon: 'Coffee', image: '/imagenes/categorias/bebidas/banner.webp' },
-  { id: 'broaster', code: '1003', name: 'BROASTER', icon: 'Drumstick', image: '/imagenes/categorias/broaster/banner.webp' },
-  { id: 'hamburguesas', code: '1004', name: 'HAMBURGUESAS', icon: 'Beef', image: '/imagenes/categorias/hamburguesas/banner.webp' },
-  { id: 'infusiones', code: '1005', name: 'INFUSIONES', icon: 'CupSoda', image: '/imagenes/categorias/infusiones/banner.webp' },
-  { id: 'platos-amazonicos', code: '1006', name: 'PLATOS AMAZÓNICOS', icon: 'Flame', image: '/imagenes/categorias/platos-amazonicos/banner.webp' },
-  { id: 'refrescos', code: '1007', name: 'REFRESCOS', icon: 'GlassWater', image: '/imagenes/categorias/refrescos/banner.webp' },
-  { id: 'salchipapas', code: '1008', name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'Flame', image: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp' },
-  { id: 'promociones', code: '1009', name: 'PROMOCIONES', icon: 'BadgePercent', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80' },
-  { id: 'adicional', code: '1010', name: 'ADICIONAL', icon: 'PlusCircle', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&auto=format&fit=crop&q=80' }
+  { id: 'C0001', code: 'C0001', slug: 'promociones', name: 'PROMOCIONES', icon: 'BadgePercent', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80' },
+  { id: 'C0002', code: 'C0002', slug: 'alitas', name: 'ALITAS', icon: 'Flame', image: '/imagenes/categorias/alitas/banner.webp' },
+  { id: 'C0003', code: 'C0003', slug: 'bebidas', name: 'BEBIDAS', icon: 'CupSoda', image: '/imagenes/categorias/bebidas/banner.webp' },
+  { id: 'C0004', code: 'C0004', slug: 'broaster', name: 'BROASTER', icon: 'Drumstick', image: '/imagenes/categorias/broaster/banner.webp' },
+  { id: 'C0005', code: 'C0005', slug: 'hamburguesas', name: 'HAMBURGUESAS', icon: 'Beef', image: '/imagenes/categorias/hamburguesas/banner.webp' },
+  { id: 'C0006', code: 'C0006', slug: 'infusiones', name: 'INFUSIONES', icon: 'Coffee', image: '/imagenes/categorias/infusiones/banner.webp' },
+  { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS', icon: 'Utensils', image: '/imagenes/categorias/platos-amazonicos/banner.webp' },
+  { id: 'C0008', code: 'C0008', slug: 'refrescos', name: 'REFRESCOS', icon: 'GlassWater', image: '/imagenes/categorias/refrescos/banner.webp' },
+  { id: 'C0009', code: 'C0009', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'Layers', image: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp' },
+  { id: 'C0010', code: 'C0010', slug: 'adicional', name: 'ADICIONAL', icon: 'PlusCircle', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&auto=format&fit=crop&q=80' }
 ];
 
 const CATEGORIES_DIR = path.join(process.cwd(), 'data', 'categories');
