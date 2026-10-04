@@ -67,17 +67,20 @@ export function compileHtml() {
   copyDirRecursive(path.join(ROOT_DIR, 'data'), path.join(DIST_DIR, 'data'));
   console.log('✅ Archivos públicos, admin y catálogo data copiados a dist/.');
 
-  // 2b. Generar endpoints JSON estáticos para que /api/products y /api/categories funcionen de inmediato en Vercel
+  // 2b. Generar endpoints JSON estáticos para que /api/products, /api/categories y /api/portadas funcionen de inmediato en Vercel
   const productsPath = path.join(ROOT_DIR, 'data/products.json');
   const categoriesPath = path.join(ROOT_DIR, 'data/categories.json');
+  const portadasPath = path.join(ROOT_DIR, 'data/portadas.json');
   const productsRaw = fs.existsSync(productsPath) ? fs.readFileSync(productsPath, 'utf8') : '[]';
   const categoriesRaw = fs.existsSync(categoriesPath) ? fs.readFileSync(categoriesPath, 'utf8') : '[]';
+  const portadasRaw = fs.existsSync(portadasPath) ? fs.readFileSync(portadasPath, 'utf8') : '[]';
 
   const apiDir = path.join(DIST_DIR, 'api');
   if (!fs.existsSync(apiDir)) fs.mkdirSync(apiDir, { recursive: true });
 
   fs.writeFileSync(path.join(apiDir, 'products.json'), productsRaw, 'utf8');
   fs.writeFileSync(path.join(apiDir, 'categories.json'), categoriesRaw, 'utf8');
+  fs.writeFileSync(path.join(apiDir, 'portadas.json'), portadasRaw, 'utf8');
   
   // Archivo directo sin extensión como respaldo para static routing
   const apiProductsDir = path.join(apiDir, 'products');
@@ -87,6 +90,10 @@ export function compileHtml() {
   const apiCategoriesDir = path.join(apiDir, 'categories');
   if (!fs.existsSync(apiCategoriesDir)) fs.mkdirSync(apiCategoriesDir, { recursive: true });
   fs.writeFileSync(path.join(apiCategoriesDir, 'index.json'), categoriesRaw, 'utf8');
+
+  const apiPortadasDir = path.join(apiDir, 'portadas');
+  if (!fs.existsSync(apiPortadasDir)) fs.mkdirSync(apiPortadasDir, { recursive: true });
+  fs.writeFileSync(path.join(apiPortadasDir, 'index.json'), portadasRaw, 'utf8');
 
   console.log('✅ API endpoints JSON estáticos generados en dist/api/.');
 

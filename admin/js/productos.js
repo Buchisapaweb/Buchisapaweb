@@ -902,22 +902,19 @@ async function eliminarPlatoAjax(id, nombre) {
         card.style.pointerEvents = 'none';
     });
 
-    try {
-        cerrarModal();
+    cerrarModal();
 
+    try {
         await fetch(`/api/products/${encodeURIComponent(id)}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
         });
-
-        cards.forEach(card => card.remove());
-        await initProductosView();
-
     } catch (error) {
         console.error("Error al eliminar plato:", error);
-        cards.forEach(card => card.remove());
-        await initProductosView();
     }
+
+    cards.forEach(card => card.remove());
+    await initProductosView();
 }
 
 /**
@@ -1181,14 +1178,20 @@ function abrirEditarProductoModal(p) {
                 </div>
 
                 <!-- Barra Fija Inferior con Botones Flexibles Equilibrados en Móvil y Escritorio -->
-                <div class="action-bar-fixed-bottom flex items-center justify-center sm:justify-end gap-3 w-full">
-                    <button type="button" onclick="cerrarModal()" class="flex-1 sm:flex-none text-center justify-center px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press cursor-pointer border border-slate-700/50">
-                        Cancelar
+                <div class="action-bar-fixed-bottom flex items-center justify-between gap-3 w-full">
+                    <button type="button" onclick="eliminarPlatoAjax('${p.id || ''}', '${(p.name || '').replace(/'/g, "\\'")}')" class="px-4 py-3 bg-red-950/70 hover:bg-red-900/90 text-red-300 hover:text-white font-bold rounded-xl text-xs flex items-center gap-1.5 border border-red-500/40 active-press cursor-pointer transition-all">
+                        <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>
+                        <span>Eliminar</span>
                     </button>
-                    <button type="button" onclick="guardarProductoAjax(event, 'producto-edit-form')" class="flex-1 sm:flex-none text-center justify-center px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-orange-600/20 active-press cursor-pointer">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i>
-                        <span>Guardar Producto</span>
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="cerrarModal()" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all active-press cursor-pointer border border-slate-700/50">
+                            Cancelar
+                        </button>
+                        <button type="button" onclick="guardarProductoAjax(event, 'producto-edit-form')" class="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-orange-600/20 active-press cursor-pointer">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span>Guardar Cambios</span>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -2003,16 +2006,6 @@ async function guardarCategoriaAjax(e) {
 async function eliminarCategoriaAjax(cid) {
     if (!cid) return;
     const searchId = cid.toString().trim().toLowerCase();
-    const target = activeCategories.find(c => 
-        (c.id || '').toLowerCase() === searchId || 
-        (c.code || '').toLowerCase() === searchId || 
-        (c.slug || '').toLowerCase() === searchId
-    );
-    const nameStr = target ? target.name.toUpperCase() : cid;
-
-    if (!confirm(`¿Estás seguro de que deseas eliminar la categoría "${nameStr}"? Esta acción no se puede deshacer.`)) {
-        return;
-    }
 
     activeCategories = activeCategories.filter(c => 
         (c.id || '').toLowerCase() !== searchId && 
@@ -2024,8 +2017,10 @@ async function eliminarCategoriaAjax(cid) {
         await fetch(`/api/categories/${encodeURIComponent(cid)}`, {
             method: 'DELETE',
             headers: { 'Accept': 'application/json' }
-        }).catch(() => {});
-    } catch (err) {}
+        });
+    } catch (err) {
+        console.error("Error al eliminar categoría:", err);
+    }
 
     cerrarModal();
     await initProductosView();

@@ -1052,7 +1052,142 @@ const ORDERS_FILE = path.join(process.cwd(), 'data', 'orders.json');
 const TICKETS_FILE = path.join(process.cwd(), 'data', 'tickets.json');
 
 function generateInitialOrders(): Order[] {
-  return [];
+  const now = new Date();
+  const t1 = new Date(now.getTime() - 25 * 60000).toISOString();
+  const t2 = new Date(now.getTime() - 50 * 60000).toISOString();
+  const t3 = new Date(now.getTime() - 95 * 60000).toISOString();
+  const t4 = new Date(now.getTime() - 140 * 60000).toISOString();
+
+  return [
+    {
+      id: 'ord-101',
+      orderNumber: 101,
+      customerName: 'Juan Carlos Mendoza',
+      customerPhone: '987654321',
+      customerEmail: 'juan.mendoza@gmail.com',
+      orderType: 'delivery',
+      deliveryAddress: 'Av. Gran Chimú 450, Urb. Santa Clara, Ate',
+      deliveryFee: 5.00,
+      paymentMethod: 'Yape',
+      subtotal: 38.00,
+      total: 43.00,
+      status: 'entregado',
+      createdAt: t1,
+      items: [
+        {
+          name: 'Tacacho con Cecina y Chorizo Amazónico',
+          quantity: 1,
+          price: 28.00,
+          customization: {
+            accompaniments: ['Patacones crocantes', 'Ají de cocona'],
+            cremas: ['Crema de la casa', 'Ají charapita'],
+            notes: 'Bien doradito el chorizo, por favor.'
+          }
+        },
+        {
+          name: 'Jarra de Refresco de Cocona 1L',
+          quantity: 1,
+          price: 10.00,
+          customization: {
+            notes: 'Bien heladita.'
+          }
+        }
+      ]
+    },
+    {
+      id: 'ord-102',
+      orderNumber: 102,
+      customerName: 'María Elena Vargas',
+      customerPhone: '912345678',
+      orderType: 'salon',
+      deliveryAddress: 'Mesa 4 (Salón Principal)',
+      deliveryFee: 0.00,
+      paymentMethod: 'Plin',
+      subtotal: 45.00,
+      total: 45.00,
+      status: 'preparando',
+      createdAt: t2,
+      items: [
+        {
+          name: '1/4 Pollo Broaster BuchiSapa + Papas Doradas',
+          quantity: 2,
+          price: 18.00,
+          customization: {
+            accompaniments: ['Papas fritas crocantes', 'Ensalada clásica'],
+            cremas: ['Mayonesa casera', 'Tártara especial', 'Ají pollero'],
+            notes: 'Parte pierna y pecho.'
+          }
+        },
+        {
+          name: 'Gaseosa Inka Cola 1.5L',
+          quantity: 1,
+          price: 9.00
+        }
+      ]
+    },
+    {
+      id: 'ord-103',
+      orderNumber: 103,
+      customerName: 'Roberto Quispe T.',
+      customerPhone: '955432198',
+      orderType: 'pickup',
+      deliveryAddress: 'Recojo en Mostrador',
+      deliveryFee: 0.00,
+      paymentMethod: 'Efectivo',
+      subtotal: 40.00,
+      total: 40.00,
+      status: 'listo',
+      createdAt: t3,
+      items: [
+        {
+          name: 'Alitas Broaster Acevichadas (12 piezas)',
+          quantity: 1,
+          price: 32.00,
+          customization: {
+            accompaniments: ['Papas amarillas crocantes'],
+            cremas: ['Salsa acevichada de la casa', 'Ají rocoto'],
+            notes: 'Salsa acevichada bien bañada.'
+          }
+        },
+        {
+          name: 'Porción de Yuca Frita Amazónica',
+          quantity: 1,
+          price: 8.00
+        }
+      ]
+    },
+    {
+      id: 'ord-104',
+      orderNumber: 104,
+      customerName: 'Lucía Morales',
+      customerPhone: '944888333',
+      orderType: 'delivery',
+      deliveryAddress: 'Calle 28 de Julio Mz. B Lte. 12, Santa Clara',
+      deliveryFee: 5.00,
+      paymentMethod: 'Tarjeta',
+      subtotal: 29.00,
+      total: 34.00,
+      status: 'pendiente',
+      createdAt: t4,
+      items: [
+        {
+          name: 'Hamburguesa BuchiSapa Artesanal Doble Carne',
+          quantity: 1,
+          price: 22.00,
+          customization: {
+            accompaniments: ['Papas al hilo', 'Queso cheddar fundido'],
+            cremas: ['Golf', 'BBQ ahumada', 'Tártara'],
+            notes: 'Sin cebolla, carne término 3/4.'
+          }
+        },
+        {
+          name: 'Refresco Natural de Aguajina Helada',
+          quantity: 1,
+          price: 7.00
+        }
+      ]
+    }
+  ];
 }
 
 function loadOrdersFromDisk(): Order[] {
@@ -1060,12 +1195,14 @@ function loadOrdersFromDisk(): Order[] {
     if (fs.existsSync(ORDERS_FILE)) {
       const raw = fs.readFileSync(ORDERS_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (err) {
     console.error('Error al cargar órdenes de disco:', err);
   }
-  return [];
+  const initial = generateInitialOrders();
+  saveOrdersToDisk(initial);
+  return initial;
 }
 
 function saveOrdersToDisk(data?: Order[]) {
@@ -1690,9 +1827,17 @@ export async function updateProduct(id: string, data: Partial<Product>): Promise
 }
 
 export async function deleteProduct(id: string): Promise<boolean> {
+  productsStore = loadProductsFromDisk();
+  const searchId = (id || '').trim().toLowerCase();
   const initialLen = productsStore.length;
-  const target = productsStore.find(p => p.id === id || p.code === id);
-  productsStore = productsStore.filter(p => p.id !== id && p.code !== id);
+  const target = productsStore.find(p => 
+    (p.id || '').toLowerCase() === searchId || 
+    (p.code || '').toLowerCase() === searchId
+  );
+  productsStore = productsStore.filter(p => 
+    (p.id || '').toLowerCase() !== searchId && 
+    (p.code || '').toLowerCase() !== searchId
+  );
   saveProductsToDisk();
   if (target) {
     syncProductToSupabase(target, 'delete');
@@ -1983,7 +2128,7 @@ export async function getTickets(): Promise<TicketRecord[]> {
     }));
 
     const rawNum = typeof o.orderNumber === 'number' ? o.orderNumber : parseInt(String(o.orderNumber).replace(/\D/g, ''), 10) || (orders.length - idx);
-    const formattedNum = String(rawNum).padStart(5, '0');
+    const formattedNum = String(rawNum).padStart(6, '0');
 
     return {
       id: `tk-${o.id}`,
@@ -2012,7 +2157,7 @@ export async function getTickets(): Promise<TicketRecord[]> {
 export async function createQuickTicket(data: Partial<TicketRecord>): Promise<TicketRecord> {
   const now = new Date();
   const nextNumber = customTicketsStore.length + 1;
-  const seq = String(nextNumber).padStart(5, '0');
+  const seq = String(nextNumber).padStart(6, '0');
 
   const newTicket: TicketRecord = {
     id: `tk-quick-${Date.now()}`,

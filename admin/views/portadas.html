@@ -1,0 +1,304 @@
+<!-- Vista Principal del Módulo de Portadas -->
+<div id="portadas-main-wrapper" class="space-y-6 animate-fade-in pb-16">
+
+    <!-- ======================================================================== -->
+    <!-- SECCIÓN 1: LISTADO DE PORTADAS Y SIMULADOR (VISTA PRINCIPAL) -->
+    <!-- ======================================================================== -->
+    <div id="portadas-list-view" class="space-y-6">
+        <!-- Header Principal de Portadas con Botones Rediseñados de Alta Gama -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800/80 select-none">
+            <div>
+                <div class="flex items-center gap-3">
+                    <span class="w-2 h-7 bg-gradient-to-b from-orange-500 via-orange-600 to-amber-500 rounded-full shadow-[0_0_16px_rgba(249,115,22,0.6)]"></span>
+                    <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Gestión de Portadas</h2>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Controla en tiempo real las imágenes de escritorio (1920x1080) y móvil (1080x1350) del carrusel</p>
+            </div>
+
+            <!-- Botones de Acción Superiores: Grilla de 3 Columnas Full Width en Móvil y Flex en Desktop -->
+            <div class="grid grid-cols-3 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:gap-2.5 shrink-0">
+                <!-- Botón Ver en Tienda -->
+                <a href="/" target="_blank" class="h-11 px-1.5 sm:px-4 rounded-2xl bg-[#121829] hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 flex items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold transition-all shadow-md active-press w-full sm:w-auto whitespace-nowrap" title="Ver Tienda en Vivo">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 shrink-0"></i>
+                    <span>Ver Tienda</span>
+                </a>
+
+                <!-- Botón Sincronizar -->
+                <button type="button" onclick="initPortadasView()" class="h-11 px-1.5 sm:px-4 rounded-2xl bg-[#121829] hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 flex items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold transition-all shadow-md active-press w-full sm:w-auto whitespace-nowrap" title="Sincronizar y Refrescar">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 shrink-0"></i>
+                    <span>Sincronizar</span>
+                </button>
+
+                <!-- Botón Nueva Portada -->
+                <button type="button" onclick="abrirCrearPortadaView()" class="h-11 px-2 sm:px-6 rounded-2xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-black text-[11px] sm:text-sm tracking-wide shadow-lg shadow-orange-500/25 flex items-center justify-center gap-1 sm:gap-2 border border-orange-400/40 transition-all active-press cursor-pointer w-full sm:w-auto whitespace-nowrap">
+                    <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <i data-lucide="plus" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white stroke-[3]"></i>
+                    </div>
+                    <span>Nueva Portada</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Métricas -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 select-none">
+            <div class="p-4 bg-[#111728] rounded-2xl border border-slate-800/90 shadow-sm">
+                <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Total Banners</span>
+                <span class="text-xl font-black text-white font-mono block mt-1" id="stat-total-portadas">0 portadas</span>
+            </div>
+            <div class="p-4 bg-[#111728] rounded-2xl border border-slate-800/90 shadow-sm">
+                <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">En Carrusel Activo</span>
+                <span class="text-xl font-black text-emerald-400 font-mono block mt-1" id="stat-activas-portadas">0 activas</span>
+            </div>
+            <div class="p-4 bg-[#111728] rounded-2xl border border-slate-800/90 shadow-sm">
+                <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Escritorio (16:9)</span>
+                <span class="text-sm font-black text-amber-400 font-mono block mt-1.5">1920 × 1080 px</span>
+            </div>
+            <div class="p-4 bg-[#111728] rounded-2xl border border-slate-800/90 shadow-sm">
+                <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Móvil (4:5)</span>
+                <span class="text-sm font-black text-cyan-400 font-mono block mt-1.5">1080 × 1350 px</span>
+            </div>
+        </div>
+
+        <!-- Simulador de Vista en Vivo con Bordes Extra Redondeados y Separación Elegante -->
+        <div class="bg-[#111728] rounded-3xl border border-slate-800/90 p-4 sm:p-6 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="eye" class="w-4 h-4 text-orange-400"></i>
+                    <h3 class="text-xs sm:text-sm font-black uppercase tracking-wider text-white">Previsualización de Carrusel en Vivo</h3>
+                </div>
+
+                <!-- Control Segmentado de Tamaño Idéntico para Escritorio y Móvil -->
+                <div class="grid grid-cols-2 p-1.5 rounded-2xl bg-[#080c18] border border-slate-800/90 shadow-inner select-none gap-1.5 w-full sm:w-[360px]">
+                    <button type="button" id="sim-toggle-desktop" onclick="cambiarModoSimulador('desktop')" class="h-9 px-3 rounded-xl text-[11px] sm:text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20 flex items-center justify-center gap-1.5 w-full transition-all cursor-pointer">
+                        <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+                        <span>Escritorio (16:9)</span>
+                    </button>
+                    <button type="button" id="sim-toggle-mobile" onclick="cambiarModoSimulador('mobile')" class="h-9 px-3 rounded-xl text-[11px] sm:text-xs font-extrabold text-slate-400 hover:text-white bg-transparent flex items-center justify-center gap-1.5 w-full transition-all cursor-pointer">
+                        <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+                        <span>Móvil (4:5)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor del Banner en el Simulador (Extra Redondeado, No toca los bordes) -->
+            <div class="flex justify-center items-center py-2 bg-[#090d18] rounded-2xl border border-slate-800/60 overflow-hidden">
+                <div id="sim-stage-container" class="relative transition-all duration-300 w-full max-w-[920px] aspect-[16/9] px-3 sm:px-4 py-2">
+                    <div class="w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative bg-black">
+                        <img id="simulator-preview-img" src="/imagenes/portada/Portada1E.webp" alt="Banner Portada" class="w-full h-full object-cover transition-opacity duration-300">
+                        
+                        <!-- Dots de navegación del carrusel -->
+                        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/70 backdrop-blur-md border border-white/20 shadow-lg" id="simulator-dots">
+                            <!-- Se inyectan dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listado de Tarjetas de Portadas -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2 select-none">
+                    <i data-lucide="layers" class="w-4 h-4 text-orange-400"></i>
+                    <span>Portadas Registradas</span>
+                </h3>
+                <span class="text-xs text-slate-400 font-semibold" id="portadas-counter-text">Cargando portadas...</span>
+            </div>
+
+            <!-- Grid de Portadas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="portadas-grid-container">
+                <!-- Renderizado dinámico vía admin/js/portadas.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================== -->
+    <!-- SECCIÓN 2: FORMULARIO DEDICADO EN PÁGINA COMPLETA (CREAR / EDITAR) -->
+    <!-- ======================================================================== -->
+    <div id="portada-editor-view" class="hidden space-y-6">
+        <!-- Header del Formulario -->
+        <div class="flex items-center justify-between gap-4 pb-4 border-b border-slate-800 select-none">
+            <div class="flex items-center gap-3">
+                <button type="button" onclick="cancelarEditorPortada()" class="w-10 h-10 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-700/80 shadow-md active-press shrink-0" title="Volver al listado">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </button>
+                <div>
+                    <h2 class="text-xl font-black text-white tracking-tight" id="editor-title-header">Crear Portada</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Sube tus diseños en alta definición WebP sin textos sobrepuestos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selector de Tipo de Portada: General vs Escritorio vs Móvil -->
+        <div class="bg-[#111728] p-4 sm:p-5 rounded-3xl border border-slate-800/90 space-y-3">
+            <label class="block text-xs font-black uppercase text-orange-400 tracking-wider select-none">
+                Selecciona el Tipo de Creación de Portada *
+            </label>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 select-none">
+                <!-- Opción 1: Portada General -->
+                <label class="relative flex items-center gap-3 p-3.5 rounded-2xl bg-[#0a0e1a] border border-slate-800 hover:border-orange-500/60 cursor-pointer transition-all portada-type-label active" id="label-type-general">
+                    <input type="radio" name="portada-target-type" value="general" checked onchange="cambiarTipoObjetivoPortada('general')" class="text-orange-500 focus:ring-0 w-4 h-4">
+                    <div>
+                        <span class="block text-xs font-black text-white">🖼️ Portada General</span>
+                        <span class="block text-[10px] text-slate-400 mt-0.5">Escritorio (16:9) + Móvil (4:5)</span>
+                    </div>
+                </label>
+
+                <!-- Opción 2: Portada para Escritorio -->
+                <label class="relative flex items-center gap-3 p-3.5 rounded-2xl bg-[#0a0e1a] border border-slate-800 hover:border-orange-500/60 cursor-pointer transition-all portada-type-label" id="label-type-desktop">
+                    <input type="radio" name="portada-target-type" value="desktop" onchange="cambiarTipoObjetivoPortada('desktop')" class="text-orange-500 focus:ring-0 w-4 h-4">
+                    <div>
+                        <span class="block text-xs font-black text-white">🖥️ Portada para Escritorio</span>
+                        <span class="block text-[10px] text-slate-400 mt-0.5">Solo Desktop: 1920 × 1080 px</span>
+                    </div>
+                </label>
+
+                <!-- Opción 3: Portada para Móvil -->
+                <label class="relative flex items-center gap-3 p-3.5 rounded-2xl bg-[#0a0e1a] border border-slate-800 hover:border-orange-500/60 cursor-pointer transition-all portada-type-label" id="label-type-mobile">
+                    <input type="radio" name="portada-target-type" value="mobile" onchange="cambiarTipoObjetivoPortada('mobile')" class="text-orange-500 focus:ring-0 w-4 h-4">
+                    <div>
+                        <span class="block text-xs font-black text-white">📱 Portada para Móvil</span>
+                        <span class="block text-[10px] text-slate-400 mt-0.5">Solo Móvil: 1080 × 1350 px</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <form id="portada-full-form" onsubmit="event.preventDefault(); guardarPortadaFormulario(); return false;" class="space-y-6">
+            <input type="hidden" id="editor-portada-id" value="">
+            <input type="hidden" id="editor-image-desktop-val" value="">
+            <input type="hidden" id="editor-image-mobile-val" value="">
+
+            <!-- Grid de Carga de Imágenes con Previsualización de Aspect Ratio Real -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- 1. BLOQUE ESCRITORIO: 1920x1080 (16:9) -->
+                <div id="box-upload-desktop" class="bg-[#111728] p-5 sm:p-6 rounded-3xl border border-slate-800/90 space-y-4 shadow-lg">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800 select-none">
+                        <div>
+                            <span class="block text-xs font-black uppercase text-amber-400">Diseño para Escritorio & Tablet</span>
+                            <span class="block text-[11px] text-slate-400 font-mono mt-0.5">1920 × 1080 px (16:9 Horizontal)</span>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase font-mono">
+                            WebP HD
+                        </span>
+                    </div>
+
+                    <!-- Marco de Previsualización 16:9 (Extra Redondeado, No toca los bordes) -->
+                    <div class="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border-2 border-dashed border-slate-700 bg-black flex items-center justify-center group shadow-inner">
+                        <img id="editor-preview-desktop-img" src="/imagenes/portada/Portada1E.webp" alt="Desktop Preview" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4 text-center">
+                            <label class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold rounded-xl cursor-pointer flex items-center gap-2 shadow-xl transition-all">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                                <span>Subir Archivo Escritorio</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="handleDesktopFileInput(this)">
+                            </label>
+                            <span class="text-[10px] text-slate-300">Se convertirá automáticamente a WebP</span>
+                        </div>
+                    </div>
+
+                    <!-- Input URL Directa o Botón de Subida -->
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <input type="file" accept="image/*" onchange="handleDesktopFileInput(this)" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-800 file:text-orange-400 hover:file:bg-slate-700 cursor-pointer">
+                        </div>
+                        <input type="url" id="editor-url-desktop-input" oninput="handleDesktopUrlInput(this.value)" placeholder="O pegar enlace web: https://ejemplo.com/portada-16x9.webp" class="w-full bg-[#0a0e1a] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-orange-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- 2. BLOQUE MÓVIL: 1080x1350 (4:5) -->
+                <div id="box-upload-mobile" class="bg-[#111728] p-5 sm:p-6 rounded-3xl border border-slate-800/90 space-y-4 shadow-lg">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800 select-none">
+                        <div>
+                            <span class="block text-xs font-black uppercase text-cyan-400">Diseño para Teléfonos Móviles</span>
+                            <span class="block text-[11px] text-slate-400 font-mono mt-0.5">1080 × 1350 px (4:5 Vertical)</span>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase font-mono">
+                            WebP HD
+                        </span>
+                    </div>
+
+                    <!-- Marco de Previsualización 4:5 (Extra Redondeado) -->
+                    <div class="flex justify-center items-center">
+                        <div class="relative w-full max-w-[260px] aspect-[4/5] rounded-2xl overflow-hidden border-2 border-dashed border-slate-700 bg-black flex items-center justify-center group shadow-inner">
+                            <img id="editor-preview-mobile-img" src="/imagenes/portada/Portada1M.webp" alt="Mobile Preview" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4 text-center">
+                                <label class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold rounded-xl cursor-pointer flex items-center gap-2 shadow-xl transition-all">
+                                    <i data-lucide="upload" class="w-4 h-4"></i>
+                                    <span>Subir Archivo Móvil</span>
+                                    <input type="file" accept="image/*" class="hidden" onchange="handleMobileFileInput(this)">
+                                </label>
+                                <span class="text-[10px] text-slate-300">Se convertirá automáticamente a WebP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input URL Directa o Botón de Subida -->
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <input type="file" accept="image/*" onchange="handleMobileFileInput(this)" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-800 file:text-orange-400 hover:file:bg-slate-700 cursor-pointer">
+                        </div>
+                        <input type="url" id="editor-url-mobile-input" oninput="handleMobileUrlInput(this.value)" placeholder="O pegar enlace web: https://ejemplo.com/portada-4x5.webp" class="w-full bg-[#0a0e1a] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-orange-500 focus:outline-none">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Estado y Código / ID Oficial de la Portada -->
+            <div class="bg-[#111728] p-5 sm:p-6 rounded-3xl border border-slate-800/90 space-y-4 shadow-lg">
+                <h3 class="text-xs font-black uppercase text-slate-300 tracking-wider select-none flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-4 h-4 text-orange-400"></i>
+                    <span>Información de la Portada</span>
+                </h3>
+
+                <!-- Inputs ocultos preservados para compatibilidad interna -->
+                <input type="hidden" id="editor-title-input" value="">
+                <input type="hidden" id="editor-order-input" value="1">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Campo CÓDIGO / ID OFICIAL estilo Categorías -->
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-400 mb-1.5 tracking-wider select-none">
+                            CÓDIGO / ID OFICIAL
+                        </label>
+                        <input type="text" id="editor-portada-code-input" readonly value="PT001" class="w-full bg-[#0a0e1a] border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white font-mono font-bold focus:outline-none select-all shadow-inner">
+                    </div>
+
+                    <!-- Estado de Visualización -->
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-400 mb-1.5 tracking-wider select-none">
+                            Estado de Visualización
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer select-none bg-[#0a0e1a] p-3 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all h-[46px]">
+                            <input type="checkbox" id="editor-active-input" checked class="rounded bg-slate-800 border-slate-700 text-orange-600 focus:ring-orange-500 w-4 h-4">
+                            <div>
+                                <span class="text-xs text-white font-extrabold block leading-none">Publicado en Carrusel</span>
+                                <span class="text-[10px] text-slate-400 block mt-0.5">Visibilidad activa en el catálogo</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Acciones Inferior Rediseñada -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5 border-t border-slate-800/90">
+                <button type="button" id="btn-eliminar-editor-view" onclick="eliminarPortadaDesdeEditor()" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-red-950/80 to-rose-950/80 hover:from-red-900 hover:to-rose-900 text-red-300 hover:text-white font-extrabold text-xs sm:text-sm border border-red-500/40 hover:border-red-400/60 flex items-center justify-center gap-2 transition-all shadow-md shadow-red-950/50 active-press">
+                    <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>
+                    <span>Eliminar Portada</span>
+                </button>
+
+                <div class="flex items-center gap-3 w-full sm:w-auto sm:ml-auto justify-end">
+                    <button type="button" onclick="cancelarEditorPortada()" class="flex-1 sm:flex-none px-6 py-3 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white font-extrabold text-xs sm:text-sm border border-slate-700/80 transition-all active-press">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="flex-1 sm:flex-none px-7 py-3 rounded-2xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-black text-xs sm:text-sm shadow-xl shadow-orange-500/30 border border-orange-400/40 flex items-center justify-center gap-2.5 transition-all active-press cursor-pointer">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-white stroke-[2.5]"></i>
+                        <span>Guardar Portada</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>

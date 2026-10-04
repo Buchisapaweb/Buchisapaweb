@@ -58,6 +58,11 @@
                     <span>Productos</span>
                 </a>
 
+                <a href="/admin?view=portadas" id="nav-portadas" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-slate-400 hover:bg-slate-800/50 hover:text-slate-100">
+                    <i data-lucide="image" class="w-4 h-4"></i>
+                    <span>Portadas</span>
+                </a>
+
                 <a href="/admin?view=pedidos" id="nav-pedidos" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-slate-400 hover:bg-slate-800/50 hover:text-slate-100">
                     <i data-lucide="shopping-bag" class="w-4 h-4"></i>
                     <span>Pedidos</span>
@@ -160,6 +165,8 @@
             'dashboard': 'Dashboard',
             'clientes': 'Clientes',
             'productos': 'Productos',
+            'portadas': 'Portadas y Banners',
+            'portada': 'Portadas y Banners',
             'pedidos': 'Pedidos y Comandas',
             'ticket': 'Ticket',
             'configuracion': 'Configuración'
@@ -172,6 +179,8 @@
 
         if (view === 'productos' && typeof initProductosView === 'function') {
             initProductosView();
+        } else if ((view === 'portadas' || view === 'portada') && typeof initPortadasView === 'function') {
+            initPortadasView();
         }
     });
 </script>

@@ -305,10 +305,16 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     }
   });
 
-  // Delete category
-  app.delete('/api/categories/:id', async (req: Request, res: Response) => {
+  // Delete category (DELETE & POST)
+  app.all(['/api/categories/:id', '/api/admin/categories/:id', '/api/categories/delete/:id', '/api/categories/delete', '/api/admin/categories/delete'], async (req: Request, res: Response, next) => {
+    if (req.method !== 'DELETE' && !(req.method === 'POST' && req.path.includes('/delete'))) {
+      return next();
+    }
     try {
-      const categoryId = req.params.id as string;
+      const categoryId = (req.params.id || req.body.id || req.body.code || req.body.slug || req.query.id) as string;
+      if (!categoryId) {
+        return res.status(400).json({ success: false, error: 'ID de categoría requerido' });
+      }
       const deleted = await deleteCategory(categoryId);
       res.json({ success: deleted });
     } catch (error: any) {
@@ -357,10 +363,16 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     }
   });
 
-  // Delete product
-  app.delete('/api/products/:id', async (req: Request, res: Response) => {
+  // Delete product (DELETE & POST)
+  app.all(['/api/products/:id', '/api/admin/products/:id', '/api/products/delete/:id', '/api/products/delete', '/api/admin/products/delete'], async (req: Request, res: Response, next) => {
+    if (req.method !== 'DELETE' && !(req.method === 'POST' && req.path.includes('/delete'))) {
+      return next();
+    }
     try {
-      const productId = req.params.id as string;
+      const productId = (req.params.id || req.body.id || req.body.code || req.query.id) as string;
+      if (!productId) {
+        return res.status(400).json({ success: false, error: 'ID de producto requerido' });
+      }
       const deleted = await deleteProduct(productId);
       if (deleted) {
         broadcastProductStockUpdate({ id: productId, deleted: true, available: false, stock: 0 });
@@ -2937,17 +2949,18 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     }
     
     let view = (req.query.view as string) || 'dashboard';
-    const allowedViews = ['dashboard', 'clientes', 'productos', 'pedidos', 'ticket', 'configuracion'];
+    const allowedViews = ['dashboard', 'clientes', 'productos', 'portadas', 'portada', 'pedidos', 'ticket', 'configuracion'];
     if (!allowedViews.includes(view)) {
       view = 'dashboard';
     }
+    const canonicalView = view === 'portada' ? 'portadas' : view;
     
     try {
       const headerPath = path.join(process.cwd(), 'admin/includes/header.html');
       const sidebarPath = path.join(process.cwd(), 'admin/includes/sidebar.html');
       const topbarPath = path.join(process.cwd(), 'admin/includes/topbar.html');
       const footerPath = path.join(process.cwd(), 'admin/includes/footer.html');
-      const viewPath = path.join(process.cwd(), `admin/views/${view}.html`);
+      const viewPath = path.join(process.cwd(), `admin/views/${canonicalView}.html`);
       
       let header = fs.readFileSync(headerPath, 'utf8');
       let sidebar = fs.readFileSync(sidebarPath, 'utf8');
@@ -2955,17 +2968,17 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
       let footer = fs.readFileSync(footerPath, 'utf8');
       let viewContent = fs.readFileSync(viewPath, 'utf8');
       
-      const view_title = view === 'dashboard' ? 'Dashboard' : view === 'clientes' ? 'Clientes' : view === 'productos' ? 'Productos' : view === 'pedidos' ? 'Pedidos y Comandas' : view === 'ticket' ? 'Ticket' : 'Configuración';
+      const view_title = view === 'dashboard' ? 'Dashboard' : view === 'clientes' ? 'Clientes' : view === 'productos' ? 'Productos' : (view === 'portadas' || view === 'portada') ? 'Portadas y Banners' : view === 'pedidos' ? 'Pedidos y Comandas' : view === 'ticket' ? 'Ticket' : 'Configuración';
       
       topbar = topbar.replace('id="active-view-title">Dashboard<', `id="active-view-title">${view_title}<`);
       
       sidebar = sidebar.replace(
-        `id="nav-${view}" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-slate-400 hover:bg-slate-800/50 hover:text-slate-100"`,
-        `id="nav-${view}" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20"`
+        `id="nav-${canonicalView}" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-slate-400 hover:bg-slate-800/50 hover:text-slate-100"`,
+        `id="nav-${canonicalView}" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg shadow-orange-600/20"`
       );
       
-      if (fs.existsSync(path.join(process.cwd(), `admin/css/${view}.css`)) && !header.includes(`/admin/css/${view}.css`)) {
-        header = header.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${view}.css">\n</head>`);
+      if (fs.existsSync(path.join(process.cwd(), `admin/css/${canonicalView}.css`)) && !header.includes(`/admin/css/${canonicalView}.css`)) {
+        header = header.replace('</head>', `  <link rel="stylesheet" href="/admin/css/${canonicalView}.css">\n</head>`);
       }
 
       // Pre-inyectar datos analíticos en tiempo real para carga de métricas sin retrasos ni parpadeos
