@@ -1,10 +1,6 @@
 {
-  "name": "BuchiSapa - Pollería & Sabor Amazónico",
-  "description": "Sitio web oficial y sistema de pedidos de Buchisapa. Ubicados en Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima). Horario: Lunes a Domingo de 6:00 PM a 5:00 AM.",
-  "requestFramePermissions": [
-    "geolocation"
-  ],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "name": "App",
+  "description": "Nueva aplicación",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
 }
