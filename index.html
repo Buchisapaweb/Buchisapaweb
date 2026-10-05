@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuchiSapa - Pollería & Sabor Amazónico</title>
+  <meta name="description" content="Sitio web oficial y sistema de pedidos de Buchisapa. Ubicados en Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima). Horario: Lunes a Domingo de 6:00 PM a 5:00 AM.">
+  <meta property="og:title" content="BuchiSapa - Pollería & Sabor Amazónico">
+  <meta property="og:description" content="Sitio web oficial y sistema de pedidos de Buchisapa. Ubicados en Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima). Horario: Lunes a Domingo de 6:00 PM a 5:00 AM.">
+  
+  <!-- PWA & Optimización Móvil -->
+  <meta name="theme-color" content="#dc2626">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/imagenes/logo/logo-buchisapa.webp">
+  
+  <!-- Google Identity Services (GIS) para inicio de sesión real -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <!-- Ignorar script errors de CDN externos -->
+  <script>
+    window.addEventListener('error', function (e) {
+      if (e.message && e.message.toLowerCase().includes('script error')) {
+        e.preventDefault();
+        return true;
+      }
+    }, true);
+  </script>
+
+  <!-- Script del Encabezado y Navegación Crítico (Cargado en HEAD para disponibilidad inmediata) -->
+  <script src="/js/encabezado.js?v=20260928_5"></script>
+
+  <!-- CSS Organizado en /css con Cache-Buster -->
+  <link rel="stylesheet" href="/css/comun.css?v=20260928_5">
+  <link rel="stylesheet" href="/css/encabezado.css?v=20260928_5">
+  <link rel="stylesheet" href="/css/modales.css?v=20260928_5">
+  <link rel="stylesheet" href="/css/cliente.css?v=20260928_5">
+  <link rel="stylesheet" href="/css/promociones.css?v=20260928_5">
+  <link rel="stylesheet" href="/css/personalizador.css?v=20260928_6">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  
+  <!-- Preload de Imágenes de Portada en WebP para Carga Ultrarrápida sin Parpadeos -->
+  <link rel="preload" as="image" href="/imagenes/portada/Portada1M.webp" media="(max-width: 640px)" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="/imagenes/portada/Portada1E.webp" media="(min-width: 641px)" type="image/webp" fetchpriority="high">
+  <link rel="prefetch" as="image" href="/imagenes/portada/Portada2M.webp" media="(max-width: 640px)" type="image/webp">
+  <link rel="prefetch" as="image" href="/imagenes/portada/Portada2E.webp" media="(min-width: 641px)" type="image/webp">
+
+  <!-- Tipografía -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800;1,900&family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- PARTIAL: ENCABEZADO -->
+  <!-- PARTIAL: MENU_MOVIL -->
+  <!-- PARTIAL: CARRUSEL_PORTADA -->
+
+  <!-- CARTA Y CATÁLOGO DE PLATOS -->
+  <main class="container main-content-padded">
+
+    <!-- SECCIÓN DE RESULTADOS DE BÚSQUEDA Y CATEGORÍAS -->
+    <div id="search-results-section" class="search-view-section is-hidden">
+      <div class="search-view-header">
+        <button class="btn-volver" type="button" onclick="exitSearchMode()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+          Volver a Categorías
+        </button>
+        <h2 id="search-view-title" class="search-view-title">Resultados</h2>
+      </div>
+      <div id="search-view-list" class="buchisapa-cards-list"></div>
+    </div>
+
+    <!-- ENCABEZADO DE SECCIÓN PRINCIPAL -->
+    <div class="section-title-wrap" id="main-section-title-wrap">
+      <span class="section-kicker">NUESTRA CARTA</span>
+      <h2 class="section-heading">Explora por Categorías</h2>
+      <p class="section-subtitle">Selecciona una categoría para ver los platos, combos y promociones disponibles.</p>
+    </div>
+
+    <!-- SECCIÓN DE BANNERS DE TODAS LAS CATEGORÍAS (GRID RESPONSIVO EN ORDEN ALFABÉTICO A - Z) -->
+    <div id="category-banners-section" class="mobile-category-cards-grid desktop-category-cards-grid">
+      
+      <!-- 1. ALITAS (A) -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/alitas/banner.webp');" onclick="openCategoryView('alitas', 'ALITAS')" title="Alitas Broaster & BBQ">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">ALITAS</h2>
+        </div>
+      </div>
+
+      <!-- 2. BEBIDAS (B) -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/bebidas/banner.webp');" onclick="openCategoryView('bebidas', 'BEBIDAS')" title="Bebidas Frías">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">BEBIDAS</h2>
+        </div>
+      </div>
+
+      <!-- 3. BROASTER (B) -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/broaster/banner.webp');" onclick="openCategoryView('broaster', 'BROASTER')" title="Pollo Broaster Crujiente">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">BROASTER</h2>
+        </div>
+      </div>
+
+      <!-- 4. HAMBURGUESAS (H) -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/hamburguesas/banner.webp');" onclick="openCategoryView('hamburguesas', 'HAMBURGUESAS')" title="Hamburguesas BuchiSapa">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">HAMBURGUESAS</h2>
+        </div>
+      </div>
+
+      <!-- 5. INFUSIONES (I) -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/infusiones/banner.webp');" onclick="openCategoryView('infusiones', 'INFUSIONES')" title="Infusiones y Calientes">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">INFUSIONES</h2>
+        </div>
+      </div>
+
+      <!-- 6. PLATOS AMAZÓNICOS (P) -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/platos-amazonicos/banner.webp');" onclick="openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS')" title="Platos Amazónicos BuchiSapa">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">PLATOS AMAZÓNICOS</h2>
+        </div>
+      </div>
+
+      <!-- 7. REFRESCOS (R) -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/refrescos/banner.webp');" onclick="openCategoryView('refrescos', 'REFRESCOS')" title="Refrescos Naturales Amazónicos">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">REFRESCOS</h2>
+        </div>
+      </div>
+
+      <!-- 8. SALCHIPAPAS Y SALCHIBROASTERS (S) -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp');" onclick="openCategoryView('salchipapas', 'SALCHIPAPAS Y SALCHIBROASTERS')" title="Salchipapas y Salchibroasters">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">SALCHIPAPAS Y SALCHIBROASTERS</h2>
+        </div>
+      </div>
+
+      <!-- 9. ADICIONALES -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/adicionales/banner.webp');" onclick="openCategoryView('adicionales', 'ADICIONALES')" title="Adicionales">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">ADICIONALES</h2>
+        </div>
+      </div>
+
+      <!-- 10. PROMOCIONES -->
+      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/promociones/banner.webp');" onclick="openCategoryView('promociones', 'PROMOCIONES')" title="Promociones">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">PROMOCIONES</h2>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- PARTIAL: PANEL_CARRITO -->
+  <!-- PARTIAL: VENTANA_UBICACION -->
+  <!-- PARTIAL: VENTANA_AUTENTICACION -->
+
+  <!-- IFRAME OCULTO OBLIGATORIO PARA IMPRESIÓN DIRECTA POR WIFI -->
+  <iframe name="print_hidden" id="print_hidden" class="hidden-iframe" title="WiFi Print Frame"></iframe>
+
+  <!-- PARTIAL: PIE_PAGINA -->
+
+  <!-- JAVASCRIPT ORGANIZADO EN /js con Cache-Buster -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer crossorigin=""></script>
+  <script src="/js/supabase-cliente.js?v=20260928_5"></script>
+  <script src="/js/horario.js?v=20260928_5"></script>
+  <script src="/js/carrito.js?v=20260928_5"></script>
+  <script src="/js/personalizador.js?v=20260928_5"></script>
+  <script src="/js/promociones.js?v=20260928_5"></script>
+  <script src="/js/app.js?v=20260928_5"></script>
+</body>
+</html>
