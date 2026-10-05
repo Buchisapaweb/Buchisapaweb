@@ -2682,13 +2682,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // 2. Recursos del frontend reorganizados (se conservan las URLs públicas antiguas para no romper enlaces).
   app.use('/css', express.static(path.join(process.cwd(), 'frontend/src/styles'), staticOptions));
+  app.use('/css', express.static(path.join(process.cwd(), 'dist/css'), staticOptions));
   app.use('/js', express.static(path.join(process.cwd(), 'frontend/src/scripts'), staticOptions));
+  app.use('/js', express.static(path.join(process.cwd(), 'dist/js'), staticOptions));
   app.use('/styles', express.static(path.join(process.cwd(), 'frontend/src/styles'), staticOptions));
+  app.use('/styles', express.static(path.join(process.cwd(), 'dist/css'), staticOptions));
   app.use('/scripts', express.static(path.join(process.cwd(), 'frontend/src/scripts'), staticOptions));
+  app.use('/scripts', express.static(path.join(process.cwd(), 'dist/js'), staticOptions));
 
-  // 2. Archivos estáticos de css, js, html y raíz pública (todos dentro de public/)
+  // 2. Archivos estáticos de css, js, html y raíz pública (todos dentro de public/ y dist/)
   app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
   app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
+  app.use(express.static(path.join(process.cwd(), 'dist'), staticOptions));
 
   // 3. Servir HTML Compilado del Panel de Administración para /admin y cualquier subruta (/admin/dashboard, /admin/productos, etc.)
   app.get(['/admin', '/admin.html', /^\/admin(?:\/.*)?$/], (req: Request, res: Response, next) => {
@@ -2704,6 +2709,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // 4. Panel de Administración Oficial BuchiSapa (Archivos estáticos CSS, JS, imágenes)
   app.use('/admin', express.static(path.join(process.cwd(), 'frontend/src/admin'), { ...staticOptions, index: false }));
+  app.use('/admin', express.static(path.join(process.cwd(), 'dist/admin'), { ...staticOptions, index: false }));
 
   app.get(['/kitchen', '/cocina', '/cocina.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/cocina.html'));
@@ -2777,7 +2783,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/terminos.html'));
   });
 
-
   app.get(['/contactanos', '/contactanos.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/contactanos.html'));
   });
@@ -2794,7 +2799,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/ubicacion.html'));
   });
 
-
   // 3. Página de Inicio (HTML5 con parciales compilados)
   app.get(['/', '/index.html'], (_req: Request, res: Response) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -2806,6 +2810,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // Fallback a index.html para SPA/rutas directas
   app.get(/.*/, (req: Request, res: Response) => {
+    if (path.extname(req.path) || req.path.startsWith('/js/') || req.path.startsWith('/css/') || req.path.startsWith('/api/') || req.path.startsWith('/admin/')) {
+      return res.status(404).send('404 Not Found');
+    }
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');

@@ -1,25 +1,26 @@
 /* ==========================================================================
-   BUCHISAPA BURGER & BROASTER - GESTIÓN DE UTENSILIOS & EQUIPAMIENTO
+   BUCHISAPA BURGER & BROASTER - UTENSILIOS & EQUIPOS
    Layer: /admin/styles/utensilios.css
    ========================================================================== */
 
-/* 1. ESTADO DE EQUIPO */
-.equip-status-operativo {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+.utensilio-status-tag {
+  font-size: 0.76rem;
+  font-weight: 700;
   padding: 3px 8px;
   border-radius: var(--radius-xs);
-  font-size: 0.74rem;
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.equip-status-mantenimiento {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  padding: 3px 8px;
-  border-radius: var(--radius-xs);
-  font-size: 0.74rem;
-  font-weight: 800;
+.utensilio-operativo {
+  background: var(--accent-green-dim);
+  color: var(--accent-green);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.utensilio-mantenimiento {
+  background: var(--accent-gold-dim);
+  color: var(--accent-gold);
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }

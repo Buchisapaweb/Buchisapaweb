@@ -1,14 +1,12 @@
 /* ==========================================================================
-   BUCHISAPA BURGER & BROASTER - PANEL DE ADMINISTRACIÓN OFICIAL
-   Estilos Principales del Administrador: /admin/styles/admin.css
+   BUCHISAPA BURGER & BROASTER - PANEL ADMINISTRATIVO PRINCIPAL
+   Master Stylesheet Architecture
+   Layer: /admin/styles/admin.css
    ========================================================================== */
 
-/* 1. FUNDAMENTOS Y ARQUITECTURA */
 @import './variables.css';
 @import './estructura.css';
 @import './componentes.css';
-
-/* 2. MÓDULOS DEL PANEL (SIMETRÍA 1:1 CON LAS VISTAS HTML) */
 @import './dashboard.css';
 @import './portada.css';
 @import './productos.css';
@@ -19,32 +17,3 @@
 @import './utensilios.css';
 @import './ticket.css';
 @import './configuracion.css';
-
-/* Micro-ajustes de fuentes y rendering */
-html, body {
-  min-height: 100%;
-}
-
-::selection {
-  background: rgba(14, 165, 233, 0.35);
-  color: #ffffff;
-}
-
-/* Scrollbar personalizado para panel administrativo */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(3, 7, 18, 0.85);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.2);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.4);
-}

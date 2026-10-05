@@ -7,6 +7,10 @@ export interface Category {
   name: string;
   icon: string;
   description: string;
+  banner?: string;
+  image?: string;
+  order?: number;
+  slug?: string;
 }
 
 export interface Product {
@@ -97,18 +101,18 @@ export interface Claim {
   createdAt: string;
 }
 
-// 1. CATEGORÍAS OFICIALES BUCHISAPA
+// 1. CATEGORÍAS OFICIALES BUCHISAPA (10 CATEGORÍAS ENLAZADAS AL CLIENTE)
 const initialCategories: Category[] = [
-  { id: 'alitas', code: '1001', name: 'ALITAS', icon: 'Drumstick', description: 'Alitas crujientes en salsa acevichada y BBQ.' },
-  { id: 'bebidas', code: '1002', name: 'BEBIDAS', icon: 'Coffee', description: 'Gaseosas heladas, agua y bebidas en botella.' },
-  { id: 'broaster', code: '1003', name: 'BROASTER', icon: 'Drumstick', description: 'Pollo broaster ultra crocante con papas, arroz y cremas.' },
-  { id: 'hamburguesas', code: '1004', name: 'HAMBURGUESAS', icon: 'Beef', description: 'Hamburguesas artesanales, choripanes y sándwiches especiales.' },
-  { id: 'infusiones', code: '1005', name: 'INFUSIONES', icon: 'CupSoda', description: 'Infusiones calientes y café aromático pasado.' },
-  { id: 'platos-amazonicos', code: '1006', name: 'PLATOS AMAZÓNICOS', icon: 'Flame', description: 'Auténticos sabores de la selva peruana: tacacho, cecina, juanes y patacones.' },
-  { id: 'refrescos', code: '1007', name: 'REFRESCOS', icon: 'GlassWater', description: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.' },
-  { id: 'salchipapas', code: '1008', name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'Flame', description: 'Papas crocantes, salchichas, chorizos y combinaciones broaster.' },
-  { id: 'adicionales', code: '1009', name: 'ADICIONALES', icon: 'Plus', description: 'Complementos y adicionales para personalizar los pedidos.' },
-  { id: 'promociones', code: '1010', name: 'PROMOCIONES', icon: 'Sparkles', description: 'Promociones y combos especiales de BuchiSapa.' }
+  { id: 'alitas', code: '1001', name: 'ALITAS', icon: 'Drumstick', description: 'Alitas crujientes en salsa acevichada y BBQ.', banner: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80', order: 1 },
+  { id: 'bebidas', code: '1002', name: 'BEBIDAS', icon: 'Coffee', description: 'Gaseosas heladas, agua y bebidas en botella.', banner: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80', order: 2 },
+  { id: 'broaster', code: '1003', name: 'BROASTER', icon: 'Drumstick', description: 'Pollo broaster ultra crocante con papas, arroz y cremas.', banner: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80', order: 3 },
+  { id: 'hamburguesas', code: '1004', name: 'HAMBURGUESAS', icon: 'Beef', description: 'Hamburguesas artesanales, choripanes y sándwiches especiales.', banner: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80', order: 4 },
+  { id: 'infusiones', code: '1005', name: 'INFUSIONES', icon: 'CupSoda', description: 'Infusiones calientes y café aromático pasado.', banner: 'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80', order: 5 },
+  { id: 'platos-amazonicos', code: '1006', name: 'PLATOS AMAZÓNICOS', icon: 'Flame', description: 'Auténticos sabores de la selva peruana: tacacho, cecina, juanes y patacones.', banner: '/imagenes/categorias/platos-amazonicos/banner.webp', order: 6 },
+  { id: 'refrescos', code: '1007', name: 'REFRESCOS', icon: 'GlassWater', description: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.', banner: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80', order: 7 },
+  { id: 'salchipapas', code: '1008', name: 'SALCHIPAPAS Y SALCHIBROASTERS', icon: 'Flame', description: 'Papas crocantes, salchichas, chorizos y combinaciones broaster.', banner: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80', order: 8 },
+  { id: 'adicionales', code: '1009', name: 'ADICIONALES', icon: 'Plus', description: 'Complementos y adicionales para personalizar los pedidos.', banner: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80', order: 9 },
+  { id: 'promociones', code: '1010', name: 'PROMOCIONES', icon: 'Sparkles', description: 'Promociones y combos especiales de BuchiSapa.', banner: '/imagenes/portada/Portada1E.webp', order: 10 }
 ];
 
 // 2. SALSAS DE LA CASA
@@ -831,6 +835,106 @@ const initialProducts: Product[] = [
     stock: 50,
     image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
     includes_sauces: true
+  },
+  // COMBOS & PACKS ESPECIALES
+  {
+    id: 'com-1',
+    code: 'COM001',
+    name: 'Combo Familiar Broaster',
+    category_id: 'promociones',
+    price: 45.00,
+    description: '1 Pollo broaster entero crocante + porción familiar de papas fritas + ensalada + chicha morada 1.5L.',
+    badge: 'FAMILIAR',
+    popular: true,
+    available: true,
+    stock: 30,
+    image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'com-2',
+    code: 'COM002',
+    name: 'Combo Selvático Dúo',
+    category_id: 'promociones',
+    price: 32.00,
+    description: '1 Tacacho con cecina + 1 Arroz chaufa amazónico + 2 refrescos de cocona helados.',
+    badge: 'DÚO',
+    popular: true,
+    available: true,
+    stock: 30,
+    image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'com-3',
+    code: 'COM003',
+    name: 'Combo Burger Lover',
+    category_id: 'promociones',
+    price: 28.00,
+    description: '2 Hamburguesas a lo Pobre + 2 porciones de papas crujientes + 2 Inca Cola 500ml.',
+    badge: 'BURGER',
+    popular: true,
+    available: true,
+    stock: 30,
+    image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  // ADICIONALES Y GUARNICIONES
+  {
+    id: 'ext-1',
+    code: 'EXT001',
+    name: 'Porción de Papas Fritas',
+    category_id: 'adicionales',
+    price: 6.00,
+    description: 'Papas amarillas crocantes saladas al punto, doradas al momento.',
+    badge: 'EXTRA',
+    popular: false,
+    available: true,
+    stock: 80,
+    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'ext-2',
+    code: 'EXT002',
+    name: 'Porción Extra de Cecina',
+    category_id: 'adicionales',
+    price: 8.00,
+    description: 'Láminas jugosas de cecina ahumada artesanal de la selva.',
+    badge: 'SELVA',
+    popular: false,
+    available: true,
+    stock: 45,
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'ext-3',
+    code: 'EXT003',
+    name: 'Porción de Tacacho',
+    category_id: 'adicionales',
+    price: 6.00,
+    description: 'Bolas de plátano majado con chicharrón y sazón amazónica.',
+    badge: 'TÍPICO',
+    popular: false,
+    available: true,
+    stock: 50,
+    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: true
+  },
+  {
+    id: 'ext-4',
+    code: 'EXT004',
+    name: 'Porción de Cremas de la Casa',
+    category_id: 'adicionales',
+    price: 3.00,
+    description: 'Variedad de salsas caseras: ají pollero, tártara, mayonesa y rocoto.',
+    badge: 'CREMAS',
+    popular: false,
+    available: true,
+    stock: 100,
+    image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80',
+    includes_sauces: false
   }
 ];
 

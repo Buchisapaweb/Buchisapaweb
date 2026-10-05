@@ -9,7 +9,7 @@
       <div class="admin-view-kicker">BUCHISAPA · ESTRUCTURA & SECCIONES DEL MENÚ</div>
       <h2 class="admin-view-title" id="title-categorias">Categorías del Menú</h2>
       <p class="admin-view-subtitle">
-        Organiza y estructura las secciones de la tienda virtual: Hamburguesas, Broaster, Salchipapas, Combos, Bebidas y Guarniciones.
+        Organiza y estructura las secciones de la tienda virtual vinculadas en tiempo real con la carta de clientes.
       </p>
     </div>
     <div class="admin-view-actions">
@@ -26,6 +26,12 @@
     <!-- TOOLBAR INTEGRADO -->
     <div class="workspace-toolbar">
       <div class="toolbar-left">
+        <div class="search-box">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="categorias-search-input" class="admin-search-input" placeholder="Buscar categoría por nombre..." oninput="window.filterCategoriesGrid(this.value)">
+        </div>
+      </div>
+      <div class="toolbar-right">
         <span class="count-indicator" id="categorias-count-badge">Cargando categorías...</span>
       </div>
     </div>

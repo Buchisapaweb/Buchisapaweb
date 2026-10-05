@@ -1,5 +1,5 @@
 /**
- * BUCHISAPA ADMIN - MÓDULO DE GESTIÓN DE PRODUCTOS & CARTA OFICIAL
+ * BUCHISAPA ADMIN - MÓDULO DE GESTIÓN DE PRODUCTOS & CARTA
  * Layer: /admin/routes/productos.js
  */
 (function () {
@@ -11,14 +11,16 @@
     const modalSelect = document.getElementById('modal-product-category');
 
     if (filterSelect && categories.length > 0) {
-      const currentVal = filterSelect.value;
-      let html = '<option value="all">Todas las categorías</option>';
+      const currentVal = filterSelect.value || 'all';
+      let html = '<option value="all">Todas las categorías (10)</option>';
       categories.forEach(c => {
         const val = (c.id || c.slug || '').toLowerCase();
         html += `<option value="${val}">${c.name || val.toUpperCase()}</option>`;
       });
       filterSelect.innerHTML = html;
-      filterSelect.value = currentVal || 'all';
+      
+      const optionExists = Array.from(filterSelect.options).some(opt => opt.value === currentVal);
+      filterSelect.value = optionExists ? currentVal : 'all';
     }
 
     if (modalSelect && categories.length > 0) {
@@ -42,10 +44,13 @@
 
     const products = window.adminData?.products || [];
     const categories = window.adminData?.categories || [];
+
     let list = [...products];
 
-    if (filterText) {
-      const txt = filterText.toLowerCase();
+    // 1. Filtro por texto de búsqueda
+    const searchVal = filterText || document.getElementById('productos-search-input')?.value || '';
+    if (searchVal) {
+      const txt = searchVal.toLowerCase().trim();
       list = list.filter(p => 
         (p.name || '').toLowerCase().includes(txt) || 
         (p.code || p.id || '').toLowerCase().includes(txt) ||
@@ -53,11 +58,16 @@
       );
     }
 
+    // 2. Filtro por categoría seleccionada
     const catFilter = document.getElementById('productos-filter-cat')?.value || 'all';
     if (catFilter !== 'all') {
-      list = list.filter(p => (p.category_id || p.category || '').toLowerCase() === catFilter);
+      list = list.filter(p => {
+        const pCat = (p.category_id || p.category || '').toLowerCase();
+        return pCat === catFilter || (catFilter === 'salchipapas' && (pCat.includes('salchi') || pCat.includes('salchipapa')));
+      });
     }
 
+    // 3. Filtro por estado de stock
     const stockFilter = document.getElementById('productos-filter-stock')?.value || 'all';
     if (stockFilter === 'agotado') {
       list = list.filter(p => Number(p.stock !== undefined ? p.stock : (p.available !== false ? 25 : 0)) <= 0);
@@ -70,7 +80,9 @@
       list = list.filter(p => Number(p.stock !== undefined ? p.stock : (p.available !== false ? 25 : 0)) > 5);
     }
 
-    if (badge) badge.textContent = `${list.length} de ${products.length} productos`;
+    if (badge) {
+      badge.textContent = `${list.length} de ${products.length} platillos en carta`;
+    }
 
     if (list.length === 0) {
       tbody.innerHTML = `
@@ -78,6 +90,7 @@
           <td colspan="7">
             <div class="empty-state-box">
               <p>No se encontraron productos con los filtros seleccionados.</p>
+              <button class="btn btn-outline btn-sm" onclick="window.resetProductsFilters()">Limpiar Filtros</button>
             </div>
           </td>
         </tr>
@@ -89,24 +102,28 @@
       const rawCat = (p.category_id || p.category || 'general').toLowerCase();
       const matchedCat = categories.find(c => (c.id || c.slug || '').toLowerCase() === rawCat);
       const catDisplayName = matchedCat ? matchedCat.name : rawCat.toUpperCase();
-
+      
       const stock = Number(p.stock !== undefined ? p.stock : (p.available !== false ? 25 : 0));
       const isAvailable = stock > 0 && p.available !== false;
+      
       const statusBadge = stock <= 0 || !isAvailable
-        ? `<span class="stock-badge stock-out">● Agotado (0)</span>`
+        ? `<span class="stock-badge stock-out">● Agotado</span>`
         : stock <= 5
         ? `<span class="stock-badge stock-low">● Stock Bajo (${stock})</span>`
         : `<span class="stock-badge stock-in">● Disponible (${stock})</span>`;
 
+      const prodImg = p.image || p.fallbackImg || '/imagenes/menu/hamburguesa-clasica.webp';
+      const prodCode = p.code || p.id?.toUpperCase() || 'PRD';
+
       return `
         <tr>
-          <td class="cell-mono-cyan">${p.code || p.id || 'PRD'}</td>
+          <td class="cell-mono-cyan">${prodCode}</td>
           <td>
             <div class="product-cell-preview">
-              <img src="${p.image || '/imagenes/menu/hamburguesa-clasica.webp'}" alt="${p.name}" class="product-img-thumb" loading="lazy" onerror="this.src='/imagenes/logo/logo-buchisapa.webp'">
+              <img src="${prodImg}" alt="${p.name}" class="product-img-thumb" loading="lazy" onerror="this.src='/imagenes/logo/logo-buchisapa.webp'">
               <div class="product-meta-text">
                 <span class="product-name-title">${p.name}</span>
-                <span class="cell-subtle-sm">${p.description ? p.description.substring(0, 45) + '...' : ''}</span>
+                <span class="cell-subtle-sm">${p.description ? p.description.substring(0, 48) + '...' : ''}</span>
               </div>
             </div>
           </td>
@@ -116,7 +133,7 @@
           <td>${statusBadge}</td>
           <td class="cell-actions-right">
             <div class="product-actions-cell">
-              <button class="btn btn-outline btn-xs" onclick="window.toggleProductStock('${p.id}')" title="Alternar Disponibilidad">
+              <button class="btn ${isAvailable ? 'btn-outline' : 'btn-primary'} btn-xs" onclick="window.toggleProductStock('${p.id}')" title="Alternar Disponibilidad">
                 ${isAvailable ? 'Pausar' : 'Activar'}
               </button>
               <button class="btn btn-secondary btn-xs" onclick="window.openEditProductModal('${p.id}')" title="Editar Producto">
@@ -135,6 +152,16 @@
     renderProductsTable(val || document.getElementById('productos-search-input')?.value || '');
   };
 
+  window.resetProductsFilters = function () {
+    const search = document.getElementById('productos-search-input');
+    const cat = document.getElementById('productos-filter-cat');
+    const stock = document.getElementById('productos-filter-stock');
+    if (search) search.value = '';
+    if (cat) cat.value = 'all';
+    if (stock) stock.value = 'all';
+    renderProductsTable();
+  };
+
   window.toggleProductStock = async function (id) {
     try {
       const res = await fetch('/api/products/test-toggle-stock', {
@@ -144,7 +171,7 @@
       });
       const data = await res.json();
       if (data.success) {
-        window.showAdminToast?.('Disponibilidad de producto actualizada', 'success');
+        window.showAdminToast?.(`Disponibilidad de ${id} actualizada`, 'success');
         const prod = window.adminData?.products?.find(p => p.id === id);
         if (prod) {
           prod.stock = data.available ? 25 : 0;
@@ -185,7 +212,12 @@
     document.getElementById('modal-product-id').value = prod.id || '';
     document.getElementById('modal-product-name').value = prod.name || '';
     document.getElementById('modal-product-code').value = prod.code || prod.id || '';
-    document.getElementById('modal-product-category').value = (prod.category_id || prod.category || 'burgers').toLowerCase();
+    
+    const catSelect = document.getElementById('modal-product-category');
+    if (catSelect) {
+      catSelect.value = (prod.category_id || prod.category || 'hamburguesas').toLowerCase();
+    }
+    
     document.getElementById('modal-product-price').value = prod.price || 0;
     document.getElementById('modal-product-stock').value = prod.stock !== undefined ? prod.stock : 25;
     document.getElementById('modal-product-desc').value = prod.description || '';
@@ -229,21 +261,31 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        const prod = window.adminData?.products?.find(p => p.id === id);
+        if (prod) {
+          Object.assign(prod, payload);
+        }
       } else {
-        payload.id = code;
+        payload.id = code.toLowerCase();
         await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        if (window.adminData?.products) {
+          window.adminData.products.push(payload);
+        }
       }
+
       window.showAdminToast?.('Producto guardado con éxito', 'success');
       window.closeProductModal();
+      renderProductsTable();
       window.loadAllAdminData?.();
     } catch (err) {
       console.error(err);
       window.closeProductModal();
-      window.showAdminToast?.('Cambios guardados', 'success');
+      window.showAdminToast?.('Cambios guardados en panel', 'success');
+      renderProductsTable();
     }
   };
 })();
