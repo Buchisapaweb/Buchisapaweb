@@ -1,1 +1,43 @@
-<section class="admin-view" id="view-categorias" aria-labelledby="title-categorias"></section>
+<!-- ====================================================================
+     VISTA GESTIÓN DE CATEGORÍAS - BUCHISAPA BURGER & BROASTER
+     ==================================================================== -->
+<section class="admin-view" id="view-categorias" aria-labelledby="title-categorias">
+  
+  <!-- CABECERA UNIFICADA DE LA VISTA -->
+  <div class="admin-view-header">
+    <div class="admin-view-header-left">
+      <div class="admin-view-kicker">BUCHISAPA · ESTRUCTURA & SECCIONES DEL MENÚ</div>
+      <h2 class="admin-view-title" id="title-categorias">Categorías del Menú</h2>
+      <p class="admin-view-subtitle">
+        Organiza y estructura las secciones de la tienda virtual: Hamburguesas, Broaster, Salchipapas, Combos, Bebidas y Guarniciones.
+      </p>
+    </div>
+    <div class="admin-view-actions">
+      <button class="btn btn-primary btn-sm" type="button" onclick="window.openNewCategoryModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Nueva Categoría</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- WORKSPACE MASTER UNIFICADO -->
+  <div class="admin-workspace-card">
+
+    <!-- TOOLBAR INTEGRADO -->
+    <div class="workspace-toolbar">
+      <div class="toolbar-left">
+        <span class="count-indicator" id="categorias-count-badge">Cargando categorías...</span>
+      </div>
+    </div>
+
+    <!-- GRILLA DE CATEGORÍAS (RESPONSIVA) -->
+    <div class="categories-grid" id="categorias-grid-container">
+      <div class="empty-state-box">
+        <div class="spinner"></div>
+        <p>Cargando categorías del menú...</p>
+      </div>
+    </div>
+
+  </div>
+
+</section>

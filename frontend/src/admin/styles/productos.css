@@ -1,0 +1,94 @@
+/* ==========================================================================
+   BUCHISAPA BURGER & BROASTER - GESTIÓN DE PRODUCTOS & CARTA
+   Layer: /admin/styles/productos.css
+   ========================================================================== */
+
+/* 1. TABLA Y MINIATURAS DE PRODUCTO */
+.product-cell-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-img-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: #01040a;
+  border: 1px solid var(--admin-border-subtle);
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition-fast);
+}
+
+.product-cell-preview:hover .product-img-thumb {
+  transform: scale(1.08);
+  border-color: var(--brand-cyan);
+}
+
+.product-meta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.product-name-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.product-cat-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--brand-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* 2. BADGES DE STOCK Y DISPONIBILIDAD */
+.stock-badge {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stock-in {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.stock-low {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.stock-out {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--brand-rose);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+/* 3. CONTROLES Y MODALES DE PRODUCTO */
+.price-pill {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #38d5ff;
+}
+
+.product-actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}

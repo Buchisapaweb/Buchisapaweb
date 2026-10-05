@@ -1,0 +1,104 @@
+/* ==========================================================================
+   BUCHISAPA BURGER & BROASTER - GESTIÓN DE PEDIDOS & COMANDAS
+   Layer: /admin/styles/pedidos.css
+   ========================================================================== */
+
+/* 1. BADGES DE ESTADO DE ORDEN */
+.order-status-badge {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-transform: uppercase;
+}
+
+.order-status-pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.order-status-cooking {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38d5ff;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.order-status-delivery {
+  background: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.order-status-completed {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.order-status-cancelled {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--brand-rose);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+}
+
+/* 2. TIPO DE ENTREGA */
+.delivery-type-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.delivery-type-local {
+  background: rgba(14, 165, 233, 0.1);
+  color: var(--brand-cyan);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.delivery-type-delivery {
+  background: rgba(244, 63, 94, 0.1);
+  color: #fda4af;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+/* 3. MODAL DETALLE DE PEDIDO */
+.modal-order-items-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.modal-order-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  color: var(--text-main);
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.modal-order-total-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 1rem;
+}

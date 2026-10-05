@@ -1,0 +1,75 @@
+/* ==========================================================================
+   BUCHISAPA BURGER & BROASTER - CONFIGURACIÓN Y SIMULADOR DE TICKET
+   Layer: /admin/styles/ticket.css
+   ========================================================================== */
+
+/* 1. LAYOUT DE CONFIGURACIÓN & PREVIEW */
+.ticket-workspace-split {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .ticket-workspace-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 2. PAPEL TÉRMICO 80MM (SIMULACIÓN REALISTA) */
+.ticket-thermal-receipt {
+  background: #ffffff;
+  color: #111827;
+  padding: 24px 18px;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(0, 0, 0, 0.05);
+  border-top: 4px dashed #cbd5e1;
+  border-bottom: 4px dashed #cbd5e1;
+}
+
+.ticket-header-print {
+  text-align: center;
+  border-bottom: 1px dashed #64748b;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.ticket-title-brand {
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.ticket-divider {
+  border-top: 1px dashed #64748b;
+  margin: 10px 0;
+}
+
+.ticket-item-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+  font-size: 0.82rem;
+}
+
+.ticket-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 900;
+  font-size: 0.95rem;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #111827;
+}
+
+.ticket-footer-print {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: #475569;
+}

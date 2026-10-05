@@ -1,0 +1,126 @@
+<!-- ====================================================================
+     MODALES GLOBALES DEL PANEL ADMINISTRATIVO BUCHISAPA
+     ==================================================================== -->
+
+<!-- 1. MODAL DE PRODUCTO (CREAR / EDITAR) -->
+<div class="admin-modal-backdrop" id="modal-product-backdrop">
+  <div class="admin-modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-product-title">Nuevo Producto</h3>
+      <button class="modal-close-btn" type="button" onclick="window.closeProductModal()">✕</button>
+    </div>
+    <form id="form-admin-product" onsubmit="window.handleSaveProduct(event)">
+      <input type="hidden" id="modal-product-id" value="">
+      
+      <div class="form-group">
+        <label class="form-label">Nombre del Platillo *</label>
+        <input type="text" id="modal-product-name" class="form-input" placeholder="Ej: Hamburguesa Buchi Royal" required>
+      </div>
+
+      <div class="form-grid-2col">
+        <div class="form-group">
+          <label class="form-label">Categoría *</label>
+          <select id="modal-product-category" class="form-select" required>
+            <option value="hamburguesas">Hamburguesas</option>
+            <option value="broaster">Broaster</option>
+            <option value="salchipapas">Salchipapas</option>
+            <option value="bebidas">Bebidas</option>
+            <option value="combos">Combos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Precio (S/) *</label>
+          <input type="number" step="0.10" id="modal-product-price" class="form-input" placeholder="0.00" required>
+        </div>
+      </div>
+
+      <div class="form-grid-2col">
+        <div class="form-group">
+          <label class="form-label">Stock Inicial *</label>
+          <input type="number" id="modal-product-stock" class="form-input" value="25" min="0" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Código / SKU</label>
+          <input type="text" id="modal-product-code" class="form-input" placeholder="PRD001">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea id="modal-product-desc" class="form-textarea" rows="2" placeholder="Ingredientes, detalles de preparación..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">URL de Imagen</label>
+        <input type="text" id="modal-product-img" class="form-input" placeholder="/imagenes/menu/hamburguesa-clasica.webp">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="window.closeProductModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar Producto</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 2. MODAL DE CATEGORÍA (CREAR / EDITAR) -->
+<div class="admin-modal-backdrop" id="modal-category-backdrop">
+  <div class="admin-modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-category-title">Nueva Categoría</h3>
+      <button class="modal-close-btn" type="button" onclick="window.closeCategoryModal()">✕</button>
+    </div>
+    <form id="form-admin-category" onsubmit="window.handleSaveCategory(event)">
+      <input type="hidden" id="modal-category-id" value="">
+      
+      <div class="form-group">
+        <label class="form-label">Nombre de Categoría *</label>
+        <input type="text" id="modal-category-name" class="form-input" placeholder="Ej: Hamburguesas Artesanales" required>
+      </div>
+
+      <div class="form-grid-2col">
+        <div class="form-group">
+          <label class="form-label">Slug / Identificador *</label>
+          <input type="text" id="modal-category-slug" class="form-input" placeholder="hamburguesas" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Orden de Visualización</label>
+          <input type="number" id="modal-category-order" class="form-input" value="1">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Imagen / Banner URL</label>
+        <input type="text" id="modal-category-banner" class="form-input" placeholder="/imagenes/menu/categoria-burgers.webp">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="window.closeCategoryModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar Categoría</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 3. MODAL DE DETALLE DE ORDEN & COMANDA -->
+<div class="admin-modal-backdrop" id="modal-order-backdrop">
+  <div class="admin-modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-order-title">Detalle del Pedido #BS-0000</h3>
+      <button class="modal-close-btn" type="button" onclick="window.closeOrderModal()">✕</button>
+    </div>
+    <div class="modal-order-body" id="modal-order-body">
+      <!-- Dinámico vía JavaScript -->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="window.closeOrderModal()">Cerrar</button>
+      <button type="button" class="btn btn-primary" onclick="window.printCurrentModalOrder()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+        <span>Imprimir Comanda</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENEDOR DE TOASTS NOTIFICACIONES -->
+<div class="admin-toast-container" id="admin-toast-container"></div>
