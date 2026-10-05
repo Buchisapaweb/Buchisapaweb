@@ -48,26 +48,6 @@ usersStore.set(adminWebUser.email.toLowerCase(), adminWebUser);
 usersStore.set(adminWebUser.uid, adminWebUser);
 usersStore.set('admin-buchisapaweb-id', adminWebUser);
 
-const adminWebUser: UserProfile = {
-  id: '166099db-28ad-4329-b3c4-117f63188472',
-  uid: '166099db-28ad-4329-b3c4-117f63188472',
-  email: 'buchisapaweb@gmail.com',
-  name: 'Administrador BuchiSapa',
-  firstName: 'Administrador',
-  lastName: 'BuchiSapa',
-  phone: '942 475 459',
-  docType: 'DNI',
-  docNumber: '70000001',
-  role: 'admin',
-  isAdmin: true,
-  emailVerified: true,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-usersStore.set(adminWebUser.email.toLowerCase(), adminWebUser);
-usersStore.set(adminWebUser.uid, adminWebUser);
-usersStore.set('admin-buchisapaweb-id', adminWebUser);
-
 const defaultCustomer: UserProfile = {
   id: 'cust-buchisapa-1',
   uid: 'cust-buchisapa-1',
