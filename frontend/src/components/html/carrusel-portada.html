@@ -1,0 +1,60 @@
+<!-- HERO SLIDER / CAROUSEL BANNERS (CARGA WEBP Y LAZY LOADING INTELIGENTE) -->
+<section class="hero-carousel-container" aria-label="Banners de Portada BuchiSapa">
+  <div class="carousel-track" id="hero-carousel-track">
+    
+    <!-- SLIDE 1: BROASTER -->
+    <div class="carousel-slide active">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada1M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada1E.webp">
+        <img src="/imagenes/portada/Portada1E.webp" alt="Portada Pollo Broaster BuchiSapa" class="carousel-slide-img" loading="eager" fetchpriority="high" decoding="async" onerror="if(!this.dataset.failed){this.dataset.failed='1';this.src='/imagenes/portada/Portada1M.webp';}">
+      </picture>
+    </div>
+
+    <!-- SLIDE 2: PLATOS AMAZÓNICOS -->
+    <div class="carousel-slide">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada2M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada2E.webp">
+        <img src="/imagenes/portada/Portada2E.webp" alt="Portada Platos Amazónicos BuchiSapa" class="carousel-slide-img" loading="eager" decoding="async" onerror="if(!this.dataset.failed){this.dataset.failed='1';this.src='/imagenes/portada/Portada2M.webp';}">
+      </picture>
+    </div>
+
+    <!-- SLIDE 3: HAMBURGUESAS -->
+    <div class="carousel-slide">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada3M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada3E.webp">
+        <img src="/imagenes/portada/Portada3E.webp" alt="Portada Hamburguesas BuchiSapa" class="carousel-slide-img" loading="lazy" decoding="async" onerror="if(!this.dataset.failed){this.dataset.failed='1';this.src='/imagenes/portada/Portada3M.webp';}">
+      </picture>
+    </div>
+
+    <!-- SLIDE 4: HAMBURGUESA AMAZÓNICA -->
+    <div class="carousel-slide">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada4M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada4E.webp">
+        <img src="/imagenes/portada/Portada4E.webp" alt="Portada Hamburguesa Amazónica BuchiSapa" class="carousel-slide-img" loading="lazy" decoding="async" onerror="if(!this.dataset.failed){this.dataset.failed='1';this.src='/imagenes/portada/Portada4M.webp';}">
+      </picture>
+    </div>
+
+    <!-- SLIDE 5: BURGER & COMBOS BUCHISAPA -->
+    <div class="carousel-slide">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada5M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada5E.webp">
+        <img src="/imagenes/portada/Portada5E.webp" alt="Portada Burger BuchiSapa" class="carousel-slide-img" loading="lazy" decoding="async" onerror="if(!this.dataset.failed){this.dataset.failed='1';this.src='/imagenes/portada/Portada5M.webp';}">
+      </picture>
+    </div>
+
+  </div>
+
+  <!-- INDICADORES PUNTOS -->
+  <div class="carousel-dots" id="carousel-dots-container">
+    <span class="carousel-dot active" onclick="goToSlide(0)" aria-label="Ir a diapositiva 1"></span>
+    <span class="carousel-dot" onclick="goToSlide(1)" aria-label="Ir a diapositiva 2"></span>
+    <span class="carousel-dot" onclick="goToSlide(2)" aria-label="Ir a diapositiva 3"></span>
+    <span class="carousel-dot" onclick="goToSlide(3)" aria-label="Ir a diapositiva 4"></span>
+    <span class="carousel-dot" onclick="goToSlide(4)" aria-label="Ir a diapositiva 5"></span>
+  </div>
+</section>

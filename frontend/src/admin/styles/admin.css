@@ -1,0 +1,74 @@
+/* ==========================================================================
+   BUCHISAPA BURGER & BROASTER - PANEL DE ADMINISTRACIÓN OFICIAL
+   Estilos Principales del Administrador: /admin/styles/admin.css
+   ========================================================================== */
+
+@import './variables.css';
+@import './estructura.css';
+@import './componentes.css';
+@import './dashboard.css';
+
+
+/* ===== REDISEÑO ADMIN 2026 · BUCHISAPA ===== */
+:root {
+  --admin-bg: #050a16;
+  --admin-surface: rgba(8, 16, 31, .90);
+  --admin-surface-2: rgba(13, 25, 47, .92);
+  --admin-border: rgba(56, 189, 248, .16);
+  --admin-accent: #38d5ff;
+  --admin-accent-2: #e94cff;
+  --admin-danger: #ff5577;
+  --admin-success: #26d6a3;
+}
+html, body { min-height:100%; }
+body {
+  background:
+    linear-gradient(90deg, rgba(2,8,22,.88), rgba(2,8,22,.58)),
+    url('/imagenes/admin/admin-bg-neon.webp') center/cover scroll no-repeat;
+  color:#f8fbff;
+}
+.admin-sidebar {
+  background: linear-gradient(180deg, rgba(3,12,28,.96), rgba(4,13,29,.90));
+  border-right:1px solid rgba(56,189,248,.18);
+  box-shadow: 12px 0 42px rgba(0,0,0,.30);
+  backdrop-filter: blur(18px);
+}
+.sidebar-brand { border-bottom-color:rgba(56,189,248,.14); }
+.sidebar-brand::after { background:linear-gradient(90deg,transparent,#38d5ff,#e94cff,transparent); box-shadow:0 0 18px rgba(56,213,255,.24); }
+.brand-icon-wrap { border-color:rgba(56,213,255,.30); box-shadow:0 0 24px rgba(56,213,255,.10); }
+.brand-text p { color:#58dcff; text-shadow:0 0 12px rgba(56,213,255,.22); }
+.nav-section-label { padding:14px 14px 8px; font-size:.66rem; font-weight:900; letter-spacing:.16em; color:#7890ad; }
+.nav-item { min-height:48px; color:#9fb2cb; border-radius:14px; border:1px solid transparent; transition:.18s ease; }
+.nav-item:hover { background:rgba(56,189,248,.07); border-color:rgba(56,189,248,.12); color:#fff; }
+.nav-item.active { background:linear-gradient(90deg,rgba(23,122,198,.23),rgba(68,27,117,.13)); border-color:rgba(56,213,255,.22); box-shadow:inset 3px 0 0 #38d5ff, 0 8px 24px rgba(0,0,0,.10); color:#fff; }
+.nav-item.active svg, .nav-item:hover svg { stroke:#5de3ff; filter:drop-shadow(0 0 6px rgba(56,213,255,.22)); }
+.nav-badge { border-radius:999px; padding:3px 8px; font-size:.64rem; font-weight:900; margin-left:auto; }
+.nav-badge-count { background:rgba(245,158,11,.10); border:1px solid rgba(245,158,11,.24); color:#ffd166; }
+.nav-badge-live { background:rgba(56,213,255,.10); border:1px solid rgba(56,213,255,.25); color:#5de3ff; }
+.admin-topbar { background:rgba(3,11,24,.84); border-bottom-color:rgba(56,189,248,.12); box-shadow:0 8px 28px rgba(0,0,0,.18); backdrop-filter:blur(16px); }
+.admin-content { max-width:1540px; padding-bottom:40px; }
+.section-panel, .metric-card, .panel-card, .category-form-section, .category-list-section, .chart-panel, .form-card-panel {
+  background:linear-gradient(145deg,rgba(8,17,34,.92),rgba(7,12,28,.88)) !important;
+  border:1px solid rgba(56,189,248,.12) !important;
+  box-shadow:0 18px 50px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.025);
+  backdrop-filter:blur(14px);
+}
+.btn-primary, .btn-clean-primary { background:linear-gradient(135deg,#e11d48,#ff2f72) !important; border-color:rgba(255,255,255,.12) !important; box-shadow:0 10px 28px rgba(225,29,72,.22); }
+.btn-primary:hover, .btn-clean-primary:hover { filter:brightness(1.08); transform:translateY(-1px); }
+.admin-table { border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid rgba(56,189,248,.12); border-radius:16px; }
+.admin-table th { background:linear-gradient(180deg,rgba(18,37,66,.95),rgba(10,24,45,.95)) !important; color:#8fa9c5; border-bottom:1px solid rgba(56,189,248,.12); text-transform:uppercase; letter-spacing:.08em; font-size:.68rem; }
+.admin-table td { border-bottom-color:rgba(255,255,255,.055); color:#dce7f5; }
+.admin-table tbody tr:hover { background:rgba(56,189,248,.035); }
+.form-input, .form-textarea, select { background:rgba(3,10,23,.78) !important; border:1px solid rgba(96,165,250,.16) !important; color:#f8fafc !important; border-radius:12px; }
+.form-input:hover, .form-textarea:hover, select:hover { border-color:rgba(56,189,248,.28) !important; }
+.form-input:focus, .form-textarea:focus, select:focus { border-color:rgba(56,213,255,.62) !important; box-shadow:0 0 0 3px rgba(56,213,255,.10),0 0 24px rgba(56,213,255,.06) !important; }
+.form-label { color:#b8c8db; font-weight:800; }
+.panel-title, .form-page-title, .category-page-main-title { letter-spacing:-.02em; }
+.empty-state { color:#7e94ad; }
+@media(max-width:760px){
+  .admin-content{padding:16px 12px 32px;}
+  .admin-table{display:block;overflow-x:auto;white-space:nowrap;}
+  .nav-item{min-height:46px;}
+}
+
+.admin-empty-view{min-height:58vh;display:grid;place-items:center;text-align:center;padding:48px 24px;border:1px solid rgba(56,213,255,.10);border-radius:24px;background:rgba(4,12,27,.36)}.admin-empty-view>div{max-width:620px}.admin-empty-kicker{color:#55ddff;font-size:.72rem;font-weight:900;letter-spacing:.18em;margin-bottom:12px}.admin-empty-view h2{margin:0 0 10px;font-size:clamp(1.6rem,3vw,2.4rem);color:#f8fbff}.admin-empty-view p{margin:0;color:#8297b1;font-size:1rem;line-height:1.7}
