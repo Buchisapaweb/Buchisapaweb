@@ -4,8 +4,8 @@
  */
 
 const SUPABASE_CONFIG = {
-  url: 'https://ckgvgfpcxeqyilfphnsu.supabase.co',
-  anonKey: 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M'
+  url: (typeof window !== 'undefined' && window.SUPABASE_URL) || 'https://ckgvgfpcxeqyilfphnsu.supabase.co',
+  anonKey: (typeof window !== 'undefined' && window.SUPABASE_ANON_KEY) || 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M'
 };
 
 const BuchisapaAPI = {

@@ -24,6 +24,14 @@ function getCompiledIndexHtml(): string {
       template = template.replace(new RegExp(`<!-- PARTIAL: ${key} -->`, 'g'), content);
     }
   }
+  const runtimeConfigScript = `
+  <script>
+    window.SUPABASE_URL = ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ckgvgfpcxeqyilfphnsu.supabase.co')};
+    window.SUPABASE_ANON_KEY = ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M')};
+    window.GOOGLE_CLIENT_ID = ${JSON.stringify(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '953347930157-111mqqngt4hq55dgco230jk1bvcba8fa.apps.googleusercontent.com')};
+  </script>
+  `;
+  template = template.replace('</head>', `${runtimeConfigScript}</head>`);
   return template;
 }
 
@@ -52,6 +60,14 @@ function getCompiledAdminHtml(): string {
       template = template.replace(new RegExp(`<!-- PARTIAL: ${key} -->`, 'g'), content);
     }
   }
+  const runtimeConfigScript = `
+  <script>
+    window.SUPABASE_URL = ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ckgvgfpcxeqyilfphnsu.supabase.co')};
+    window.SUPABASE_ANON_KEY = ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M')};
+    window.GOOGLE_CLIENT_ID = ${JSON.stringify(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '953347930157-111mqqngt4hq55dgco230jk1bvcba8fa.apps.googleusercontent.com')};
+  </script>
+  `;
+  template = template.replace('</head>', `${runtimeConfigScript}</head>`);
   return template;
 }
 import { sendVerificationEmail, verifyCode } from './backend/src/services/emailVerification.ts';
