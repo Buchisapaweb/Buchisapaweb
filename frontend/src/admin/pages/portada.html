@@ -1,1 +1,175 @@
-<section class="admin-view" id="view-portada" aria-labelledby="title-portada"></section>
+<!-- ====================================================================
+     VISTA GESTIÓN DE PORTADAS - BUCHISAPA BURGER & BROASTER
+     ==================================================================== -->
+<section class="admin-view" id="view-portada" aria-labelledby="title-portada">
+  
+  <!-- CABECERA DE LA VISTA (DISEÑO ELEGANTE Y RESPONSIVO DE EXTREMO A EXTREMO) -->
+  <div class="portadas-header-panel">
+    <div class="portadas-header-left">
+      <div class="portadas-kicker">BUCHISAPA · GESTOR DE CONTENIDO</div>
+      <h2 class="portadas-main-title">Portadas del Carrusel</h2>
+      <p class="portadas-main-desc">
+        Personaliza las imágenes principales en alta definición para Escritorio (1920×1080 · 16:9) y Móvil (1080×1350 · 4:5).
+      </p>
+    </div>
+    <div class="portadas-header-actions" id="portadas-header-actions">
+      <button class="btn btn-primary btn-create-portada" id="btn-open-create-portada" type="button" onclick="window.openCreatePortadaForm()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Crear Portada</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- FORMULARIO CREADOR / EDITOR DE PORTADAS -->
+  <div class="portada-editor-card" id="portada-editor-card" style="display: none;">
+    <div class="editor-header">
+      <div class="editor-header-left">
+        <span class="editor-badge-id" id="portada-form-id-badge">PT0001</span>
+        <h3 class="editor-title" id="portada-form-title-heading">Crear Nueva Portada</h3>
+      </div>
+      <button class="editor-close-btn" type="button" onclick="window.closePortadaForm()" title="Cerrar formulario">✕</button>
+    </div>
+
+    <form id="form-portada" onsubmit="window.handleSavePortada(event)">
+      <input type="hidden" id="portada-form-mode" value="create">
+      <input type="hidden" id="portada-form-id" value="">
+
+      <!-- BARRA SUPERIOR DE ESTADO Y CONFIGURACIÓN -->
+      <div class="portada-meta-topbar">
+        <div class="form-group-compact">
+          <label class="compact-label" for="portada-input-id">ID</label>
+          <input type="text" id="portada-input-id" class="compact-input" readonly disabled placeholder="PT0001">
+        </div>
+
+        <div class="switch-container-wrap">
+          <label class="switch-container">
+            <input type="checkbox" id="portada-input-active" checked>
+            <span class="switch-slider"></span>
+          </label>
+          <div class="switch-label-box">
+            <span class="switch-title">Portada Activa</span>
+            <span class="switch-desc">Visible en el carrusel de la tienda</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENEDOR DE DISEÑOS DE IMAGEN: ESCRITORIO (16:9) Y MÓVIL (4:5) -->
+      <div class="portada-images-grid">
+        
+        <!-- 1. IMAGEN DE PORTADA PARA ESCRITORIO (1920x1080 - 16:9) -->
+        <div class="image-upload-card image-card-desktop">
+          <div class="upload-card-header">
+            <div class="upload-card-title-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <h4 class="upload-card-title">Imagen para Escritorio</h4>
+            </div>
+            <span class="ratio-badge">1920×1080 (16:9)</span>
+          </div>
+
+          <!-- CONTENEDOR DE PREVIEW 16:9 (DE EXTREMO A EXTREMO) -->
+          <div class="preview-frame preview-frame-desktop" id="preview-frame-desktop">
+            <img id="img-preview-desktop" src="" alt="Previsualización Escritorio" style="display: none;" onerror="window.handlePreviewError('desktop')">
+            <div class="preview-empty-placeholder" id="placeholder-desktop">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+              <span>Sin imagen seleccionada</span>
+            </div>
+          </div>
+
+          <!-- CONTROLES: BOTÓN SUBIR IMAGEN (1 POR FILA) Y URL -->
+          <div class="upload-controls-stack">
+            <input type="file" id="file-upload-desktop" accept="image/*" style="display: none;" onchange="window.handleImageFileSelect(event, 'desktop')">
+            <button type="button" class="btn btn-upload-full" onclick="document.getElementById('file-upload-desktop').click()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Subir imagen</span>
+            </button>
+            
+            <div class="url-input-container">
+              <input type="text" id="portada-input-image-desktop" class="form-input-url" placeholder="URL" oninput="window.updatePreviewFromUrl('desktop', this.value)">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. IMAGEN DE PORTADA PARA MÓVIL (1080x1350 - 4:5) -->
+        <div class="image-upload-card image-card-mobile">
+          <div class="upload-card-header">
+            <div class="upload-card-title-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+              <h4 class="upload-card-title">Imagen para Móvil</h4>
+            </div>
+            <span class="ratio-badge">1080×1350 (4:5)</span>
+          </div>
+
+          <!-- CONTENEDOR DE PREVIEW 4:5 (DE EXTREMO A EXTREMO) -->
+          <div class="preview-frame preview-frame-mobile" id="preview-frame-mobile">
+            <img id="img-preview-mobile" src="" alt="Previsualización Móvil" style="display: none;" onerror="window.handlePreviewError('mobile')">
+            <div class="preview-empty-placeholder" id="placeholder-mobile">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+              <span>Sin imagen seleccionada</span>
+            </div>
+          </div>
+
+          <!-- CONTROLES: BOTÓN SUBIR IMAGEN (1 POR FILA) Y URL -->
+          <div class="upload-controls-stack">
+            <input type="file" id="file-upload-mobile" accept="image/*" style="display: none;" onchange="window.handleImageFileSelect(event, 'mobile')">
+            <button type="button" class="btn btn-upload-full" onclick="document.getElementById('file-upload-mobile').click()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Subir imagen</span>
+            </button>
+            
+            <div class="url-input-container">
+              <input type="text" id="portada-input-image-mobile" class="form-input-url" placeholder="URL" oninput="window.updatePreviewFromUrl('mobile', this.value)">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOTONES DE ACCIÓN DEL FORMULARIO -->
+      <div class="editor-actions-bar">
+        <button type="button" class="btn btn-outline-secondary" onclick="window.closePortadaForm()">
+          <span>Cancelar</span>
+        </button>
+        <button type="submit" class="btn btn-primary btn-save-portada" id="btn-submit-portada">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span id="btn-submit-portada-text">Guardar Portada</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- SECCIÓN DE PORTADAS CREADAS (DE EXTREMO A EXTREMO) -->
+  <div class="portadas-list-section" id="portadas-list-section">
+    
+    <!-- CONTROL DE VISTA Y FILTRO DE PORTADAS -->
+    <div class="portadas-view-controls">
+      <div class="view-controls-left">
+        <h3 class="section-subtitle">Portadas Creadas</h3>
+        <span class="count-badge" id="portadas-count-badge">0 activas de 0</span>
+      </div>
+      
+      <div class="view-mode-toggle-group">
+        <span class="view-mode-label">Vista:</span>
+        <div class="toggle-buttons-pill">
+          <button class="view-mode-btn active" id="btn-view-mode-mobile" type="button" onclick="window.setPortadasViewMode('mobile')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+            <span>Móvil (4:5)</span>
+          </button>
+          <button class="view-mode-btn" id="btn-view-mode-desktop" type="button" onclick="window.setPortadasViewMode('desktop')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Escritorio (16:9)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTA DE PORTADAS CREADAS -->
+    <div class="portadas-list-grid" id="admin-portadas-grid">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando portadas creadas...</p>
+      </div>
+    </div>
+
+  </div>
+
+</section>

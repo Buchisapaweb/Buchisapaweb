@@ -499,7 +499,6 @@ body.search-open {
   }
 
   .cart-drawer-header,
-  .auth-window-topbar,
   .modal-header,
   .google-dark-topbar,
   .otp-modal-header {
@@ -508,6 +507,14 @@ body.search-open {
     flex-shrink: 0 !important;
     background: #ffffff !important;
     z-index: 100 !important;
+  }
+
+  .auth-window-topbar {
+    position: static !important;
+    top: auto !important;
+    flex-shrink: 0 !important;
+    background: transparent !important;
+    z-index: auto !important;
   }
 
   .cart-drawer-body,

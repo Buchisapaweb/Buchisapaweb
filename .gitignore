@@ -18,6 +18,7 @@ pids
 
 # Dependency directories
 node_modules/
+bun.lock*
 
 # Production build outputs
 dist/

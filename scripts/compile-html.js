@@ -68,8 +68,6 @@ export function compileHtml() {
   const adminSrc = path.join(ROOT_DIR, 'frontend/src/admin');
   const adminDest = path.join(DIST_DIR, 'admin');
   copyDirRecursive(adminSrc, adminDest);
-  // El shell es una plantilla de compilación, no un archivo público adicional.
-  fs.rmSync(path.join(adminDest, 'admin-shell.html'), { force: true });
 
   const adminPartials = {
     'SIDEBAR': 'frontend/src/admin/components/sidebar.html',
@@ -87,7 +85,7 @@ export function compileHtml() {
     'MODALS': 'frontend/src/admin/components/modals.html'
   };
 
-  let adminTemplate = fs.readFileSync(path.join(ROOT_DIR, 'frontend/src/admin/admin-shell.html'), 'utf8');
+  let adminTemplate = fs.readFileSync(path.join(ROOT_DIR, 'frontend/src/admin/admin.html'), 'utf8');
   for (const [key, relPath] of Object.entries(adminPartials)) {
     const fullPath = path.join(ROOT_DIR, relPath);
     if (fs.existsSync(fullPath)) {

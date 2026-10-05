@@ -42,6 +42,18 @@
           </div>
         </div>
 
+        <!-- MI PEDIDO ACTUAL -->
+        <button class="mobile-nav-card" type="button" onclick="openCartFromDrawer()">
+          <div class="nav-card-left">
+            <svg class="nav-card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="4" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            <span class="nav-card-text">MI PEDIDO ACTUAL</span>
+          </div>
+          <span class="drawer-cart-count" id="drawer-cart-count">0</span>
+        </button>
+
         <!-- 4. CARTA SALÓN (COLLAPSIBLE) -->
         <div class="mobile-nav-collapsible" id="carta-salon-collapsible">
           <button class="mobile-nav-card" type="button" onclick="toggleNavCollapsible('carta-salon-collapsible')">

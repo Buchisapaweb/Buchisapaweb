@@ -1446,10 +1446,11 @@ img.lazy-img.loaded {
 }
 
 /* Category Cards Grid (Cuadrados 1:1 - 1 por fila en móvil, 2 en tablet, 4 en desktop) */
+#category-banners-section,
 .mobile-category-cards-grid,
 .desktop-category-cards-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
   grid-auto-rows: auto;
   gap: 16px;
   margin: 0 auto 28px;
@@ -1459,10 +1460,16 @@ img.lazy-img.loaded {
   box-sizing: border-box;
 }
 
+#category-banners-section[style*="display: none"],
+#category-banners-section.is-hidden {
+  display: none !important;
+}
+
 @media (min-width: 480px) {
+  #category-banners-section,
   .mobile-category-cards-grid,
   .desktop-category-cards-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 18px;
     padding: 0;
   }
@@ -1470,9 +1477,10 @@ img.lazy-img.loaded {
 
 /* TABLETA (640px a 1023px): 2 Columnas */
 @media (min-width: 640px) {
+  #category-banners-section,
   .mobile-category-cards-grid,
   .desktop-category-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
     grid-auto-rows: auto;
     gap: 20px;
     max-width: 960px;
@@ -1482,9 +1490,10 @@ img.lazy-img.loaded {
 
 /* ESCRITORIO (>= 1024px): 4 Columnas */
 @media (min-width: 1024px) {
+  #category-banners-section,
   .mobile-category-cards-grid,
   .desktop-category-cards-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr) !important;
     grid-auto-rows: auto;
     gap: 24px;
     max-width: 1360px;
@@ -1495,11 +1504,12 @@ img.lazy-img.loaded {
 
 .category-banner-card {
   position: relative;
-  width: 100%;
-  height: auto;
-  min-height: auto;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: auto !important;
   aspect-ratio: 1 / 1 !important;
-  border-radius: 20px;
+  border-radius: 20px !important;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -1513,10 +1523,10 @@ img.lazy-img.loaded {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   transform: translateZ(0);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  box-sizing: border-box !important;
 }
 
 @media (min-width: 640px) {
@@ -2712,12 +2722,11 @@ img.lazy-img.loaded {
   position: fixed;
   inset: 0;
   background: #ffffff;
-  z-index: 700;
+  z-index: 1000000;
   display: none !important;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -2728,26 +2737,33 @@ img.lazy-img.loaded {
 
 #login-modal.modal-backdrop.open,
 #login-modal.modal-backdrop.active {
-  display: flex !important;
+  display: block !important;
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+}
+
+body:has(#login-modal.open) .floating-whatsapp-btn,
+body:has(#login-modal.active) .floating-whatsapp-btn {
+  display: none !important;
+  pointer-events: none !important;
 }
 
 .buchisapa-auth-modal-box {
   background: #ffffff;
   width: 100%;
   max-width: 480px;
-  min-height: 100vh;
+  min-height: 100%;
   margin: 0 auto;
   border-radius: 0;
   box-shadow: none;
   position: relative;
   overflow: visible;
-  padding: 16px 20px 40px;
+  padding: 16px 20px 48px;
   display: flex;
   flex-direction: column;
   animation: authWindowFadeIn 0.22s ease-out;
+  box-sizing: border-box;
 }
 
 @keyframes authWindowFadeIn {
@@ -2766,6 +2782,9 @@ img.lazy-img.loaded {
   margin-bottom: 8px;
   width: 100%;
   padding-bottom: 8px;
+  position: static !important;
+  top: auto !important;
+  background: transparent !important;
 }
 
 .auth-window-back-btn {
@@ -2810,16 +2829,20 @@ img.lazy-img.loaded {
 .auth-logo-center-wrap {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-top: 4px;
   margin-bottom: 14px;
+  width: 100%;
 }
 
 .auth-logo-img {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  width: 140px;
+  max-width: 70%;
+  height: auto;
+  border-radius: 0 !important;
+  object-fit: contain !important;
+  box-shadow: none !important;
+  display: block;
 }
 
 .auth-welcome-title {

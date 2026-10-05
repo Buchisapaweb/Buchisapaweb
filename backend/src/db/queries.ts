@@ -835,8 +835,6 @@ const initialProducts: Product[] = [
 ];
 
 // 4. PROMOCIONES
-const PROMOTIONS_FILE = path.join(process.cwd(), 'data', 'promociones.json');
-
 const initialPromotions: Promotion[] = [
   {
     id: 'promo-1',
@@ -912,38 +910,12 @@ const initialPromotions: Promotion[] = [
   }
 ];
 
-function loadPromotionsFromDisk(): Promotion[] {
-  try {
-    if (fs.existsSync(PROMOTIONS_FILE)) {
-      const raw = fs.readFileSync(PROMOTIONS_FILE, 'utf-8');
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
-    }
-  } catch (err) {
-    console.warn('No se pudo cargar promociones de disco, usando iniciales:', err);
-  }
-  return [...initialPromotions];
-}
-
-function savePromotionsToDisk() {
-  try {
-    const dir = path.dirname(PROMOTIONS_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(PROMOTIONS_FILE, JSON.stringify(promotionsStore, null, 2), 'utf-8');
-  } catch (err) {
-    console.error('Error al guardar promociones en disco:', err);
-  }
-}
+let promotionsStore: Promotion[] = [...initialPromotions];
 
 // IN-MEMORY STORES
 const categoriesStore = [...initialCategories];
 let productsStore = [...initialProducts];
 const saucesStore = [...initialSauces];
-let promotionsStore: Promotion[] = loadPromotionsFromDisk();
 const ordersStore: Order[] = [];
 const claimsStore: Claim[] = [];
 
@@ -1007,7 +979,6 @@ export async function createPromotion(data: Partial<Promotion>): Promise<Promoti
   };
 
   promotionsStore.push(newPromo);
-  savePromotionsToDisk();
   return newPromo;
 }
 
@@ -1023,14 +994,12 @@ export async function updatePromotion(id: string, data: Partial<Promotion>): Pro
     originalPrice: data.originalPrice !== undefined ? Number(data.originalPrice) : current.originalPrice,
     id // preserve id
   };
-  savePromotionsToDisk();
   return promotionsStore[index];
 }
 
 export async function deletePromotion(id: string): Promise<boolean> {
   const initialLength = promotionsStore.length;
   promotionsStore = promotionsStore.filter(item => item.id !== id);
-  savePromotionsToDisk();
   return promotionsStore.length < initialLength;
 }
 
@@ -1039,7 +1008,6 @@ export async function reorderPromotions(orderedIds: string[]): Promise<Promotion
     const p = promotionsStore.find(item => item.id === id);
     if (p) p.order = index + 1;
   });
-  savePromotionsToDisk();
   return promotionsStore.sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 
@@ -1654,33 +1622,22 @@ export async function clearAllTickets(): Promise<boolean> {
 }
 
 // ============================================================================
-// GESTIÓN DE PORTADAS / HERO CAROUSEL BANNERS
+// GESTIÓN DE PORTADAS / HERO CAROUSEL BANNERS (FORMATO PT0001)
 // ============================================================================
 export interface PortadaBanner {
   id: string;
-  title?: string;
-  highlight?: string;
-  subtitle?: string;
-  badge?: string;
-  badgeType?: string;
+  title: string;
   image: string;
-  imageMobile?: string;
-  secretPillIcon?: string;
-  secretPillText?: string;
-  buttonText?: string;
-  buttonCategory?: string;
-  features?: string[];
+  imageMobile: string;
   active: boolean;
   order: number;
   createdAt: string;
   updatedAt?: string;
 }
 
-const PORTADAS_FILE = path.join(process.cwd(), 'data', 'portadas.json');
-
 const initialPortadas: PortadaBanner[] = [
   {
-    id: 'portada-1',
+    id: 'PT0001',
     title: 'Portada 1',
     image: '/imagenes/portada/Portada1E.webp',
     imageMobile: '/imagenes/portada/Portada1M.webp',
@@ -1689,7 +1646,7 @@ const initialPortadas: PortadaBanner[] = [
     createdAt: new Date().toISOString()
   },
   {
-    id: 'portada-2',
+    id: 'PT0002',
     title: 'Portada 2',
     image: '/imagenes/portada/Portada2E.webp',
     imageMobile: '/imagenes/portada/Portada2M.webp',
@@ -1698,7 +1655,7 @@ const initialPortadas: PortadaBanner[] = [
     createdAt: new Date().toISOString()
   },
   {
-    id: 'portada-3',
+    id: 'PT0003',
     title: 'Portada 3',
     image: '/imagenes/portada/Portada3E.webp',
     imageMobile: '/imagenes/portada/Portada3M.webp',
@@ -1707,7 +1664,7 @@ const initialPortadas: PortadaBanner[] = [
     createdAt: new Date().toISOString()
   },
   {
-    id: 'portada-4',
+    id: 'PT0004',
     title: 'Portada 4',
     image: '/imagenes/portada/Portada4E.webp',
     imageMobile: '/imagenes/portada/Portada4M.webp',
@@ -1717,67 +1674,12 @@ const initialPortadas: PortadaBanner[] = [
   }
 ];
 
-function loadPortadasFromDisk(): PortadaBanner[] {
-  try {
-    const targetDir = path.join(process.cwd(), 'public', 'imagenes', 'portada');
-    const distDir = path.join(process.cwd(), 'dist', 'imagenes', 'portada');
-    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-    if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
-
-    // Auto-reparar archivos WebP corruptos (< 500 bytes)
-    for (let i = 1; i <= 10; i++) {
-      const eFile = path.join(targetDir, `Portada${i}E.webp`);
-      const mFile = path.join(targetDir, `Portada${i}M.webp`);
-
-      const eExist = fs.existsSync(eFile) && fs.statSync(eFile).size > 500;
-      const mExist = fs.existsSync(mFile) && fs.statSync(mFile).size > 500;
-
-      if (!eExist && mExist) {
-        try { fs.copyFileSync(mFile, eFile); } catch (e) {}
-      } else if (eExist && !mExist) {
-        try { fs.copyFileSync(eFile, mFile); } catch (e) {}
-      }
-
-      // Sincronizar hacia dist
-      if (fs.existsSync(eFile) && fs.statSync(eFile).size > 500) {
-        try { fs.copyFileSync(eFile, path.join(distDir, `Portada${i}E.webp`)); } catch (e) {}
-      }
-      if (fs.existsSync(mFile) && fs.statSync(mFile).size > 500) {
-        try { fs.copyFileSync(mFile, path.join(distDir, `Portada${i}M.webp`)); } catch (e) {}
-      }
-    }
-
-    if (fs.existsSync(PORTADAS_FILE)) {
-      const raw = fs.readFileSync(PORTADAS_FILE, 'utf-8');
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
-    }
-  } catch (err) {
-    console.warn('No se pudo cargar portadas de disco, usando iniciales:', err);
-  }
-  return [...initialPortadas];
-}
-
-function savePortadasToDisk() {
-  try {
-    const dir = path.dirname(PORTADAS_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(PORTADAS_FILE, JSON.stringify(portadasStore, null, 2), 'utf-8');
-  } catch (err) {
-    console.error('Error al guardar portadas en disco:', err);
-  }
-}
-
-let portadasStore: PortadaBanner[] = loadPortadasFromDisk();
+let portadasStore: PortadaBanner[] = [...initialPortadas];
 
 export async function getPortadas(includeInactive = false): Promise<PortadaBanner[]> {
   let list = [...portadasStore];
   if (!includeInactive) {
-    list = list.filter(p => p.active);
+    list = list.filter(p => p.active !== false);
   }
   return list.sort((a, b) => a.order - b.order);
 }
@@ -1787,7 +1689,19 @@ export async function getPortadaById(id: string): Promise<PortadaBanner | null> 
   return p || null;
 }
 
-export function savePortadaImageBase64(base64Str: string, slideNumber: number, type: 'E' | 'M'): string {
+export function generateNextPortadaId(): string {
+  const existingNums = portadasStore
+    .map(p => {
+      const match = p.id.match(/^PT(\d+)$/i);
+      return match ? parseInt(match[1], 10) : 0;
+    })
+    .filter(n => !isNaN(n));
+  const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
+  const nextNum = maxNum + 1;
+  return `PT${String(nextNum).padStart(4, '0')}`;
+}
+
+export function savePortadaImageBase64(base64Str: string, id: string, type: 'E' | 'M'): string {
   if (!base64Str || typeof base64Str !== 'string' || !base64Str.startsWith('data:image')) {
     return base64Str;
   }
@@ -1795,18 +1709,18 @@ export function savePortadaImageBase64(base64Str: string, slideNumber: number, t
     const base64Data = base64Str.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
     const targetDir = path.join(process.cwd(), 'public', 'imagenes', 'portada');
-    if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir, { recursive: true });
-    }
-    const fileName = `Portada${slideNumber}${type}.webp`;
+    const distDir = path.join(process.cwd(), 'dist', 'imagenes', 'portada');
+    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+    if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
+
+    const cleanId = id.replace(/[^a-zA-Z0-9]/g, '');
+    const fileName = `Portada_${cleanId}_${type}.webp`;
     const filePath = path.join(targetDir, fileName);
     fs.writeFileSync(filePath, buffer);
 
-    // Guardar también en la otra versión (E/M) para que tanto móviles como escritorios y tabletas se sincronicen de inmediato
-    const otherType = type === 'E' ? 'M' : 'E';
-    const otherFileName = `Portada${slideNumber}${otherType}.webp`;
-    const otherFilePath = path.join(targetDir, otherFileName);
-    fs.writeFileSync(otherFilePath, buffer);
+    try {
+      fs.copyFileSync(filePath, path.join(distDir, fileName));
+    } catch (e) {}
 
     return `/imagenes/portada/${fileName}`;
   } catch (e) {
@@ -1816,38 +1730,30 @@ export function savePortadaImageBase64(base64Str: string, slideNumber: number, t
 }
 
 export async function createPortada(data: Partial<PortadaBanner>): Promise<PortadaBanner> {
-  const slideNum = data.order || (portadasStore.length + 1);
-  let finalImage = data.image || `/imagenes/portada/Portada${slideNum}E.webp`;
-  let finalImageMobile = data.imageMobile || `/imagenes/portada/Portada${slideNum}M.webp`;
+  const newId = data.id && data.id.startsWith('PT') ? data.id : generateNextPortadaId();
+  const nextOrder = data.order !== undefined ? data.order : portadasStore.length + 1;
+
+  let finalImage = data.image || `/imagenes/portada/Portada1E.webp`;
+  let finalImageMobile = data.imageMobile || data.image || `/imagenes/portada/Portada1M.webp`;
 
   if (finalImage && finalImage.startsWith('data:image')) {
-    finalImage = savePortadaImageBase64(finalImage, slideNum, 'E');
+    finalImage = savePortadaImageBase64(finalImage, newId, 'E');
   }
   if (finalImageMobile && finalImageMobile.startsWith('data:image')) {
-    finalImageMobile = savePortadaImageBase64(finalImageMobile, slideNum, 'M');
+    finalImageMobile = savePortadaImageBase64(finalImageMobile, newId, 'M');
   }
 
   const newPortada: PortadaBanner = {
-    id: data.id || `portada-${Date.now()}`,
-    title: data.title || `Portada ${slideNum}`,
-    highlight: data.highlight || '',
-    subtitle: data.subtitle || 'Promoción especial BuchiSapa Burger & Broaster',
-    badge: data.badge || '✨ DESTACADO',
-    badgeType: data.badgeType || 'red-pill',
+    id: newId,
+    title: data.title || `Portada ${nextOrder}`,
     image: finalImage,
     imageMobile: finalImageMobile,
-    secretPillIcon: data.secretPillIcon || '💡',
-    secretPillText: data.secretPillText || '',
-    buttonText: data.buttonText || 'VER CARTA',
-    buttonCategory: data.buttonCategory || 'todos',
-    features: data.features || ['✦ SABOR AMAZÓNICO', '🔥 PREPARADO AL MOMENTO'],
-    active: data.active !== undefined ? data.active : true,
-    order: data.order !== undefined ? data.order : portadasStore.length + 1,
+    active: data.active !== undefined ? Boolean(data.active) : true,
+    order: nextOrder,
     createdAt: new Date().toISOString()
   };
 
   portadasStore.push(newPortada);
-  savePortadasToDisk();
   return newPortada;
 }
 
@@ -1856,16 +1762,14 @@ export async function updatePortada(id: string, data: Partial<PortadaBanner>): P
   if (index === -1) return null;
 
   const current = portadasStore[index];
-  const slideNum = data.order || current.order || (index + 1);
-
   let finalImage = data.image !== undefined ? data.image : current.image;
   let finalImageMobile = data.imageMobile !== undefined ? data.imageMobile : current.imageMobile;
 
   if (finalImage && finalImage.startsWith('data:image')) {
-    finalImage = savePortadaImageBase64(finalImage, slideNum, 'E');
+    finalImage = savePortadaImageBase64(finalImage, id, 'E');
   }
   if (finalImageMobile && finalImageMobile.startsWith('data:image')) {
-    finalImageMobile = savePortadaImageBase64(finalImageMobile, slideNum, 'M');
+    finalImageMobile = savePortadaImageBase64(finalImageMobile, id, 'M');
   }
 
   portadasStore[index] = {
@@ -1873,10 +1777,11 @@ export async function updatePortada(id: string, data: Partial<PortadaBanner>): P
     ...data,
     image: finalImage,
     imageMobile: finalImageMobile,
+    active: data.active !== undefined ? Boolean(data.active) : current.active,
+    order: data.order !== undefined ? Number(data.order) : current.order,
     updatedAt: new Date().toISOString(),
     id // preserve id
   };
-  savePortadasToDisk();
   return portadasStore[index];
 }
 
@@ -1886,7 +1791,6 @@ export async function deletePortada(id: string): Promise<boolean> {
   portadasStore.forEach((p, idx) => {
     p.order = idx + 1;
   });
-  savePortadasToDisk();
   return portadasStore.length < initialLength;
 }
 
@@ -1895,7 +1799,6 @@ export async function reorderPortadas(orderedIds: string[]): Promise<PortadaBann
     const p = portadasStore.find(item => item.id === id);
     if (p) p.order = index + 1;
   });
-  savePortadasToDisk();
   return portadasStore.sort((a, b) => a.order - b.order);
 }
 
