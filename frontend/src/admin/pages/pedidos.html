@@ -1,0 +1,36 @@
+<div class="view-header">
+  <div>
+    <span class="view-kicker">GESTIÓN DE PEDIDOS</span>
+    <h2 class="view-title">Comandas y Órdenes</h2>
+    <p class="view-subtitle">Administra los pedidos entrantes, cambia estados y envía comandas a cocina o impresión.</p>
+  </div>
+  <div class="view-actions">
+    <button class="btn btn-secondary" onclick="window.BuchiSapaAdmin.loadOrders()">
+      <span>Actualizar Pedidos</span>
+    </button>
+  </div>
+</div>
+
+<div class="dash-recent-orders-card">
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th># ORDEN</th>
+          <th>FECHA / HORA</th>
+          <th>CLIENTE</th>
+          <th>TELÉFONO</th>
+          <th>TIPO</th>
+          <th>TOTAL</th>
+          <th>ESTADO</th>
+          <th>ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody id="orders-page-tbody">
+        <tr>
+          <td colspan="8" class="text-center py-4">Cargando pedidos...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

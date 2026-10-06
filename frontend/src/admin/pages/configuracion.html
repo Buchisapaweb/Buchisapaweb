@@ -1,0 +1,34 @@
+<div class="view-header">
+  <div>
+    <span class="view-kicker">CONFIGURACIÓN GENERAL</span>
+    <h2 class="view-title">Ajustes del Establecimiento</h2>
+    <p class="view-subtitle">Información del negocio, teléfono WhatsApp, dirección y costos de delivery.</p>
+  </div>
+</div>
+<div class="dash-recent-orders-card" style="padding: 24px;">
+  <form id="form-admin-config" onsubmit="event.preventDefault(); alert('Ajustes guardados correctamente');">
+    <div class="form-grid-2col">
+      <div class="form-group">
+        <label class="form-label">Nombre del Negocio</label>
+        <input type="text" class="form-input" value="BuchiSapa - Pollería & Sabor Amazónico" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Teléfono / WhatsApp Pedidos</label>
+        <input type="text" class="form-input" value="+51 943 312 024">
+      </div>
+    </div>
+    <div class="form-grid-2col">
+      <div class="form-group">
+        <label class="form-label">Ubicación / Dirección</label>
+        <input type="text" class="form-input" value="Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Costo de Delivery Estándar (S/)</label>
+        <input type="number" step="0.50" class="form-input" value="5.00">
+      </div>
+    </div>
+    <div class="modal-footer" style="padding-top: 16px;">
+      <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+    </div>
+  </form>
+</div>
