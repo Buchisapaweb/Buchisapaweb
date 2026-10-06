@@ -110,7 +110,7 @@ const initialCategories: Category[] = [
     "name": "ADICIONALES",
     "icon": "Plus",
     "description": "Complementos y adicionales para personalizar los pedidos.",
-    "banner": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+    "banner": "/imagenes/categorias/adicionales/banner.webp",
     "order": 1
   },
   {
@@ -119,7 +119,7 @@ const initialCategories: Category[] = [
     "name": "ALITAS",
     "icon": "Drumstick",
     "description": "Alitas crujientes en salsa acevichada y BBQ.",
-    "banner": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80",
+    "banner": "/imagenes/categorias/alitas/banner.webp",
     "order": 2
   },
   {
@@ -128,7 +128,7 @@ const initialCategories: Category[] = [
     "name": "BEBIDAS",
     "icon": "Coffee",
     "description": "Gaseosas heladas, agua y bebidas en botella.",
-    "banner": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80",
+    "banner": "/imagenes/categorias/bebidas/banner.webp",
     "order": 3
   },
   {
@@ -137,7 +137,7 @@ const initialCategories: Category[] = [
     "name": "BROASTER",
     "icon": "Drumstick",
     "description": "Pollo broaster ultra crocante con papas, arroz y cremas.",
-    "banner": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "banner": "/imagenes/categorias/broaster/banner.webp",
     "order": 4
   },
   {
@@ -146,7 +146,7 @@ const initialCategories: Category[] = [
     "name": "HAMBURGUESAS",
     "icon": "Beef",
     "description": "Hamburguesas artesanales, choripanes y sándwiches especiales.",
-    "banner": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+    "banner": "/imagenes/categorias/hamburguesas/banner.webp",
     "order": 5
   },
   {
@@ -155,7 +155,7 @@ const initialCategories: Category[] = [
     "name": "INFUSIONES",
     "icon": "CupSoda",
     "description": "Infusiones calientes y café aromático pasado.",
-    "banner": "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80",
+    "banner": "/imagenes/categorias/infusiones/banner.webp",
     "order": 6
   },
   {
@@ -173,7 +173,7 @@ const initialCategories: Category[] = [
     "name": "PROMOCIONES",
     "icon": "Sparkles",
     "description": "Promociones y combos especiales de BuchiSapa.",
-    "banner": "/imagenes/portada/Portada1E.webp",
+    "banner": "/imagenes/categorias/promociones/banner.webp",
     "order": 8
   },
   {
@@ -182,7 +182,7 @@ const initialCategories: Category[] = [
     "name": "REFRESCOS",
     "icon": "GlassWater",
     "description": "Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.",
-    "banner": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80",
+    "banner": "/imagenes/categorias/refrescos/banner.webp",
     "order": 9
   },
   {
@@ -191,7 +191,7 @@ const initialCategories: Category[] = [
     "name": "SALCHIPAPAS Y SALCHIBROASTERS",
     "icon": "Flame",
     "description": "Papas crocantes, salchichas, chorizos y combinaciones broaster.",
-    "banner": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "banner": "/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp",
     "order": 10
   }
 ];
@@ -1143,13 +1143,38 @@ export async function getCategories(): Promise<Category[]> {
   return [...categoriesStore].sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 }
 
-export async function updateCategory(id: string, patch: Partial<Pick<Category, 'name' | 'icon' | 'description'>>): Promise<Category | null> {
-  const category = categoriesStore.find(c => c.id === id);
+export async function createCategory(data: Partial<Category>): Promise<Category> {
+  const newCatId = data.id || `C00${categoriesStore.length + 1}`.slice(-5);
+  const newCat: Category = {
+    id: newCatId,
+    code: data.code || newCatId,
+    name: (data.name || 'NUEVA CATEGORÍA').toUpperCase().trim(),
+    icon: data.icon || 'Flame',
+    description: data.description || '',
+    banner: data.banner || '/imagenes/categorias/platos-amazonicos/banner.webp',
+    order: data.order || categoriesStore.length + 1,
+    slug: data.slug || (data.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  };
+  categoriesStore.push(newCat);
+  return { ...newCat };
+}
+
+export async function updateCategory(id: string, patch: Partial<Category>): Promise<Category | null> {
+  const category = categoriesStore.find(c => c.id === id || (c.code && c.code.toLowerCase() === id.toLowerCase()));
   if (!category) return null;
   if (typeof patch.name === 'string' && patch.name.trim()) category.name = patch.name.trim().toUpperCase();
   if (typeof patch.icon === 'string' && patch.icon.trim()) category.icon = patch.icon.trim();
   if (typeof patch.description === 'string') category.description = patch.description.trim();
+  if (typeof patch.banner === 'string' && patch.banner.trim()) category.banner = patch.banner.trim();
+  if (typeof patch.code === 'string' && patch.code.trim()) category.code = patch.code.trim();
   return { ...category };
+}
+
+export async function deleteCategory(id: string): Promise<boolean> {
+  const index = categoriesStore.findIndex(c => c.id === id || (c.code && c.code.toLowerCase() === id.toLowerCase()));
+  if (index === -1) return false;
+  categoriesStore.splice(index, 1);
+  return true;
 }
 
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {

@@ -1,18 +1,28 @@
 /* =========================================================
-   BUCHISAPA - PÁGINA OFICIAL DE INFORMACIÓN (CSS)
+   BUCHISAPA - ESTILOS OFICIALES DE SUBPÁGINAS Y CONTENIDO ESTÁTICO
+   (Información, Nosotros, Políticas, Términos, Servicios y Contacto)
    ========================================================= */
 
-body.info-page-body {
-  background-color: #ffffff !important; background: #ffffff !important;
+body.info-page-body,
+body.nosotros-page-body,
+body.politicas-page-body,
+body.servicios-page-body,
+body.contactanos-page-body {
+  background: #ffffff !important;
   color: #0f172a;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-.info-navbar {
-  background-color: #ffffff;
+/* NAVBAR Y NAVEGACIÓN COMÚN */
+.info-navbar,
+.nosotros-navbar,
+.politicas-navbar,
+.servicios-navbar,
+.contactanos-navbar,
+.subpage-navbar {
+  background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
   position: relative;
   top: 0;
@@ -20,110 +30,303 @@ body.info-page-body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.info-nav-container {
+.info-nav-container,
+.nosotros-nav-wrap,
+.politicas-nav-wrap,
+.servicios-nav-wrap,
+.contactanos-nav-wrap,
+.subpage-nav-wrap {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
-.info-brand {
+.info-brand,
+.nosotros-brand,
+.politicas-brand,
+.servicios-brand,
+.contactanos-brand,
+.subpage-brand {
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
 }
 
-.info-brand-logo {
+.info-brand-logo,
+.nosotros-brand-logo,
+.politicas-brand-logo,
+.servicios-brand-logo,
+.contactanos-brand-logo,
+.subpage-brand-logo {
   height: 42px;
   width: auto;
   object-fit: contain;
 }
 
-.info-brand-title {
+.info-brand-title,
+.nosotros-brand-title,
+.politicas-brand-title,
+.servicios-brand-title,
+.contactanos-brand-title,
+.subpage-brand-title {
   font-weight: 900;
   font-size: 16px;
   color: #0f172a;
 }
 
-.info-brand-sub {
+.info-brand-sub,
+.nosotros-brand-sub,
+.politicas-brand-sub,
+.servicios-brand-sub,
+.contactanos-brand-sub {
   font-size: 10px;
   color: #ea580c;
   font-weight: 700;
   text-transform: uppercase;
 }
 
-.info-back-btn {
+.info-back-btn,
+.nosotros-back-btn,
+.politicas-back-btn,
+.servicios-back-btn,
+.contactanos-back-btn,
+.clean-back-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: #ea580c;
-  color: #ffffff;
-  border-radius: 10px;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.info-single-column {
-  max-width: 800px;
-  margin: 32px auto 60px auto;
-  padding: 0 16px;
-  width: 100%;
-}
-
-.info-content-card {
-  background-color: #ffffff;
+  background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  padding: 36px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  border-radius: 9999px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+  text-decoration: none;
+  transition: all 0.15s ease;
 }
 
-@media (max-width: 600px) {
-  .info-content-card {
-    padding: 20px;
-  }
+.info-back-btn:hover,
+.nosotros-back-btn:hover,
+.politicas-back-btn:hover,
+.servicios-back-btn:hover,
+.contactanos-back-btn:hover,
+.clean-back-btn:hover {
+  background: #f1f5f9;
+  color: #dc2626;
+  border-color: #fecdd3;
 }
 
-.info-article-header {
-  border-bottom: 2px solid #ffedd5;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
+/* HERO SUPERIOR DE SUBPÁGINAS */
+.nosotros-hero,
+.politicas-hero,
+.servicios-hero,
+.contactanos-hero {
+  padding: 40px 16px 24px;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
+.nosotros-hero-badge,
+.politicas-hero-badge,
+.servicios-hero-badge,
+.contactanos-hero-badge,
 .info-article-badge {
   display: inline-block;
-  padding: 4px 10px;
-  background-color: #ffedd5;
-  color: #c2410c;
-  border-radius: 6px;
+  background: #fef2f2;
+  color: #dc2626;
   font-size: 11px;
   font-weight: 800;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  margin-bottom: 12px;
+  border: 1px solid #fee2e2;
 }
 
+.nosotros-hero-title,
+.politicas-hero-title,
+.servicios-hero-title,
+.contactanos-hero-title,
 .info-article-title {
-  font-size: 26px;
-  font-weight: 900;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 800;
   color: #0f172a;
-  letter-spacing: -0.5px;
+  margin: 0 0 10px 0;
   line-height: 1.25;
 }
 
-.info-article-body {
-  font-size: 15px;
-  line-height: 1.7;
-  color: #334155;
+.nosotros-hero-sub,
+.politicas-hero-sub,
+.servicios-hero-sub,
+.contactanos-hero-sub {
+  font-size: 14.5px;
+  color: #64748b;
+  margin: 0 auto;
+  line-height: 1.5;
 }
 
-.info-footer {
-  margin-top: auto;
-  background-color: #0f172a;
-  color: #94a3b8;
-  padding: 24px 0;
-  font-size: 13px;
+/* CONTENEDOR CENTRAL DE ARTÍCULOS */
+.info-single-column,
+.nosotros-single-column,
+.politicas-single-column,
+.servicios-single-column,
+.contactanos-single-column {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+  width: 100%;
+}
+
+.info-content-card,
+.nosotros-section-block,
+.politicas-section-block,
+.servicios-section-block,
+.contactanos-section-block {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 28px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.nosotros-section-title,
+.politicas-section-title,
+.servicios-section-title,
+.contactanos-section-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+}
+
+.nosotros-section-p,
+.politicas-section-p,
+.servicios-section-p,
+.contactanos-section-p {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.65;
+  margin: 0 0 12px 0;
+}
+
+/* ESPECÍFICO: TARJETAS DE VALORES (NOSOTROS) */
+.nosotros-values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.nosotros-value-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
   text-align: center;
+}
+
+.nosotros-value-icon { font-size: 28px; margin-bottom: 8px; }
+.nosotros-value-title { font-weight: 800; font-size: 15px; color: #0f172a; margin-bottom: 6px; }
+.nosotros-value-desc { font-size: 13px; color: #64748b; line-height: 1.45; }
+
+/* ESPECÍFICO: SERVICIOS Y GIFTCARDS */
+.servicios-cta-box {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border: 1.5px solid #fed7aa;
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.servicios-cta-btn,
+.servicios-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #ea580c;
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.3);
+  transition: transform 0.15s;
+}
+
+.servicios-cta-btn:hover,
+.servicios-btn-primary:hover { transform: scale(1.02); }
+
+.servicios-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.servicios-giftcard-card {
+  background: #ffffff;
+  border: 2px solid #fdba74;
+  border-radius: 20px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.08);
+}
+
+.servicios-giftcard-amount { font-size: 32px; font-weight: 900; color: #ea580c; margin-bottom: 6px; }
+.servicios-giftcard-sub { font-size: 12.5px; color: #64748b; margin-bottom: 16px; }
+.servicios-action-margin { margin-top: 16px; }
+.servicios-action-margin-sm { margin-top: 10px; }
+
+/* ESPECÍFICO: CONTACTO */
+.contactanos-card-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  text-decoration: none;
+  margin-bottom: 12px;
+  transition: all 0.15s ease;
+}
+
+.contactanos-card-link:hover {
+  background: #ffffff;
+  border-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.08);
+}
+
+.contactanos-card-icon { font-size: 24px; flex-shrink: 0; }
+.contactanos-card-text { font-weight: 800; font-size: 14.5px; color: #0f172a; }
+.contactanos-card-sub { font-size: 12.5px; color: #64748b; margin-top: 2px; }
+
+/* FOOTER COMÚN DE SUBPÁGINAS */
+.info-footer,
+.nosotros-footer,
+.politicas-footer,
+.servicios-footer,
+.contactanos-footer {
+  margin-top: auto;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 12.5px;
+  color: #94a3b8;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
 }

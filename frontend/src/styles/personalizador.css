@@ -1,9 +1,3 @@
-/* ==========================================================================
-   PRODUCT CUSTOMIZER MODAL - RESTAURANTE BUCHISAPA
-   Diseño de personalización de plato con acompañamientos, cremas e indicaciones
-   Fiel a la interfaz oficial: Header visible, < Volver al inicio limpio y 2 Columnas
-   ========================================================================== */
-
 .product-customizer-modal {
   display: none;
   position: relative;
@@ -12,20 +6,14 @@
   background: transparent;
   z-index: 100;
   margin: 0;
-  box-sizing: border-box;
   padding: 4px 0 16px;
 }
 
 @media (min-width: 768px) {
-  .product-customizer-modal {
-    padding: 8px 0 16px;
-  }
+  .product-customizer-modal { padding: 8px 0 16px; }
 }
 
-.product-customizer-modal.open,
-.product-customizer-modal.active {
-  display: block !important;
-}
+.product-customizer-modal.active { display: block !important; }
 
 .product-customizer-container {
   width: 100% !important;
@@ -34,24 +22,14 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  box-sizing: border-box;
   margin: 0 !important;
 }
 
-.product-customizer-inner-wrap {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
+.product-customizer-inner-wrap { max-width: 1180px; margin: 0 auto; padding: 0; width: 100%; }
 
 /* BOTÓN VOLVER (MISMO ESTILO QUE VISTA DE PRODUCTOS) */
-.product-back-bar {
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-}
+
+.product-back-bar { margin-bottom: 16px; display: flex; align-items: center; }
 
 .product-nav-back-clean {
   display: inline-flex;
@@ -65,46 +43,24 @@
   cursor: pointer;
   padding: 6px 0;
   transition: transform 0.15s ease, color 0.15s ease;
-  font-family: 'Plus Jakarta Sans', sans-serif;
   user-select: none;
 }
 
-.product-nav-back-clean:hover {
-  color: #dc2626;
-  transform: translateX(-3px);
-}
+.product-nav-back-clean:hover { color: #dc2626; transform: translateX(-3px); }
 
-.product-nav-back-clean svg {
-  stroke-width: 3.5;
-  width: 16px;
-  height: 16px;
-  color: #0f172a;
-}
+.product-nav-back-clean svg { stroke-width: 3.5; width: 16px; height: 16px; color: #0f172a; }
 
 /* GRID RESPONSIVO: 1 COLUMNA EN MÓVIL, 2 COLUMNAS ELEGANTES EN ESCRITORIO */
-.product-detail-layout-grid {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
+
+.product-detail-layout-grid { width: 100%; display: flex; flex-direction: column; gap: 24px; }
 
 @media (min-width: 900px) {
-  .product-detail-layout-grid {
-    display: grid;
-    grid-template-columns: minmax(360px, 460px) 1fr;
-    column-gap: 40px;
-    align-items: start;
-  }
-
-  .product-detail-left-col {
-    position: relative;
-    top: auto;
-    width: 100%;
-  }
+  .product-detail-layout-grid { display: grid; grid-template-columns: minmax(360px, 460px) 1fr; column-gap: 40px; align-items: start; }
+  .product-detail-left-col { position: relative; top: auto; width: 100%; }
 }
 
 /* HERO IMAGE & BADGE - FOTOGRAFÍA CUADRADA 1:1 DE ALTA FIDELIDAD */
+
 .product-hero-card {
   position: relative;
   width: 100%;
@@ -146,6 +102,7 @@
 }
 
 /* CARD DE INFORMACIÓN PRINCIPAL (TITULO, PRECIO, DESCRIPCIÓN) */
+
 .product-main-info-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -165,17 +122,10 @@
 }
 
 @media (min-width: 768px) {
-  .product-main-title {
-    font-size: 28px;
-  }
+  .product-main-title { font-size: 28px; }
 }
 
-.product-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
+.product-meta-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 
 .product-main-cat-label {
   font-size: 11px;
@@ -188,29 +138,13 @@
   text-transform: uppercase;
 }
 
-.product-price-wrapper {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 14px;
-}
+.product-price-wrapper { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
 
-.product-main-price {
-  font-size: 28px;
-  font-weight: 900;
-  color: #dc2626;
-  line-height: 1;
-  letter-spacing: -0.5px;
-}
+.product-main-price { font-size: 28px; font-weight: 900; color: #dc2626; line-height: 1; letter-spacing: -0.5px; }
 
-.product-main-unit-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
-}
+.product-main-unit-label { font-size: 12px; font-weight: 600; color: #64748b; }
 
 .product-main-description {
-  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13.5px;
   font-weight: 500;
   color: #334155;
@@ -221,6 +155,7 @@
 }
 
 /* SECCIONES MODULARES */
+
 .product-section-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -228,7 +163,6 @@
   padding: 20px 22px;
   margin-bottom: 16px;
   width: 100%;
-  box-sizing: border-box;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
 }
 
@@ -241,11 +175,7 @@
   gap: 10px;
 }
 
-.product-section-title-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.product-section-title-group { display: flex; align-items: center; gap: 10px; }
 
 .product-section-icon {
   width: 32px;
@@ -260,29 +190,14 @@
   flex-shrink: 0;
 }
 
-.product-section-h3 {
-  margin: 0 0 2px 0;
-  font-size: 14.5px;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.2;
-}
+.product-section-h3 { margin: 0 0 2px 0; font-size: 14.5px; font-weight: 800; color: #0f172a; line-height: 1.2; }
 
-.product-section-subtitle {
-  margin: 0;
-  font-size: 11.5px;
-  color: #64748b;
-  font-weight: 500;
-}
+.product-section-subtitle { margin: 0; font-size: 11.5px; color: #64748b; font-weight: 500; }
 
-.product-section-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+.product-section-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
 /* BOTONES DE PRESET */
+
 .preset-pill-btn {
   font-size: 11px;
   font-weight: 700;
@@ -296,39 +211,21 @@
   border: 1.5px solid transparent;
 }
 
-.preset-pill-btn.teal {
-  border-color: #0d9488;
-  background: #f0fdfa;
-  color: #0d9488;
-}
-.preset-pill-btn.teal:hover {
-  background: #ccfbf1;
-}
+.preset-pill-btn.teal { border-color: #0d9488; background: #f0fdfa; color: #0d9488; }
 
-.preset-pill-btn.yellow {
-  border-color: #fde047;
-  background: #fefce8;
-  color: #854d0e;
-}
-.preset-pill-btn.yellow:hover {
-  background: #fef9c3;
-}
+.preset-pill-btn.teal:hover { background: #ccfbf1; }
 
-.preset-pill-btn.outline {
-  border-color: #cbd5e1;
-  background: #ffffff;
-  color: #475569;
-}
-.preset-pill-btn.outline:hover {
-  background: #f1f5f9;
-}
+.preset-pill-btn.yellow { border-color: #fde047; background: #fefce8; color: #854d0e; }
+
+.preset-pill-btn.yellow:hover { background: #fef9c3; }
+
+.preset-pill-btn.outline { border-color: #cbd5e1; background: #ffffff; color: #475569; }
+
+.preset-pill-btn.outline:hover { background: #f1f5f9; }
 
 /* LISTA DE ITEMS / ACOMPAÑAMIENTOS Y SALSAS */
-.product-items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+
+.product-items-list { display: flex; flex-direction: column; gap: 8px; }
 
 .product-item-toggle-card {
   display: flex;
@@ -343,20 +240,11 @@
   background: #ffffff;
 }
 
-.product-item-toggle-card:hover {
-  border-color: #cbd5e1;
-}
+.product-item-toggle-card:hover { border-color: #cbd5e1; }
 
-.product-item-toggle-card.active {
-  border-color: #059669;
-  background: #f0fdf4;
-}
+.product-item-toggle-card.active { border-color: #059669; background: #f0fdf4; }
 
-.product-item-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.product-item-left { display: flex; align-items: center; gap: 10px; }
 
 .product-item-checkbox {
   width: 22px;
@@ -371,47 +259,22 @@
   flex-shrink: 0;
 }
 
-.product-item-toggle-card.active .product-item-checkbox {
-  border-color: #059669;
-  background: #059669;
-  color: #ffffff;
-}
+.product-item-toggle-card.active .product-item-checkbox { border-color: #059669; background: #059669; color: #ffffff; }
 
-.product-item-checkbox-check {
-  display: none;
-  font-size: 13px;
-  font-weight: 900;
-  line-height: 1;
-}
+.product-item-checkbox-check { display: none; font-size: 13px; font-weight: 900; line-height: 1; }
 
-.product-item-toggle-card.active .product-item-checkbox-check {
-  display: block;
-}
+.product-item-toggle-card.active .product-item-checkbox-check { display: block; }
 
-.product-item-name {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #475569;
-}
+.product-item-name { font-size: 13.5px; font-weight: 600; color: #475569; }
 
-.product-item-toggle-card.active .product-item-name {
-  font-weight: 700;
-  color: #0f172a;
-}
+.product-item-toggle-card.active .product-item-name { font-weight: 700; color: #0f172a; }
 
-.product-item-badge {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #94a3b8;
-  white-space: nowrap;
-}
+.product-item-badge { font-size: 11.5px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
 
-.product-item-toggle-card.active .product-item-badge {
-  font-weight: 700;
-  color: #059669;
-}
+.product-item-toggle-card.active .product-item-badge { font-weight: 700; color: #059669; }
 
 /* INDICACIONES ESPECIALES */
+
 .product-notes-textarea {
   width: 100%;
   border: 1.5px solid #e2e8f0;
@@ -424,30 +287,17 @@
   min-height: 65px;
   font-family: inherit;
   outline: none;
-  box-sizing: border-box;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.product-notes-textarea:focus {
-  border-color: #dc2626;
-  background: #ffffff;
-}
+.product-notes-textarea:focus { border-color: #dc2626; background: #ffffff; }
 
-.product-allergen-note {
-  font-size: 12px;
-  color: #64748b;
-  margin-top: 10px;
-  line-height: 1.4;
-}
+.product-allergen-note { font-size: 12px; color: #64748b; margin-top: 10px; line-height: 1.4; }
 
-.product-allergen-link {
-  color: #dc2626;
-  font-weight: 700;
-  text-decoration: underline;
-  cursor: pointer;
-}
+.product-allergen-link { color: #dc2626; font-weight: 700; text-decoration: underline; cursor: pointer; }
 
 /* BARRA DE ACCIÓN INTEGRADA EN EL SCROLL (FLUYE CON TODO EL CONTENIDO) */
+
 .product-inline-action-bar {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -457,7 +307,6 @@
   margin-bottom: 28px;
   width: 100%;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-  box-sizing: border-box;
 }
 
 .product-sticky-bottom-bar {
@@ -472,17 +321,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
 }
 
-.product-sticky-inner {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.product-sticky-inner { width: 100%; display: flex; align-items: center; gap: 10px; }
 
 /* SELECTOR DE CANTIDAD */
+
 .product-stepper {
   background: #f1f5f9;
   border-radius: 12px;
@@ -510,23 +354,14 @@
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
-.product-stepper-btn:hover {
-  background: #f8fafc;
-}
+.product-stepper-btn:hover { background: #f8fafc; }
 
-.product-stepper-btn:active {
-  transform: scale(0.92);
-}
+.product-stepper-btn:active { transform: scale(0.92); }
 
-.product-stepper-qty {
-  font-size: 15px;
-  font-weight: 800;
-  color: #0f172a;
-  min-width: 20px;
-  text-align: center;
-}
+.product-stepper-qty { font-size: 15px; font-weight: 800; color: #0f172a; min-width: 20px; text-align: center; }
 
 /* BOTÓN AGREGAR A MI PEDIDO */
+
 .product-add-cart-btn {
   flex: 1 1 auto;
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
@@ -545,11 +380,6 @@
   white-space: nowrap;
 }
 
-.product-add-cart-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.45);
-}
+.product-add-cart-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(220, 38, 38, 0.45); }
 
-.product-add-cart-btn:active {
-  transform: scale(0.98);
-}
+.product-add-cart-btn:active { transform: scale(0.98); }

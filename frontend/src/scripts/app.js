@@ -89,6 +89,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => {
         openCategoryView(catParam, catParam.toUpperCase().replace(/-/g, ' '));
       }, 150);
+    } else {
+      const searchSec = document.getElementById('search-results-section');
+      const catSec = document.getElementById('category-banners-section');
+      const heroSec = document.querySelector('.hero-carousel-container');
+      const titleWrap = document.getElementById('main-section-title-wrap');
+      if (searchSec) {
+        searchSec.classList.add('is-hidden');
+        searchSec.style.display = 'none';
+      }
+      if (catSec) catSec.style.display = '';
+      if (heroSec) heroSec.style.display = '';
+      if (titleWrap) titleWrap.style.display = '';
     }
   } catch (e) {}
 
@@ -519,6 +531,15 @@ function closeLoginModal(e) {
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
   }
+
+  // Limpiar cualquier query param de login en la URL si existía (ej: ?login=admin)
+  try {
+    if (window.location.search && (window.location.search.includes('login') || window.location.search.includes('admin') || window.location.search.includes('auth'))) {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  } catch (err) {}
 }
 
 let currentAuthView = 'login';
@@ -965,7 +986,13 @@ function checkRegisterFormReady() {
 function isUserAdmin(email, role) {
   const cleanEmail = (email || '').trim().toLowerCase();
   const adminEmails = ['buchisapaweb@gmail.com', 'nexaltustecsac@gmail.com', 'admin@buchisapa.pe'];
-  return adminEmails.includes(cleanEmail) || cleanEmail.includes('admin') || role === 'admin';
+  return adminEmails.includes(cleanEmail) || 
+         cleanEmail.includes('admin') || 
+         cleanEmail.startsWith('adm') || 
+         cleanEmail === '70000001' || 
+         cleanEmail === 'buchisapa' || 
+         cleanEmail === 'admin1' ||
+         role === 'admin';
 }
 
 async function handleAuthLoginSubmit(event) {
@@ -1077,13 +1104,15 @@ async function handleAuthLoginSubmit(event) {
     // Si el usuario es administrador o solicitó acceso admin
     if (isAdmin) {
       localStorage.setItem('buchisapa_admin_token', token);
+      sessionStorage.setItem('buchisapa_admin_token', token);
       sessionStorage.setItem('buchisapa_admin_session', JSON.stringify(user));
+      localStorage.setItem('buchisapa_admin_session', JSON.stringify(user));
       localStorage.setItem('buchisapa_customer', JSON.stringify(user));
 
       showCustomSuccess('¡Acceso concedido! Redirigiendo a Administración...');
       setTimeout(() => {
-        window.location.href = '/admin';
-      }, 150);
+        window.location.href = `/admin?token=${encodeURIComponent(token)}`;
+      }, 100);
       return;
     }
 
@@ -1813,7 +1842,7 @@ function handleUserIconClick() {
   if (saved) {
     try {
       const customer = JSON.parse(saved);
-      if (customer && (customer.name || customer.email) && !customer.guest) {
+      if (customer && (customer.name || customer.email) && !customer.guest && !customer.isAdmin && customer.role !== 'admin') {
         openUserProfileModal();
         return;
       }
@@ -1824,15 +1853,6 @@ function handleUserIconClick() {
 
 function openUserProfileModal(targetScreen = 'main') {
   const saved = localStorage.getItem('buchisapa_customer');
-  if (saved) {
-    try {
-      const customer = JSON.parse(saved);
-      if (customer.isAdmin || customer.role === 'admin' || customer.email === 'buchisapaweb@gmail.com' || customer.email === 'nexaltustecsac@gmail.com') {
-        window.location.href = '/admin';
-        return;
-      }
-    } catch (e) {}
-  }
   if (!saved) {
     openLoginModal('login');
     return;
@@ -1840,6 +1860,10 @@ function openUserProfileModal(targetScreen = 'main') {
 
   try {
     const customer = JSON.parse(saved);
+    if (!customer || customer.isAdmin || customer.role === 'admin' || customer.guest) {
+      openLoginModal('login');
+      return;
+    }
     const fullnameEl = document.getElementById('profile-user-fullname');
     const emailEl = document.getElementById('profile-user-email');
     const avatarInitial = document.getElementById('profile-avatar-initial');
@@ -2167,7 +2191,10 @@ async function handleLogoutCustomer() {
 
   updateNavbarUserAuth();
   closeLoginModal();
-  window.location.href = '/index.html';
+  try {
+    history.replaceState(null, '', '/');
+  } catch (e) {}
+  window.location.href = window.location.origin + '/';
 }
 
 function updateNavbarUserAuth() {
@@ -3733,15 +3760,16 @@ function openCategoryView(catId, catTitle) {
     renderCardsInContainer(filtered, container);
   }
 
-  // Desplazamiento inmediato y perfecto a la sección de productos
-  if (typeof window.scrollTo === 'function') {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Asegurar que el pie de página siempre esté visible
+  const footerEl = document.querySelector('.site-footer-buchisapa') || document.querySelector('footer');
+  if (footerEl) {
+    footerEl.style.display = 'block';
   }
-  setTimeout(() => {
-    if (searchSec && typeof searchSec.scrollIntoView === 'function') {
-      searchSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, 50);
+
+  // Desplazamiento inmediato al inicio (0, 0) para que la cabecera quede visible
+  if (typeof window.scrollTo === 'function') {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
 }
 
 function renderOfficialPromotionsInApp(container) {

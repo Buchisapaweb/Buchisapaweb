@@ -31,19 +31,12 @@ export function compileHtml() {
     }
   }
 
-  // 1. Sincronizar recursos del frontend a public/ para que Vite los encuentre en build time
-  copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/styles'), path.join(PUBLIC_DIR, 'css'));
-  copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/scripts'), path.join(PUBLIC_DIR, 'js'));
-  copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/assets/images'), path.join(PUBLIC_DIR, 'imagenes'));
+  // 1. Limpieza de duplicados: No contaminar public/ con copias de frontend/src
 
-  // 2. Compilar index.html con todos sus partials
+  // 2. Compilar index.html con los 3 componentes esenciales
   const partials = {
     'ENCABEZADO': 'frontend/src/components/html/encabezado.html',
-    'MENU_MOVIL': 'frontend/src/components/html/menu-movil.html',
     'CARRUSEL_PORTADA': 'frontend/src/components/html/carrusel-portada.html',
-    'PANEL_CARRITO': 'frontend/src/components/html/panel-carrito.html',
-    'VENTANA_UBICACION': 'frontend/src/components/html/ventana-ubicacion.html',
-    'VENTANA_AUTENTICACION': 'frontend/src/components/html/ventana-autenticacion.html',
     'PIE_PAGINA': 'frontend/src/components/html/pie-pagina.html'
   };
 
@@ -105,8 +98,6 @@ export function compileHtml() {
 
   // 5. Asegurar rutas directas para Vercel y hosts estáticos
   const directPages = [
-    { src: 'frontend/src/pages/html/cocina.html', outName: 'cocina' },
-    { src: 'frontend/src/pages/html/cocina.html', outName: 'kitchen' },
     { src: 'frontend/src/pages/html/ubicacion.html', outName: 'ubicacion' },
     { src: 'frontend/src/pages/html/reclamaciones.html', outName: 'reclamaciones' },
     { src: 'frontend/src/pages/html/informacion.html', outName: 'informacion' },
@@ -117,14 +108,12 @@ export function compileHtml() {
     { src: 'frontend/src/pages/html/historia.html', outName: 'historia' },
     { src: 'frontend/src/pages/html/vision.html', outName: 'vision' },
     { src: 'frontend/src/pages/html/valores.html', outName: 'valores' },
-    { src: 'frontend/src/pages/html/reservas.html', outName: 'reservas' },
-    { src: 'frontend/src/pages/html/catering.html', outName: 'catering' },
-    { src: 'frontend/src/pages/html/fiestas.html', outName: 'fiestas' },
-    { src: 'frontend/src/pages/html/giftcards.html', outName: 'giftcards' },
     { src: 'frontend/src/pages/html/valores-nutricionales.html', outName: 'valores-nutricionales' },
     { src: 'frontend/src/pages/html/politicas-privacidad.html', outName: 'politicas-privacidad' },
     { src: 'frontend/src/pages/html/terminos.html', outName: 'terminos' },
-    { src: 'frontend/src/pages/html/carrito.html', outName: 'carrito' }
+    { src: 'frontend/src/pages/html/carrito.html', outName: 'carrito' },
+    { src: 'frontend/src/pages/html/producto.html', outName: 'producto' },
+    { src: 'frontend/src/pages/html/productoDetalle.html', outName: 'productoDetalle' }
   ];
 
   for (const page of directPages) {
@@ -139,7 +128,7 @@ export function compileHtml() {
       fs.writeFileSync(path.join(pageDir, 'index.html'), content, 'utf8');
     }
   }
-  console.log('✅ Rutas estáticas limpias creadas (/kitchen, /ubicacion, /reclamaciones).');
+  console.log('✅ Rutas estáticas limpias creadas (/ubicacion, /reclamaciones, /carrito).');
 }
 
 compileHtml();

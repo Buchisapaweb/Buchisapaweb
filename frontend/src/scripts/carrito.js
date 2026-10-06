@@ -95,6 +95,12 @@ const BuchisapaCart = {
     this.updateUI();
   },
 
+  setOrderType(type) {
+    this.orderType = type === 'pickup' ? 'pickup' : 'delivery';
+    localStorage.setItem('buchisapa_order_type', this.orderType);
+    this.updateUI();
+  },
+
   getCategoryBadge(product) {
     const cat = (product.category_id || product.category || '').toLowerCase();
     if (cat.includes('promocion') || cat.includes('promo')) return 'PROMOCIONES';
@@ -643,7 +649,7 @@ const BuchisapaCart = {
     const emptyActionBtn = document.getElementById('btn-cart-empty');
 
     if (count === 0) {
-      // ESTADO VACÍO (DISEÑO EXACTO SEGÚN CAPTURA)
+      // ESTADO VACÍO (DISEÑO MODERNO Y ATRACTIVO)
       if (subbarWrap) subbarWrap.style.display = 'none';
       if (emptyActionBtn) {
         emptyActionBtn.classList.add('is-hidden');
@@ -653,16 +659,31 @@ const BuchisapaCart = {
       const emptyStateHtml = `
         <div class="cart-empty-state">
           <div class="cart-empty-icon-card">
-            <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
               <path d="M3 6h18"/>
               <path d="M16 10a4 4 0 0 1-8 0"/>
             </svg>
           </div>
           <h3 class="cart-empty-title">Tu pedido está vacío</h3>
-          <p class="cart-empty-desc">Aún no has seleccionado ningún plato. Explora nuestras hamburguesas artesanales, broaster crocante, caldos y platos amazónicos.</p>
-          <button class="cart-empty-action-btn" type="button" onclick="window.location.href = '/';">
-            Explorar la Carta y Pedir
+          <p class="cart-empty-desc">Aún no has seleccionado ningún plato. Explora nuestras especialidades al carbón, broaster crocante y delicias amazónicas.</p>
+          
+          <div class="cart-empty-quick-categories">
+            <span class="quick-cat-label">Explorar por categoría:</span>
+            <div class="quick-cat-chips">
+              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('hamburguesas', 'HAMBURGUESAS');">🍔 Hamburguesas</button>
+              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('broaster', 'BROASTER');">🍗 Broaster</button>
+              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS');">🌴 Amazónicos</button>
+              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('alitas', 'ALITAS');">🍗 Alitas</button>
+              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('bebidas', 'BEBIDAS');">🥤 Bebidas</button>
+            </div>
+          </div>
+
+          <button class="cart-empty-action-btn" type="button" onclick="BuchisapaCart.closeDrawer(); if(typeof window.scrollToCategoryBanners==='function'){window.scrollToCategoryBanners();}else{window.scrollTo({top:0,behavior:'smooth'});}">
+            <span>Explorar la Carta y Pedir</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
           </button>
         </div>
       `;
@@ -675,7 +696,7 @@ const BuchisapaCart = {
         itemsContainer.innerHTML = emptyStateHtml;
       }
     } else {
-      // ESTADO CON PLATOS (DISEÑO EXACTO NUEVA ACTUALIZACIÓN)
+      // ESTADO CON PLATOS (DISEÑO ACTUALIZADO)
       if (subbarWrap) subbarWrap.style.display = 'flex';
       if (emptyActionBtn) {
         emptyActionBtn.classList.remove('is-hidden');
@@ -742,15 +763,27 @@ const BuchisapaCart = {
       }
 
       const dishesListHtml = `
+        <!-- SELECTOR DE MODALIDAD DE ENTREGA -->
+        <div class="cart-mode-toggle-wrap">
+          <button type="button" class="cart-mode-tab ${!isPickup ? 'active' : ''}" onclick="BuchisapaCart.setOrderType('delivery')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.6C2 10.8 2 11.2 2 11.6V16c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+            <span>Delivery a Domicilio</span>
+          </button>
+          <button type="button" class="cart-mode-tab ${isPickup ? 'active' : ''}" onclick="BuchisapaCart.setOrderType('pickup')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Recojo en Tienda</span>
+          </button>
+        </div>
+
         <!-- LISTA DE TARJETAS DE PLATOS -->
         <div class="cart-dish-items-list">
           ${this.items.map((item, idx) => {
             const isDrinkItem = this.isDrinkOrNoSauceItem(item);
             const hasSauces = !isDrinkItem && Array.isArray(item.selectedSauces) && item.selectedSauces.length > 0;
-            const saucesText = hasSauces ? item.selectedSauces.join(', ') : '';
             const priceFormatted = (parseFloat(item.price) || 0).toFixed(2);
+            const itemSubtotal = ((parseFloat(item.price) || 0) * (item.quantity || 1)).toFixed(2);
             const categoryBadge = item.categoryBadge || (isDrinkItem ? 'BEBIDAS' : 'PROMOCIONES');
-            const optionText = item.option || (isDrinkItem ? 'Opción: Bebida Individual Helada' : 'Opción: Combo Completo');
+            const optionText = item.option || (isDrinkItem ? 'Bebida Helada' : 'Combo Completo');
             const accompanimentsText = item.accompaniments || this.getDefaultAccompaniments(item);
             const itemFallback = (typeof window.getCategoryBannerFallback === 'function') 
               ? window.getCategoryBannerFallback(item.category_id || item.category || categoryBadge) 
@@ -758,54 +791,68 @@ const BuchisapaCart = {
             const itemImg = item.image || itemFallback;
 
             const cardClass = 'cart-dish-card';
-            const stockBadgeHtml = '';
 
             return `
               <div class="${cardClass}" id="cart-item-${item.id || idx}">
                 <!-- FILA SUPERIOR: FOTO, BADGE, NOMBRE, PRECIO Y TACHO -->
                 <div class="dish-card-main-row">
-                  <img src="${itemImg}" alt="${item.name || 'Plato'}" class="dish-card-thumbnail" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${itemFallback}';">
+                  <div class="dish-card-thumb-wrap">
+                    <img src="${itemImg}" alt="${item.name || 'Plato'}" class="dish-card-thumbnail" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${itemFallback}';">
+                  </div>
                   
                   <div class="dish-card-info-col">
                     <div class="dish-card-top-badge-row">
-                      <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-                        <span class="dish-card-cat-badge">${categoryBadge}</span>
-                        ${stockBadgeHtml}
-                      </div>
-                      <button class="dish-card-trash-btn" type="button" onclick="BuchisapaCart.removeItem(${idx})" aria-label="Eliminar ${item.name || 'plato'}">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                      <span class="dish-card-cat-badge">${categoryBadge}</span>
+                      <button class="dish-card-trash-btn" type="button" onclick="BuchisapaCart.removeItem(${idx})" aria-label="Eliminar ${item.name || 'plato'}" title="Eliminar plato del pedido">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M3 6h18"/>
                           <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
                           <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                          <line x1="10" y1="11" x2="10" y2="17"/>
+                          <line x1="14" y1="11" x2="14" y2="17"/>
                         </svg>
                       </button>
                     </div>
 
                     <h4 class="dish-card-name">${item.name || 'Plato Buchisapa'}</h4>
-                    <div class="dish-card-price-red">S/ ${priceFormatted}</div>
+                    <div class="dish-card-price-row">
+                      <span class="dish-card-price-red">S/ ${priceFormatted}</span>
+                      <span class="dish-card-unit-label">c/u</span>
+                    </div>
                     <div class="dish-card-option-subtitle">${optionText}</div>
                   </div>
                 </div>
 
                 <!-- CAJA VERDE DE ACOMPAÑAMIENTOS -->
                 <div class="dish-card-accompaniments-box">
-                  <span class="acc-symbol">⊙</span> ${accompanimentsText}
+                  <div class="acc-badge-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Incluye:</span>
+                  </div>
+                  <span class="acc-text">${accompanimentsText}</span>
                 </div>
 
-                <!-- FILA DE CREMAS (SOLO SI APLICA Y NO ES BEBIDA) -->
+                <!-- FILA DE CREMAS / SALSAS CON PILLS ESTILIZADAS -->
                 ${hasSauces ? `
-                <div class="dish-card-cremas-text">
-                  <strong>Cremas:</strong> ${saucesText}${item.notes ? ` (${item.notes})` : ''}
+                <div class="dish-card-cremas-container">
+                  <span class="cremas-header-tag">Salsas:</span>
+                  <div class="sauces-tags-list">
+                    ${item.selectedSauces.map(s => `<span class="sauce-tag-pill">✨ ${s}</span>`).join('')}
+                  </div>
+                  ${item.notes ? `<div class="dish-card-note-pill">📝 <em>${item.notes}</em></div>` : ''}
                 </div>
-                ` : (item.notes ? `<div class="dish-card-cremas-text"><strong>Notas:</strong> ${item.notes}</div>` : '')}
+                ` : (item.notes ? `<div class="dish-card-cremas-container"><div class="dish-card-note-pill">📝 <em>${item.notes}</em></div></div>` : '')}
 
                 <!-- FILA DE CANTIDAD Y STEPPER -->
                 <div class="dish-card-quantity-row">
-                  <span class="qty-label">Cantidad:</span>
+                  <div class="dish-card-item-subtotal">
+                    <span class="subtotal-label">Subtotal:</span>
+                    <span class="subtotal-val">S/ ${itemSubtotal}</span>
+                  </div>
                   <div class="qty-stepper-pill">
-                    <button class="stepper-action-btn minus" type="button" onclick="BuchisapaCart.updateQuantity(${idx}, -1)" aria-label="Disminuir cantidad">−</button>
+                    <button class="stepper-action-btn minus" type="button" onclick="BuchisapaCart.updateQuantity(${idx}, -1)" aria-label="Disminuir cantidad" title="Restar 1">−</button>
                     <span class="stepper-num">${item.quantity}</span>
-                    <button class="stepper-action-btn plus" type="button" onclick="BuchisapaCart.updateQuantity(${idx}, 1)" aria-label="Aumentar cantidad">+</button>
+                    <button class="stepper-action-btn plus" type="button" onclick="BuchisapaCart.updateQuantity(${idx}, 1)" aria-label="Aumentar cantidad" title="Sumar 1">+</button>
                   </div>
                 </div>
               </div>
@@ -814,7 +861,7 @@ const BuchisapaCart = {
         </div>
 
         <!-- BOTÓN AGREGAR MÁS PLATOS DE LA CARTA -->
-        <button class="cart-add-more-btn" type="button" onclick="BuchisapaCart.closeDrawer(); window.scrollTo({ top: 0, behavior: 'smooth' });">
+        <button class="cart-add-more-btn" type="button" onclick="BuchisapaCart.closeDrawer(); if(typeof window.scrollToCategoryBanners==='function'){window.scrollToCategoryBanners();}else{window.scrollTo({top:0,behavior:'smooth'});}">
           <span class="plus-sign">+</span>
           <span>Agregar más platos de la carta</span>
         </button>
@@ -828,7 +875,7 @@ const BuchisapaCart = {
         <div class="cart-order-summary-card">
           <div class="summary-card-header">
             <h3 class="summary-card-title">Resumen del Pedido</h3>
-            <span class="summary-item-badge" id="cart-summary-item-count">${count === 1 ? '1 item' : `${count} items`}</span>
+            <span class="summary-item-badge" id="cart-summary-item-count">${count === 1 ? '1 plato' : `${count} platos`}</span>
           </div>
 
           <div class="summary-lines-group">
@@ -838,7 +885,7 @@ const BuchisapaCart = {
             </div>
             <div class="cart-summary-line">
               <span class="summary-line-label">Modalidad:</span>
-              <span class="summary-line-val modality-tag">${isPickup ? '🏪 Recojo en Tienda (Santa Clara)' : '🛵 Delivery'}</span>
+              <span class="summary-line-val modality-tag">${isPickup ? '🏪 Recojo en Tienda (Santa Clara)' : '🛵 Delivery a Domicilio'}</span>
             </div>
             <div class="cart-summary-line">
               <span class="summary-line-label" id="cart-delivery-label">${isPickup ? 'Costo de entrega:' : `Costo de envío (${districtName}):`}</span>
@@ -856,14 +903,14 @@ const BuchisapaCart = {
           </div>
 
           <!-- BLOQUE DE CUPÓN INTERACTIVO -->
-          <div class="cart-coupon-box" style="margin: 12px 0 16px; padding: 10px 12px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px;">
-            <div style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+          <div class="cart-coupon-box">
+            <div class="coupon-title-row">
               <span>🎟️ ¿Tienes un código de descuento?</span>
-              <span style="font-size: 10px; color: #dc2626; font-weight: 600;">Ejem: BUCHISAPA10</span>
+              <span class="coupon-hint">Ej: BUCHISAPA10</span>
             </div>
-            <div style="display: flex; gap: 6px;">
-              <input type="text" id="cart-coupon-input" placeholder="Ingresa tu cupón" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 10px; font-size: 12px; text-transform: uppercase; font-weight: 700;" onkeypress="if(event.key==='Enter'){ BuchisapaCart.applyCouponCode(this.value); }">
-              <button type="button" onclick="BuchisapaCart.applyCouponCode(document.getElementById('cart-coupon-input').value)" style="background: #dc2626; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer;">Aplicar</button>
+            <div class="coupon-input-group">
+              <input type="text" id="cart-coupon-input" placeholder="Ingresa tu código" onkeypress="if(event.key==='Enter'){ BuchisapaCart.applyCouponCode(this.value); }">
+              <button type="button" class="coupon-apply-btn" onclick="BuchisapaCart.applyCouponCode(document.getElementById('cart-coupon-input').value)">Aplicar</button>
             </div>
           </div>
 
@@ -872,21 +919,17 @@ const BuchisapaCart = {
           <div class="cart-summary-total-row">
             <div class="summary-total-left">
               <span class="summary-total-main-label">Total a Pagar:</span>
-              <span class="summary-igv-sublabel">IGV incluido</span>
+              <span class="summary-igv-sublabel">IGV y empaques incluidos</span>
             </div>
             <div class="summary-total-main-val" id="cart-total">
               <span class="currency-prefix">S/</span> ${totalFormatted}
             </div>
           </div>
 
-
-
           <!-- BOTÓN PRINCIPAL ROJO CONTINUAR CON LA ENTREGA -->
           <button class="cart-checkout-main-btn" type="button" onclick="BuchisapaCart.proceedToCheckout()">
             <span>Continuar con la Entrega</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
+            <span class="checkout-btn-price">S/ ${totalFormatted} →</span>
           </button>
 
           <!-- AVISO DE PEDIDO DIRECTO A COCINA -->
@@ -918,22 +961,21 @@ const BuchisapaCart = {
   },
 
   openDrawer() {
-    if (window.location.pathname !== '/carrito' && window.location.pathname !== '/carrito.html') {
-      window.location.href = '/carrito';
-      return;
-    }
     const drawer = document.getElementById('cart-drawer-modal');
     if (drawer) {
       document.body.classList.add('cart-drawer-open');
       drawer.style.display = 'flex';
       void drawer.offsetWidth;
-      drawer.classList.add('open');
-      drawer.classList.add('active');
-      document.body.style.overflow = '';
+      drawer.classList.add('open', 'active');
+      document.body.style.overflow = 'hidden';
+      this.updateUI();
+      if (this.items && this.items.length > 0) {
+        this.checkRealtimeStock(true);
+      }
+      return;
     }
-    this.updateUI();
-    if (this.items && this.items.length > 0) {
-      this.checkRealtimeStock(true);
+    if (window.location.pathname !== '/carrito' && window.location.pathname !== '/carrito.html') {
+      window.location.href = '/carrito';
     }
   },
 
@@ -941,9 +983,12 @@ const BuchisapaCart = {
     const drawer = document.getElementById('cart-drawer-modal');
     if (drawer) {
       document.body.classList.remove('cart-drawer-open');
-      drawer.classList.remove('open');
-      drawer.classList.remove('active');
-      drawer.style.display = 'none';
+      drawer.classList.remove('open', 'active');
+      setTimeout(() => {
+        if (!drawer.classList.contains('open')) {
+          drawer.style.display = 'none';
+        }
+      }, 250);
       document.body.style.overflow = '';
       this.updateFloatingCartBar();
     }

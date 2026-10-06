@@ -96,13 +96,17 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('buchisapa_admin_session');
       sessionStorage.removeItem('buchisapa_admin_session');
       sessionStorage.removeItem('buchisapa_admin_user');
+      sessionStorage.clear();
       
       document.cookie = "buchisapa_admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     } catch (e) {}
 
-    // Redirigir siempre a la página principal /index.html
-    window.location.replace('/index.html');
+    // Limpiar hash y redirigir limpiamente a la página principal
+    try {
+      history.replaceState(null, '', '/');
+    } catch (e) {}
+    window.location.href = window.location.origin + '/';
   };
 
   const logoutBtn = document.getElementById('btn-admin-logout');
