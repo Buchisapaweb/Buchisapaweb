@@ -178,17 +178,28 @@
       products = [];
     }
 
-    // Filtrar por categoría
+    // Filtrar por categoría utilizando mapeo de ID exacto para evitar conflictos con tildes y guiones
+    const slugToIdMap = {
+      'adicionales': 'C0001',
+      'alitas': 'C0002',
+      'bebidas': 'C0003',
+      'broaster': 'C0004',
+      'hamburguesas': 'C0005',
+      'infusiones': 'C0006',
+      'platos-amazonicos': 'C0007',
+      'promociones': 'C0008',
+      'refrescos': 'C0009',
+      'salchipapas': 'C0010',
+      'salchipapas-y-salchibroasters': 'C0010'
+    };
+
     let filtered = products;
     if (catId && catId !== 'todas' && catId !== 'all') {
       const catIdNorm = String(catId || '').toLowerCase().trim();
+      const targetCatId = slugToIdMap[catIdNorm] || catIdNorm.toUpperCase();
       filtered = products.filter(p => {
-        const pCatId = String(p.category_id || '').toLowerCase();
-        const pCatName = String(p.category || '').toLowerCase();
-        const pCatBadge = String(p.categoryBadge || '').toLowerCase();
-        return pCatId.includes(catIdNorm) || catIdNorm.includes(pCatId) ||
-               pCatName.includes(catIdNorm) || catIdNorm.includes(pCatName) ||
-               pCatBadge.includes(catIdNorm) || catIdNorm.includes(pCatBadge);
+        const pCatId = String(p.category_id || '').toUpperCase().trim();
+        return pCatId === targetCatId;
       });
     }
 

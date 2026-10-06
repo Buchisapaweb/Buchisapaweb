@@ -94,8 +94,7 @@ body.contactanos-page-body {
 .nosotros-back-btn,
 .politicas-back-btn,
 .servicios-back-btn,
-.contactanos-back-btn,
-.clean-back-btn {
+.contactanos-back-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -114,8 +113,7 @@ body.contactanos-page-body {
 .nosotros-back-btn:hover,
 .politicas-back-btn:hover,
 .servicios-back-btn:hover,
-.contactanos-back-btn:hover,
-.clean-back-btn:hover {
+.contactanos-back-btn:hover {
   background: #f1f5f9;
   color: #dc2626;
   border-color: #fecdd3;
