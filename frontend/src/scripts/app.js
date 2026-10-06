@@ -129,7 +129,31 @@
     const all = getAllProducts();
     const filtered = currentCategory === 'all' 
       ? all 
-      : all.filter(p => String(p.category).toLowerCase() === String(currentCategory).toLowerCase());
+      : all.filter(p => {
+          const pCatName = String(p.category || '').toLowerCase().trim();
+          const pCatId = String(p.category_id || p.categoryId || '').toLowerCase().trim();
+          const target = String(currentCategory).toLowerCase().trim();
+          
+          // Mapeos de slug de categoría a ID exacto
+          const slugToIdMap = {
+            'adicionales': 'c0001',
+            'alitas': 'c0002',
+            'bebidas': 'c0003',
+            'broaster': 'c0004',
+            'hamburguesas': 'c0005',
+            'infusiones': 'c0006',
+            'platos-amazonicos': 'c0007',
+            'promociones': 'c0008',
+            'refrescos': 'c0009',
+            'salchipapas': 'c0010',
+            'salchipapas-y-salchibroasters': 'c0010'
+          };
+          
+          const mappedTargetId = slugToIdMap[target];
+          return pCatName === target || 
+                 pCatId === target || 
+                 (mappedTargetId && pCatId === mappedTargetId);
+        });
 
     const titleEl = document.getElementById('category-selected-title');
     if (titleEl) {
@@ -151,7 +175,7 @@
     if (prod && window.BuchisapaCart) {
       window.BuchisapaCart.addItem({
         id: prod.id,
-        title: prod.title,
+        title: prod.title || prod.name,
         price: prod.price,
         image: prod.image,
         qty: 1
@@ -165,18 +189,68 @@
     window.location.href = `/producto?id=${productId}`;
   };
 
-  // Inicializar al cargar el DOM
-  document.addEventListener('DOMContentLoaded', () => {
+  // Función asíncrona para cargar productos de la base de datos
+  async function loadDatabaseProducts() {
+    try {
+      const res = await fetch('/api/products');
+      if (res.ok) {
+        const json = await res.json();
+        const apiProducts = json.data || [];
+        if (Array.isArray(apiProducts) && apiProducts.length > 0) {
+          // Mapear campos de la base de datos para compatibilidad con la UI de app.js
+          const mappedProducts = apiProducts.map(p => ({
+            ...p,
+            id: p.id || p.code,
+            title: p.name,
+            price: Number(p.price || 0),
+            image: p.image || '/imagenes/categorias/broaster/banner.webp',
+            badge: p.badge || (p.popular ? '🔥 POPULAR' : ''),
+            description: p.description || ''
+          }));
+          
+          allMenuProducts = mappedProducts;
+          currentProducts = mappedProducts;
+          window.currentProducts = mappedProducts; // Sincronizar cache global
+          
+          // Re-renderizar con los productos de la BD
+          const urlParams = new URLSearchParams(window.location.search);
+          const catQuery = urlParams.get('cat');
+          if (catQuery) {
+            window._appOpenCategoryView(catQuery, catQuery.toUpperCase());
+          } else {
+            renderProductsGrid(mappedProducts);
+          }
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Fallo cargando productos desde la BD de Supabase, usando catálogo local estático como respaldo:', e);
+    }
+    
+    // Fallback por defecto si la API falla
     allMenuProducts = OFFICIAL_CATALOG;
     currentProducts = OFFICIAL_CATALOG;
+    window.currentProducts = OFFICIAL_CATALOG;
+    renderProductsGrid(OFFICIAL_CATALOG);
+  }
+
+  // Inicializar al cargar el DOM
+  document.addEventListener('DOMContentLoaded', () => {
+    // Seteo rápido con catálogo estático para render instantáneo
+    allMenuProducts = OFFICIAL_CATALOG;
+    currentProducts = OFFICIAL_CATALOG;
+    window.currentProducts = OFFICIAL_CATALOG;
 
     // Inicializar carrito
     if (window.BuchisapaCart && typeof window.BuchisapaCart.init === 'function') {
       window.BuchisapaCart.init();
     }
 
-    // Renderizar catálogo inicial
+    // Renderizar catálogo inicial estático inmediatamente
     renderProductsGrid(OFFICIAL_CATALOG);
+    
+    // Cargar asíncronamente los 57 productos reales de la base de datos
+    loadDatabaseProducts();
   });
 
 })();
