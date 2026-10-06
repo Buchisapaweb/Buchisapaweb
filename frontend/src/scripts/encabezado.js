@@ -70,12 +70,6 @@ function openCategoryView(catId, catTitle) {
     window.closeProductDetailModal();
   }
 
-  // Si app.js ya ha inicializado su función de renderizado de categorías, ejecutarla
-  if (window._appOpenCategoryView && typeof window._appOpenCategoryView === 'function') {
-    window._appOpenCategoryView(catId, catTitle);
-    return;
-  }
-
   // Redirección si estamos en otra subpágina
   const currentPath = window.location.pathname.toLowerCase();
   if (currentPath !== '/' && !currentPath.endsWith('/index.html') && currentPath !== '') {
@@ -83,17 +77,17 @@ function openCategoryView(catId, catTitle) {
     return;
   }
 
-  // Si app.js aún se está descargando o inicializando, esperar brevemente a su disponibilidad
-  let attempts = 0;
-  const pollInterval = setInterval(() => {
-    attempts++;
-    if (window._appOpenCategoryView && typeof window._appOpenCategoryView === 'function') {
-      clearInterval(pollInterval);
-      window._appOpenCategoryView(catId, catTitle);
-    } else if (attempts >= 40) {
-      clearInterval(pollInterval);
-    }
-  }, 50);
+  // Si categoria.js con base de datos ya está inicializado, ejecutarlo prioritariamente
+  if (window.dbOpenCategoryView && typeof window.dbOpenCategoryView === 'function') {
+    window.dbOpenCategoryView(catId, catTitle);
+    return;
+  }
+
+  // Fallback si por alguna razón no está disponible dbOpenCategoryView
+  if (window._appOpenCategoryView && typeof window._appOpenCategoryView === 'function') {
+    window._appOpenCategoryView(catId, catTitle);
+    return;
+  }
 }
 
 function selectCategoryFromDrawer(catId, catName) {
