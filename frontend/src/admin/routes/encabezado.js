@@ -3,7 +3,7 @@
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Live clock in topbar
+  // 1. Reloj en vivo (Live Clock)
   const timeEl = document.getElementById('topbar-live-time');
   const dateEl = document.getElementById('topbar-live-date');
   if (timeEl && dateEl) {
@@ -16,22 +16,65 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateClock, 1000);
   }
 
-  // Mobile sidebar toggle
+  // 2. Perfil de usuario administrador dinámico
+  const userNameEl = document.getElementById('topbar-user-name');
+  const userAvatarEl = document.getElementById('topbar-user-avatar');
+  if (userAvatarEl) {
+    userAvatarEl.addEventListener('error', () => {
+      userAvatarEl.style.display = 'none';
+      const fallback = userAvatarEl.nextElementSibling;
+      if (fallback) fallback.style.display = 'block';
+    });
+  }
+
+  const loadDynamicUserProfile = async () => {
+    try {
+      const stored = localStorage.getItem('buchisapa_admin_user') || sessionStorage.getItem('buchisapa_admin_user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (userNameEl && u.name) userNameEl.textContent = u.name;
+        if (userAvatarEl && u.avatar) userAvatarEl.src = u.avatar;
+      }
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.user) {
+          if (userNameEl && (data.user.name || data.user.full_name)) {
+            userNameEl.textContent = data.user.name || data.user.full_name;
+          }
+          if (userAvatarEl && data.user.avatar) {
+            userAvatarEl.src = data.user.avatar;
+          }
+        }
+      }
+    } catch (err) {}
+  };
+  loadDynamicUserProfile();
+
+  // 3. Menú lateral en dispositivos móviles (Sidebar Toggle)
   const mobileMenuBtn = document.getElementById('btn-mobile-menu');
   const sidebar = document.getElementById('admin-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const closeSidebarBtn = document.getElementById('btn-sidebar-close');
 
   const toggleSidebar = () => {
-    sidebar?.classList.toggle('open');
-    overlay?.classList.toggle('active');
+    if (sidebar) {
+      sidebar.classList.toggle('active');
+      sidebar.classList.toggle('open');
+    }
+    if (overlay) {
+      overlay.classList.toggle('active');
+      overlay.classList.toggle('open');
+      const isOpen = sidebar?.classList.contains('active') || sidebar?.classList.contains('open');
+      overlay.style.display = isOpen ? 'block' : 'none';
+    }
   };
 
   mobileMenuBtn?.addEventListener('click', toggleSidebar);
   closeSidebarBtn?.addEventListener('click', toggleSidebar);
   overlay?.addEventListener('click', toggleSidebar);
 
-  // Admin Logout button
+  // 4. Botón de Cerrar Sesión (Admin Logout)
   const logoutBtn = document.getElementById('btn-admin-logout');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
@@ -39,25 +82,46 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           await fetch('/api/auth/admin-logout', { method: 'POST' });
         } catch (e) {
-          console.error(e);
+          console.error('Error durante la revocación de sesión en servidor:', e);
         }
+
         localStorage.removeItem('buchisapa_admin_token');
+        localStorage.removeItem('buchisapa_admin_user');
+        localStorage.removeItem('buchisapa_admin_session');
         sessionStorage.removeItem('buchisapa_admin_session');
-        window.location.href = '/';
+        sessionStorage.removeItem('buchisapa_admin_user');
+        
+        document.cookie = "buchisapa_admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        window.location.href = '/index.html';
       }
     });
   }
+
+  // 5. Controles de Modales
+  document.getElementById('btn-close-product-modal')?.addEventListener('click', window.closeProductModal);
+  document.getElementById('btn-cancel-product-modal')?.addEventListener('click', window.closeProductModal);
+  document.getElementById('btn-close-category-modal')?.addEventListener('click', window.closeCategoryModal);
+  document.getElementById('btn-cancel-category-modal')?.addEventListener('click', window.closeCategoryModal);
+  document.getElementById('btn-close-order-modal')?.addEventListener('click', window.closeOrderModal);
+  document.getElementById('btn-cancel-order-modal')?.addEventListener('click', window.closeOrderModal);
+  document.getElementById('btn-print-modal-order')?.addEventListener('click', window.printCurrentModalOrder);
 });
 
-// Global modal helpers
+// Ayudantes de Apertura / Cierre de Modales Globale
 window.closeProductModal = function() {
-  document.getElementById('modal-product-backdrop')?.classList.remove('active');
+  document.getElementById('modal-product-backdrop')?.classList.remove('active', 'open');
 };
 
 window.closeCategoryModal = function() {
-  document.getElementById('modal-category-backdrop')?.classList.remove('active');
+  document.getElementById('modal-category-backdrop')?.classList.remove('active', 'open');
 };
 
 window.closeOrderModal = function() {
-  document.getElementById('modal-order-backdrop')?.classList.remove('active');
+  document.getElementById('modal-order-backdrop')?.classList.remove('active', 'open');
+};
+
+window.printCurrentModalOrder = function() {
+  window.print();
 };

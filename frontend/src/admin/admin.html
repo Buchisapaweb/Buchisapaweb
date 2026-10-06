@@ -8,48 +8,71 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- ESTILOS MODULARES DEL PANEL ADMIN -->
   <link rel="stylesheet" href="/admin/styles/encabezado.css">
+  <link rel="stylesheet" href="/admin/styles/dashboard.css">
+  <link rel="stylesheet" href="/admin/styles/clientes.css">
+  <link rel="stylesheet" href="/admin/styles/productos.css">
+  <link rel="stylesheet" href="/admin/styles/categorias.css">
+  <link rel="stylesheet" href="/admin/styles/portada.css">
+  <link rel="stylesheet" href="/admin/styles/pedidos.css">
+  <link rel="stylesheet" href="/admin/styles/ticket.css">
+  <link rel="stylesheet" href="/admin/styles/insumos.css">
+  <link rel="stylesheet" href="/admin/styles/utensilios.css">
+  <link rel="stylesheet" href="/admin/styles/configuracion.css">
 </head>
 <body>
   <div class="admin-layout">
     <!-- PARTIAL: ENCABEZADO -->
     <main class="admin-main">
       <div class="admin-content" id="admin-main-content">
-        <div class="admin-view active" id="view-dashboard" style="display: block;">
+        <div class="admin-view active" id="view-dashboard">
           <!-- PARTIAL: VIEW_DASHBOARD -->
         </div>
-        <div class="admin-view" id="view-pedidos" style="display: none;">
-          <!-- PARTIAL: VIEW_PEDIDOS -->
-        </div>
-        <div class="admin-view" id="view-productos" style="display: none;">
-          <!-- PARTIAL: VIEW_PRODUCTOS -->
-        </div>
-        <div class="admin-view" id="view-categorias" style="display: none;">
-          <!-- PARTIAL: VIEW_CATEGORIAS -->
-        </div>
-        <div class="admin-view" id="view-portada" style="display: none;">
-          <!-- PARTIAL: VIEW_PORTADA -->
-        </div>
-        <div class="admin-view" id="view-clientes" style="display: none;">
+        <div class="admin-view" id="view-clientes">
           <!-- PARTIAL: VIEW_CLIENTES -->
         </div>
-        <div class="admin-view" id="view-insumos" style="display: none;">
-          <!-- PARTIAL: VIEW_INSUMOS -->
+        <div class="admin-view" id="view-productos">
+          <!-- PARTIAL: VIEW_PRODUCTOS -->
         </div>
-        <div class="admin-view" id="view-utensilios" style="display: none;">
-          <!-- PARTIAL: VIEW_UTENSILIOS -->
+        <div class="admin-view" id="view-categorias">
+          <!-- PARTIAL: VIEW_CATEGORIAS -->
         </div>
-        <div class="admin-view" id="view-ticket" style="display: none;">
+        <div class="admin-view" id="view-portada">
+          <!-- PARTIAL: VIEW_PORTADA -->
+        </div>
+        <div class="admin-view" id="view-pedidos">
+          <!-- PARTIAL: VIEW_PEDIDOS -->
+        </div>
+        <div class="admin-view" id="view-ticket">
           <!-- PARTIAL: VIEW_TICKET -->
         </div>
-        <div class="admin-view" id="view-configuracion" style="display: none;">
+        <div class="admin-view" id="view-insumos">
+          <!-- PARTIAL: VIEW_INSUMOS -->
+        </div>
+        <div class="admin-view" id="view-utensilios">
+          <!-- PARTIAL: VIEW_UTENSILIOS -->
+        </div>
+        <div class="admin-view" id="view-configuracion">
           <!-- PARTIAL: VIEW_CONFIGURACION -->
         </div>
       </div>
     </main>
   </div>
 
+  <!-- SCRIPTS MODULARES DEL PANEL ADMIN -->
   <script src="/admin/routes/encabezado.js"></script>
+  <script src="/admin/routes/dashboard.js"></script>
+  <script src="/admin/routes/clientes.js"></script>
+  <script src="/admin/routes/productos.js"></script>
+  <script src="/admin/routes/categorias.js"></script>
+  <script src="/admin/routes/portada.js"></script>
+  <script src="/admin/routes/pedidos.js"></script>
+  <script src="/admin/routes/ticket.js"></script>
+  <script src="/admin/routes/insumos.js"></script>
+  <script src="/admin/routes/utensilios.js"></script>
+  <script src="/admin/routes/configuracion.js"></script>
   <script src="/admin/routes/admin.js"></script>
 </body>
 </html>

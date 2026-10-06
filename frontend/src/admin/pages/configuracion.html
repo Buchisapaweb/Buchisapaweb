@@ -1,34 +1,27 @@
-<div class="view-header">
-  <div>
-    <span class="view-kicker">CONFIGURACIÓN GENERAL</span>
-    <h2 class="view-title">Ajustes del Establecimiento</h2>
-    <p class="view-subtitle">Información del negocio, teléfono WhatsApp, dirección y costos de delivery.</p>
+<div class="main-page-card">
+  <div class="view-header">
+    <div class="view-header-title-wrap">
+      <h2 class="view-title">Configuración General del Sistema</h2>
+      <p class="view-subtitle">Parámetros generales de BuchiSapa Burger & Broaster, datos de contacto y horarios.</p>
+    </div>
   </div>
-</div>
-<div class="dash-recent-orders-card" style="padding: 24px;">
-  <form id="form-admin-config" onsubmit="event.preventDefault(); alert('Ajustes guardados correctamente');">
-    <div class="form-grid-2col">
+
+  <div class="config-grid">
+    <div class="config-card">
+      <h3 class="card-section-title">Datos del Establecimiento</h3>
       <div class="form-group">
-        <label class="form-label">Nombre del Negocio</label>
-        <input type="text" class="form-input" value="BuchiSapa - Pollería & Sabor Amazónico" readonly>
+        <label class="form-label">Nombre del Restaurante</label>
+        <input type="text" id="config-store-name" class="form-input" value="BuchiSapa Burger & Broaster">
       </div>
       <div class="form-group">
         <label class="form-label">Teléfono / WhatsApp Pedidos</label>
-        <input type="text" class="form-input" value="+51 943 312 024">
-      </div>
-    </div>
-    <div class="form-grid-2col">
-      <div class="form-group">
-        <label class="form-label">Ubicación / Dirección</label>
-        <input type="text" class="form-input" value="Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima)">
+        <input type="text" id="config-store-phone" class="form-input" value="+51 987 654 321">
       </div>
       <div class="form-group">
-        <label class="form-label">Costo de Delivery Estándar (S/)</label>
-        <input type="number" step="0.50" class="form-input" value="5.00">
+        <label class="form-label">Horario de Atención</label>
+        <input type="text" id="config-store-schedule" class="form-input" value="Lunes a Domingo: 5:00 PM - 11:30 PM">
       </div>
+      <button class="btn btn-primary" id="btn-save-store-config">Guardar Cambios</button>
     </div>
-    <div class="modal-footer" style="padding-top: 16px;">
-      <button type="submit" class="btn btn-primary">Guardar Configuración</button>
-    </div>
-  </form>
+  </div>
 </div>

@@ -2,18 +2,17 @@
      ENCABEZADO UNIFICADO: SIDEBAR, TOPBAR Y MODALES GLOBALES - BUCHISAPA
      ==================================================================== -->
 
-<!-- 1. SIDEBAR DE NAVEGACIÓN -->
+<!-- 1. SIDEBAR DE NAVEGACIÓN (TEMA OSCURO OFICIAL) -->
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 <aside class="admin-sidebar" id="admin-sidebar">
   <div class="sidebar-top">
     <!-- BRAND HEADER -->
     <div class="sidebar-brand">
       <div class="brand-icon-wrap">
-        <img src="/imagenes/logo/logo-buchisapa.webp" alt="BuchiSapa" class="admin-brand-logo-img">
+        <img src="/imagenes/logo/logo-buchisapa.webp" alt="Logo BuchiSapa" class="brand-logo-img" id="sidebar-logo-img">
       </div>
       <div class="brand-text">
-        <h1>BuchiSapa</h1>
-        <p>Panel Administrativo</p>
+        <h1 class="brand-title-gold">BuchiSapa</h1>
       </div>
       <button class="sidebar-close-btn" id="btn-sidebar-close" type="button" title="Cerrar menú" aria-label="Cerrar menú">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -22,47 +21,51 @@
 
     <!-- NAVEGACIÓN PRINCIPAL -->
     <nav class="sidebar-nav" aria-label="Navegación principal">
-      <div class="nav-section-label">OPERACIONES</div>
       <button class="nav-item active" data-view="dashboard" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span>Dashboard</span>
       </button>
-      <button class="nav-item" data-view="pedidos" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span>Pedidos</span>
-      </button>
-      <button class="nav-item" data-view="ticket" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
-        <span>Ticket / Impresión</span>
+
+      <button class="nav-item" data-view="clientes" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Clientes</span>
       </button>
 
-      <div class="nav-section-label">CATÁLOGO VIRTUAL</div>
       <button class="nav-item" data-view="productos" type="button">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
         <span>Productos</span>
       </button>
+
       <button class="nav-item" data-view="categorias" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
         <span>Categorías</span>
       </button>
+
       <button class="nav-item" data-view="portada" type="button">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
         <span>Portadas</span>
       </button>
 
-      <div class="nav-section-label">GESTIÓN & NEGOCIO</div>
-      <button class="nav-item" data-view="clientes" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>Clientes</span>
+      <button class="nav-item" data-view="pedidos" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span>Pedidos</span>
       </button>
+
+      <button class="nav-item" data-view="ticket" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+        <span>Ticket</span>
+      </button>
+
       <button class="nav-item" data-view="insumos" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9h20"/><path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"/><path d="M9 22V12h6v10"/><path d="m2 9 3-6h14l3 6"/></svg>
-        <span>Insumos / Stock</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+        <span>Insumos</span>
       </button>
+
       <button class="nav-item" data-view="utensilios" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 2v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V2"/><path d="M12 10v12"/><path d="M18 10v12"/></svg>
         <span>Utensilios</span>
       </button>
+
       <button class="nav-item" data-view="configuracion" type="button">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         <span>Configuración</span>
@@ -79,29 +82,26 @@
   </div>
 </aside>
 
-<!-- 2. TOPBAR SUPERIOR -->
+<!-- 2. TOPBAR SUPERIOR (TEMA OSCURO OFICIAL) -->
 <header class="admin-topbar">
   <div class="topbar-left">
+    <!-- ÍCONO HAMBURGER MENU -->
     <button class="menu-toggle-btn" id="btn-mobile-menu" type="button" title="Abrir menú" aria-label="Abrir menú">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" x2="21" y1="6" y2="6"/>
+        <line x1="3" x2="21" y1="12" y2="12"/>
+        <line x1="3" x2="21" y1="18" y2="18"/>
+      </svg>
     </button>
-    <div class="topbar-live-clock" id="topbar-live-clock" title="Hora y fecha oficial del sistema en vivo">
-      <div class="live-clock-badge">
-        <span class="live-clock-pulse"></span>
-        <span class="live-clock-status">SISTEMA EN VIVO</span>
-      </div>
-      <div class="live-clock-content">
-        <span class="live-clock-time" id="topbar-live-time">--:--:--</span>
-        <span class="live-clock-sep">•</span>
-        <span class="live-clock-date" id="topbar-live-date">--</span>
-      </div>
-    </div>
   </div>
+
   <div class="topbar-right">
-    <div class="admin-user-pill" id="topbar-user-pill" onclick="window.switchAdminView('configuracion')" title="Gestionar perfil de administrador">
+    <!-- PALABRA ADMINISTRADOR Y FOTO DEL ADMINISTRADOR DINÁMICO -->
+    <div class="admin-user-pill" id="topbar-user-pill" title="Administrador">
       <span class="user-name" id="topbar-user-name">Administrador</span>
-      <div class="user-avatar-wrap">
-        <img src="/imagenes/logo/logo-buchisapa.webp" alt="Administrador" class="user-avatar-img" id="topbar-user-avatar">
+      <div class="user-avatar-circle">
+        <img src="/imagenes/logo/logo-buchisapa.webp" alt="Foto Administrador" class="user-avatar-img" id="topbar-user-avatar">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" class="user-avatar-fallback"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
     </div>
   </div>
@@ -112,9 +112,9 @@
   <div class="admin-modal-card">
     <div class="modal-header">
       <h3 class="modal-title" id="modal-product-title">Nuevo Producto</h3>
-      <button class="modal-close-btn" type="button" onclick="window.closeProductModal()">✕</button>
+      <button class="modal-close-btn" type="button" id="btn-close-product-modal">✕</button>
     </div>
-    <form id="form-admin-product" onsubmit="window.handleSaveProduct(event)">
+    <form id="form-admin-product">
       <input type="hidden" id="modal-product-id" value="">
       <div class="form-group">
         <label class="form-label">Nombre del Platillo *</label>
@@ -155,7 +155,7 @@
         <input type="text" id="modal-product-img" class="form-input" placeholder="/imagenes/menu/hamburguesa-clasica.webp">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="window.closeProductModal()">Cancelar</button>
+        <button type="button" class="btn btn-secondary" id="btn-cancel-product-modal">Cancelar</button>
         <button type="submit" class="btn btn-primary">Guardar Producto</button>
       </div>
     </form>
@@ -166,9 +166,9 @@
   <div class="admin-modal-card">
     <div class="modal-header">
       <h3 class="modal-title" id="modal-category-title">Nueva Categoría</h3>
-      <button class="modal-close-btn" type="button" onclick="window.closeCategoryModal()">✕</button>
+      <button class="modal-close-btn" type="button" id="btn-close-category-modal">✕</button>
     </div>
-    <form id="form-admin-category" onsubmit="window.handleSaveCategory(event)">
+    <form id="form-admin-category">
       <input type="hidden" id="modal-category-id" value="">
       <div class="form-group">
         <label class="form-label">Nombre de Categoría *</label>
@@ -189,7 +189,7 @@
         <input type="text" id="modal-category-banner" class="form-input" placeholder="/imagenes/menu/categoria-burgers.webp">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="window.closeCategoryModal()">Cancelar</button>
+        <button type="button" class="btn btn-secondary" id="btn-cancel-category-modal">Cancelar</button>
         <button type="submit" class="btn btn-primary">Guardar Categoría</button>
       </div>
     </form>
@@ -200,14 +200,14 @@
   <div class="admin-modal-card">
     <div class="modal-header">
       <h3 class="modal-title" id="modal-order-title">Detalle del Pedido #BS-0000</h3>
-      <button class="modal-close-btn" type="button" onclick="window.closeOrderModal()">✕</button>
+      <button class="modal-close-btn" type="button" id="btn-close-order-modal">✕</button>
     </div>
     <div class="modal-order-body" id="modal-order-body">
       <!-- Dinámico vía JavaScript -->
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="window.closeOrderModal()">Cerrar</button>
-      <button type="button" class="btn btn-primary" onclick="window.printCurrentModalOrder()">
+      <button type="button" class="btn btn-secondary" id="btn-cancel-order-modal">Cerrar</button>
+      <button type="button" class="btn btn-primary" id="btn-print-modal-order">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
         <span>Imprimir Comanda</span>
       </button>

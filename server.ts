@@ -2703,14 +2703,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use('/scripts', express.static(path.join(process.cwd(), 'frontend/src/scripts'), staticOptions));
   app.use('/scripts', express.static(path.join(process.cwd(), 'dist/js'), staticOptions));
 
-  // 2. Archivos estáticos de css, js, html y raíz pública (todos dentro de public/ y dist/)
-  app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
-  app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
-  app.use(express.static(path.join(process.cwd(), 'dist'), staticOptions));
-
-  // 3. Servir HTML Compilado del Panel de Administración para /admin y cualquier subruta (/admin/dashboard, /admin/productos, etc.)
+  // 3. Panel de Administración Oficial BuchiSapa (Servido 100% directo desde frontend/src/admin/)
   app.get(['/admin', '/admin.html', /^\/admin(?:\/.*)?$/], (req: Request, res: Response, next) => {
-    // Los recursos estáticos del Admin se sirven normalmente; el HTML del panel se renderiza directamente
     if (path.extname(req.path)) return next();
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -2720,9 +2714,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.send(getCompiledAdminHtml());
   });
 
-  // 4. Panel de Administración Oficial BuchiSapa (Archivos estáticos CSS, JS, imágenes)
   app.use('/admin', express.static(path.join(process.cwd(), 'frontend/src/admin'), { ...staticOptions, index: false }));
-  app.use('/admin', express.static(path.join(process.cwd(), 'dist/admin'), { ...staticOptions, index: false }));
+
+  // 4. Archivos estáticos de css, js, html y raíz pública
+  app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
+  app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
+  app.use(express.static(path.join(process.cwd(), 'dist'), staticOptions));
 
   app.get(['/reclamaciones', '/reclamaciones.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/reclamaciones.html'));

@@ -70,8 +70,7 @@ export function compileHtml() {
   copyDirRecursive(adminSrc, adminDest);
 
   const adminPartials = {
-    'SIDEBAR': 'frontend/src/admin/components/sidebar.html',
-    'TOPBAR': 'frontend/src/admin/components/topbar.html',
+    'ENCABEZADO': 'frontend/src/admin/components/encabezado.html',
     'VIEW_DASHBOARD': 'frontend/src/admin/pages/dashboard.html',
     'VIEW_CLIENTES': 'frontend/src/admin/pages/clientes.html',
     'VIEW_PRODUCTOS': 'frontend/src/admin/pages/productos.html',
@@ -81,8 +80,7 @@ export function compileHtml() {
     'VIEW_TICKET': 'frontend/src/admin/pages/ticket.html',
     'VIEW_INSUMOS': 'frontend/src/admin/pages/insumos.html',
     'VIEW_UTENSILIOS': 'frontend/src/admin/pages/utensilios.html',
-    'VIEW_CONFIGURACION': 'frontend/src/admin/pages/configuracion.html',
-    'MODALS': 'frontend/src/admin/components/modals.html'
+    'VIEW_CONFIGURACION': 'frontend/src/admin/pages/configuracion.html'
   };
 
   let adminTemplate = fs.readFileSync(path.join(ROOT_DIR, 'frontend/src/admin/admin.html'), 'utf8');

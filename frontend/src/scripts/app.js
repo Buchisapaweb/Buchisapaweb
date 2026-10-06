@@ -3696,8 +3696,8 @@ function openCategoryView(catId, catTitle) {
   });
 
   if (countEl) {
-    countEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'plato disponible' : 'platos disponibles'}`;
-    countEl.style.display = 'inline-block';
+    countEl.textContent = '';
+    countEl.style.display = 'none';
   }
   if (subtitleEl) {
     subtitleEl.textContent = `Explora nuestra selección especial de ${displayTitle.toLowerCase()} preparados al instante.`;

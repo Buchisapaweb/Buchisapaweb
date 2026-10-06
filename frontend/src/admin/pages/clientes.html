@@ -1,25 +1,30 @@
-<div class="view-header">
-  <div>
-    <span class="view-kicker">GESTIÓN & NEGOCIO</span>
-    <h2 class="view-title">Clientes Registrados</h2>
-    <p class="view-subtitle">Directorio de usuarios y registros del sistema de pedidos.</p>
+<div class="main-page-card">
+  <div class="view-header">
+    <div class="view-header-title-wrap">
+      <h2 class="view-title">Clientes Registrados</h2>
+      <p class="view-subtitle">Gestión de la base de datos de clientes, datos de contacto y frecuencia de consumo.</p>
+    </div>
+    <div class="view-actions">
+      <input type="text" id="input-search-clients" placeholder="Buscar por nombre, DNI o teléfono..." class="form-input search-input">
+    </div>
   </div>
-</div>
-<div class="dash-recent-orders-card">
+
   <div class="table-responsive">
-    <table class="admin-table">
+    <table class="table-custom">
       <thead>
         <tr>
-          <th>NOMBRE</th>
-          <th>CORREO ELECTRÓNICO</th>
-          <th>TELÉFONO</th>
+          <th>Cliente</th>
+          <th>Correo Electrónico</th>
+          <th>Teléfono / WhatsApp</th>
           <th>DNI / RUC</th>
-          <th>PEDIDOS</th>
+          <th>Pedidos Realizados</th>
         </tr>
       </thead>
       <tbody id="clients-page-tbody">
         <tr>
-          <td colspan="5" class="text-center py-4">Cargando lista de clientes...</td>
+          <td colspan="5" class="table-empty-cell">
+            Cargando lista de clientes...
+          </td>
         </tr>
       </tbody>
     </table>

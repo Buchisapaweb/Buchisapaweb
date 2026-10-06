@@ -1,33 +1,34 @@
-<div class="view-header">
-  <div>
-    <span class="view-kicker">CATÁLOGO VIRTUAL</span>
-    <h2 class="view-title">Gestión de Productos y Platos</h2>
-    <p class="view-subtitle">Agrega, edita y administra los platillos, precios, stock e imágenes de la carta.</p>
+<div class="main-page-card">
+  <div class="view-header">
+    <div class="view-header-title-wrap">
+      <h2 class="view-title">Catálogo de Productos y Platillos</h2>
+      <p class="view-subtitle">Administra el menú oficial de BuchiSapa, precios, imágenes y disponibilidad.</p>
+    </div>
+    <div class="view-actions">
+      <button class="btn btn-primary" id="btn-open-new-product">
+        <span>+ Nuevo Producto</span>
+      </button>
+    </div>
   </div>
-  <div class="view-actions">
-    <button class="btn btn-primary" onclick="window.openNewProductModal()">
-      <span>+ Nuevo Producto</span>
-    </button>
-  </div>
-</div>
 
-<div class="dash-recent-orders-card">
   <div class="table-responsive">
-    <table class="admin-table">
+    <table class="table-custom">
       <thead>
         <tr>
-          <th>IMAGEN</th>
-          <th>NOMBRE DEL PLATILLO</th>
-          <th>CATEGORÍA</th>
-          <th>PRECIO</th>
-          <th>STOCK</th>
-          <th>ESTADO</th>
-          <th>ACCIONES</th>
+          <th>Imagen</th>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Precio</th>
+          <th>Stock / Disp.</th>
+          <th>Estado</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody id="products-page-tbody">
         <tr>
-          <td colspan="7" class="text-center py-4">Cargando productos del catálogo...</td>
+          <td colspan="7" class="table-empty-cell">
+            Cargando catálogo de productos...
+          </td>
         </tr>
       </tbody>
     </table>
