@@ -275,12 +275,21 @@
   .promo-page-title { font-size: 32px; margin: 14px 0 34px; }
 
   /* Footer responsivo */
-  .footer-accordion-item { border-bottom: none; width: auto; }
-  .footer-accordion-header { cursor: default; padding: 0 0 16px 0; pointer-events: none; justify-content: center; text-align: center; }
-  .footer-accordion-body { padding: 0; gap: 10px; align-items: center; text-align: center; }
-  .footer-reclamaciones-col { margin-top: 0; align-items: center; text-align: center; }
-  .footer-phone-callout { text-align: center; align-items: center; }
-  .footer-bottom-bar-desktop { flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+  .footer-columns-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .footer-bottom-bar-flex {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-very-bottom-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
 
   .related-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -334,17 +343,11 @@
 
   .footer-content-wrap { padding: 0 32px; }
   .footer-columns-grid {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 40px 52px;
-    margin-bottom: 36px;
-    max-width: 1140px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
-    text-align: center;
   }
 }
 
