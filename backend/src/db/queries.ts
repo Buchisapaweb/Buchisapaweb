@@ -1178,18 +1178,18 @@ export async function deleteCategory(id: string): Promise<boolean> {
 }
 
 const CATEGORY_SLUG_TO_ID: Record<string, string> = {
-  'hamburguesas': 'C0001',
-  'broaster': 'C0002',
-  'salchipapas': 'C0003',
-  'salchipapas-y-salchibroasters': 'C0003',
-  'alitas': 'C0004',
-  'platos-amazonicos': 'C0005',
-  'bebidas': 'C0006',
-  'refrescos': 'C0007',
-  'infusiones': 'C0008',
-  'promociones': 'C0009',
-  'adicionales': 'C0010',
-  'extras': 'C0010'
+  'adicionales': 'C0001',
+  'extras': 'C0001',
+  'alitas': 'C0002',
+  'bebidas': 'C0003',
+  'broaster': 'C0004',
+  'hamburguesas': 'C0005',
+  'infusiones': 'C0006',
+  'platos-amazonicos': 'C0007',
+  'promociones': 'C0008',
+  'refrescos': 'C0009',
+  'salchipapas-y-salchibroasters': 'C0010',
+  'salchipapas': 'C0010'
 };
 
 export async function getProducts(categoryId?: string): Promise<Product[]> {
