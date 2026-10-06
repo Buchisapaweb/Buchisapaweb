@@ -362,3 +362,42 @@
   .promo-btn-agregar { padding: 9px 18px; font-size: 14px; }
   .category-banner-title { font-size: 22px; }
 }
+
+/* --- BREAKPOINT 7: DETALLES DE TABLET (768px a 1023px) --- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .promo-item-body { padding: 12px 10px 14px; }
+  .promo-item-title { font-size: 13px; line-height: 1.3; min-height: 34px; margin-bottom: 6px; }
+  .promo-item-desc { font-size: 10px; line-height: 1.35; min-height: 28px; margin-bottom: 8px; }
+  .promo-item-price { font-size: 15px; }
+  .promo-btn-agregar { padding: 6px 10px; font-size: 11.5px; gap: 4px; border-radius: 6px; }
+  .promo-basket-icon { width: 13px; height: 13px; }
+}
+
+/* --- BREAKPOINT COMPLEMENTARIO: SECCIONES CHECKOUT, CARRITO Y UBICACIÓN --- */
+@media (min-width: 600px) {
+  .checkout-form-grid.two-cols {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 860px) {
+  .loc-main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    padding: 28px 20px;
+    gap: 28px;
+  }
+}
+
+@media (min-width: 900px) {
+  .cart-desktop-grid-layout {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 32px;
+  }
+  .checkout-grid-layout {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 32px;
+  }
+}
+

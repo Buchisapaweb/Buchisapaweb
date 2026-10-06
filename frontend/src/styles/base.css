@@ -60,21 +60,6 @@ main,
   background: rgba(148, 163, 184, 0.8);
 }
 
-@media (max-width: 768px) {
-  ::-webkit-scrollbar,
-  *::-webkit-scrollbar,
-  html::-webkit-scrollbar,
-  body::-webkit-scrollbar {
-    width: 0 !important;
-    height: 0 !important;
-    display: none !important;
-  }
-  html, body, * {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-  }
-}
-
 /* Contenedor Fluido Responsivo */
 .container {
   width: 100%;

@@ -173,6 +173,3 @@ body.cart-drawer-open .cart-drawer {
 .cart-page-card { background: #ffffff; border-radius: 24px; padding: 24px; border: 1px solid #f1f5f9; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04); }
 .cart-desktop-grid-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
 
-@media (min-width: 900px) {
-  .cart-desktop-grid-layout { grid-template-columns: 1.4fr 1fr; gap: 32px; }
-}

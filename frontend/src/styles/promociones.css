@@ -41,35 +41,9 @@ body.promociones-page-body {
   text-transform: uppercase;
 }
 
-@media (min-width: 768px) {
-  .promo-page-title { font-size: 32px; margin: 14px 0 34px; }
-}
-
 /* CUADRÍCULA DE TARJETAS (4 COLUMNAS EN ESCRITORIO, TABLET Y PANTALLA GRANDE) */
 
 .promo-grid-4col { display: grid; grid-template-columns: 1fr; gap: 16px; width: 100%; }
-
-@media (max-width: 767px) {
-  .promo-grid-4col { display: flex !important; flex-direction: column !important; gap: 18px !important; width: 100% !important; }
-}
-
-/* TABLETS (desde 768px): 4 COLUMNAS PERFECTAMENTE CALIBRADAS */
-
-@media (min-width: 768px) {
-  .promo-grid-4col { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-}
-
-/* ESCRITORIO (desde 1024px) */
-
-@media (min-width: 1024px) {
-  .promo-grid-4col { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
-}
-
-/* PANTALLA GRANDE (desde 1366px) */
-
-@media (min-width: 1366px) {
-  .promo-grid-4col { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; }
-}
 
 /* TARJETA DE PROMOCIÓN ELEGANTE Y LLAMATIVA */
 
@@ -196,26 +170,6 @@ body.promociones-page-body {
 
 .promo-basket-icon { stroke: #ffffff; flex-shrink: 0; }
 
-/* AJUSTES RESPONSIVOS DE TARJETAS PARA TABLET (768px a 1023px) */
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .promo-item-body { padding: 12px 10px 14px; }
-  .promo-item-title { font-size: 13px; line-height: 1.3; min-height: 34px; margin-bottom: 6px; }
-  .promo-item-desc { font-size: 10px; line-height: 1.35; min-height: 28px; margin-bottom: 8px; }
-  .promo-item-price { font-size: 15px; }
-  .promo-btn-agregar { padding: 6px 10px; font-size: 11.5px; gap: 4px; border-radius: 6px; }
-  .promo-basket-icon { width: 13px; height: 13px; }
-}
-
-/* ESCRITORIO Y PANTALLA GRANDE */
-
-@media (min-width: 1366px) {
-  .promo-item-body { padding: 18px 20px 22px; }
-  .promo-item-title { font-size: 16px; min-height: 44px; }
-  .promo-item-desc { font-size: 12px; min-height: 36px; }
-  .promo-item-price { font-size: 20px; }
-  .promo-btn-agregar { padding: 9px 18px; font-size: 14px; }
-}
 
 /* MODAL DE DETALLE VER MÁS */
 
