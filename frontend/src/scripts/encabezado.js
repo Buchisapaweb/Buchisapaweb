@@ -3,6 +3,14 @@
  * Control del menú hamburguesa pantalla completa, búsqueda desplegable, acordeones y sincronización
  */
 
+// Ignorar script errors de CDN externos (evita ruido en consola)
+window.addEventListener('error', function (e) {
+  if (e.message && e.message.toLowerCase().includes('script error')) {
+    e.preventDefault();
+    return true;
+  }
+}, true);
+
 function toggleMobileMenu(forceState) {
   const backdrop = document.getElementById('mobile-menu-backdrop');
   if (!backdrop) return;
@@ -75,37 +83,17 @@ function openCategoryView(catId, catTitle) {
     return;
   }
 
-  // Si estamos en la página principal, mostrar la sección de resultados
-  const searchSec = document.getElementById('search-results-section');
-  const catSec = document.getElementById('category-banners-section');
-  const heroSec = document.querySelector('.hero-carousel-container');
-  const titleWrap = document.getElementById('main-section-title-wrap');
-  const titleEl = document.getElementById('search-view-title');
-
-  if (searchSec) {
-    searchSec.style.display = 'block';
-    searchSec.classList.remove('is-hidden');
-  }
-  if (catSec) catSec.style.display = 'none';
-  if (heroSec) heroSec.style.display = 'none';
-  if (titleWrap) titleWrap.style.display = 'none';
-
-  if (titleEl && (catTitle || catId)) {
-    titleEl.textContent = (catTitle || catId).toUpperCase();
-  }
-
-  setTimeout(() => {
-    if (searchSec) {
-      const header = document.querySelector('.site-header');
-      const headerHeight = header ? header.offsetHeight : 80;
-      const rect = searchSec.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const targetY = rect.top + scrollTop - headerHeight - 16;
-      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Si app.js aún se está descargando o inicializando, esperar brevemente a su disponibilidad
+  let attempts = 0;
+  const pollInterval = setInterval(() => {
+    attempts++;
+    if (window._appOpenCategoryView && typeof window._appOpenCategoryView === 'function') {
+      clearInterval(pollInterval);
+      window._appOpenCategoryView(catId, catTitle);
+    } else if (attempts >= 40) {
+      clearInterval(pollInterval);
     }
-  }, 60);
+  }, 50);
 }
 
 function selectCategoryFromDrawer(catId, catName) {
@@ -267,14 +255,133 @@ function initDesktopDropdowns() {
   });
 }
 
-// Inicializar al cargar el DOM o si ya está listo
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDesktopDropdowns);
-} else {
+function initEncabezadoEvents() {
   initDesktopDropdowns();
+
+  // 1. Delegación de eventos para banners de categorías en el home
+  const bannersContainer = document.getElementById('category-banners-section');
+  if (bannersContainer) {
+    bannersContainer.addEventListener('click', (e) => {
+      const card = e.target.closest('.category-banner-card');
+      if (!card) return;
+      const catId = card.dataset.category;
+      const catTitle = card.dataset.title || card.getAttribute('title') || (catId ? catId.toUpperCase() : '');
+      if (catId) {
+        openCategoryView(catId, catTitle);
+      }
+    });
+  }
+
+  // 2. Botón volver en sección de búsqueda / resultados
+  const exitSearchBtn = document.getElementById('btn-exit-search');
+  if (exitSearchBtn) {
+    exitSearchBtn.addEventListener('click', () => {
+      if (typeof window.exitSearchMode === 'function') {
+        window.exitSearchMode();
+      }
+    });
+  }
+
+  // 3. Dropdown de categorías del encabezado
+  const catDropdownMenu = document.querySelector('#nav-dropdown-categorias .desktop-dropdown-menu');
+  if (catDropdownMenu) {
+    catDropdownMenu.addEventListener('click', (e) => {
+      const item = e.target.closest('.dropdown-item');
+      if (!item) return;
+      const catId = item.dataset.category;
+      const catTitle = item.dataset.title || item.textContent.trim();
+      if (catId) {
+        openCategoryView(catId, catTitle);
+      }
+    });
+  }
+
+  // 4. Selector de ubicación en encabezado
+  const locBtn = document.getElementById('btn-header-location') || document.querySelector('.location-picker-inline');
+  if (locBtn) {
+    locBtn.addEventListener('click', () => {
+      if (typeof window.openLocationModal === 'function') {
+        window.openLocationModal();
+      }
+    });
+  }
+
+  // 5. Botón menú hamburguesa
+  const navToggleBtn = document.getElementById('btn-nav-toggle') || document.querySelector('.nav-toggle-btn');
+  if (navToggleBtn) {
+    navToggleBtn.addEventListener('click', () => toggleMobileMenu());
+  }
+
+  // 6. Botón Carta Completa
+  const fullMenuBtn = document.getElementById('btn-header-full-menu');
+  if (fullMenuBtn) {
+    fullMenuBtn.addEventListener('click', () => {
+      if (typeof window.openFullMenuModal === 'function') {
+        window.openFullMenuModal();
+      }
+    });
+  }
+
+  // 7. Carrito en cabecera
+  const cartBtn = document.getElementById('header-cart-btn');
+  if (cartBtn) {
+    cartBtn.addEventListener('click', () => {
+      if (window.BuchisapaCart && typeof window.BuchisapaCart.openDrawer === 'function') {
+        window.BuchisapaCart.openDrawer();
+      }
+    });
+  }
+
+  // 8. Botón Autenticación / Perfil
+  const authBtn = document.getElementById('header-auth-btn');
+  if (authBtn) {
+    authBtn.addEventListener('click', () => {
+      if (typeof window.handleUserIconClick === 'function') {
+        window.handleUserIconClick();
+      }
+    });
+  }
+
+  // 9. Búsqueda y botones de limpiar
+  const headerSearchBtn = document.getElementById('header-search-btn');
+  if (headerSearchBtn) {
+    headerSearchBtn.addEventListener('click', () => toggleSearchBar());
+  }
+
+  const searchCloseBtn = document.getElementById('search-close-action-btn');
+  if (searchCloseBtn) {
+    searchCloseBtn.addEventListener('click', () => toggleSearchBar(false));
+  }
+
+  const clearDesktopBtn = document.getElementById('desktop-search-clear-btn');
+  if (clearDesktopBtn) {
+    clearDesktopBtn.addEventListener('click', clearSearchInput);
+  }
+
+  const clearMobileBtn = document.getElementById('search-clear-btn');
+  if (clearMobileBtn) {
+    clearMobileBtn.addEventListener('click', clearSearchInput);
+  }
+
+  const desktopInput = document.getElementById('desktop-search-input');
+  if (desktopInput) {
+    desktopInput.addEventListener('input', (e) => onSearchInputChanged(e.target.value));
+  }
+
+  const mobileInput = document.getElementById('main-search-input');
+  if (mobileInput) {
+    mobileInput.addEventListener('input', (e) => onSearchInputChanged(e.target.value));
+  }
 }
 
-// Exponer funciones en window para invocación desde HTML onclick
+// Inicializar al cargar el DOM o si ya está listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initEncabezadoEvents);
+} else {
+  initEncabezadoEvents();
+}
+
+// Exponer funciones en window para compatibilidad
 window.toggleMobileMenu = toggleMobileMenu;
 window.openMobileMenu = openMobileMenu;
 window.closeMobileDrawer = closeMobileDrawer;
@@ -288,3 +395,4 @@ window.onSearchInputChanged = onSearchInputChanged;
 window.clearSearchInput = clearSearchInput;
 window.initDesktopDropdowns = initDesktopDropdowns;
 window.closeAllDesktopDropdowns = closeAllDesktopDropdowns;
+window.initEncabezadoEvents = initEncabezadoEvents;

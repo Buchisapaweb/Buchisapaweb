@@ -13,12 +13,12 @@
   z-index: 100;
   margin: 0;
   box-sizing: border-box;
-  padding: 4px 0 32px;
+  padding: 4px 0 16px;
 }
 
 @media (min-width: 768px) {
   .product-customizer-modal {
-    padding: 8px 0 48px;
+    padding: 8px 0 16px;
   }
 }
 

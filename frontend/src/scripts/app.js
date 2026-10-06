@@ -354,6 +354,31 @@ function initCarouselTouchGestures() {
 
   container.addEventListener('mouseenter', () => stopAutoPlay());
   container.addEventListener('mouseleave', () => startAutoPlay());
+
+  // Delegación de clic en los puntos del carrusel (elimina inline onclick)
+  const dotsContainer = document.getElementById('carousel-dots-container');
+  if (dotsContainer) {
+    dotsContainer.addEventListener('click', (e) => {
+      const dot = e.target.closest('.carousel-dot');
+      if (!dot) return;
+      const idx = Array.from(dotsContainer.children).indexOf(dot);
+      if (idx >= 0) goToSlide(idx);
+    });
+  }
+
+  // Fallback de imágenes de carrusel (elimina inline onerror)
+  const track = document.getElementById('hero-carousel-track');
+  if (track) {
+    track.addEventListener('error', (e) => {
+      const img = e.target;
+      if (img && img.classList && img.classList.contains('carousel-slide-img')) {
+        if (!img.dataset.failed) {
+          img.dataset.failed = '1';
+          img.src = '/imagenes/portada/Portada1M.webp';
+        }
+      }
+    }, true);
+  }
 }
 
 
@@ -1799,6 +1824,15 @@ function handleUserIconClick() {
 
 function openUserProfileModal(targetScreen = 'main') {
   const saved = localStorage.getItem('buchisapa_customer');
+  if (saved) {
+    try {
+      const customer = JSON.parse(saved);
+      if (customer.isAdmin || customer.role === 'admin' || customer.email === 'buchisapaweb@gmail.com' || customer.email === 'nexaltustecsac@gmail.com') {
+        window.location.href = '/admin';
+        return;
+      }
+    } catch (e) {}
+  }
   if (!saved) {
     openLoginModal('login');
     return;
@@ -3518,6 +3552,8 @@ function openCategoryView(catId, catTitle) {
   const catSec = document.getElementById('category-banners-section');
   const heroSec = document.querySelector('.hero-carousel-container');
   const titleEl = document.getElementById('search-view-title');
+  const countEl = document.getElementById('search-view-count');
+  const subtitleEl = document.getElementById('search-view-subtitle');
   const titleWrap = document.getElementById('main-section-title-wrap');
   const container = document.getElementById('search-view-list');
   const input = document.getElementById('main-search-input');
@@ -3526,6 +3562,7 @@ function openCategoryView(catId, catTitle) {
 
   if (input) input.value = '';
   if (searchSec) {
+    searchSec.classList.add('promociones-mode');
     searchSec.style.display = 'block';
     searchSec.classList.remove('is-hidden');
   }
@@ -3534,32 +3571,61 @@ function openCategoryView(catId, catTitle) {
   if (titleWrap) titleWrap.style.display = 'none';
   if (closeBtn) closeBtn.style.display = 'block';
 
-  const normCatId = (catId || '').toLowerCase().trim();
-  const normCatTitle = (catTitle || '').toLowerCase().trim();
-  const isPromo = normCatId.includes('promo') || normCatTitle.includes('promo') || normCatId.includes('combo') || normCatTitle.includes('combo');
-
   if (backBtn) {
     backBtn.innerHTML = `
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-      Volver a Categorías
+      <span>Volver a Categorías</span>
     `;
   }
 
-  if (searchSec) {
-    searchSec.classList.add('promociones-mode');
-    searchSec.style.display = 'block';
-    searchSec.classList.remove('is-hidden');
-  }
   if (container) {
-    container.classList.add('promo-grid-4col');
-    container.classList.remove('buchisapa-cards-list');
+    container.classList.add('promo-grid-4col', 'buchisapa-cards-list');
+  }
+
+  // Mapeo exhaustivo de categorías con códigos oficiales C0001 - C0010
+  const CATEGORY_MAP = {
+    'c0001': { id: 'C0001', name: 'ADICIONALES', slug: 'adicionales' },
+    'adicionales': { id: 'C0001', name: 'ADICIONALES', slug: 'adicionales' },
+    'c0002': { id: 'C0002', name: 'ALITAS', slug: 'alitas' },
+    'alitas': { id: 'C0002', name: 'ALITAS', slug: 'alitas' },
+    'c0003': { id: 'C0003', name: 'BEBIDAS', slug: 'bebidas' },
+    'bebidas': { id: 'C0003', name: 'BEBIDAS', slug: 'bebidas' },
+    'c0004': { id: 'C0004', name: 'BROASTER', slug: 'broaster' },
+    'broaster': { id: 'C0004', name: 'BROASTER', slug: 'broaster' },
+    'c0005': { id: 'C0005', name: 'HAMBURGUESAS', slug: 'hamburguesas' },
+    'hamburguesas': { id: 'C0005', name: 'HAMBURGUESAS', slug: 'hamburguesas' },
+    'c0006': { id: 'C0006', name: 'INFUSIONES', slug: 'infusiones' },
+    'infusiones': { id: 'C0006', name: 'INFUSIONES', slug: 'infusiones' },
+    'c0007': { id: 'C0007', name: 'PLATOS AMAZÓNICOS', slug: 'platos-amazonicos' },
+    'platos-amazonicos': { id: 'C0007', name: 'PLATOS AMAZÓNICOS', slug: 'platos-amazonicos' },
+    'platos amazonicos': { id: 'C0007', name: 'PLATOS AMAZÓNICOS', slug: 'platos-amazonicos' },
+    'c0008': { id: 'C0008', name: 'PROMOCIONES', slug: 'promociones' },
+    'promociones': { id: 'C0008', name: 'PROMOCIONES', slug: 'promociones' },
+    'promo': { id: 'C0008', name: 'PROMOCIONES', slug: 'promociones' },
+    'promos': { id: 'C0008', name: 'PROMOCIONES', slug: 'promociones' },
+    'c0009': { id: 'C0009', name: 'REFRESCOS', slug: 'refrescos' },
+    'refrescos': { id: 'C0009', name: 'REFRESCOS', slug: 'refrescos' },
+    'c0010': { id: 'C0010', name: 'SALCHIPAPAS Y SALCHIBROASTERS', slug: 'salchipapas' },
+    'salchipapas': { id: 'C0010', name: 'SALCHIPAPAS Y SALCHIBROASTERS', slug: 'salchipapas' },
+    'salchipapas-y-salchibroasters': { id: 'C0010', name: 'SALCHIPAPAS Y SALCHIBROASTERS', slug: 'salchipapas' }
+  };
+
+  const cleanCatKey = normalizeText(catId || catTitle || '').replace(/\s+/g, '-');
+  const matchedMeta = CATEGORY_MAP[cleanCatKey] || 
+                      CATEGORY_MAP[normalizeText(catId || '')] || 
+                      CATEGORY_MAP[normalizeText(catTitle || '')];
+
+  const displayTitle = matchedMeta ? matchedMeta.name : (catTitle || catId || 'PLATOS').toUpperCase();
+  if (titleEl) {
+    titleEl.textContent = displayTitle;
+    titleEl.style.display = 'block';
   }
 
   // Sincronizar active state en quick category pills
   document.querySelectorAll('.quick-cat-btn').forEach(btn => {
-    const text = btn.textContent.toLowerCase();
-    const target = (catId || catTitle || '').toLowerCase();
-    if (text.includes(target) || (target.includes('amazon') && text.includes('amazónico'))) {
+    const text = normalizeText(btn.textContent || '');
+    const target = matchedMeta ? matchedMeta.slug : normalizeText(catId || catTitle || '');
+    if (text.includes(target) || (target.includes('amazon') && text.includes('amazon'))) {
       btn.classList.add('active');
     } else {
       btn.classList.remove('active');
@@ -3568,8 +3634,8 @@ function openCategoryView(catId, catTitle) {
 
   // Sincronizar active state en dropdown items de escritorio
   document.querySelectorAll('.desktop-dropdown-menu .dropdown-item').forEach(btn => {
-    const text = (btn.textContent || '').trim().toLowerCase();
-    const target = (catTitle || catId || '').trim().toLowerCase();
+    const text = normalizeText(btn.textContent || '');
+    const target = matchedMeta ? normalizeText(matchedMeta.name) : normalizeText(catTitle || catId || '');
     if (text === target || (target.includes('amazon') && text.includes('amazon'))) {
       btn.classList.add('active');
     } else {
@@ -3577,106 +3643,87 @@ function openCategoryView(catId, catTitle) {
     }
   });
 
-  const displayTitle = isPromo ? 'PROMOCIONES' : (catTitle || catId || 'PLATOS').toUpperCase();
-  if (titleEl) titleEl.textContent = displayTitle;
-
-  // Renderizar los productos correspondientes a la categoría elegida
-  if (isPromo) {
-    renderOfficialPromotionsInApp(container);
-  } else {
-    const items = getAllProducts();
-    const rawTarget = normalizeText(catId || catTitle || '');
-
-    const filtered = items.filter(p => {
-      const pCatId = normalizeText(p.category_id || '');
-      const pCatName = normalizeText(p.category || '');
-      const pName = normalizeText(p.name || '');
-
-      // Coincidencia exacta o directa
-      if (pCatId === rawTarget || pCatName === rawTarget) return true;
-
-      // Promociones y Combos
-      if (rawTarget.includes('promo') || rawTarget.includes('combo')) {
-        return pCatId.includes('promo') || pCatName.includes('promo') || 
-               pCatId.includes('combo') || pCatName.includes('combo') ||
-               p.is_promo === true || (typeof p.discount === 'number' && p.discount > 0);
-      }
-
-      // Platos Amazónicos / Selva
-      if (rawTarget.includes('amazon') || rawTarget.includes('selva')) {
-        return pCatId.includes('amazon') || pCatId.includes('selva') || 
-               pCatName.includes('amazon') || pCatName.includes('selva') ||
-               pName.includes('tacacho') || pName.includes('cecina') || pName.includes('juane') || pName.includes('patacon') || pName.includes('chilcano') || pName.includes('palometa');
-      }
-
-      // Hamburguesas
-      if (rawTarget.includes('hamburg') || rawTarget.includes('burger')) {
-        return pCatId.includes('hamburg') || pCatId.includes('burger') || 
-               pCatName.includes('hamburg') || pCatName.includes('burger');
-      }
-
-      // Broaster
-      if (rawTarget.includes('broaster') && !rawTarget.includes('salchi')) {
-        return (pCatId.includes('broaster') || pCatName.includes('broaster') || pCatName.includes('pollo')) && !pCatName.includes('salchi');
-      }
-
-      // Salchipapas y Salchibroasters
-      if (rawTarget.includes('salchi')) {
-        return pCatId.includes('salchi') || pCatName.includes('salchi');
-      }
-
-      // Alitas
-      if (rawTarget.includes('alita')) {
-        return pCatId.includes('alita') || pCatName.includes('alita');
-      }
-
-      // Bebidas / Gaseosas
-      if (rawTarget.includes('bebida') || rawTarget.includes('gaseosa')) {
-        return pCatId.includes('bebida') || pCatId.includes('gaseosa') || 
-               pCatName.includes('bebida') || pCatName.includes('gaseosa');
-      }
-
-      // Refrescos
-      if (rawTarget.includes('refresco')) {
-        return pCatId.includes('refresco') || pCatName.includes('refresco');
-      }
-
-      // Infusiones / Calientes
-      if (rawTarget.includes('infusion') || rawTarget.includes('caliente')) {
-        return pCatId.includes('infusion') || pCatName.includes('infusion') || 
-               pCatId.includes('caliente') || pCatName.includes('caliente');
-      }
-
-      // Fallback
-      return pCatId.includes(rawTarget) || pCatName.includes(rawTarget) || rawTarget.includes(pCatId);
-    });
-
-    if (filtered.length === 0) {
-      if (container) {
-        container.innerHTML = `
-          <div class="empty-results-box" style="padding: 40px 16px; text-align: center; grid-column: 1 / -1;">
-            <div style="font-size: 36px; margin-bottom: 8px;">🍽️</div>
-            <div style="font-weight: 800; font-size: 16px; color: #1e293b; margin-bottom: 4px;">Platos de ${displayTitle}</div>
-            <div style="font-size: 13px; color: #64748b;">Estamos preparando nuevas delicias y combos para esta categoría.</div>
-          </div>
-        `;
-      }
-    } else {
-      renderCardsInContainer(filtered, container);
-    }
+  // Obtener lista completa de productos
+  let items = getAllProducts();
+  if (!Array.isArray(items) || items.length === 0) {
+    items = getFallbackProducts();
   }
 
-  // Redireccionar / Desplazar suavemente a la sección de productos para tabletas, computadoras y teléfonos
+  const rawTarget = normalizeText(catId || catTitle || '');
+
+  const filtered = items.filter(p => {
+    if (matchedMeta) {
+      if (p.category_id && p.category_id.toUpperCase() === matchedMeta.id) return true;
+      if (p.category && normalizeText(p.category) === normalizeText(matchedMeta.name)) return true;
+    }
+    const pCatId = normalizeText(p.category_id || '');
+    const pCatName = normalizeText(p.category || '');
+
+    if (pCatId === rawTarget || pCatName === rawTarget) return true;
+
+    if (rawTarget.includes('promo') || rawTarget.includes('combo')) {
+      return pCatId === 'c0008' || pCatId.includes('promo') || pCatName.includes('promo') || p.is_promo === true;
+    }
+    if (rawTarget.includes('amazon') || rawTarget.includes('selva')) {
+      return pCatId === 'c0007' || pCatId.includes('amazon') || pCatName.includes('amazon');
+    }
+    if (rawTarget.includes('hamburg') || rawTarget.includes('burger')) {
+      return pCatId === 'c0005' || pCatId.includes('hamburg') || pCatName.includes('hamburg');
+    }
+    if (rawTarget.includes('broaster') && !rawTarget.includes('salchi')) {
+      return pCatId === 'c0004' || (pCatName.includes('broaster') && !pCatName.includes('salchi'));
+    }
+    if (rawTarget.includes('salchi')) {
+      return pCatId === 'c0010' || pCatId.includes('salchi') || pCatName.includes('salchi');
+    }
+    if (rawTarget.includes('alita')) {
+      return pCatId === 'c0002' || pCatId.includes('alita') || pCatName.includes('alita');
+    }
+    if (rawTarget.includes('bebida') || rawTarget.includes('gaseosa')) {
+      return pCatId === 'c0003' || pCatId.includes('bebida') || pCatName.includes('bebida');
+    }
+    if (rawTarget.includes('refresco')) {
+      return pCatId === 'c0009' || pCatId.includes('refresco') || pCatName.includes('refresco');
+    }
+    if (rawTarget.includes('infusion') || rawTarget.includes('caliente')) {
+      return pCatId === 'c0006' || pCatId.includes('infusion') || pCatName.includes('infusion');
+    }
+    if (rawTarget.includes('adicional')) {
+      return pCatId === 'c0001' || pCatId.includes('adicional') || pCatName.includes('adicional');
+    }
+
+    return pCatId.includes(rawTarget) || pCatName.includes(rawTarget);
+  });
+
+  if (countEl) {
+    countEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'plato disponible' : 'platos disponibles'}`;
+    countEl.style.display = 'inline-block';
+  }
+  if (subtitleEl) {
+    subtitleEl.textContent = `Explora nuestra selección especial de ${displayTitle.toLowerCase()} preparados al instante.`;
+  }
+
+  if (filtered.length === 0) {
+    if (container) {
+      container.innerHTML = `
+        <div class="empty-results-box" style="padding: 48px 24px; text-align: center; grid-column: 1 / -1; width: 100%; background: #ffffff; border: 1.5px dashed #e2e8f0; border-radius: 20px;">
+          <div style="font-size: 40px; margin-bottom: 10px;">🍽️</div>
+          <div style="font-weight: 800; font-size: 20px; color: #0f172a; margin-bottom: 6px; font-family: 'Playfair Display', Georgia, serif;">Platos de ${displayTitle}</div>
+          <div style="font-size: 14.5px; color: #64748b;">Estamos preparando nuevas delicias y combos para esta categoría.</div>
+        </div>
+      `;
+    }
+  } else {
+    renderCardsInContainer(filtered, container);
+  }
+
+  // Desplazamiento inmediato y perfecto a la sección de productos
+  if (typeof window.scrollTo === 'function') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   setTimeout(() => {
-    if (searchSec) {
-      const header = document.querySelector('.site-header');
-      const headerHeight = header ? header.offsetHeight : 70;
-      const rect = searchSec.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const targetY = rect.top + scrollTop - headerHeight - 12;
-      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (searchSec && typeof searchSec.scrollIntoView === 'function') {
+      searchSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, 50);
 }
@@ -3746,10 +3793,6 @@ function renderOfficialPromotionsInApp(container) {
       <div class="promo-item-body dish-card-content">
         <span class="dish-card-cat-label">PROMOCIONES</span>
         <h3 class="promo-item-title dish-card-title">${escapeFn(p.name)}</h3>
-        <p class="promo-item-desc dish-card-desc">
-          ${escapeFn(p.shortDesc)}
-          <button type="button" class="promo-ver-mas-inline" onclick="event.stopPropagation(); openPromoOrProductModal('${p.id}')">VER MÁS</button>
-        </p>
         <div class="promo-item-footer dish-card-footer">
           <span class="promo-item-price dish-card-price">S/${p.price.toFixed(2)}</span>
           <button 
@@ -3998,16 +4041,16 @@ function goToFavorites() {
 
 function getCategoryBannerFallback(catId) {
   const c = String(catId || '').toLowerCase().trim();
-  if (c.includes('hamburguesa') || c.includes('burger')) return '/imagenes/categorias/hamburguesas/banner.webp';
-  if (c.includes('amazon') || c.includes('selva') || c.includes('juane') || c.includes('tacacho') || c.includes('patacon')) return '/imagenes/categorias/platos-amazonicos/banner.webp';
-  if (c.includes('broaster') || c.includes('pollo')) return '/imagenes/categorias/broaster/banner.webp';
-  if (c.includes('alita')) return '/imagenes/categorias/alitas/banner.webp';
-  if (c.includes('salchipapa') || c.includes('salchibroaster')) return '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp';
-  if (c.includes('bebida') || c.includes('gaseosa')) return '/imagenes/categorias/bebidas/banner.webp';
-  if (c.includes('refresco') || c.includes('jugo') || c.includes('chicha') || c.includes('cocona') || c.includes('aguajina')) return '/imagenes/categorias/refrescos/banner.webp';
-  if (c.includes('infusion') || c.includes('cafe') || c.includes('te')) return '/imagenes/categorias/infusiones/banner.webp';
-  if (c.includes('adicional')) return '/imagenes/categorias/adicionales/banner.webp';
-  if (c.includes('promocion')) return '/imagenes/categorias/promociones/banner.webp';
+  if (c === 'c0001' || c.includes('adicional')) return '/imagenes/categorias/adicionales/banner.webp';
+  if (c === 'c0002' || c.includes('alita')) return '/imagenes/categorias/alitas/banner.webp';
+  if (c === 'c0003' || c.includes('bebida') || c.includes('gaseosa')) return '/imagenes/categorias/bebidas/banner.webp';
+  if (c === 'c0004' || (c.includes('broaster') && !c.includes('salchi'))) return '/imagenes/categorias/broaster/banner.webp';
+  if (c === 'c0005' || c.includes('hamburguesa') || c.includes('burger')) return '/imagenes/categorias/hamburguesas/banner.webp';
+  if (c === 'c0006' || c.includes('infusion') || c.includes('cafe') || c.includes('te') || c.includes('caliente')) return '/imagenes/categorias/infusiones/banner.webp';
+  if (c === 'c0007' || c.includes('amazon') || c.includes('selva') || c.includes('juane') || c.includes('tacacho') || c.includes('patacon')) return '/imagenes/categorias/platos-amazonicos/banner.webp';
+  if (c === 'c0008' || c.includes('promocion') || c.includes('promo') || c.includes('combo')) return '/imagenes/categorias/promociones/banner.webp';
+  if (c === 'c0009' || c.includes('refresco') || c.includes('jugo') || c.includes('chicha') || c.includes('cocona') || c.includes('aguajina')) return '/imagenes/categorias/refrescos/banner.webp';
+  if (c === 'c0010' || c.includes('salchipapa') || c.includes('salchibroaster')) return '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp';
   return '/imagenes/portada/Portada1E.webp';
 }
 window.getCategoryBannerFallback = getCategoryBannerFallback;
@@ -4041,8 +4084,10 @@ function renderCardsInContainer(items, container) {
     else if (rawCat.includes('BEBIDA')) rawCat = 'BEBIDAS';
     else if (rawCat.includes('INFUSION')) rawCat = 'INFUSIONES';
     else if (rawCat.includes('AMAZON') || rawCat.includes('SELVA')) rawCat = 'PLATOS AMAZÓNICOS';
+    else if (rawCat.includes('PROMO')) rawCat = 'PROMOCIONES';
     else if (rawCat.includes('REFRESCO')) rawCat = 'REFRESCOS';
     else if (rawCat.includes('SALCHI')) rawCat = 'SALCHIPAPAS Y SALCHIBROASTERS';
+    else if (rawCat.includes('ADICIONAL')) rawCat = 'ADICIONALES';
     else rawCat = rawCat.replace(/-/g, ' ');
 
     const fallbackImg = getCategoryBannerFallback(catId);
@@ -4053,17 +4098,14 @@ function renderCardsInContainer(items, container) {
       initialImg = initialImg.replace('.jpg', '.webp');
     }
 
-    const isTopFour = idx < 4;
-    const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect width='100%25' height='100%25' fill='%23f1f5f9'/%3E%3C/svg%3E";
-
     return `
       <article class="promo-item-card buchisapa-dish-card" onclick="openProductDetailModal('${p.id}')" style="cursor: pointer;" title="${escapeFn(p.name || 'Plato')}">
         <div class="promo-item-img-box dish-card-img-wrap">
           <img 
-            ${isTopFour ? `src="${initialImg}"` : `src="${placeholderSvg}" data-src="${initialImg}"`}
+            src="${initialImg}" 
             alt="${escapeFn(p.name || 'Plato')}" 
-            class="promo-item-img dish-card-img ${isTopFour ? 'loaded' : 'lazy-img'}" 
-            loading="${isTopFour ? 'eager' : 'lazy'}" 
+            class="promo-item-img dish-card-img loaded" 
+            loading="${idx < 4 ? 'eager' : 'lazy'}" 
             decoding="async" 
             onerror="this.onerror=null; this.src='${fallbackImg}';"
           >
@@ -4076,7 +4118,6 @@ function renderCardsInContainer(items, container) {
         <div class="promo-item-body dish-card-content">
           <span class="dish-card-cat-label">${escapeFn(rawCat)}</span>
           <h3 class="promo-item-title dish-card-title">${escapeFn(p.name || 'Plato Buchisapa')}</h3>
-          <p class="promo-item-desc dish-card-desc">${escapeFn(p.description || 'Delicioso plato Buchisapa preparado con ingredientes frescos y el inconfundible toque amazónico.')}</p>
           <div class="promo-item-footer dish-card-footer">
             <span class="promo-item-price dish-card-price">S/${parseFloat(p.price || 0).toFixed(2)}</span>
             <button 
@@ -4174,575 +4215,861 @@ function quickAddToCart(productId, event) {
    ========================================================= */
 function getFallbackProducts() {
   return [
-    {
-      id: "promo-1",
-      name: "Promoción Tú Eliges con Gaseosa 1.5 LT.",
-      category_id: "promociones",
-      category: "promociones",
-      price: 90.90,
-      description: "1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 1.5. LT. Incluye ensalada fresca o cocida a elección y variedad de salsas caseras.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/portada/Portada2E.webp"
-    },
-    {
-      id: "promo-2",
-      name: "Promoción Tu Chicha 1.5 LT.",
-      category_id: "promociones",
-      category: "promociones",
-      price: 95.50,
-      description: "1 Pardos Brasa + papas fritas + guarnición + botella de chicha de 1.5 LT. Incluye ensalada fresca o cocida y cremas de la casa.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/portada/Portada1E.webp"
-    },
-    {
-      id: "promo-3",
-      name: "Promoción Tú Eliges con Gaseosa 2.25 LT.",
-      category_id: "promociones",
-      category: "promociones",
-      price: 95.50,
-      description: "1 Pardos Brasa + papas fritas + guarnición + Inca Kola sin azúcar de 2.25 LT. Incluye ensalada regular y variedad de salsas artesanales a elección.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/portada/Portada3E.webp"
-    },
-    {
-      id: "promo-4",
-      name: "Promoción Para 2",
-      category_id: "promociones",
-      category: "promociones",
-      price: 57.90,
-      description: "1/2 Pardos Brasa + papas fritas + ensalada regular + 2 bebidas personales. Incluye cremas caseras.",
-      popular: true,
-      is_promo: true,
-      image: "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
-      fallbackImg: "/imagenes/portada/Portada4E.webp"
-    },
-    {
-      id: "ama-1",
-      name: "Patacones con Chorizo",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 12.00,
-      description: "Patacones crujientes dorados con chorizo ahumado jugoso y crema selvática irresistible tradicional",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-2",
-      name: "Tacacho con Cecina",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 12.00,
-      description: "Tacacho suave amazónico con cecina ahumada jugosa plátano dulce y sarza criolla",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-3",
-      name: "Juanes",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 15.00,
-      description: "Juane tradicional jugoso con arroz selvático gallina tierna huevo y maduro frito",
-      popular: true,
-      image: "/imagenes/categorias/platos-amazonicos/banner.webp"
-    },
-    {
-      id: "ama-4",
-      name: "Chilcano de Carachama o Pescado del Día",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 15.00,
-      description: "Chilcano caliente selvático con carachama fresca jugosa yuca suave y culantro aromático",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-5",
-      name: "Palometa Frita con Maduro o Plátano",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 15.00,
-      description: "Palometa frita crujiente dorada con arroz blanco maduros dulces y salsa criolla",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-6",
-      name: "Caldo Amazónico",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 12.00,
-      description: "Caldo amazónico verde aromático con pescado fresco culantro yuca y sabor revitalizante",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ama-7",
-      name: "Arroz Chaufa Amazónico",
-      category_id: "platos-amazonicos",
-      category: "platos-amazonicos",
-      price: 15.00,
-      description: "Arroz chaufa amazónico salteado con cecina ahumada chorizo jugoso y toque selvático",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-1",
-      name: "Clásica",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 10.00,
-      description: "Hamburguesa clásica jugosa artesanal con papas crujientes ensalada fresca y cremas caseras",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-2",
-      name: "Choripan",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 10.00,
-      description: "Choripan jugoso artesanal con chorizo parrillero papas crujientes ensalada fresca y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-3",
-      name: "Hawaiana Carne",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 14.00,
-      description: "Hamburguesa hawaiana con carne artesanal jugosa piña dulce queso jamón y crema",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-4",
-      name: "Hawaiana Pollo",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 13.00,
-      description: "Hamburguesa hawaiana con pollo crispy crujiente piña jugosa queso jamón y crema",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1521305916504-4a1121188589?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-5",
-      name: "Pollo Deshilachado",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 9.00,
-      description: "Hamburguesa suave con pollo deshilachado jugoso papas doradas ensalada fresca y cremas",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-6",
-      name: "Filete de Pollo",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 11.00,
-      description: "Filete pollo dorado crujiente jugoso con papas ensalada fresca y cremas caseras",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1525164286253-04e68b9d94c6?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-7",
-      name: "Cheese Burguer",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 11.00,
-      description: "Hamburguesa casera jugosa con doble queso cheddar derretido cremoso y pan suave",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-8",
-      name: "Bacon Burguer",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 12.00,
-      description: "Hamburguesa jugosa con tocino ahumado crujiente papas doradas queso derretido y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-9",
-      name: "La Suprema",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 15.00,
-      description: "Hamburguesa suprema gigante con tocino queso huevo frito jamón y papas crujientes",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-10",
-      name: "Hamburguesa a lo Pobre",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 14.00,
-      description: "Hamburguesa completa pobre con huevo jamón queso plátano frito y cremas caseras",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-11",
-      name: "Royal",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 13.00,
-      description: "Hamburguesa royal mixta con carnes selectas chorizo pollo y sabores selváticos únicos",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ham-12",
-      name: "Royal a lo Pobre",
-      category_id: "hamburguesas",
-      category: "hamburguesas",
-      price: 14.00,
-      description: "Hamburguesa royal pobre con carne artesanal huevo jamón queso plátano y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "bro-1",
-      name: "Pecho",
-      category_id: "broaster",
-      category: "broaster",
-      price: 18.00,
-      description: "Pecho broaster gigante crujiente jugoso con arroz blanco papas y ensalada fresca",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "bro-2",
-      name: "Pierna",
-      category_id: "broaster",
-      category: "broaster",
-      price: 12.00,
-      description: "Pierna broaster dorada crujiente jugosa con arroz graneado papas y ensalada fresca",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "bro-3",
-      name: "Encuentro",
-      category_id: "broaster",
-      category: "broaster",
-      price: 13.00,
-      description: "Encuentro broaster mixto crujiente con pecho pierna arroz papas y ensalada completa",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "bro-4",
-      name: "Ala",
-      category_id: "broaster",
-      category: "broaster",
-      price: 10.00,
-      description: "Ala broaster crujiente dorada jugosa con arroz blanco papas y ensalada fresca",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-1",
-      name: "Salchipapa Clásica",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 10.00,
-      description: "Salchipapa clásica tradicional con papas crujientes salchicha dorada y cremas caseras abundantes",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-2",
-      name: "Salchipapa a lo Pobre",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 13.00,
-      description: "Salchipapa pobre con papas huevo frito plátano maduro salchicha y cremas caseras",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-3",
-      name: "Salchibroaster Pecho",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 20.00,
-      description: "Salchibroaster pecho con pollo crujiente jugoso papas doradas ensalada fresca y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-4",
-      name: "Salchibroaster Pierna",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 14.00,
-      description: "Salchibroaster pierna con pollo jugoso dorado papas crujientes ensalada fresca y cremas",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-5",
-      name: "Salchibroaster Encuentro",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 16.00,
-      description: "Salchibroaster encuentro mixto con pollo broaster variado papas crujientes y cremas abundantes",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-6",
-      name: "Salchibroaster Ala",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 13.00,
-      description: "Salchibroaster ala con pollo crujiente dorado papas fritas ensalada fresca y cremas",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "sal-7",
-      name: "Salchichorizo",
-      category_id: "salchipapas",
-      category: "salchipapas",
-      price: 13.00,
-      description: "Salchichorizo potente con chorizo parrillero jugoso papas crujientes y cremas selváticas picantes",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ali-1",
-      name: "Acevichadas",
-      category_id: "alitas",
-      category: "alitas",
-      price: 15.00,
-      description: "Alitas acevichadas jugosas con salsa marina cremosa papas doradas y toque cítrico",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ali-2",
-      name: "BBQ",
-      category_id: "alitas",
-      category: "alitas",
-      price: 15.00,
-      description: "Alitas BBQ jugosas ahumadas con salsa dulce intensa papas doradas y limón",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-1",
-      name: "Inca Cola",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 5.00,
-      description: "Gaseosa dorada peruana dulce refrescante burbujeante ideal para acompañar cualquier comida diaria",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-2",
-      name: "Coca Cola",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 5.00,
-      description: "Gaseosa negra clásica mundial refrescante burbujeante helada perfecta para hamburguesas y broaster",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-3",
-      name: "Fanta",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 3.50,
-      description: "Gaseosa naranja dulce burbujeante refrescante helada perfecta para días calurosos intensos siempre",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-4",
-      name: "Pepsi",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 2.00,
-      description: "Gaseosa cola refrescante ligera burbujeante helada ideal para acompañar hamburguesas y salchipapas",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "beb-5",
-      name: "Agua Cielo",
-      category_id: "bebidas",
-      category: "bebidas",
-      price: 2.50,
-      description: "Agua pura cristalina sin gas natural refrescante saludable ideal para hidratarte diariamente",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-1",
-      name: "Maracuyá",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco tropical maracuyá dulce ácido natural refrescante amazónico energizante y muy revitalizante",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-2",
-      name: "Chicha",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco morado tradicional dulce andino refrescante natural casero perfecto para platos amazónicos",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-3",
-      name: "Cocona",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco amazónico cocona cítrico exótico refrescante natural revitalizante ideal para calores intensos",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1556881286-fc6915169721?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-4",
-      name: "Aguajina",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco amazónico aguaje dulce cremoso refrescante natural nutritivo perfecto para días calurosos",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ref-5",
-      name: "Camu Camu",
-      category_id: "refrescos",
-      category: "refrescos",
-      price: 3.00,
-      description: "Refresco camu camu ácido vitamínico refrescante amazónico energizante ideal para defensas diarias",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "inf-1",
-      name: "Anís",
-      category_id: "infusiones",
-      category: "infusiones",
-      price: 2.50,
-      description: "Infusión caliente anís aromática digestiva relajante suave perfecta después de comidas pesadas",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "inf-2",
-      name: "Té",
-      category_id: "infusiones",
-      category: "infusiones",
-      price: 2.50,
-      description: "Infusión caliente té reconfortante aromático suave ideal para cualquier momento del día",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "inf-3",
-      name: "Manzanilla",
-      category_id: "infusiones",
-      category: "infusiones",
-      price: 2.50,
-      description: "Flores de manzanilla seleccionadas. Calma, descanso y aroma herbal que reconforta el alma.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "com-1",
-      name: "Combo Familiar Broaster",
-      category_id: "promociones",
-      category: "combos",
-      price: 45.00,
-      description: "1 Pollo broaster entero crocante + porción familiar de papas fritas + ensalada + chicha morada 1.5L.",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "com-2",
-      name: "Combo Selvático Dúo",
-      category_id: "promociones",
-      category: "combos",
-      price: 32.00,
-      description: "1 Tacacho con cecina + 1 Arroz chaufa amazónico + 2 refrescos de cocona helados.",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "com-3",
-      name: "Combo Burger Lover",
-      category_id: "promociones",
-      category: "combos",
-      price: 28.00,
-      description: "2 Hamburguesas a lo Pobre + 2 porciones de papas crujientes + 2 Inca Cola 500ml.",
-      popular: true,
-      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ext-1",
-      name: "Porción de Papas Fritas",
-      category_id: "adicionales",
-      category: "extras",
-      price: 6.00,
-      description: "Papas amarillas crocantes saladas al punto, doradas al momento.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ext-2",
-      name: "Porción Extra de Cecina",
-      category_id: "adicionales",
-      category: "extras",
-      price: 8.00,
-      description: "Láminas jugosas de cecina ahumada artesanal de la selva.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ext-3",
-      name: "Porción de Tacacho",
-      category_id: "adicionales",
-      category: "extras",
-      price: 6.00,
-      description: "Bolas de plátano majado con chicharrón y sazón amazónica.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: "ext-4",
-      name: "Porción de Cremas de la Casa",
-      category_id: "adicionales",
-      category: "extras",
-      price: 3.00,
-      description: "Variedad de salsas caseras: ají pollero, tártara, mayonesa y rocoto.",
-      popular: false,
-      image: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80"
-    }
-  ];
+  {
+    "id": "PL00001",
+    "code": "PL00001",
+    "name": "Acevichadas",
+    "category": "ALITAS",
+    "category_id": "C0002",
+    "price": 15,
+    "description": "Acompañamiento: 5 alitas + Papas crocantes",
+    "badge": "ACEVICHADAS",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00002",
+    "code": "PL00002",
+    "name": "Agua Cielo",
+    "category": "BEBIDAS",
+    "category_id": "C0003",
+    "price": 2.5,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "NATURAL",
+    "popular": false,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00003",
+    "code": "PL00003",
+    "name": "Aguajina",
+    "category": "REFRESCOS",
+    "category_id": "C0009",
+    "price": 3,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "SELVÁTICO",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1546173159-315724a31696?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00004",
+    "code": "PL00004",
+    "name": "Ala",
+    "category": "BROASTER",
+    "category_id": "C0004",
+    "price": 10,
+    "description": "Acompañamiento: Papa crocante + Ensalada fresca + Arroz",
+    "badge": "ECONÓMICO",
+    "popular": false,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00005",
+    "code": "PL00005",
+    "name": "Anís",
+    "category": "INFUSIONES",
+    "category_id": "C0006",
+    "price": 2.5,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "CALIENTE",
+    "popular": false,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00006",
+    "code": "PL00006",
+    "name": "Arroz Chaufa Amazónico",
+    "category": "PLATOS AMAZÓNICOS",
+    "category_id": "C0007",
+    "price": 15,
+    "description": "Acompañamiento: Cecina y chorizo amazónico salteado",
+    "badge": "FUSIÓN",
+    "popular": true,
+    "available": true,
+    "stock": 20,
+    "image": "/imagenes/categorias/platos-amazonicos/banner.webp",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00007",
+    "code": "PL00007",
+    "name": "Bacon Burguer",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 12,
+    "description": "Acompañamiento: Papas crocantes + Tocino + Queso",
+    "badge": "TOCINO",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00008",
+    "code": "PL00008",
+    "name": "BBQ",
+    "category": "ALITAS",
+    "category_id": "C0002",
+    "price": 15,
+    "description": "Acompañamiento: 5 alitas + Papas crocantes",
+    "badge": "BBQ",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1527477378308-140ae2443325?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00009",
+    "code": "PL00009",
+    "name": "Café",
+    "category": "INFUSIONES",
+    "category_id": "C0006",
+    "price": 3,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "PASADO",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00010",
+    "code": "PL00010",
+    "name": "Caldo Amazónico",
+    "category": "PLATOS AMAZÓNICOS",
+    "category_id": "C0007",
+    "price": 12,
+    "description": "Acompañamiento: Yuca + Verduras de la selva",
+    "badge": "TRADICIONAL",
+    "popular": false,
+    "available": true,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00011",
+    "code": "PL00011",
+    "name": "Camu Camu",
+    "category": "REFRESCOS",
+    "category_id": "C0009",
+    "price": 3,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "VITAMINA C",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00012",
+    "code": "PL00012",
+    "name": "Cheese Burguer",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 11,
+    "description": "Acompañamiento: Queso cheddar",
+    "badge": "CHEDDAR",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00013",
+    "code": "PL00013",
+    "name": "Chicha",
+    "category": "REFRESCOS",
+    "category_id": "C0009",
+    "price": 3,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "CASERA",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00014",
+    "code": "PL00014",
+    "name": "Chilcano de Carachama o Pescado del Día",
+    "category": "PLATOS AMAZÓNICOS",
+    "category_id": "C0007",
+    "price": 15,
+    "description": "Acompañamiento: Inguiri + Plátano",
+    "badge": "RECONSTITUYENTE",
+    "popular": false,
+    "available": true,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00015",
+    "code": "PL00015",
+    "name": "Choripán",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 10,
+    "description": "Acompañamiento: Papas crocantes + Chorizo + Ensalada fresca",
+    "badge": "PARRILLERO",
+    "popular": false,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00016",
+    "code": "PL00016",
+    "name": "Clásica",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 10,
+    "description": "Acompañamiento: Hamburguesa artesanal + Papa crocante + Ensalada fresca",
+    "badge": "CLÁSICA",
+    "popular": true,
+    "available": true,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00017",
+    "code": "PL00017",
+    "name": "Coca Cola",
+    "category": "BEBIDAS",
+    "category_id": "C0003",
+    "price": 5,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "PERSONAL",
+    "popular": true,
+    "available": true,
+    "stock": 45,
+    "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00018",
+    "code": "PL00018",
+    "name": "Cocona",
+    "category": "REFRESCOS",
+    "category_id": "C0009",
+    "price": 3,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "TÍPICO",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00019",
+    "code": "PL00019",
+    "name": "Encuentro",
+    "category": "BROASTER",
+    "category_id": "C0004",
+    "price": 13,
+    "description": "Acompañamiento: Papa crocante + Ensalada fresca + Arroz",
+    "badge": "BROASTER",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00020",
+    "code": "PL00020",
+    "name": "Fanta",
+    "category": "BEBIDAS",
+    "category_id": "C0003",
+    "price": 3.5,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "PERSONAL",
+    "popular": false,
+    "available": true,
+    "stock": 35,
+    "image": "https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00021",
+    "code": "PL00021",
+    "name": "Filete de Pollo",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 11,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "popular": false,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1525164286253-04e68b9d94c6?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00022",
+    "code": "PL00022",
+    "name": "Hamburguesa",
+    "category": "ADICIONALES",
+    "category_id": "C0001",
+    "price": 5,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00023",
+    "code": "PL00023",
+    "name": "Hamburguesa a lo Pobre",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 14,
+    "description": "Acompañamiento: Huevo frito + Queso + Jamón + Plátano",
+    "badge": "A LO POBRE",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00024",
+    "code": "PL00024",
+    "name": "Hawaiana Carne",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 14,
+    "description": "Acompañamiento: Papa crocante + Carne artesanal + Huevo + Jamón + Queso + Piña + Ensalada fresca",
+    "badge": "HAWAIANA",
+    "popular": true,
+    "available": true,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00025",
+    "code": "PL00025",
+    "name": "Hawaiana Pollo",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 13,
+    "description": "Acompañamiento: Papa crocante + Pollo crispy + Huevo + Jamón + Queso + Piña + Ensalada fresca",
+    "badge": "CRISPY",
+    "popular": true,
+    "available": true,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00026",
+    "code": "PL00026",
+    "name": "Huevo",
+    "category": "ADICIONALES",
+    "category_id": "C0001",
+    "price": 2,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 100,
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00027",
+    "code": "PL00027",
+    "name": "Inca Kola",
+    "category": "BEBIDAS",
+    "category_id": "C0003",
+    "price": 5,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "POPULAR",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00028",
+    "code": "PL00028",
+    "name": "Jamón",
+    "category": "ADICIONALES",
+    "category_id": "C0001",
+    "price": 2,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 80,
+    "image": "https://images.unsplash.com/photo-1524438418049-ab2acb7aa48f?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00029",
+    "code": "PL00029",
+    "name": "Juanes",
+    "category": "PLATOS AMAZÓNICOS",
+    "category_id": "C0007",
+    "price": 15,
+    "description": "Acompañamiento: Maduros fritos",
+    "badge": "TRADICIÓN",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00030",
+    "code": "PL00030",
+    "name": "La Suprema",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 15,
+    "description": "Acompañamiento: Tocino + Queso + Huevo frito + Jamón",
+    "badge": "SUPREMA",
+    "popular": true,
+    "available": true,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00031",
+    "code": "PL00031",
+    "name": "Maracuyá",
+    "category": "REFRESCOS",
+    "category_id": "C0009",
+    "price": 3,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "REFRESCANTE",
+    "popular": true,
+    "available": true,
+    "stock": 45,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00032",
+    "code": "PL00032",
+    "name": "Palometa Frita con Maduro o Plátano",
+    "category": "PLATOS AMAZÓNICOS",
+    "category_id": "C0007",
+    "price": 15,
+    "description": "Acompañamiento: Arroz + Maduro frito",
+    "badge": "RÍO",
+    "popular": false,
+    "available": true,
+    "stock": 15,
+    "image": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00033",
+    "code": "PL00033",
+    "name": "Patacones con Chorizo",
+    "category": "PLATOS AMAZÓNICOS",
+    "category_id": "C0007",
+    "price": 12,
+    "description": "Acompañamiento: Patacones + Chorizo",
+    "badge": "ENTRADA",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00034",
+    "code": "PL00034",
+    "name": "Pecho",
+    "category": "BROASTER",
+    "category_id": "C0004",
+    "price": 18,
+    "description": "Acompañamiento: Papa crocante + Ensalada fresca + Arroz",
+    "badge": "PREMIUM",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00035",
+    "code": "PL00035",
+    "name": "Pepsi",
+    "category": "BEBIDAS",
+    "category_id": "C0003",
+    "price": 2,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "PERSONAL",
+    "popular": false,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00036",
+    "code": "PL00036",
+    "name": "Pierna",
+    "category": "BROASTER",
+    "category_id": "C0004",
+    "price": 12,
+    "description": "Acompañamiento: Papa crocante + Ensalada fresca + Arroz",
+    "badge": "CLÁSICO",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00037",
+    "code": "PL00037",
+    "name": "Piña",
+    "category": "ADICIONALES",
+    "category_id": "C0001",
+    "price": 2,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 80,
+    "image": "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00038",
+    "code": "PL00038",
+    "name": "Plátano",
+    "category": "ADICIONALES",
+    "category_id": "C0001",
+    "price": 2,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 80,
+    "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00039",
+    "code": "PL00039",
+    "name": "Pollo Broaster",
+    "category": "ADICIONALES",
+    "category_id": "C0001",
+    "price": 5,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00040",
+    "code": "PL00040",
+    "name": "Pollo Deshilachado",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 9,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "badge": "DESHILACHADO",
+    "popular": false,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1525164286253-04e68b9d94c6?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00041",
+    "code": "PL00041",
+    "name": "PROMO BROASTER FAMILIAR",
+    "category": "PROMOCIONES",
+    "category_id": "C0008",
+    "price": 38,
+    "description": "La selección ideal para compartir en familia. Incluye un Broaster Presa Pecho, un Broaster Presa Pierna y un Broaster Presa Ala, con el sabor crujiente que nos caracteriza, más una Gaseosa Personal Inca Kola. / Acompañamientos: Papa crocante + Ensalada fresca + Arroz",
+    "badge": "FAMILIAR",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00042",
+    "code": "PL00042",
+    "name": "PROMO BUCHI DUO",
+    "category": "PROMOCIONES",
+    "category_id": "C0008",
+    "price": 22,
+    "description": "Una experiencia pensada para dos. Disfruta de dos Hamburguesas Tipo Clásica elaboradas con nuestra hamburguesa artesanal premium, acompañadas de dos Gaseosas Personales Pepsi. / Acompañamientos: Papa crocante + Hamburguesa artesanal + Ensalada fresca",
+    "badge": "DUO",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00043",
+    "code": "PL00043",
+    "name": "PROMO SALCHI BURGER",
+    "category": "PROMOCIONES",
+    "category_id": "C0008",
+    "price": 24,
+    "description": "La fusión de nuestros dos clásicos más pedidos. Una Hamburguesa Tipo Cheese Burguer y una Salchipapa Tipo Salchipapa Clásica, acompañadas de una Gaseosa Personal Coca Cola. / Acompañamientos: Queso cheddar + Papa crocante + Ensalada fresca",
+    "badge": "COMBO",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00044",
+    "code": "PL00044",
+    "name": "PROMO SELVA POWER",
+    "category": "PROMOCIONES",
+    "category_id": "C0008",
+    "price": 29,
+    "description": "Un homenaje a la Amazonía. Compuesto por un Plato Amazónico Tipo Tacacho con Cecina y un Salchibroaster Tipo Salchibroaster Pierna Presa Pierna, junto a una Gaseosa Personal Fanta. / Acompañamientos: Maduros fritos + Sarza criolla + Papa crocante + Ensalada fresca",
+    "badge": "SELVA",
+    "popular": true,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00045",
+    "code": "PL00045",
+    "name": "Queso",
+    "category": "ADICIONALES",
+    "category_id": "C0001",
+    "price": 2,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 80,
+    "image": "https://images.unsplash.com/photo-1552767059-ce182ead8c1b?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00046",
+    "code": "PL00046",
+    "name": "Royal",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 13,
+    "description": "Acompañamiento: Carne casera + Pollo deshilachado + Pollo + Chorizo",
+    "badge": "ROYAL",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00047",
+    "code": "PL00047",
+    "name": "Royal a lo Pobre",
+    "category": "HAMBURGUESAS",
+    "category_id": "C0005",
+    "price": 14,
+    "description": "Acompañamiento: Papa crocante + Carne artesanal + Huevo + Jamón + Queso + Plátano + Ensalada fresca",
+    "badge": "ESPECIAL",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00048",
+    "code": "PL00048",
+    "name": "Salchibroaster Ala",
+    "category": "SALCHIPAPAS Y SALCHIBROASTERS",
+    "category_id": "C0010",
+    "price": 13,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "badge": "BROASTER",
+    "popular": false,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00049",
+    "code": "PL00049",
+    "name": "Salchibroaster Encuentro",
+    "category": "SALCHIPAPAS Y SALCHIBROASTERS",
+    "category_id": "C0010",
+    "price": 16,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "badge": "ENCUENTRO",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00050",
+    "code": "PL00050",
+    "name": "Salchibroaster Pecho",
+    "category": "SALCHIPAPAS Y SALCHIBROASTERS",
+    "category_id": "C0010",
+    "price": 20,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "badge": "PECHO",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00051",
+    "code": "PL00051",
+    "name": "Salchibroaster Pierna",
+    "category": "SALCHIPAPAS Y SALCHIBROASTERS",
+    "category_id": "C0010",
+    "price": 14,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "badge": "PIERNA",
+    "popular": true,
+    "available": true,
+    "stock": 25,
+    "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00052",
+    "code": "PL00052",
+    "name": "Salchichorizo",
+    "category": "SALCHIPAPAS Y SALCHIBROASTERS",
+    "category_id": "C0010",
+    "price": 13,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "badge": "PARRILLERO",
+    "popular": false,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00053",
+    "code": "PL00053",
+    "name": "Salchipapa a lo Pobre",
+    "category": "SALCHIPAPAS Y SALCHIBROASTERS",
+    "category_id": "C0010",
+    "price": 13,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "badge": "A LO POBRE",
+    "popular": true,
+    "available": true,
+    "stock": 30,
+    "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00054",
+    "code": "PL00054",
+    "name": "Salchipapa Clásica",
+    "category": "SALCHIPAPAS Y SALCHIBROASTERS",
+    "category_id": "C0010",
+    "price": 10,
+    "description": "Acompañamiento: Papas crocantes + Ensalada fresca",
+    "badge": "CLÁSICA",
+    "popular": true,
+    "available": true,
+    "stock": 40,
+    "image": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00055",
+    "code": "PL00055",
+    "name": "Tacacho con Cecina",
+    "category": "PLATOS AMAZÓNICOS",
+    "category_id": "C0007",
+    "price": 12,
+    "description": "Acompañamiento: Maduros fritos + Sarza criolla",
+    "badge": "ESTRELLA",
+    "popular": true,
+    "available": true,
+    "stock": 35,
+    "image": "/imagenes/categorias/platos-amazonicos/banner.webp",
+    "includes_sauces": true
+  },
+  {
+    "id": "PL00056",
+    "code": "PL00056",
+    "name": "Té",
+    "category": "INFUSIONES",
+    "category_id": "C0006",
+    "price": 2.5,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "CALIENTE",
+    "popular": false,
+    "available": true,
+    "stock": 50,
+    "image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  },
+  {
+    "id": "PL00057",
+    "code": "PL00057",
+    "name": "Tocino",
+    "category": "ADICIONALES",
+    "category_id": "C0001",
+    "price": 2,
+    "description": "No cuenta con acompañamientos ni cremas",
+    "badge": "EXTRA",
+    "popular": false,
+    "available": true,
+    "stock": 80,
+    "image": "https://images.unsplash.com/photo-1528607929212-2636ec44253e?w=600&auto=format&fit=crop&q=80",
+    "includes_sauces": false
+  }
+];
 }
 
 /* =========================================================
@@ -4765,10 +5092,6 @@ const FOOTER_MODAL_DATA = {
     title: "Nuestros Valores",
     content: `• <strong>Pasión por el Sabor:</strong> Cuidamos cada receta con amor y sazón tradicional.<br>• <strong>Frescura Garantizada:</strong> Insumos del día seleccionados cuidadosamente.<br>• <strong>Hospitalidad Amazónica:</strong> Trato cálido, rápido y eficiente.<br>• <strong>Compromiso:</strong> Atención ininterrumpida y puntualidad en el delivery.`
   },
-  restaurantes: {
-    title: "Nuestros Restaurantes",
-    content: `📍 <strong>Sede Principal:</strong> Jr. San Martín 450, Tarapoto.<br>📍 <strong>Sede Lima:</strong> Sede de atención y despachos autorizados.<br>📍 <strong>Sede Moyobamba:</strong> Centro de la ciudad.<br><br>🕐 <em>Atención las 24 horas para salón, recojo y delivery.</em>`
-  },
   reservas: {
     title: "Reservas de Mesas",
     content: `Para reservar tu mesa en BuchiSapa para cumpleaños, aniversarios o reuniones familiares, escríbenos directamente a nuestro WhatsApp oficial <strong>+51 943 312 024</strong> indicando la fecha, hora y número de comensales. ¡Te esperamos con el mejor ambiente!`
@@ -4789,10 +5112,6 @@ const FOOTER_MODAL_DATA = {
     title: "Valores Nutricionales",
     content: `En BuchiSapa preparamos nuestras recetas con aceites de alta pureza, pollos frescos de primera calidad y acompañamientos balanceados con ensaladas frescas preparadas al momento.`
   },
-  alergenos: {
-    title: "Cartilla de Alérgenos",
-    content: `Nuestros platos pueden contener trazas de gluten (harina de empanizado), huevo (mayonesa casera), lácteos (cremas de queso) y soya. Si tienes alguna restricción alimentaria o alergia, por favor infórmalo al momento de realizar tu pedido.`
-  },
   privacidad: {
     title: "Políticas de Privacidad",
     content: `En cumplimiento con la Ley N° 29733 (Ley de Protección de Datos Personales de Perú), te garantizamos que los datos de contacto y entrega proporcionados serán utilizados exclusivamente para procesar tu pedido y brindarte una mejor atención.`
@@ -4801,21 +5120,9 @@ const FOOTER_MODAL_DATA = {
     title: "Términos y Condiciones",
     content: `Los precios mostrados en la carta están expresados en Soles (S/) e incluyen impuestos de ley. El tiempo estimado de entrega por delivery es de 25 a 45 minutos sujeto al tráfico y condiciones climáticas.`
   },
-  promociones: {
-    title: "Términos de Promociones Comerciales",
-    content: `Las promociones y combos son válidos hasta agotar stock y no son acumulables con otros descuentos. Válido tanto para consumo en salón como pedidos delivery.`
-  },
   terminos_giftcard: {
     title: "Términos Vales y Giftcards",
     content: `Los vales de consumo tienen una vigencia de 6 meses desde su fecha de emisión y son canjeables en cualquiera de nuestras sedes.`
-  },
-  trabaja: {
-    title: "Trabaja con Nosotros",
-    content: `¿Te gustaría formar parte de la familia BuchiSapa? Buscamos talentos para cocina, atención al cliente y reparto. Envía tu CV a <strong>buchisapaweb@gmail.com</strong> o comunícate al <strong>943 312 024</strong>.`
-  },
-  proveedores: {
-    title: "Portal de Proveedores",
-    content: `Si eres productor local de insumos amazónicos (plátano, cecina, frutas tropicales, especias) o proveedor de empaques ecológicos, escríbenos a <strong>buchisapaweb@gmail.com</strong> para evaluar propuestas comerciales.`
   }
 };
 

@@ -1,41 +1,10 @@
 <!-- HEADER NAVEGACIÓN Y BÚSQUEDA OFICIAL BUCHISAPA -->
-<script>
-  if (typeof window.toggleMobileMenu !== 'function') {
-    window.toggleMobileMenu = function(forceState) {
-      var backdrop = document.getElementById('mobile-menu-backdrop');
-      if (!backdrop) return;
-      var isOpen = backdrop.classList.contains('active') || backdrop.classList.contains('open') || backdrop.style.display === 'flex';
-      var shouldOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
-      if (shouldOpen) {
-        backdrop.style.display = 'flex';
-        void backdrop.offsetWidth;
-        backdrop.classList.add('active', 'open');
-        document.body.style.overflow = 'hidden';
-        if (window.BuchisapaCart && typeof window.BuchisapaCart.getItemsCount === 'function') {
-          var countEl = document.getElementById('drawer-cart-count');
-          if (countEl) countEl.textContent = String(window.BuchisapaCart.getItemsCount());
-        }
-      } else {
-        backdrop.classList.remove('active', 'open');
-        setTimeout(function() {
-          if (!backdrop.classList.contains('active') && !backdrop.classList.contains('open')) {
-            backdrop.style.display = 'none';
-          }
-        }, 280);
-        document.body.style.overflow = '';
-      }
-    };
-    window.openMobileMenu = function() { window.toggleMobileMenu(true); };
-    window.closeMobileDrawer = function() { window.toggleMobileMenu(false); };
-    window.closeMobileMenu = function() { window.toggleMobileMenu(false); };
-  }
-</script>
 <header class="site-header">
   <div class="container header-nav">
     
     <!-- LADO IZQUIERDO: TOGGLE MÓVIL Y LOGO -->
     <div class="header-left">
-      <button class="nav-toggle-btn mobile-only" aria-label="Abrir menú" onclick="toggleMobileMenu()" type="button">
+      <button class="nav-toggle-btn mobile-only" id="btn-nav-toggle" aria-label="Abrir menú" type="button">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round">
           <line x1="3" x2="21" y1="6" y2="6"/>
           <line x1="3" x2="21" y1="12" y2="12"/>
@@ -49,7 +18,7 @@
     </div>
 
     <!-- SELECTOR DE UBICACIÓN (ESTILO PARDO'S / GOURMET) -->
-    <div class="location-picker-inline" onclick="openLocationModal()" title="Cambiar dirección o modo de entrega">
+    <div class="location-picker-inline" id="btn-header-location" title="Cambiar dirección o modo de entrega">
       <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
         <circle cx="12" cy="10" r="3.2"/>
@@ -70,28 +39,28 @@
           <svg class="nav-chevron-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div class="desktop-dropdown-menu">
-          <button class="dropdown-item" type="button" onclick="openCategoryView('alitas', 'ALITAS')">ALITAS</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('bebidas', 'BEBIDAS')">BEBIDAS</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('broaster', 'BROASTER')">BROASTER</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('hamburguesas', 'HAMBURGUESAS')">HAMBURGUESAS</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('infusiones', 'INFUSIONES')">INFUSIONES</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS')">PLATOS AMAZÓNICOS</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('refrescos', 'REFRESCOS')">REFRESCOS</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('salchipapas', 'SALCHIPAPAS Y SALCHIBROASTERS')">SALCHIPAPAS Y SALCHIBROASTERS</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('adicionales', 'ADICIONALES')">ADICIONALES</button>
-          <button class="dropdown-item" type="button" onclick="openCategoryView('promociones', 'PROMOCIONES')">PROMOCIONES</button>
+          <button class="dropdown-item" type="button" data-category="adicionales" data-title="ADICIONALES">ADICIONALES</button>
+          <button class="dropdown-item" type="button" data-category="alitas" data-title="ALITAS">ALITAS</button>
+          <button class="dropdown-item" type="button" data-category="bebidas" data-title="BEBIDAS">BEBIDAS</button>
+          <button class="dropdown-item" type="button" data-category="broaster" data-title="BROASTER">BROASTER</button>
+          <button class="dropdown-item" type="button" data-category="hamburguesas" data-title="HAMBURGUESAS">HAMBURGUESAS</button>
+          <button class="dropdown-item" type="button" data-category="infusiones" data-title="INFUSIONES">INFUSIONES</button>
+          <button class="dropdown-item" type="button" data-category="platos-amazonicos" data-title="PLATOS AMAZÓNICOS">PLATOS AMAZÓNICOS</button>
+          <button class="dropdown-item" type="button" data-category="promociones" data-title="PROMOCIONES">PROMOCIONES</button>
+          <button class="dropdown-item" type="button" data-category="refrescos" data-title="REFRESCOS">REFRESCOS</button>
+          <button class="dropdown-item" type="button" data-category="salchipapas" data-title="SALCHIPAPAS Y SALCHIBROASTERS">SALCHIPAPAS Y SALCHIBROASTERS</button>
         </div>
       </div>
 
-      <!-- 3. CARTA SALÓN ⌵ -->
+      <!-- CARTA SALÓN ⌵ -->
       <div class="desktop-dropdown-wrap" id="nav-dropdown-carta">
         <button class="desktop-nav-link dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false">
           <span>CARTA SALÓN</span>
           <svg class="nav-chevron-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div class="desktop-dropdown-menu">
-          <button class="dropdown-item" type="button" onclick="openFullMenuModal()">CARTA COMPLETA</button>
-          <a href="/nosotros" class="dropdown-item" style="text-decoration: none;">SOBRE BUCHISAPA</a>
+          <button class="dropdown-item" id="btn-header-full-menu" type="button">CARTA COMPLETA</button>
+          <a href="/nosotros" class="dropdown-item">SOBRE BUCHISAPA</a>
         </div>
       </div>
     </nav>
@@ -108,17 +77,16 @@
           id="desktop-search-input" 
           class="desktop-search-field" 
           placeholder="¿Qué se te antoja?" 
-          oninput="onSearchInputChanged(this.value)"
           autocomplete="off"
         >
-        <button id="desktop-search-clear-btn" class="search-clear-btn-inline" type="button" onclick="clearSearchInput()" aria-label="Limpiar búsqueda" style="display: none;">✕</button>
+        <button id="desktop-search-clear-btn" class="search-clear-btn-inline is-hidden" type="button" aria-label="Limpiar búsqueda">✕</button>
       </div>
     </div>
 
     <!-- ACCIONES DE CABECERA: MI PEDIDO & INGRESAR -->
     <div class="header-actions">
       <!-- BOTÓN BÚSQUEDA SOLO EN MÓVILES PEQUEÑOS -->
-      <button class="header-icon-btn mobile-only" id="header-search-btn" aria-label="Buscar platos" onclick="toggleSearchBar()" title="Buscar platos" type="button">
+      <button class="header-icon-btn mobile-only" id="header-search-btn" aria-label="Buscar platos" title="Buscar platos" type="button">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="7.5"/>
           <line x1="21" y1="21" x2="16.5" y2="16.5"/>
@@ -126,7 +94,7 @@
       </button>
 
       <!-- CARRITO: SIEMPRE DISPONIBLE EN EL ENCABEZADO -->
-      <button class="desktop-cart-link-btn" id="header-cart-btn" type="button" onclick="if(window.BuchisapaCart && typeof window.BuchisapaCart.openDrawer === 'function') window.BuchisapaCart.openDrawer();" aria-label="Abrir carrito" title="Mi carrito">
+      <button class="desktop-cart-link-btn" id="header-cart-btn" type="button" aria-label="Abrir carrito" title="Mi carrito">
         <svg class="cart-bag-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
           <path d="M3 6h18"/>
@@ -137,7 +105,7 @@
       </button>
 
       <!-- BOTÓN ROJO SÓLIDO INGRESAR ([👤 WHITE] INGRESAR) -->
-      <button class="desktop-user-auth-btn" id="header-auth-btn" aria-label="Ingresar a mi cuenta" onclick="handleUserIconClick()" type="button">
+      <button class="desktop-user-auth-btn" id="header-auth-btn" aria-label="Ingresar a mi cuenta" type="button">
         <svg class="auth-user-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
@@ -150,7 +118,7 @@
 </header>
 
 <!-- BARRA DE BÚSQUEDA DESPLEGABLE EN DISPOSITIVOS MÓVILES -->
-<div class="buchisapa-search-bar-wrap" id="buchisapa-search-bar-wrap" style="display: none;">
+<div class="buchisapa-search-bar-wrap is-hidden" id="buchisapa-search-bar-wrap">
   <div class="container search-bar-inner">
     <div class="search-bar-top-row">
       <div class="search-input-pill-wrapper">
@@ -163,12 +131,11 @@
           id="main-search-input" 
           class="search-pill-input" 
           placeholder="¿Qué se te antoja?" 
-          oninput="onSearchInputChanged(this.value)"
           autocomplete="off"
         >
-        <button id="search-clear-btn" class="search-clear-btn" type="button" onclick="clearSearchInput()" aria-label="Limpiar búsqueda" style="display: none;">✕</button>
+        <button id="search-clear-btn" class="search-clear-btn is-hidden" type="button" aria-label="Limpiar búsqueda">✕</button>
       </div>
-      <button id="search-close-action-btn" class="search-action-btn" type="button" onclick="toggleSearchBar(false)">Cerrar</button>
+      <button id="search-close-action-btn" class="search-action-btn" type="button">Cerrar</button>
     </div>
   </div>
 </div>

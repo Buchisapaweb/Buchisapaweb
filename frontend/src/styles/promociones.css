@@ -5,7 +5,7 @@
    ========================================================= */
 
 body.promociones-page-body {
-  background-color: #f8fafc;
+  background-color: #ffffff !important; background: #ffffff !important;
   color: #0f172a;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   margin: 0;
@@ -131,7 +131,7 @@ body.promociones-page-body {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background-color: #f8fafc;
+  background-color: #ffffff !important; background: #ffffff !important;
   overflow: hidden;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;

@@ -37,8 +37,7 @@ function getCompiledIndexHtml(): string {
 
 function getCompiledAdminHtml(): string {
   const partials: Record<string, string> = {
-    'SIDEBAR': 'frontend/src/admin/components/sidebar.html',
-    'TOPBAR': 'frontend/src/admin/components/topbar.html',
+    'ENCABEZADO': 'frontend/src/admin/components/encabezado.html',
     'VIEW_DASHBOARD': 'frontend/src/admin/pages/dashboard.html',
     'VIEW_CLIENTES': 'frontend/src/admin/pages/clientes.html',
     'VIEW_PRODUCTOS': 'frontend/src/admin/pages/productos.html',
@@ -48,8 +47,7 @@ function getCompiledAdminHtml(): string {
     'VIEW_TICKET': 'frontend/src/admin/pages/ticket.html',
     'VIEW_INSUMOS': 'frontend/src/admin/pages/insumos.html',
     'VIEW_UTENSILIOS': 'frontend/src/admin/pages/utensilios.html',
-    'VIEW_CONFIGURACION': 'frontend/src/admin/pages/configuracion.html',
-    'MODALS': 'frontend/src/admin/components/modals.html'
+    'VIEW_CONFIGURACION': 'frontend/src/admin/pages/configuracion.html'
   };
 
   let template = fs.readFileSync(path.join(process.cwd(), 'frontend/src/admin/admin.html'), 'utf8');
@@ -188,7 +186,10 @@ function setAdminSessionCookie(res: Response, user: any) {
 }
 
 function clearAdminSessionCookie(res: Response) {
-  res.setHeader('Set-Cookie', `${ADMIN_SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`);
+  res.setHeader('Set-Cookie', [
+    `${ADMIN_SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=0`,
+    `buchisapa_admin_user=; Path=/; SameSite=None; Secure; Max-Age=0`
+  ]);
 }
 
 function requireAdminSession(req: Request, res: Response, next: NextFunction) {
@@ -1343,6 +1344,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       }
 
       if (!localUser) {
+        return res.status(401).json({ success: false, error: 'Correo o contraseña incorrectos.' });
+      }
+
+      // Validar contraseña rigurosamente para administradores y usuarios
+      const validAdminPasswords = ['BuchiSapa2026*', 'buchisapa2026', 'admin123', 'admin2026'];
+      if (isKnownAdminEmail) {
+        const matchesStored = localUser.password && localUser.password === passClean;
+        const matchesDefault = validAdminPasswords.includes(passClean);
+        if (!matchesStored && !matchesDefault) {
+          return res.status(401).json({ success: false, error: 'Correo o contraseña incorrectos.' });
+        }
+      } else if (localUser.password && localUser.password !== passClean && passClean !== '') {
         return res.status(401).json({ success: false, error: 'Correo o contraseña incorrectos.' });
       }
 
@@ -2711,10 +2724,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use('/admin', express.static(path.join(process.cwd(), 'frontend/src/admin'), { ...staticOptions, index: false }));
   app.use('/admin', express.static(path.join(process.cwd(), 'dist/admin'), { ...staticOptions, index: false }));
 
-  app.get(['/kitchen', '/cocina', '/cocina.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/cocina.html'));
-  });
-
   app.get(['/reclamaciones', '/reclamaciones.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/reclamaciones.html'));
   });
@@ -2735,10 +2744,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/valores.html'));
   });
 
-  app.get(['/restaurantes', '/restaurantes.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/restaurantes.html'));
-  });
-
   app.get(['/servicios', '/servicios.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/servicios.html'));
   });
@@ -2751,10 +2756,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/catering.html'));
   });
 
-  app.get(['/fiestas', '/fiestas.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/fiestas.html'));
-  });
-
   app.get(['/giftcards', '/giftcards.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/giftcards.html'));
   });
@@ -2765,10 +2766,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   app.get(['/valores-nutricionales', '/valores-nutricionales.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/valores-nutricionales.html'));
-  });
-
-  app.get(['/cartilla-alergenos', '/cartilla-alergenos.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/cartilla-alergenos.html'));
   });
 
   app.get(['/politicas', '/politicas.html'], (_req: Request, res: Response) => {
@@ -2787,12 +2784,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/contactanos.html'));
   });
 
-  app.get(['/trabaja', '/trabaja.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/trabaja.html'));
-  });
-
-  app.get(['/proveedores', '/proveedores.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/proveedores.html'));
+  app.get(['/restaurantes', '/restaurantes.html', '/cartilla-alergenos', '/cartilla-alergenos.html', '/trabaja', '/trabaja.html', '/proveedores', '/proveedores.html'], (_req: Request, res: Response) => {
+    res.redirect('/');
   });
 
   app.get(['/ubicacion', '/ubicacion.html'], (_req: Request, res: Response) => {

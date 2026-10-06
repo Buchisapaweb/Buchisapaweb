@@ -38,22 +38,6 @@ const INFORMACION_DATA = {
       </ul>
     `
   },
-  restaurantes: {
-    category: "NOSOTROS",
-    title: "Nuestras Sedes y Puntos de Atención",
-    content: `
-      <h3>Sede Central Santa Clara - Ate</h3>
-      <p><strong>Dirección:</strong> Av. La Estrella con Calle 28 de Julio (Esquina de la Posta de Santa Clara, a 1 cuadra del Real Plaza Santa Clara).</p>
-      <p><strong>Horario de Atención:</strong> Lunes a Domingo de 6:00 PM a 5:00 AM (Servicio Nocturno Continuo).</p>
-      <div class="info-contact-card">
-        <span class="info-contact-icon">🛵</span>
-        <div>
-          <div class="info-contact-text-title">Central Delivery y Recojo</div>
-          <div class="info-contact-text-sub">Llamadas y WhatsApp: +51 943 312 024</div>
-        </div>
-      </div>
-    `
-  },
   reservas: {
     category: "SERVICIOS",
     title: "Reserva de Mesas y Eventos",
@@ -103,19 +87,6 @@ const INFORMACION_DATA = {
       <p>Utilizamos aceites vegetales de primer uso para frituras limpias y crujientes, garantizando un sabor puro y saludable.</p>
     `
   },
-  alergenos: {
-    category: "INFORMACIÓN ADICIONAL",
-    title: "Cartilla de Alérgenos",
-    content: `
-      <p>Si sufres de alergias alimentarias, consulta la siguiente tabla de ingredientes:</p>
-      <ul>
-        <li><strong>Gluten (Trigo):</strong> Empanizado de Pollo Broaster, Tequeños, Pan de Hamburguesa.</li>
-        <li><strong>Lácteos / Queso:</strong> Salsas de la casa, Tequeños, Queso cheddar en hamburguesas.</li>
-        <li><strong>Soya y Sésamo:</strong> Aderezos de pollo al carbón y salsas orientales.</li>
-        <li><strong>Huevo:</strong> Mayonesa de la casa, crema tártara.</li>
-      </ul>
-    `
-  },
   privacidad: {
     category: "POLÍTICAS Y TÉRMINOS",
     title: "Políticas de Privacidad y Protección de Datos",
@@ -136,41 +107,11 @@ const INFORMACION_DATA = {
       </ul>
     `
   },
-  promociones: {
-    category: "POLÍTICAS Y TÉRMINOS",
-    title: "Términos de Promociones Comerciales",
-    content: `
-      <p>Las promociones y combos mostrados en nuestra carta digital son válidas según el stock disponible diario. No son acumulables con otros cupones de descuento a menos que se indique explícitamente.</p>
-    `
-  },
   terminos_giftcard: {
     category: "POLÍTICAS Y TÉRMINOS",
     title: "Términos de Vales y Giftcards",
     content: `
       <p>Los vales corporativos y giftcards digitales no son canjeables por dinero en efectivo. En caso de saldos remanentes, estos permanecerán activos en la tarjeta hasta la fecha de expiración.</p>
-    `
-  },
-  trabaja: {
-    category: "CONTÁCTANOS",
-    title: "Trabaja con Nosotros - Únete a la Familia BuchiSapa",
-    content: `
-      <p>¡Buscamos talento apasionado por la gastronomía y la excelencia en atención al cliente!</p>
-      <p>Puestos continuos: Cocineros, Horneros, Despachadores, Asistentes de Limpieza y Motorizados de Delivery con moto propia.</p>
-      <div class="info-contact-card">
-        <span class="info-contact-icon">💼</span>
-        <div>
-          <div class="info-contact-text-title">Envíanos tu CV</div>
-          <div class="info-contact-text-sub">Correo: buchisapaweb@gmail.com | WhatsApp: +51 943 312 024</div>
-        </div>
-      </div>
-    `
-  },
-  proveedores: {
-    category: "CONTÁCTANOS",
-    title: "Portal de Proveedores",
-    content: `
-      <p>Buscamos constantemente alianzas estratégicas con productores de insumos agrícolas (plátano bellaco, cecina, ajíes), empaques ecológicos biodegradables y distribuidores de bebidas.</p>
-      <p>Envía tu catálogo o propuesta comercial a <strong>buchisapaweb@gmail.com</strong>.</p>
     `
   }
 };

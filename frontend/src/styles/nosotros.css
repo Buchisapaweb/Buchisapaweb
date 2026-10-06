@@ -3,7 +3,7 @@
    ========================================================= */
 
 body.nosotros-page-body {
-  background-color: #f8fafc;
+  background-color: #ffffff !important; background: #ffffff !important;
   color: #0f172a;
   min-height: 100vh;
   display: flex;

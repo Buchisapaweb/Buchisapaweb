@@ -111,17 +111,14 @@ export function compileHtml() {
     { src: 'frontend/src/pages/html/historia.html', outName: 'historia' },
     { src: 'frontend/src/pages/html/vision.html', outName: 'vision' },
     { src: 'frontend/src/pages/html/valores.html', outName: 'valores' },
-    { src: 'frontend/src/pages/html/restaurantes.html', outName: 'restaurantes' },
     { src: 'frontend/src/pages/html/reservas.html', outName: 'reservas' },
     { src: 'frontend/src/pages/html/catering.html', outName: 'catering' },
     { src: 'frontend/src/pages/html/fiestas.html', outName: 'fiestas' },
     { src: 'frontend/src/pages/html/giftcards.html', outName: 'giftcards' },
     { src: 'frontend/src/pages/html/valores-nutricionales.html', outName: 'valores-nutricionales' },
-    { src: 'frontend/src/pages/html/cartilla-alergenos.html', outName: 'cartilla-alergenos' },
     { src: 'frontend/src/pages/html/politicas-privacidad.html', outName: 'politicas-privacidad' },
     { src: 'frontend/src/pages/html/terminos.html', outName: 'terminos' },
-    { src: 'frontend/src/pages/html/trabaja.html', outName: 'trabaja' },
-    { src: 'frontend/src/pages/html/proveedores.html', outName: 'proveedores' }
+    { src: 'frontend/src/pages/html/carrito.html', outName: 'carrito' }
   ];
 
   for (const page of directPages) {

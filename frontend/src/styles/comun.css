@@ -25,9 +25,9 @@
   --text-main: #0f172a;
   --text-muted: #64748b;
   --text-subtle: #94a3b8;
-  --bg-main: #faf9f6;
+  --bg-main: #ffffff;
   --bg-surface: #ffffff;
-  --bg-subtle: #f1f5f9;
+  --bg-subtle: #ffffff;
   --white: #ffffff;
   --emerald: #10b981;
   --red: #ef4444;
@@ -169,8 +169,8 @@ html, body {
 
 /* CLASES UTILITARIAS COMUNES */
 .main-content-padded {
-  padding-top: 12px;
-  padding-bottom: 24px;
+  padding-top: 0 !important;
+  padding-bottom: 4px !important;
 }
 
 .is-hidden {
@@ -179,6 +179,90 @@ html, body {
 
 .hidden-iframe {
   display: none;
+}
+
+/* Espaciados y utilidades para evitar estilos inline */
+.mb-8 { margin-bottom: 8px !important; }
+.mb-12 { margin-bottom: 12px !important; }
+.mb-16 { margin-bottom: 16px !important; }
+.mb-20 { margin-bottom: 20px !important; }
+.mt-10 { margin-top: 10px !important; }
+.mt-12 { margin-top: 12px !important; }
+.mt-14 { margin-top: 14px !important; }
+.mt-16 { margin-top: 16px !important; }
+.mt-18 { margin-top: 18px !important; }
+.text-green-900 { font-weight: 900; color: #16a34a; }
+
+/* Tarjetas y bloques de información compartidos */
+.info-card-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+.info-card-box-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+.info-card-box-text {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.info-card-box-text:last-child {
+  margin-bottom: 0;
+}
+
+/* Botones de acción y CTA compartidos */
+.cta-button-red {
+  background: #dc2626;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.cta-button-red:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* Grid y tarjetas de giftcards */
+.giftcards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.giftcard-tier-card {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #ffffff;
+  padding: 20px;
+  border-radius: 14px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+.giftcard-tier-card:hover {
+  transform: translateY(-2px);
+}
+.giftcard-tier-price {
+  font-size: 24px;
+  font-weight: 900;
+  color: #fb923c;
+}
+.giftcard-tier-name {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-top: 4px;
 }
 
 /* NAVEGACIÓN Y BOTÓN VOLVER LIMPIO EN PÁGINAS SECUNDARIAS */
@@ -265,30 +349,58 @@ html, body {
 :root {
   --content-gutter: clamp(16px, 3vw, 32px);
   --section-space: clamp(32px, 5vw, 64px);
-  --content-max: 1320px;
+  --content-max: 1440px;
 }
 
-body {
-  background:
-    radial-gradient(circle at 10% 0%, rgba(245, 158, 11, 0.045), transparent 26rem),
-    radial-gradient(circle at 90% 8%, rgba(220, 38, 38, 0.035), transparent 24rem),
-    var(--bg-main);
+html,
+body,
+#root,
+main,
+.container,
+.main-content-padded,
+.search-view-section,
+#search-results-section,
+#category-banners-section,
+.site-header {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: var(--text-main);
 }
 
 .container {
   max-width: var(--content-max);
   padding-left: var(--content-gutter);
   padding-right: var(--content-gutter);
+  background: #ffffff !important;
+}
+
+footer,
+.info-footer,
+.servicios-footer,
+.politicas-footer,
+.contactanos-footer,
+.nosotros-footer,
+.site-footer-buchisapa,
+footer .container,
+.info-footer .container,
+.servicios-footer .container,
+.politicas-footer .container,
+.contactanos-footer .container,
+.nosotros-footer .container,
+.site-footer-buchisapa .container {
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
 }
 
 .main-content-padded {
-  padding-top: clamp(20px, 3vw, 36px);
-  padding-bottom: clamp(36px, 5vw, 72px);
+  padding-top: 12px;
+  padding-bottom: 20px;
 }
 
 .section-title-wrap {
-  margin-top: clamp(28px, 4vw, 52px);
-  margin-bottom: clamp(24px, 3vw, 36px);
+  margin-top: 16px;
+  margin-bottom: 16px;
   padding-inline: 8px;
 }
 

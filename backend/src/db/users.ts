@@ -16,6 +16,7 @@ export interface UserProfile {
   isAdmin?: boolean;
   marketingAccepted?: boolean;
   termsAccepted?: boolean;
+  password?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +44,7 @@ const adminWebUser: UserProfile = {
   role: 'admin',
   isAdmin: true,
   emailVerified: true,
+  password: 'BuchiSapa2026*',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
@@ -125,6 +127,7 @@ export async function registerCustomer(data: any): Promise<UserProfile> {
     emailVerified: Boolean(data.emailVerified),
     marketingAccepted: Boolean(data.marketingAccepted),
     termsAccepted: data.termsAccepted !== false,
+    password: data.password || '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

@@ -60,6 +60,7 @@
       sessionStorage.clear();
       localStorage.removeItem('buchisapa_admin_token');
       localStorage.removeItem('buchisapa_admin_session');
+      localStorage.removeItem('buchisapa_customer');
     } catch (e) {}
     location.href = '/';
   };

@@ -1,5 +1,5 @@
 <!-- MODAL CAMBIO DE UBICACIÓN Y VERIFICACIÓN EN TIEMPO REAL -->
-<div class="modal-backdrop" id="location-modal" style="display: none;" onclick="if(event.target === this) closeLocationModal()">
+<div class="modal-backdrop" id="location-modal" onclick="if(event.target === this) closeLocationModal()">
   <div class="location-modal-box" onclick="event.stopPropagation()">
     
     <!-- CABECERA DEL MODAL -->
@@ -38,9 +38,8 @@
         <input 
           type="text" 
           id="loc-tag-input" 
-          class="loc-text-input" 
+          class="loc-text-input mb-8" 
           placeholder="Etiqueta (ej: Mi casa, Casa de mamá)"
-          style="margin-bottom: 8px;"
         >
 
         <!-- Chips de Etiquetas Rápidas -->
@@ -56,10 +55,9 @@
         <input 
           type="tel" 
           id="loc-phone-input" 
-          class="loc-text-input" 
+          class="loc-text-input mb-12" 
           placeholder="Requerido para guardar la dirección"
           maxlength="15"
-          style="margin-bottom: 12px;"
         >
 
         <!-- Campos ocultos de apoyo técnico para GPS y geocodificación -->
@@ -84,7 +82,7 @@
       </div>
 
       <!-- VISTA RECOJO EN TIENDA -->
-      <div id="loc-content-pickup" style="display: none;">
+      <div id="loc-content-pickup" class="is-hidden">
         <div class="loc-pickup-card">
           <div class="loc-pickup-title-row">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -92,7 +90,7 @@
           </div>
           <div class="loc-pickup-address">Av. La Estrella con Calle 28 de Julio (Esquina de la posta, a 1 cuadra del Real Plaza Santa Clara) Ate, Lima 🇵🇪</div>
           <div class="loc-pickup-hours">
-            <span style="font-weight: 900; color: #16a34a;">🕕</span>
+            <span class="text-green-900">🕕</span>
             <span>Horario de atención: <strong>Lunes a Domingo, de 6:00 PM a 5:00 AM</strong></span>
           </div>
           <p class="loc-pickup-desc">Tu pedido estará empacado térmicamente y listo en aproximadamente 15–20 minutos para que pases a recogerlo en nuestro mostrador.</p>
@@ -108,53 +106,53 @@
 </div>
 
 <!-- MODAL DE DIAGNÓSTICO GPS -->
-<div class="modal-backdrop" id="device-gps-diag-modal" style="display: none; z-index: 100000; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(6px); align-items: center; justify-content: center;" onclick="if(event.target === this) closeDeviceGpsModal()">
-  <div style="background: #1e293b; color: #f8fafc; border-radius: 20px; padding: 20px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.12); margin: 16px;" onclick="event.stopPropagation()">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <div style="width: 36px; height: 36px; border-radius: 50%; background: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+<div class="modal-backdrop gps-diag-modal-backdrop is-hidden" id="device-gps-diag-modal" onclick="if(event.target === this) closeDeviceGpsModal()">
+  <div class="gps-diag-box" onclick="event.stopPropagation()">
+    <div class="gps-diag-header">
+      <div class="gps-diag-header-info">
+        <div class="gps-diag-icon-circle">
           🛰️
         </div>
         <div>
-          <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #ffffff;">Datos GPS del Dispositivo</h3>
-          <p style="margin: 0; font-size: 12px; color: #94a3b8;">Verificación y telemetría en tiempo real</p>
+          <h3 class="gps-diag-title">Datos GPS del Dispositivo</h3>
+          <p class="gps-diag-subtitle">Verificación y telemetría en tiempo real</p>
         </div>
       </div>
-      <button type="button" onclick="closeDeviceGpsModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 4px;" aria-label="Cerrar">✕</button>
+      <button type="button" class="gps-diag-close-btn" onclick="closeDeviceGpsModal()" aria-label="Cerrar">✕</button>
     </div>
 
-    <div style="background: rgba(15, 23, 42, 0.6); border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 13px;">
-      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-        <span style="color: #94a3b8;">📡 Estado del Sensor:</span>
-        <span id="index-diag-sensor-state" style="font-weight: 700; color: #34d399;">● Activo y Transmitiendo</span>
+    <div class="gps-diag-panel">
+      <div class="gps-diag-row">
+        <span class="gps-diag-label">📡 Estado del Sensor:</span>
+        <span id="index-diag-sensor-state" class="gps-diag-value green">● Activo y Transmitiendo</span>
       </div>
-      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-        <span style="color: #94a3b8;">🔐 Permiso del Navegador:</span>
-        <span id="index-diag-perm-state" style="font-weight: 700; color: #38bdf8;">Concedido</span>
+      <div class="gps-diag-row">
+        <span class="gps-diag-label">🔐 Permiso del Navegador:</span>
+        <span id="index-diag-perm-state" class="gps-diag-value blue">Concedido</span>
       </div>
-      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-        <span style="color: #94a3b8;">📍 Latitud / Longitud:</span>
-        <span id="index-diag-coords" style="font-weight: 700; font-family: monospace; color: #f1f5f9;">-12.0119, -76.8239</span>
+      <div class="gps-diag-row">
+        <span class="gps-diag-label">📍 Latitud / Longitud:</span>
+        <span id="index-diag-coords" class="gps-diag-value code">-12.0119, -76.8239</span>
       </div>
-      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-        <span style="color: #94a3b8;">🎯 Margen de Error:</span>
-        <span id="index-diag-accuracy" style="font-weight: 700; color: #f1f5f9;">± 15 metros</span>
+      <div class="gps-diag-row">
+        <span class="gps-diag-label">🎯 Margen de Error:</span>
+        <span id="index-diag-accuracy" class="gps-diag-value">± 15 metros</span>
       </div>
-      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-        <span style="color: #94a3b8;">⚡ Desplazamiento:</span>
-        <span id="index-diag-speed" style="font-weight: 700; color: #f1f5f9;">0.0 km/h (Estático)</span>
+      <div class="gps-diag-row">
+        <span class="gps-diag-label">⚡ Desplazamiento:</span>
+        <span id="index-diag-speed" class="gps-diag-value">0.0 km/h (Estático)</span>
       </div>
-      <div style="display: flex; justify-content: space-between; padding: 9px 0;">
-        <span style="color: #94a3b8;">⏱️ Última Verificación:</span>
-        <span id="index-diag-time" style="font-weight: 700; color: #f1f5f9;">Ahora mismo</span>
+      <div class="gps-diag-row">
+        <span class="gps-diag-label">⏱️ Última Verificación:</span>
+        <span id="index-diag-time" class="gps-diag-value">Ahora mismo</span>
       </div>
     </div>
 
-    <div style="display: flex; gap: 8px;">
-      <button type="button" onclick="triggerLocationDetection(false); updateDeviceGpsModalData(); if(window.BuchisapaPush) window.BuchisapaPush.showToast('GPS actualizado', '📡');" style="flex: 1; padding: 11px; background: #0284c7; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+    <div class="gps-diag-actions">
+      <button type="button" class="gps-diag-action-refresh" onclick="triggerLocationDetection(false); updateDeviceGpsModalData();">
         <span>🔄 Re-verificar GPS</span>
       </button>
-      <button type="button" onclick="closeDeviceGpsModal()" style="padding: 11px 18px; background: #334155; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer;">
+      <button type="button" class="gps-diag-action-close" onclick="closeDeviceGpsModal()">
         Cerrar
       </button>
     </div>

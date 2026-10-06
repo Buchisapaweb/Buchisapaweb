@@ -16,16 +16,6 @@
   <!-- Google Identity Services (GIS) para inicio de sesión real -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   
-  <!-- Ignorar script errors de CDN externos -->
-  <script>
-    window.addEventListener('error', function (e) {
-      if (e.message && e.message.toLowerCase().includes('script error')) {
-        e.preventDefault();
-        return true;
-      }
-    }, true);
-  </script>
-
   <!-- Script del Encabezado y Navegación Crítico (Cargado en HEAD para disponibilidad inmediata) -->
   <script src="/js/encabezado.js?v=20260928_5"></script>
 
@@ -58,16 +48,23 @@
   <!-- CARTA Y CATÁLOGO DE PLATOS -->
   <main class="container main-content-padded">
 
-    <!-- SECCIÓN DE RESULTADOS DE BÚSQUEDA Y CATEGORÍAS -->
+    <!-- SECCIÓN DE RESULTADOS DE BÚSQUEDA Y CATEGORÍAS (ESCRITORIO / TABLET / COMPUTADORAS) -->
     <div id="search-results-section" class="search-view-section is-hidden">
       <div class="search-view-header">
-        <button class="btn-volver" type="button" onclick="exitSearchMode()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-          Volver a Categorías
-        </button>
-        <h2 id="search-view-title" class="search-view-title">Resultados</h2>
+        <div class="search-view-header-bar">
+          <button class="btn-volver" id="btn-exit-search" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+            <span>Volver a Categorías</span>
+          </button>
+          <span id="search-view-count" class="search-view-count-badge"></span>
+        </div>
+        <div class="search-view-title-wrap">
+          <span class="section-kicker">CARTA BUCHISAPA</span>
+          <h2 id="search-view-title" class="search-view-title">Resultados</h2>
+          <p id="search-view-subtitle" class="section-subtitle">Selecciona tus platos favoritos y personalízalos a tu gusto.</p>
+        </div>
       </div>
-      <div id="search-view-list" class="buchisapa-cards-list"></div>
+      <div id="search-view-list" class="buchisapa-cards-list promo-grid-4col"></div>
     </div>
 
     <!-- ENCABEZADO DE SECCIÓN PRINCIPAL -->
@@ -80,73 +77,73 @@
     <!-- SECCIÓN DE BANNERS DE TODAS LAS CATEGORÍAS (GRID RESPONSIVO EN ORDEN ALFABÉTICO A - Z) -->
     <div id="category-banners-section" class="mobile-category-cards-grid desktop-category-cards-grid">
       
-      <!-- 1. ALITAS (A) -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/alitas/banner.webp');" onclick="openCategoryView('alitas', 'ALITAS')" title="Alitas Broaster & BBQ">
-        <div class="category-banner-overlay">
-          <h2 class="category-banner-title">ALITAS</h2>
-        </div>
-      </div>
-
-      <!-- 2. BEBIDAS (B) -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/bebidas/banner.webp');" onclick="openCategoryView('bebidas', 'BEBIDAS')" title="Bebidas Frías">
-        <div class="category-banner-overlay">
-          <h2 class="category-banner-title">BEBIDAS</h2>
-        </div>
-      </div>
-
-      <!-- 3. BROASTER (B) -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/broaster/banner.webp');" onclick="openCategoryView('broaster', 'BROASTER')" title="Pollo Broaster Crujiente">
-        <div class="category-banner-overlay">
-          <h2 class="category-banner-title">BROASTER</h2>
-        </div>
-      </div>
-
-      <!-- 4. HAMBURGUESAS (H) -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/hamburguesas/banner.webp');" onclick="openCategoryView('hamburguesas', 'HAMBURGUESAS')" title="Hamburguesas BuchiSapa">
-        <div class="category-banner-overlay">
-          <h2 class="category-banner-title">HAMBURGUESAS</h2>
-        </div>
-      </div>
-
-      <!-- 5. INFUSIONES (I) -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/infusiones/banner.webp');" onclick="openCategoryView('infusiones', 'INFUSIONES')" title="Infusiones y Calientes">
-        <div class="category-banner-overlay">
-          <h2 class="category-banner-title">INFUSIONES</h2>
-        </div>
-      </div>
-
-      <!-- 6. PLATOS AMAZÓNICOS (P) -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/platos-amazonicos/banner.webp');" onclick="openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS')" title="Platos Amazónicos BuchiSapa">
-        <div class="category-banner-overlay">
-          <h2 class="category-banner-title">PLATOS AMAZÓNICOS</h2>
-        </div>
-      </div>
-
-      <!-- 7. REFRESCOS (R) -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/refrescos/banner.webp');" onclick="openCategoryView('refrescos', 'REFRESCOS')" title="Refrescos Naturales Amazónicos">
-        <div class="category-banner-overlay">
-          <h2 class="category-banner-title">REFRESCOS</h2>
-        </div>
-      </div>
-
-      <!-- 8. SALCHIPAPAS Y SALCHIBROASTERS (S) -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp');" onclick="openCategoryView('salchipapas', 'SALCHIPAPAS Y SALCHIBROASTERS')" title="Salchipapas y Salchibroasters">
-        <div class="category-banner-overlay">
-          <h2 class="category-banner-title">SALCHIPAPAS Y SALCHIBROASTERS</h2>
-        </div>
-      </div>
-
-      <!-- 9. ADICIONALES -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/adicionales/banner.webp');" onclick="openCategoryView('adicionales', 'ADICIONALES')" title="Adicionales">
+      <!-- 1. ADICIONALES (A) -->
+      <div class="category-banner-card" data-category="adicionales" data-title="ADICIONALES" title="Adicionales">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">ADICIONALES</h2>
         </div>
       </div>
 
-      <!-- 10. PROMOCIONES -->
-      <div class="category-banner-card" style="background-image: url('/imagenes/categorias/promociones/banner.webp');" onclick="openCategoryView('promociones', 'PROMOCIONES')" title="Promociones">
+      <!-- 2. ALITAS (A) -->
+      <div class="category-banner-card" data-category="alitas" data-title="ALITAS" title="Alitas Broaster & BBQ">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">ALITAS</h2>
+        </div>
+      </div>
+
+      <!-- 3. BEBIDAS (B) -->
+      <div class="category-banner-card" data-category="bebidas" data-title="BEBIDAS" title="Bebidas Frías">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">BEBIDAS</h2>
+        </div>
+      </div>
+
+      <!-- 4. BROASTER (B) -->
+      <div class="category-banner-card" data-category="broaster" data-title="BROASTER" title="Pollo Broaster Crujiente">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">BROASTER</h2>
+        </div>
+      </div>
+
+      <!-- 5. HAMBURGUESAS (H) -->
+      <div class="category-banner-card" data-category="hamburguesas" data-title="HAMBURGUESAS" title="Hamburguesas BuchiSapa">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">HAMBURGUESAS</h2>
+        </div>
+      </div>
+
+      <!-- 6. INFUSIONES (I) -->
+      <div class="category-banner-card" data-category="infusiones" data-title="INFUSIONES" title="Infusiones y Calientes">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">INFUSIONES</h2>
+        </div>
+      </div>
+
+      <!-- 7. PLATOS AMAZÓNICOS (P) -->
+      <div class="category-banner-card" data-category="platos-amazonicos" data-title="PLATOS AMAZÓNICOS" title="Platos Amazónicos BuchiSapa">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">PLATOS AMAZÓNICOS</h2>
+        </div>
+      </div>
+
+      <!-- 8. PROMOCIONES (P) -->
+      <div class="category-banner-card" data-category="promociones" data-title="PROMOCIONES" title="Promociones">
         <div class="category-banner-overlay">
           <h2 class="category-banner-title">PROMOCIONES</h2>
+        </div>
+      </div>
+
+      <!-- 9. REFRESCOS (R) -->
+      <div class="category-banner-card" data-category="refrescos" data-title="REFRESCOS" title="Refrescos Naturales Amazónicos">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">REFRESCOS</h2>
+        </div>
+      </div>
+
+      <!-- 10. SALCHIPAPAS Y SALCHIBROASTERS (S) -->
+      <div class="category-banner-card" data-category="salchipapas" data-title="SALCHIPAPAS Y SALCHIBROASTERS" title="Salchipapas y Salchibroasters">
+        <div class="category-banner-overlay">
+          <h2 class="category-banner-title">SALCHIPAPAS Y SALCHIBROASTERS</h2>
         </div>
       </div>
 
