@@ -640,9 +640,15 @@ const BuchisapaCart = {
     const summaryCol = document.getElementById('cart-summary-col');
     const hasColumns = listCol && summaryCol;
 
+    const emptyActionBtn = document.getElementById('btn-cart-empty');
+
     if (count === 0) {
       // ESTADO VACÍO (DISEÑO EXACTO SEGÚN CAPTURA)
       if (subbarWrap) subbarWrap.style.display = 'none';
+      if (emptyActionBtn) {
+        emptyActionBtn.classList.add('is-hidden');
+        emptyActionBtn.style.setProperty('display', 'none', 'important');
+      }
 
       const emptyStateHtml = `
         <div class="cart-empty-state">
@@ -655,7 +661,7 @@ const BuchisapaCart = {
           </div>
           <h3 class="cart-empty-title">Tu pedido está vacío</h3>
           <p class="cart-empty-desc">Aún no has seleccionado ningún plato. Explora nuestras hamburguesas artesanales, broaster crocante, caldos y platos amazónicos.</p>
-          <button class="cart-empty-action-btn" type="button" onclick="BuchisapaCart.closeDrawer(); window.scrollTo({ top: 0, behavior: 'smooth' });">
+          <button class="cart-empty-action-btn" type="button" onclick="window.location.href = '/';">
             Explorar la Carta y Pedir
           </button>
         </div>
@@ -671,6 +677,10 @@ const BuchisapaCart = {
     } else {
       // ESTADO CON PLATOS (DISEÑO EXACTO NUEVA ACTUALIZACIÓN)
       if (subbarWrap) subbarWrap.style.display = 'flex';
+      if (emptyActionBtn) {
+        emptyActionBtn.classList.remove('is-hidden');
+        emptyActionBtn.style.setProperty('display', 'inline-flex', 'important');
+      }
       if (subbarCount) {
         subbarCount.textContent = `PLATOS SELECCIONADOS (${count})`;
       }
