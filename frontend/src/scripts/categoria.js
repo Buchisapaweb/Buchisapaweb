@@ -43,8 +43,11 @@
     searchSection.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Mantener compatibilidad con llamadas tradicionales
-  window.openCategoryView = window.dbOpenCategoryView;
+  // Mantener compatibilidad con llamadas tradicionales sin pisar el delegador principal de encabezado.js
+  if (!window.openCategoryView) {
+    window.openCategoryView = window.dbOpenCategoryView;
+  }
+
 
   window.exitSearchMode = function () {
     const bannersSection = document.getElementById('category-banners-section');
@@ -167,15 +170,37 @@
 
     searchList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b; font-weight: 700;">Cargando platos de la categoría...</div>';
 
+    // 1. Cargar productos desde memoria del cliente para velocidad instantánea si ya existen
     let products = [];
-    try {
-      const res = await fetch('/api/products');
-      if (res.ok) {
-        const json = await res.json();
-        products = json.data || [];
+    if (window.currentProducts && Array.isArray(window.currentProducts) && window.currentProducts.length > 0) {
+      products = window.currentProducts;
+    } else {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const json = await res.json();
+          products = json.data || [];
+          window.currentProducts = products; // Guardar en caché global del cliente
+        } else {
+          console.warn("API general de productos devolvió estado no-ok:", res.status);
+        }
+      } catch (e) {
+        console.error("Error al cargar productos desde la API general:", e);
       }
-    } catch (e) {
-      products = [];
+    }
+
+    // 2. Si falló la carga general de productos, intentar ruta específica de la categoría como fallback secundario
+    if ((!products || products.length === 0) && catId) {
+      try {
+        console.log(`Intentando fallback API específico para categoría: ${catId}`);
+        const res = await fetch(`/api/products?category=${encodeURIComponent(catId)}`);
+        if (res.ok) {
+          const json = await res.json();
+          products = json.data || [];
+        }
+      } catch (err) {
+        console.error("Error en fallback API de categoría específica:", err);
+      }
     }
 
     // Filtrar por categoría utilizando mapeo de ID exacto para evitar conflictos con tildes y guiones
@@ -197,9 +222,12 @@
     if (catId && catId !== 'todas' && catId !== 'all') {
       const catIdNorm = String(catId || '').toLowerCase().trim();
       const targetCatId = slugToIdMap[catIdNorm] || catIdNorm.toUpperCase();
+      
+      // Lógica de filtrado dual robusta: compara contra el category_id y también contra el nombre de la categoría (case-insensitive)
       filtered = products.filter(p => {
         const pCatId = String(p.category_id || '').toUpperCase().trim();
-        return pCatId === targetCatId;
+        const pCatName = String(p.category || '').toLowerCase().trim();
+        return pCatId === targetCatId || pCatName === catIdNorm;
       });
     }
 
@@ -218,6 +246,7 @@
     }
 
     searchList.innerHTML = '';
+
     filtered.forEach(item => {
       const card = document.createElement('div');
       card.className = 'buchisapa-dish-card';
