@@ -673,37 +673,35 @@
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  background: #ffffff !important;
-  border: 1.5px solid #e2e8f0 !important;
+  background: transparent !important;
+  border: none !important;
   color: #0f172a !important;
-  font-size: 14.5px !important;
-  font-weight: 700 !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
   cursor: pointer !important;
-  padding: 9px 20px !important;
-  border-radius: 9999px !important;
+  padding: 6px 0 !important;
+  border-radius: 0 !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
-  transition: all 0.18s ease !important;
+  transition: transform 0.18s ease, color 0.18s ease !important;
   user-select: none !important;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  box-shadow: none !important;
 }
 
 .btn-volver:hover {
   color: #dc2626 !important;
-  border-color: #dc2626 !important;
+  background: transparent !important;
+  border: none !important;
   transform: translateX(-3px) !important;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.15) !important;
+  box-shadow: none !important;
+}
+
+.btn-volver svg {
+  stroke-width: 3 !important;
+  color: currentColor !important;
 }
 
 .search-view-count-badge {
-  display: inline-block !important;
-  background: #fef2f2 !important;
-  color: #dc2626 !important;
-  border: 1px solid #fecaca !important;
-  border-radius: 9999px !important;
-  padding: 5px 14px !important;
-  font-size: 13px !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.2px !important;
+  display: none !important;
 }
 
 .search-view-title-wrap {
@@ -844,7 +842,7 @@
   width: 100% !important;
   min-width: 100% !important;
   max-width: 100% !important;
-  aspect-ratio: 4 / 3 !important;
+  aspect-ratio: 1 / 1 !important;
   height: auto !important;
   min-height: auto !important;
   max-height: none !important;
@@ -863,7 +861,7 @@
 .dish-card-img {
   width: 100% !important;
   height: 100% !important;
-  aspect-ratio: 4 / 3 !important;
+  aspect-ratio: 1 / 1 !important;
   object-fit: cover !important;
   display: block !important;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
