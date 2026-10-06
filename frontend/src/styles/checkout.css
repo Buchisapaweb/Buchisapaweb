@@ -1,0 +1,171 @@
+/* =========================================================
+   BUCHISAPA RESTAURANTE - ESTILOS DE FINALIZAR COMPRA (checkout.css)
+   Estilos dedicados para la página de Pago y Confirmación (/checkout.html)
+   ========================================================= */
+
+.checkout-page-main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+.checkout-page-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+.checkout-header-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 20px;
+  border-bottom: 1.5px solid #f1f5f9;
+  margin-bottom: 24px;
+}
+
+.checkout-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #16a34a;
+}
+
+.checkout-main-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 2px;
+}
+
+.checkout-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 900px) {
+  .checkout-grid-layout {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 32px;
+  }
+}
+
+/* SECCIONES DEL FORMULARIO DE CHECKOUT */
+.checkout-section-block {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.checkout-block-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkout-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 600px) {
+  .checkout-form-grid.two-cols {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.checkout-input-field {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+
+.checkout-input-field:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+/* METODOS DE PAGO SELECCIÓN */
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.payment-method-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.payment-method-card:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.payment-method-card.active {
+  background: #fff1f2;
+  border-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
+}
+
+.payment-method-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* BOTON SUBMIT DE PAGO */
+.btn-submit-order-final {
+  width: 100%;
+  height: 52px;
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.3);
+  transition: all 0.18s ease;
+}
+
+.btn-submit-order-final:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}

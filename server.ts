@@ -8,6 +8,8 @@ function getCompiledIndexHtml(): string {
   const partials: Record<string, string> = {
     'ENCABEZADO': 'frontend/src/components/html/encabezado.html',
     'CARRUSEL_PORTADA': 'frontend/src/components/html/carrusel-portada.html',
+    'CATEGORIA': 'frontend/src/components/html/categoria.html',
+    'LOGIN': 'frontend/src/components/html/login.html',
     'PIE_PAGINA': 'frontend/src/components/html/pie-pagina.html'
   };
 
@@ -2815,6 +2817,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   app.get(['/productoDetalle', '/productoDetalle.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/productoDetalle.html'));
+  });
+
+  app.get(['/checkout', '/checkout.html'], (_req: Request, res: Response) => {
+    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/checkout.html'));
   });
 
   app.get(['/reservas', '/reservas.html', '/catering', '/catering.html', '/giftcards', '/giftcards.html'], (_req: Request, res: Response) => {

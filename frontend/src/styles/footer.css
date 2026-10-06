@@ -1,0 +1,209 @@
+/* =========================================================
+   BUCHISAPA RESTAURANTE - FOOTER OSCURO COMPACTO (footer.css)
+   Estilos limpios, fondo oscuro #0b0f19 y código no tan largo.
+   ========================================================= */
+
+.site-footer-buchisapa,
+footer {
+  background: #0b0f19 !important;
+  color: #94a3b8;
+  padding: 36px 0 28px;
+  border-top: 1px solid #1e293b;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  width: 100%;
+  position: relative;
+  flex-shrink: 0 !important;
+  z-index: 10;
+}
+
+
+
+iframe.hidden-iframe,
+#print_hidden {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  border: none !important;
+  position: absolute !important;
+  visibility: hidden !important;
+}
+
+#credential_picker_container,
+#credential_picker_iframe,
+iframe[src*="accounts.google.com"] {
+  position: fixed !important;
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 999999 !important;
+}
+
+.footer-content-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent !important;
+}
+
+.footer-columns-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 28px 48px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.footer-col-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.footer-accordion-header {
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.footer-accordion-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-accordion-body a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.footer-accordion-body a:hover {
+  color: #ffffff;
+}
+
+/* Caja del Libro de Reclamaciones */
+.reclamaciones-box-btn {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s ease;
+}
+
+.reclamaciones-box-btn:hover {
+  transform: translateY(-2px);
+}
+
+.reclamaciones-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reclamaciones-text-main {
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #0284c7;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* Teléfono */
+.footer-phone-callout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.footer-phone-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.phone-sublabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* Redes Sociales y Badges */
+.footer-bottom-bar-desktop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+}
+
+.footer-social-row {
+  display: flex;
+  gap: 12px;
+}
+
+.footer-social-icon {
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.footer-social-icon:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.footer-payment-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.payment-badge {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-pci { background: #ffffff; color: #0f172a; }
+.badge-mp { background: #009ee3; color: #ffffff; }
+.badge-pe { background: #ffc700; color: #000000; }
+
+.footer-copyright {
+  color: #64748b;
+  font-size: 12px;
+  margin-top: 6px;
+}

@@ -37,6 +37,8 @@ export function compileHtml() {
   const partials = {
     'ENCABEZADO': 'frontend/src/components/html/encabezado.html',
     'CARRUSEL_PORTADA': 'frontend/src/components/html/carrusel-portada.html',
+    'CATEGORIA': 'frontend/src/components/html/categoria.html',
+    'LOGIN': 'frontend/src/components/html/login.html',
     'PIE_PAGINA': 'frontend/src/components/html/pie-pagina.html'
   };
 
@@ -112,6 +114,7 @@ export function compileHtml() {
     { src: 'frontend/src/pages/html/politicas-privacidad.html', outName: 'politicas-privacidad' },
     { src: 'frontend/src/pages/html/terminos.html', outName: 'terminos' },
     { src: 'frontend/src/pages/html/carrito.html', outName: 'carrito' },
+    { src: 'frontend/src/pages/html/checkout.html', outName: 'checkout' },
     { src: 'frontend/src/pages/html/producto.html', outName: 'producto' },
     { src: 'frontend/src/pages/html/productoDetalle.html', outName: 'productoDetalle' }
   ];
