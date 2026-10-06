@@ -5,22 +5,22 @@
 .ticket-config-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  gap: 14px;
 }
 
 .ticket-form-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 14px;
 }
 
 .card-section-title {
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   margin-top: 0;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .ticket-preview-card {

@@ -394,13 +394,13 @@ footer .container,
 }
 
 .main-content-padded {
-  padding-top: 12px;
-  padding-bottom: 20px;
+  padding-top: 4px;
+  padding-bottom: 14px;
 }
 
 .section-title-wrap {
-  margin-top: 16px;
-  margin-bottom: 16px;
+  margin-top: 6px;
+  margin-bottom: 8px;
   padding-inline: 8px;
 }
 

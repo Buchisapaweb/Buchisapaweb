@@ -59,10 +59,6 @@ export function compileHtml() {
     }
   }
 
-  // Guardar index.html compilado en dist/
-  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), indexTemplate, 'utf8');
-  console.log('✅ dist/index.html compilado con éxito (partials inyectados).');
-
   // 3. Copiar archivos de public a dist
   copyDirRecursive(PUBLIC_DIR, DIST_DIR);
 
@@ -71,6 +67,10 @@ export function compileHtml() {
   copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/scripts'), path.join(DIST_DIR, 'js'));
   copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/assets/images'), path.join(DIST_DIR, 'imagenes'));
   console.log('✅ Recursos del frontend copiados a dist/css, dist/js y dist/imagenes.');
+
+  // Guardar index.html compilado en dist/ (asegurando que NUNCA sea sobreescrito por archivos estáticos)
+  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), indexTemplate, 'utf8');
+  console.log('✅ dist/index.html compilado con éxito (partials inyectados).');
 
   // 4. Copiar módulo independiente /admin a dist/admin y compilar sus partials
   const adminSrc = path.join(ROOT_DIR, 'frontend/src/admin');

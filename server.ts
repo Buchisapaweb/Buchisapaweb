@@ -2703,9 +2703,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use('/scripts', express.static(path.join(process.cwd(), 'frontend/src/scripts'), staticOptions));
   app.use('/scripts', express.static(path.join(process.cwd(), 'dist/js'), staticOptions));
 
-  // 3. Panel de Administración Oficial BuchiSapa (Servido 100% directo desde frontend/src/admin/)
+  // 3. Panel de Administración Oficial BuchiSapa (Protegido con verificación de sesión)
   app.get(['/admin', '/admin.html', /^\/admin(?:\/.*)?$/], (req: Request, res: Response, next) => {
     if (path.extname(req.path)) return next();
+
+    const session = verifyAdminSession(getCookie(req, ADMIN_SESSION_COOKIE) || '');
+    if (!session) {
+      return res.redirect('/index.html?login=admin');
+    }
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
@@ -2716,10 +2721,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   app.use('/admin', express.static(path.join(process.cwd(), 'frontend/src/admin'), { ...staticOptions, index: false }));
 
-  // 4. Archivos estáticos de css, js, html y raíz pública
-  app.use(express.static(path.join(process.cwd(), 'public'), staticOptions));
-  app.use('/public', express.static(path.join(process.cwd(), 'public'), staticOptions));
-  app.use(express.static(path.join(process.cwd(), 'dist'), staticOptions));
+  // 4. Archivos estáticos de css, js, html y raíz pública (index: false para que '/' siempre pase por el render compilado de partials)
+  app.use(express.static(path.join(process.cwd(), 'public'), { ...staticOptions, index: false }));
+  app.use('/public', express.static(path.join(process.cwd(), 'public'), { ...staticOptions, index: false }));
+  app.use(express.static(path.join(process.cwd(), 'dist'), { ...staticOptions, index: false }));
 
   app.get(['/reclamaciones', '/reclamaciones.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/reclamaciones.html'));

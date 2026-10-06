@@ -8,11 +8,32 @@
   window.BuchiSapaAdmin = {
     currentView: 'dashboard',
 
-    init: function () {
+    init: async function () {
       console.log('🚀 BuchiSapa Admin Inicializado.');
+      const isAuth = await this.verifyAdminAuth();
+      if (!isAuth) return;
       this.bindNavigation();
       this.bindTableEvents();
       this.refreshAllData();
+    },
+
+    verifyAdminAuth: async function () {
+      try {
+        const res = await fetch('/api/auth/admin-session');
+        if (!res.ok) {
+          window.location.replace('/index.html?login=admin');
+          return false;
+        }
+        const data = await res.json().catch(() => null);
+        if (!data || !data.isAdmin) {
+          window.location.replace('/index.html?login=admin');
+          return false;
+        }
+        return true;
+      } catch (err) {
+        window.location.replace('/index.html?login=admin');
+        return false;
+      }
     },
 
     bindNavigation: function () {
@@ -59,6 +80,16 @@
           const catId = target.getAttribute('data-cat-id');
           if (typeof window.openNewCategoryModal === 'function') {
             window.openNewCategoryModal(catId);
+          }
+        } else if (target.classList.contains('btn-delete-category')) {
+          const catId = target.getAttribute('data-cat-id');
+          if (typeof window.deleteCategory === 'function') {
+            window.deleteCategory(catId);
+          } else {
+            if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+              alert('Categoría eliminada.');
+              window.AdminApp && window.AdminApp.loadCategories();
+            }
           }
         } else if (target.classList.contains('btn-goto-products')) {
           window.switchAdminView('productos');
@@ -207,16 +238,16 @@
 
     loadCategories: async function () {
       const defaultCategories = [
-        { id: 'C0001', code: 'C0001', name: 'ADICIONALES', order: 1, description: 'Complementos y adicionales para personalizar los pedidos.', banner: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600&auto=format&fit=crop&q=80', count: '12 platillos' },
-        { id: 'C0002', code: 'C0002', name: 'ALITAS', order: 2, description: 'Alitas crujientes en salsa acevichada, BBQ y maracuyá.', banner: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80', count: '8 platillos' },
-        { id: 'C0003', code: 'C0003', name: 'BEBIDAS', order: 3, description: 'Gaseosas heladas, agua mineral y bebidas personalizadas.', banner: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80', count: '10 platillos' },
-        { id: 'C0004', code: 'C0004', name: 'BROASTER', order: 4, description: 'Pollo broaster ultra crocante con papas, arroz y cremas.', banner: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80', count: '15 platillos' },
-        { id: 'C0005', code: 'C0005', name: 'HAMBURGUESAS', order: 5, description: 'Hamburguesas artesanales, choripanes y sándwiches especiales.', banner: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80', count: '18 platillos' },
-        { id: 'C0006', code: 'C0006', name: 'INFUSIONES', order: 6, description: 'Infusiones calientes y café aromático pasado.', banner: 'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80', count: '6 platillos' },
-        { id: 'C0007', code: 'C0007', name: 'PLATOS AMAZÓNICOS', order: 7, description: 'Auténticos sabores de la selva peruana: tacacho, cecina, juanes y patacones.', banner: '/imagenes/portada/Portada1E.webp', count: '14 platillos' },
-        { id: 'C0008', code: 'C0008', name: 'PROMOCIONES', order: 8, description: 'Promociones y combos especiales de BuchiSapa.', banner: '/imagenes/portada/Portada2E.webp', count: '9 platillos' },
-        { id: 'C0009', code: 'C0009', name: 'REFRESCOS', order: 9, description: 'Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.', banner: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80', count: '7 platillos' },
-        { id: 'C0010', code: 'C0010', name: 'SALCHIPAPAS Y SALCHIBROASTERS', order: 10, description: 'Papas crocantes, salchichas, chorizos y combinaciones broaster.', banner: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=600&auto=format&fit=crop&q=80', count: '11 platillos' }
+        { id: 'C0001', code: 'C0001', slug: 'adicionales', name: 'ADICIONALES', banner: '/imagenes/categorias/adicionales/banner.webp', order: 1 },
+        { id: 'C0002', code: 'C0002', slug: 'alitas', name: 'ALITAS', banner: '/imagenes/categorias/alitas/banner.webp', order: 2 },
+        { id: 'C0003', code: 'C0003', slug: 'bebidas', name: 'BEBIDAS', banner: '/imagenes/categorias/bebidas/banner.webp', order: 3 },
+        { id: 'C0004', code: 'C0004', slug: 'broaster', name: 'BROASTER', banner: '/imagenes/categorias/broaster/banner.webp', order: 4 },
+        { id: 'C0005', code: 'C0005', slug: 'hamburguesas', name: 'HAMBURGUESAS', banner: '/imagenes/categorias/hamburguesas/banner.webp', order: 5 },
+        { id: 'C0006', code: 'C0006', slug: 'infusiones', name: 'INFUSIONES', banner: '/imagenes/categorias/infusiones/banner.webp', order: 6 },
+        { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS', banner: '/imagenes/categorias/platos-amazonicos/banner.webp', order: 7 },
+        { id: 'C0008', code: 'C0008', slug: 'promociones', name: 'PROMOCIONES', banner: '/imagenes/categorias/promociones/banner.webp', order: 8 },
+        { id: 'C0009', code: 'C0009', slug: 'refrescos', name: 'REFRESCOS', banner: '/imagenes/categorias/refrescos/banner.webp', order: 9 },
+        { id: 'C0010', code: 'C0010', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS', banner: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp', order: 10 }
       ];
 
       try {
@@ -224,9 +255,9 @@
         let list = [];
         if (res.ok) {
           const cats = await res.json();
-          if (Array.isArray(cats)) {
+          if (Array.isArray(cats) && cats.length > 0) {
             list = cats;
-          } else if (cats && Array.isArray(cats.data)) {
+          } else if (cats && Array.isArray(cats.data) && cats.data.length > 0) {
             list = cats.data;
           }
         }
@@ -235,45 +266,47 @@
           list = defaultCategories;
         }
 
+        window.BuchiSapaAdmin.categories = list;
         this.renderCategoriesView(list);
 
         const kpiCats = document.getElementById('kpi-val-categorias');
         if (kpiCats) kpiCats.textContent = list.length;
       } catch (e) {
+        window.BuchiSapaAdmin.categories = defaultCategories;
         this.renderCategoriesView(defaultCategories);
       }
     },
 
     renderCategoriesView: function (cats) {
       const container = document.getElementById('category-cards-container');
-      const tbody = document.getElementById('categories-page-tbody');
       const badgeCount = document.getElementById('category-count-badge');
+      const tbody = document.getElementById('categories-page-tbody');
 
       if (badgeCount) badgeCount.textContent = `${cats.length} Categorías`;
 
       if (container) {
+        if (!cats || cats.length === 0) {
+          container.innerHTML = '<div class="category-loading-message">No hay categorías registradas en la carta digital.</div>';
+          return;
+        }
+
         container.innerHTML = cats.map(c => `
-          <div class="category-item-card">
+          <div class="category-item-card" data-cat-id="${c.id || c.code || c.slug}">
             <div class="category-card-banner-wrap">
-              <img src="${c.banner || c.image || '/imagenes/portada/Portada1E.webp'}" alt="${c.name}" class="category-card-banner-img">
+              <img src="${c.banner || c.image || '/imagenes/categorias/adicionales/banner.webp'}" alt="${c.name}" class="category-card-banner-img" onerror="this.src='/imagenes/portada/Portada1E.webp'">
               <div class="category-card-banner-overlay"></div>
-              <span class="category-code-badge">${c.code || c.id}</span>
+              <span class="category-code-badge">${c.code || c.slug || c.id}</span>
               <span class="category-order-badge">#${c.order || 1}</span>
             </div>
             <div class="category-card-body">
-              <div>
-                <h3 class="category-card-name">${c.name}</h3>
-                <p class="category-card-desc">${c.description || 'Categoría de la carta digital BuchiSapa'}</p>
-              </div>
+              <h3 class="category-card-name" title="${c.name}">${c.name}</h3>
               <div class="category-card-footer">
-                <div class="category-products-count">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-                  <span>${c.count || 'Carta BuchiSapa'}</span>
-                </div>
-                <div class="category-card-actions">
-                  <button class="btn btn-xs btn-outline-gold btn-goto-products" title="Ver platillos">Platillos</button>
-                  <button class="btn btn-xs btn-primary btn-edit-category" data-cat-id="${c.id}">Editar</button>
-                </div>
+                <button class="btn btn-xs btn-primary btn-edit-category" data-cat-id="${c.id || c.code || c.slug}" type="button">
+                  <span>Editar</span>
+                </button>
+                <button class="btn btn-xs btn-danger btn-delete-category" data-cat-id="${c.id || c.code || c.slug}" type="button">
+                  <span>Eliminar</span>
+                </button>
               </div>
             </div>
           </div>
@@ -289,7 +322,8 @@
             <td><strong class="category-table-title">${c.name}</strong></td>
             <td class="category-table-desc">${c.description || '-'}</td>
             <td class="table-cell-right">
-              <button class="btn btn-xs btn-secondary btn-edit-category" data-cat-id="${c.id}">Editar</button>
+              <button class="btn btn-xs btn-primary btn-edit-category" data-cat-id="${c.id || c.code || c.slug}" type="button">Editar</button>
+              <button class="btn btn-xs btn-danger btn-delete-category" data-cat-id="${c.id || c.code || c.slug}" type="button">Eliminar</button>
             </td>
           </tr>
         `).join('');

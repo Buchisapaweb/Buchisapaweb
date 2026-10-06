@@ -75,29 +75,50 @@ document.addEventListener('DOMContentLoaded', () => {
   overlay?.addEventListener('click', toggleSidebar);
 
   // 4. Botón de Cerrar Sesión (Admin Logout)
+  const performLogout = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    try {
+      await fetch('/api/auth/admin-logout', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (e) {
+      console.error('Error durante la revocación de sesión en servidor:', e);
+    }
+
+    // Limpiar almacenamiento local y cookies
+    try {
+      localStorage.removeItem('buchisapa_admin_token');
+      localStorage.removeItem('buchisapa_admin_user');
+      localStorage.removeItem('buchisapa_admin_session');
+      sessionStorage.removeItem('buchisapa_admin_session');
+      sessionStorage.removeItem('buchisapa_admin_user');
+      
+      document.cookie = "buchisapa_admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    } catch (e) {}
+
+    // Redirigir siempre a la página principal /index.html
+    window.location.replace('/index.html');
+  };
+
   const logoutBtn = document.getElementById('btn-admin-logout');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      if (confirm('¿Estás seguro de cerrar sesión por completo del panel de administración?')) {
-        try {
-          await fetch('/api/auth/admin-logout', { method: 'POST' });
-        } catch (e) {
-          console.error('Error durante la revocación de sesión en servidor:', e);
-        }
-
-        localStorage.removeItem('buchisapa_admin_token');
-        localStorage.removeItem('buchisapa_admin_user');
-        localStorage.removeItem('buchisapa_admin_session');
-        sessionStorage.removeItem('buchisapa_admin_session');
-        sessionStorage.removeItem('buchisapa_admin_user');
-        
-        document.cookie = "buchisapa_admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-        window.location.href = '/index.html';
-      }
-    });
+    logoutBtn.addEventListener('click', performLogout);
   }
+
+  // Delegación global por si se vuelve a renderizar el sidebar
+  document.addEventListener('click', (e) => {
+    const btn = e.target?.closest?.('#btn-admin-logout');
+    if (btn) {
+      performLogout(e);
+    }
+  });
+
+  window.adminLogout = performLogout;
 
   // 5. Controles de Modales
   document.getElementById('btn-close-product-modal')?.addEventListener('click', window.closeProductModal);

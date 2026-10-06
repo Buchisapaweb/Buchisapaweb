@@ -31,40 +31,52 @@
   let selectedSauces = [];
 
   /**
+   * Determina si un producto pertenece a categorías que NO llevan acompañamientos ni cremas
+   * (Adicionales, Bebidas, Infusiones, Refrescos)
+   */
+  function isExcludedCategory(product) {
+    if (!product) return false;
+    const cat = String(product.category_id || product.category || product.categoryPill || product.categoria || product.category_slug || '').toLowerCase().trim();
+    const catBadge = String(product.categoryBadge || '').toLowerCase().trim();
+    const name = String(product.name || '').toLowerCase().trim();
+
+    // 1. ADICIONALES (C0001), BEBIDAS (C0003), INFUSIONES (C0006), REFRESCOS (C0009)
+    if (
+      cat === 'c0001' || cat === 'c0003' || cat === 'c0006' || cat === 'c0009' ||
+      cat === 'adicionales' || cat === 'adicional' ||
+      cat === 'bebidas' || cat === 'bebida' ||
+      cat === 'infusiones' || cat === 'infusion' ||
+      cat === 'refrescos' || cat === 'refresco' ||
+      cat.includes('adicional') || cat.includes('extra') ||
+      cat.includes('bebida') || cat.includes('refresco') ||
+      cat.includes('infusion') || cat.includes('infusiones') ||
+      catBadge.includes('adicional') || catBadge.includes('bebida') ||
+      catBadge.includes('refresco') || catBadge.includes('infusion')
+    ) {
+      return true;
+    }
+
+    // Bebidas e infusiones comunes por nombre
+    const drinkKeywords = [
+      'agua', 'cielo', 'san mateo', 'san luis', 'inca kola', 'coca cola', 'fanta', 'sprite', 'pepsi', 
+      'gaseosa', 'aguajina', 'maracuyá', 'maracuya', 'camu camu', 'camu', 
+      'chicha', 'anís', 'anis', 'manzanilla', 'hierba luisa', 'infusión', 'infusion', 
+      'café', 'cafe', 'té ', 'te ', 'porción de', 'porcion de', 'adicional'
+    ];
+
+    return drinkKeywords.some(kw => name.includes(kw));
+  }
+
+  /**
    * Obtiene los acompañamientos específicos según la carta oficial Buchisapa
    */
   function getProductAccompaniments(product) {
-    const name = (product.name || '').toLowerCase().trim();
-    const cat = (product.category_id || product.category || '').toLowerCase().trim();
-
-    // 6. BEBIDAS / 7. REFRESCOS / 8. INFUSIONES (No llevan acompañamiento, son bebidas solas)
-    if (
-      cat.includes('bebida') ||
-      cat.includes('refresco') ||
-      cat.includes('infusion') ||
-      cat.includes('infusiones') ||
-      name.includes('inca kola') ||
-      name.includes('coca cola') ||
-      name.includes('fanta') ||
-      name.includes('pepsi') ||
-      name.includes('agua mineral') ||
-      name.includes('san mateo') ||
-      name.includes('aguajina') ||
-      name.includes('maracuyá') ||
-      name.includes('maracuya') ||
-      name.includes('camu camu') ||
-      name.includes('camu') ||
-      name.includes('chicha') ||
-      (name.includes('cocona') && (cat.includes('refresco') || (!name.includes('salsa') && !name.includes('ensalada') && !name.includes('ají')))) ||
-      name.includes('anís') ||
-      name.includes('anis') ||
-      name.includes('té') ||
-      name.includes('te ') ||
-      name.includes('café') ||
-      name.includes('cafe')
-    ) {
+    if (!product || isExcludedCategory(product)) {
       return [];
     }
+
+    const name = (product.name || '').toLowerCase().trim();
+    const cat = (product.category_id || product.category || '').toLowerCase().trim();
 
     // 1. PLATOS AMAZÓNICOS
     if (name.includes('patacones con chorizo') || (name.includes('patacon') && name.includes('chorizo'))) {
@@ -302,29 +314,40 @@
    * Obtiene la descripción oficial de cada producto según la carta
    */
   function getProductDescription(product) {
-    if (!product) return 'Delicioso plato preparado con ingredientes frescos y la auténtica sazón de Buchisapa.';
+    if (!product) return '';
 
+    let d = '';
     // 1. Prioridad: usar directamente la descripción oficial del objeto producto
     if (product.description && typeof product.description === 'string' && product.description.trim().length > 0) {
-      return product.description.trim();
-    }
+      d = product.description.trim();
+    } else {
+      // 2. Buscar en la lista global de productos (window.currentProducts o getFallbackProducts)
+      const list = (Array.isArray(window.currentProducts) && window.currentProducts.length > 0)
+        ? window.currentProducts
+        : (typeof getFallbackProducts === 'function' ? getFallbackProducts() : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []));
 
-    // 2. Buscar en la lista global de productos (window.currentProducts o getFallbackProducts)
-    const list = (Array.isArray(window.currentProducts) && window.currentProducts.length > 0)
-      ? window.currentProducts
-      : (typeof getFallbackProducts === 'function' ? getFallbackProducts() : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []));
+      if (Array.isArray(list) && list.length > 0) {
+        const targetId = product.id ? String(product.id).trim().toLowerCase() : '';
+        const targetName = product.name ? String(product.name).trim().toLowerCase() : '';
 
-    if (Array.isArray(list) && list.length > 0) {
-      const targetId = product.id ? String(product.id).trim().toLowerCase() : '';
-      const targetName = product.name ? String(product.name).trim().toLowerCase() : '';
-
-      const match = list.find(p => (targetId && String(p.id).toLowerCase() === targetId) || (targetName && String(p.name).toLowerCase() === targetName));
-      if (match && match.description && match.description.trim().length > 0) {
-        return match.description.trim();
+        const match = list.find(p => (targetId && String(p.id).toLowerCase() === targetId) || (targetName && String(p.name).toLowerCase() === targetName));
+        if (match && match.description && match.description.trim().length > 0) {
+          d = match.description.trim();
+        }
       }
     }
 
-    return 'Preparado al momento con ingredientes frescos de la más alta calidad y la auténtica sazón de la selva.';
+    // Eliminar texto redundante "No cuenta con acompañamientos ni cremas"
+    d = d.replace(/No cuenta con acompañamientos ni cremas\.?/gi, '').trim();
+
+    if (!d) {
+      if (isExcludedCategory(product)) {
+        return '';
+      }
+      return 'Preparado al momento con ingredientes frescos de la más alta calidad y la auténtica sazón de la selva.';
+    }
+
+    return d;
   }
 
   /**
@@ -458,12 +481,7 @@
 
     if (product.includes_sauces === false) return true;
 
-    if (
-      catBadge.includes('bebida') || catBadge.includes('infusion') || catBadge.includes('refresco') ||
-      cat.includes('bebida') || cat.includes('refresco') || cat.includes('infusion') ||
-      cat.includes('postre') || cat.includes('licor') || cat.includes('trago') ||
-      cat.includes('cafe') || cat.includes('jugo')
-    ) {
+    if (isExcludedCategory(product)) {
       return true;
     }
 
@@ -613,7 +631,7 @@
                   <div class="product-main-price">S/ ${priceNum.toFixed(2)}</div>
                   <span class="product-main-unit-label">Precio unitario</span>
                 </div>
-                <p class="product-main-description">${escapeHtml(desc)}</p>
+                ${desc ? `<p class="product-main-description">${escapeHtml(desc)}</p>` : ''}
               </div>
 
               <!-- SECCIÓN 1: ACOMPAÑAMIENTOS E INGREDIENTES (SI APLICA) -->

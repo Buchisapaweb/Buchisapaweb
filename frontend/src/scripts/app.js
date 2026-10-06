@@ -2143,15 +2143,31 @@ function handleDeleteCustomerAccount() {
   closeLoginModal();
 }
 
-function handleLogoutCustomer() {
+async function handleLogoutCustomer() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+  } catch (e) {}
+  try {
+    await fetch('/api/auth/admin-logout', { method: 'POST' });
+  } catch (e) {}
+  
   localStorage.removeItem('buchisapa_customer');
+  localStorage.removeItem('buchisapa_customer_addresses');
   localStorage.removeItem('buchisapa_admin_session');
+  localStorage.removeItem('buchisapa_admin_user');
+  localStorage.removeItem('buchisapa_admin_token');
   localStorage.removeItem('buchisapa_auth_user');
   localStorage.removeItem('buchisapa_user');
   localStorage.removeItem('buchisapa_token');
   sessionStorage.clear();
+
+  document.cookie = "buchisapa_admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "buchisapa_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
   updateNavbarUserAuth();
   closeLoginModal();
+  window.location.href = '/index.html';
 }
 
 function updateNavbarUserAuth() {
@@ -4236,7 +4252,7 @@ function getFallbackProducts() {
     "category": "BEBIDAS",
     "category_id": "C0003",
     "price": 2.5,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "NATURAL",
     "popular": false,
     "available": true,
@@ -4251,7 +4267,7 @@ function getFallbackProducts() {
     "category": "REFRESCOS",
     "category_id": "C0009",
     "price": 3,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "SELVÁTICO",
     "popular": true,
     "available": true,
@@ -4281,7 +4297,7 @@ function getFallbackProducts() {
     "category": "INFUSIONES",
     "category_id": "C0006",
     "price": 2.5,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "CALIENTE",
     "popular": false,
     "available": true,
@@ -4341,7 +4357,7 @@ function getFallbackProducts() {
     "category": "INFUSIONES",
     "category_id": "C0006",
     "price": 3,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "PASADO",
     "popular": true,
     "available": true,
@@ -4371,7 +4387,7 @@ function getFallbackProducts() {
     "category": "REFRESCOS",
     "category_id": "C0009",
     "price": 3,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "VITAMINA C",
     "popular": true,
     "available": true,
@@ -4401,7 +4417,7 @@ function getFallbackProducts() {
     "category": "REFRESCOS",
     "category_id": "C0009",
     "price": 3,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "CASERA",
     "popular": true,
     "available": true,
@@ -4461,7 +4477,7 @@ function getFallbackProducts() {
     "category": "BEBIDAS",
     "category_id": "C0003",
     "price": 5,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "PERSONAL",
     "popular": true,
     "available": true,
@@ -4476,7 +4492,7 @@ function getFallbackProducts() {
     "category": "REFRESCOS",
     "category_id": "C0009",
     "price": 3,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "TÍPICO",
     "popular": true,
     "available": true,
@@ -4506,7 +4522,7 @@ function getFallbackProducts() {
     "category": "BEBIDAS",
     "category_id": "C0003",
     "price": 3.5,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "PERSONAL",
     "popular": false,
     "available": true,
@@ -4535,7 +4551,7 @@ function getFallbackProducts() {
     "category": "ADICIONALES",
     "category_id": "C0001",
     "price": 5,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "EXTRA",
     "popular": false,
     "available": true,
@@ -4595,7 +4611,7 @@ function getFallbackProducts() {
     "category": "ADICIONALES",
     "category_id": "C0001",
     "price": 2,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "EXTRA",
     "popular": false,
     "available": true,
@@ -4610,7 +4626,7 @@ function getFallbackProducts() {
     "category": "BEBIDAS",
     "category_id": "C0003",
     "price": 5,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "POPULAR",
     "popular": true,
     "available": true,
@@ -4625,7 +4641,7 @@ function getFallbackProducts() {
     "category": "ADICIONALES",
     "category_id": "C0001",
     "price": 2,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "EXTRA",
     "popular": false,
     "available": true,
@@ -4670,7 +4686,7 @@ function getFallbackProducts() {
     "category": "REFRESCOS",
     "category_id": "C0009",
     "price": 3,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "REFRESCANTE",
     "popular": true,
     "available": true,
@@ -4730,7 +4746,7 @@ function getFallbackProducts() {
     "category": "BEBIDAS",
     "category_id": "C0003",
     "price": 2,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "PERSONAL",
     "popular": false,
     "available": true,
@@ -4760,7 +4776,7 @@ function getFallbackProducts() {
     "category": "ADICIONALES",
     "category_id": "C0001",
     "price": 2,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "EXTRA",
     "popular": false,
     "available": true,
@@ -4775,7 +4791,7 @@ function getFallbackProducts() {
     "category": "ADICIONALES",
     "category_id": "C0001",
     "price": 2,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "EXTRA",
     "popular": false,
     "available": true,
@@ -4790,7 +4806,7 @@ function getFallbackProducts() {
     "category": "ADICIONALES",
     "category_id": "C0001",
     "price": 5,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "EXTRA",
     "popular": false,
     "available": true,
@@ -4880,7 +4896,7 @@ function getFallbackProducts() {
     "category": "ADICIONALES",
     "category_id": "C0001",
     "price": 2,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "EXTRA",
     "popular": false,
     "available": true,
@@ -5045,7 +5061,7 @@ function getFallbackProducts() {
     "category": "INFUSIONES",
     "category_id": "C0006",
     "price": 2.5,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "CALIENTE",
     "popular": false,
     "available": true,
@@ -5060,7 +5076,7 @@ function getFallbackProducts() {
     "category": "ADICIONALES",
     "category_id": "C0001",
     "price": 2,
-    "description": "No cuenta con acompañamientos ni cremas",
+    "description": "",
     "badge": "EXTRA",
     "popular": false,
     "available": true,
@@ -5205,4 +5221,17 @@ if (typeof document !== 'undefined') {
 }
 
 
-document.addEventListener('DOMContentLoaded',function(){try{const p=new URLSearchParams(location.search);if(p.get('admin')==='login'&&typeof openLoginModal==='function')setTimeout(()=>openLoginModal('login'),0)}catch(e){}});
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('login') === 'admin' || p.get('admin') === 'login' || p.get('login') === '1' || p.has('auth')) {
+      setTimeout(() => {
+        if (typeof openLoginModal === 'function') {
+          openLoginModal('login');
+          const emailInput = document.getElementById('auth-login-email');
+          if (emailInput) emailInput.focus();
+        }
+      }, 100);
+    }
+  } catch (e) {}
+});
