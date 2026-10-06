@@ -3,6 +3,7 @@ import path from 'path';
 
 const ROOT_DIR = process.cwd();
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
+const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 
 export function compileHtml() {
   console.log('🔄 Compilando HTML estático y organizando rutas para producción y Vercel...');
@@ -10,8 +11,32 @@ export function compileHtml() {
   if (!fs.existsSync(DIST_DIR)) {
     fs.mkdirSync(DIST_DIR, { recursive: true });
   }
+  if (!fs.existsSync(PUBLIC_DIR)) {
+    fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+  }
 
-  // 1. Compilar index.html con todos sus partials
+  function copyDirRecursive(src, dest) {
+    if (!fs.existsSync(src)) return;
+    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+    
+    const entries = fs.readdirSync(src, { withFileTypes: true });
+    for (const entry of entries) {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+      if (entry.isDirectory()) {
+        copyDirRecursive(srcPath, destPath);
+      } else {
+        fs.copyFileSync(srcPath, destPath);
+      }
+    }
+  }
+
+  // 1. Sincronizar recursos del frontend a public/ para que Vite los encuentre en build time
+  copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/styles'), path.join(PUBLIC_DIR, 'css'));
+  copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/scripts'), path.join(PUBLIC_DIR, 'js'));
+  copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/assets/images'), path.join(PUBLIC_DIR, 'imagenes'));
+
+  // 2. Compilar index.html con todos sus partials
   const partials = {
     'ENCABEZADO': 'frontend/src/components/html/encabezado.html',
     'MENU_MOVIL': 'frontend/src/components/html/menu-movil.html',
@@ -38,33 +63,16 @@ export function compileHtml() {
   fs.writeFileSync(path.join(DIST_DIR, 'index.html'), indexTemplate, 'utf8');
   console.log('✅ dist/index.html compilado con éxito (partials inyectados).');
 
-  // 2. Copiar archivos de public a dist
-  function copyDirRecursive(src, dest) {
-    if (!fs.existsSync(src)) return;
-    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-    
-    const entries = fs.readdirSync(src, { withFileTypes: true });
-    for (const entry of entries) {
-      const srcPath = path.join(src, entry.name);
-      const destPath = path.join(dest, entry.name);
-      if (entry.isDirectory()) {
-        copyDirRecursive(srcPath, destPath);
-      } else {
-        fs.copyFileSync(srcPath, destPath);
-      }
-    }
-  }
+  // 3. Copiar archivos de public a dist
+  copyDirRecursive(PUBLIC_DIR, DIST_DIR);
 
-  copyDirRecursive(path.join(ROOT_DIR, 'public'), DIST_DIR);
-
-  // Recursos del frontend: se mantienen las URLs públicas /css, /js e /imagenes
-  // aunque internamente el código esté organizado por responsabilidad.
+  // Recursos del frontend a dist/
   copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/styles'), path.join(DIST_DIR, 'css'));
   copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/scripts'), path.join(DIST_DIR, 'js'));
   copyDirRecursive(path.join(ROOT_DIR, 'frontend/src/assets/images'), path.join(DIST_DIR, 'imagenes'));
   console.log('✅ Recursos del frontend copiados a dist/css, dist/js y dist/imagenes.');
 
-  // 3. Copiar módulo independiente /admin a dist/admin y compilar sus partials
+  // 4. Copiar módulo independiente /admin a dist/admin y compilar sus partials
   const adminSrc = path.join(ROOT_DIR, 'frontend/src/admin');
   const adminDest = path.join(DIST_DIR, 'admin');
   copyDirRecursive(adminSrc, adminDest);
@@ -95,7 +103,7 @@ export function compileHtml() {
   fs.writeFileSync(path.join(adminDest, 'index.html'), adminTemplate, 'utf8');
   console.log('✅ dist/admin/index.html compilado con éxito.');
 
-  // 4. Asegurar rutas directas para Vercel y hosts estáticos
+  // 5. Asegurar rutas directas para Vercel y hosts estáticos
   const directPages = [
     { src: 'frontend/src/pages/html/cocina.html', outName: 'cocina' },
     { src: 'frontend/src/pages/html/cocina.html', outName: 'kitchen' },
@@ -124,20 +132,14 @@ export function compileHtml() {
     if (fs.existsSync(fullSrc)) {
       const content = fs.readFileSync(fullSrc, 'utf8');
       
-      // dist/{page}.html
       fs.writeFileSync(path.join(DIST_DIR, `${page.outName}.html`), content, 'utf8');
       
-      // dist/{page}/index.html (para navegación limpia con slash final)
       const pageDir = path.join(DIST_DIR, page.outName);
       if (!fs.existsSync(pageDir)) fs.mkdirSync(pageDir, { recursive: true });
       fs.writeFileSync(path.join(pageDir, 'index.html'), content, 'utf8');
     }
   }
   console.log('✅ Rutas estáticas limpias creadas (/kitchen, /ubicacion, /reclamaciones).');
-
-  // 5. Verificar carpeta de imágenes en dist/ para Vercel
-  const logoDist = path.join(DIST_DIR, 'imagenes', 'logo', 'logo-buchisapa.webp');
-  console.log(`✅ Archivos de imágenes verificados en dist/imagenes.`);
 }
 
 compileHtml();
