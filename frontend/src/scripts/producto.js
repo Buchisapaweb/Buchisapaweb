@@ -210,7 +210,15 @@
     if (titleEl) titleEl.textContent = p.name;
 
     const descEl = document.getElementById('prod-desc');
-    if (descEl) descEl.textContent = p.description || 'Preparado al momento con los mejores ingredientes y la sazón auténtica de BuchiSapa.';
+    if (descEl) {
+      if (p.description && p.description.trim()) {
+        descEl.textContent = p.description.trim();
+        descEl.style.display = 'block';
+      } else {
+        descEl.textContent = '';
+        descEl.style.display = 'none';
+      }
+    }
 
     // Precios
     const priceEl = document.getElementById('prod-price-current');

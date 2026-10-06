@@ -625,7 +625,7 @@ const BuchisapaCart = {
     const locationLabelEl = document.getElementById('selected-location-label');
     let districtName = 'Ate';
     if (locationLabelEl && locationLabelEl.textContent) {
-      const txt = locationLabelEl.textContent.replace('Entregar a', '').trim();
+      const txt = locationLabelEl.textContent.replace('Entregar a', '').replace('Entrega en', '').trim();
       if (txt) districtName = txt;
     }
 

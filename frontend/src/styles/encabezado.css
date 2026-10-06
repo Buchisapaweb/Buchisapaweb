@@ -1,11 +1,7 @@
-/* --- 1. BARRA DE NAVEGACIÓN SUPERIOR (.site-header) --- */
 .site-header {
   background: #ffffff !important;
   border-bottom: 1.5px solid #f1f5f9;
-  position: sticky !important;
-  top: 0 !important;
-  left: 0;
-  right: 0;
+  position: relative !important;
   z-index: 9999 !important;
   box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03) !important;
   width: 100%;
@@ -556,9 +552,8 @@
 }
 
 
-/* Barra de búsqueda móvil */
 .buchisapa-search-bar-wrap {
-  position: fixed;
+  position: absolute;
   top: 76px;
   left: 0;
   right: 0;
@@ -568,6 +563,11 @@
   z-index: 9998;
   display: none;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+@media (max-width: 768px) {
+  .buchisapa-search-bar-wrap {
+    top: 64px;
+  }
 }
 .buchisapa-search-bar-wrap:not(.is-hidden) {
   display: block;

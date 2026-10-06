@@ -1,45 +1,88 @@
 /* =========================================================
    BUCHISAPA RESTAURANTE - PÁGINA DE DETALLE DE PRODUCTO (producto.css)
-   Estilos optimizados para /producto, /productoDetalle y Personalizador
+   Estilos optimizados para /producto, /productoDetalle y Personalizador.
+   Enfoca imágenes cuadradas de alta definición y adaptabilidad fluida.
    ========================================================= */
 
-/* --- 1. LAYOUT PRINCIPAL DEL DETALLE DE PRODUCTO --- */
+/* --- 1. LAYOUT PRINCIPAL Y CONTENEDOR --- */
+.producto-page-main,
 .producto-detail-main {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: clamp(16px, 3vw, 36px) clamp(12px, 2vw, 24px);
+  padding: clamp(16px, 3vw, 36px) clamp(16px, 2vw, 24px);
   width: 100%;
 }
 
+/* Breadcrumbs (Navegación de categorías) */
+.producto-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: clamp(16px, 3vw, 28px);
+}
+.producto-breadcrumbs a {
+  color: #475569;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.producto-breadcrumbs a:hover {
+  color: #dc2626;
+}
+.producto-breadcrumbs .sep {
+  color: #94a3b8;
+  font-weight: 400;
+  user-select: none;
+}
+.producto-breadcrumbs .current {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Grid de Detalle Principal */
+.producto-detail-grid,
 .producto-detail-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(24px, 4vw, 44px);
   background: #ffffff;
   border-radius: 24px;
   border: 1px solid #f1f5f9;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
   padding: clamp(16px, 3vw, 32px);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(20px, 3vw, 40px);
+  margin-bottom: 40px;
 }
 
+@media (min-width: 860px) {
+  .producto-detail-grid,
+  .producto-detail-card {
+    grid-template-columns: 1.05fr 1.15fr; /* Proporciones perfectas de columnas */
+  }
+}
 
-
-/* Galería de Imágenes del Producto */
+/* --- 2. COLUMNA IZQUIERDA: GALERÍA Y MEDIA --- */
+.producto-media-col,
 .producto-gallery-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   position: sticky;
-  top: 80px;
+  top: 90px;
 }
 
+/* Tarjeta contenedora de la imagen - FORMA CUADRADA EXIGIDA */
+.producto-image-card,
 .producto-main-img-box {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1 !important; /* Cuadrado perfecto exigido */
   border-radius: 20px;
   overflow: hidden;
   background: #f8fafc;
   position: relative;
+  border: 1px solid #e2e8f0;
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05);
 }
 
@@ -47,27 +90,115 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.producto-main-img:hover { transform: scale(1.03); }
+.producto-main-img:hover {
+  transform: scale(1.03);
+}
 
-/* --- 2. INFORMACIÓN Y SELECCIONABLES DEL PRODUCTO --- */
+/* Badges flotantes sobre la imagen */
+.producto-badge-floating {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
+  z-index: 5;
+}
+
+/* Indicador de Stock flotante inferior */
+.producto-stock-badge {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 5;
+}
+.producto-stock-dot {
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+/* Acciones rápidas de compartir debajo de imagen */
+.producto-media-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+.share-action-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.share-action-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+.share-action-btn.share-whatsapp {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #047857;
+}
+.share-action-btn.share-whatsapp:hover {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+}
+
+/* --- 3. COLUMNA DERECHA: INFORMACIÓN DEL PRODUCTO --- */
+.producto-info-col,
 .producto-info-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: clamp(16px, 2.5vw, 24px);
 }
 
+.producto-header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.producto-category-pill,
 .producto-badge-cat {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   padding: 5px 12px;
-  background: #fff1f2;
-  border: 1px solid #ffe4e6;
+  background: #fdf2f2;
+  border: 1px solid #fee2e2;
   color: #dc2626;
   border-radius: 9999px;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -75,41 +206,88 @@
 }
 
 .producto-title {
-  font-size: clamp(22px, 3.5vw, 32px);
+  font-size: clamp(22px, 3.2vw, 30px);
   font-weight: 900;
   color: #0f172a;
-  margin: 0;
   line-height: 1.25;
-}
-
-.producto-description {
-  font-size: 14px;
-  color: #64748b;
-  line-height: 1.6;
+  letter-spacing: -0.5px;
   margin: 0;
 }
 
+.producto-pricing-row,
 .producto-price-row {
   display: flex;
   align-items: baseline;
-  gap: 10px;
-  margin: 8px 0;
+  gap: 12px;
+  margin-top: 4px;
 }
-
+.producto-price-current,
 .producto-price-main {
-  font-size: clamp(24px, 4vw, 32px);
+  font-size: clamp(24px, 4.5vw, 32px);
   font-weight: 900;
   color: #dc2626;
+  letter-spacing: -0.5px;
 }
-
+.producto-price-original,
 .producto-price-old {
   font-size: 16px;
   color: #94a3b8;
   text-decoration: line-through;
   font-weight: 600;
 }
+.producto-discount-pill {
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
 
-/* --- 3. GRUPOS DE OPCIONES / ADICIONALES / GUARNICIONES --- */
+/* Descripción de plato con soporte para ocultarse elegantemente si no existe */
+.producto-description {
+  font-size: 14.5px;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Specs Chips Grid */
+.producto-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.spec-chip {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.spec-chip-icon {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.spec-chip-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+}
+.spec-chip-val {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 1px;
+}
+
+/* --- 4. PERSONALIZADOR Y SELECCIONABLES (CREMAS, GUARNICIÓN) --- */
+.customizer-box,
 .options-group-box {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -117,67 +295,155 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
+.customizer-section-title,
 .options-group-title {
   font-size: 14px;
   font-weight: 800;
   color: #0f172a;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+}
+.customizer-section-badge {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
 }
 
+/* Chips Acompañamiento / Guarniciones */
 .options-chips-wrap {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
 }
+@media (min-width: 480px) {
+  .options-chips-wrap {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
+.option-radio-card,
 .option-chip-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: #ffffff;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #334155;
   transition: all 0.15s ease;
   user-select: none;
 }
-
-.option-chip-item:hover,
-.option-chip-item.selected {
+.option-radio-card input[type="radio"],
+.option-chip-item input[type="radio"] {
+  margin-right: 10px;
+  accent-color: #dc2626;
+  width: 15px;
+  height: 15px;
+}
+.option-radio-card.active,
+.option-radio-card:hover,
+.option-chip-item.selected,
+.option-chip-item:hover {
   border-color: #dc2626;
-  background: #fef2f2;
+  background: #fdf2f2;
   color: #dc2626;
 }
 
-/* --- 4. BARRA DE COMPRA Y CANTIDADES --- */
+/* Chips de Cremas / Salsas */
+.sauces-chips-wrap {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (min-width: 580px) {
+  .sauces-chips-wrap {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.sauce-chip-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.sauce-chip-label input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: #dc2626;
+  width: 14px;
+  height: 14px;
+}
+.sauce-chip-label.active,
+.sauce-chip-label:hover {
+  border-color: #dc2626;
+  background: #fdf2f2;
+  color: #dc2626;
+}
+
+/* Input de notas */
+.notes-input-control {
+  width: 100%;
+  height: 80px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: #1e293b;
+  outline: none;
+  resize: none;
+  transition: border-color 0.15s ease;
+}
+.notes-input-control:focus {
+  border-color: #dc2626;
+}
+
+/* --- 5. COMPRA, STEPPER Y BOTONES --- */
+.purchase-action-bar,
 .buy-action-bar {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-top: 12px;
+  gap: 16px;
+  margin-top: clamp(12px, 2vw, 20px);
   padding-top: 16px;
   border-top: 1px solid #f1f5f9;
 }
 
+/* Stepper de Cantidad */
+.qty-stepper-box,
 .quantity-picker-box {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
+  gap: 12px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 9999px;
-  padding: 4px 10px;
+  padding: 6px 12px;
 }
-
+.qty-step-btn,
 .qty-control-btn {
   width: 32px;
   height: 32px;
@@ -193,55 +459,203 @@
   justify-content: center;
   transition: all 0.15s ease;
 }
-.qty-control-btn:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
-
+.qty-step-btn:hover,
+.qty-control-btn:hover {
+  background: #fdf2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+.qty-val-num,
 .qty-number-display {
   font-size: 16px;
   font-weight: 900;
   color: #0f172a;
-  min-width: 24px;
+  min-width: 20px;
   text-align: center;
 }
 
+/* Botón Agregar al Pedido */
+.btn-add-cart-primary,
 .btn-add-cart-main {
   flex: 1;
-  height: 52px;
+  height: 48px;
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.22) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.btn-add-cart-primary:hover,
+.btn-add-cart-main:hover {
+  background: #b91c1c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.32) !important;
+}
+.btn-add-cart-primary:active,
+.btn-add-cart-main:active {
+  transform: translateY(0) !important;
+}
+
+/* --- 6. BARRA COMPRA FLOTANTE EN MÓVILES (STICKY BUY BAR) --- */
+.mobile-sticky-buy-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 999;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 769px) {
+  .mobile-sticky-buy-bar {
+    display: none !important; /* Esconder en escritorio */
+  }
+}
+
+.mobile-bar-price-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.mobile-bar-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+.mobile-bar-price {
+  font-size: 18px;
+  font-weight: 900;
+  color: #dc2626;
+}
+.mobile-bar-btn {
+  height: 44px;
+  padding: 0 20px;
   background: #dc2626;
   color: #ffffff;
   border: none;
   border-radius: 9999px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 900;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
-  transition: all 0.18s ease;
-}
-.btn-add-cart-main:hover {
-  background: #b91c1c;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
 }
 
-/* --- 5. SECCIÓN DE RELACIONADOS --- */
+/* --- 7. SECCIÓN DE RELACIONADOS --- */
 .related-products-section {
-  margin-top: 40px;
-  padding-top: 24px;
+  margin-top: 48px;
+  padding-top: 32px;
   border-top: 1px solid #f1f5f9;
 }
-
 .related-section-title {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 900;
   color: #0f172a;
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
 }
-
 .related-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+}
+@media (min-width: 768px) {
+  .related-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+}
+
+.related-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
+  height: 100%;
+}
+.related-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  border-color: #e2e8f0;
+}
+.related-card-img-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1 !important; /* Relacionados también en cuadrado de alta definición */
+  overflow: hidden;
+  background: #f1f5f9;
+}
+.related-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.related-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.related-card-cat {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+.related-card-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.35;
+  margin: 0 0 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+.related-card-price {
+  font-size: 14.5px;
+  font-weight: 900;
+  color: #dc2626;
+}
+
+/* Footer de subpágina */
+.subpage-simple-footer {
+  text-align: center;
+  padding: 32px 16px 80px; /* Padding extra para no chocar con barra sticky móvil */
+  font-size: 12.5px;
+  color: #94a3b8;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 56px;
+}
+@media (min-width: 769px) {
+  .subpage-simple-footer {
+    padding: 32px 16px;
+  }
 }
