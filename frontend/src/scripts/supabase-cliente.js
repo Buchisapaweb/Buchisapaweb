@@ -36,11 +36,11 @@ const BuchisapaAPI = {
           try { if (options.body) parsedPayload = JSON.parse(options.body); } catch (e) {}
           this.reportError({
             operation: options.method === 'POST' ? 'INSERT_ORDER' : (options.method === 'PATCH' ? 'UPDATE_ORDER_STATUS' : 'FETCH_ORDERS'),
-            orderId: parsedPayload?.id,
+            idPedido: parsedPayload?.id,
             orderNumber: parsedPayload?.order_number || parsedPayload?.orderNumber,
-            customerName: parsedPayload?.customer_name || parsedPayload?.customerName,
-            customerPhone: parsedPayload?.customer_phone || parsedPayload?.customerPhone,
-            customerEmail: parsedPayload?.customer_email || parsedPayload?.customerEmail,
+            nombreCliente: parsedPayload?.customer_name || parsedPayload?.nombreCliente,
+            telefonoCliente: parsedPayload?.customer_phone || parsedPayload?.telefonoCliente,
+            emailCliente: parsedPayload?.customer_email || parsedPayload?.emailCliente,
             total: parsedPayload?.total,
             endpoint: url,
             statusCode: res.status,
@@ -80,35 +80,35 @@ const BuchisapaAPI = {
    */
   async fallbackApi(endpoint, options) {
     try {
-      let apiUrl = '/api/products';
-      if (endpoint.startsWith('categories')) apiUrl = '/api/categories';
+      let apiUrl = '/api/productos';
+      if (endpoint.startsWith('categories')) apiUrl = '/api/categorias';
       if (endpoint.startsWith('orders')) {
-        apiUrl = '/api/orders';
+        apiUrl = '/api/pedidos';
         if (endpoint.includes('?')) {
           const queryPart = endpoint.split('?')[1];
           if (queryPart.includes('customer_email=eq.') || queryPart.includes('email=')) {
             const match = queryPart.match(/(?:customer_email=eq\.|email=)([^&]+)/);
             if (match && match[1]) {
-              apiUrl = `/api/orders?email=${match[1]}`;
+              apiUrl = `/api/pedidos?email=${match[1]}`;
             }
           }
         }
         if (options && options.method === 'PATCH') {
           const match = endpoint.match(/id=eq\.([^&]+)/);
           if (match && match[1]) {
-            apiUrl = `/api/orders/${match[1]}/status`;
+            apiUrl = `/api/pedidos/${match[1]}/status`;
           }
         }
       }
-      if (endpoint.startsWith('claims')) apiUrl = '/api/claims';
-      if (endpoint.startsWith('users') || endpoint.startsWith('customers')) apiUrl = '/api/users';
+      if (endpoint.startsWith('claims')) apiUrl = '/api/reclamaciones';
+      if (endpoint.startsWith('users') || endpoint.startsWith('customers')) apiUrl = '/api/usuarios';
 
       const res = await fetch(apiUrl, options);
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
       const json = await res.json();
-      return json.data !== undefined ? json.data : json;
+      return json.datos !== undefined ? json.datos : json;
     } catch (e) {
       console.error('Error total en API:', e);
       return null;
@@ -168,12 +168,12 @@ const BuchisapaAPI = {
       // Ignorar fallo de Supabase y continuar transparentemente con el fallback local
     }
 
-    // 2. Fallback a endpoint de Express /api/orders?email=...
+    // 2. Fallback a endpoint de Express /api/pedidos?email=...
     try {
-      const res = await fetch(`/api/orders?email=${encodeURIComponent(cleanEmail)}`);
+      const res = await fetch(`/api/pedidos?email=${encodeURIComponent(cleanEmail)}`);
       if (res.ok) {
         const json = await res.json();
-        const list = Array.isArray(json) ? json : (json && Array.isArray(json.data) ? json.data : []);
+        const list = Array.isArray(json) ? json : (json && Array.isArray(json.datos) ? json.datos : []);
         if (list.length > 0) return list;
       }
     } catch (err) {
@@ -182,12 +182,12 @@ const BuchisapaAPI = {
 
     // 3. Verificación de pedidos locales en el almacén si no vienen filtrados
     try {
-      const allRes = await fetch('/api/orders');
+      const allRes = await fetch('/api/pedidos');
       if (allRes.ok) {
         const allJson = await allRes.json();
-        const allList = Array.isArray(allJson) ? allJson : (allJson && Array.isArray(allJson.data) ? allJson.data : []);
+        const allList = Array.isArray(allJson) ? allJson : (allJson && Array.isArray(allJson.datos) ? allJson.datos : []);
         return allList.filter(o => {
-          const orderEmail = (o.customer_email || o.customerEmail || '').trim().toLowerCase();
+          const orderEmail = (o.customer_email || o.emailCliente || '').trim().toLowerCase();
           return orderEmail === cleanEmail;
         });
       }
@@ -224,13 +224,13 @@ const BuchisapaAPI = {
         body: JSON.stringify({ email: cleanEmail, password: cleanPass })
       });
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.access_token) {
-        const errDetail = data.error_description || data.msg || data.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
+      const datos = await res.json().catch(() => ({}));
+      if (!res.ok || !datos.access_token) {
+        const errDetail = datos.error_description || datos.msg || datos.message || 'El correo electrónico o la contraseña ingresados no son correctos.';
         throw new Error(errDetail);
       }
 
-      const sbUser = data.user || {};
+      const sbUser = datos.user || {};
       const meta = sbUser.user_metadata || {};
       const appMeta = sbUser.app_metadata || {};
 
@@ -240,24 +240,24 @@ const BuchisapaAPI = {
         id: sbUser.id,
         uid: sbUser.id,
         email: sbUser.email || cleanEmail,
-        name: meta.name || meta.full_name || 'Usuario BuchiSapa',
-        firstName: meta.firstName || meta.given_name || (meta.name ? meta.name.split(' ')[0] : 'Admin'),
-        lastName: meta.lastName || meta.family_name || (meta.name ? meta.name.split(' ').slice(1).join(' ') : ''),
+        nombre: meta.nombre || meta.full_name || 'Usuario BuchiSapa',
+        primerNombre: meta.primerNombre || meta.given_name || (meta.nombre ? meta.nombre.split(' ')[0] : 'Admin'),
+        apellido: meta.apellido || meta.family_name || (meta.nombre ? meta.nombre.split(' ').slice(1).join(' ') : ''),
         phone: meta.phone || sbUser.phone || '',
-        docType: meta.docType || 'DNI',
-        docNumber: meta.docNumber || '',
+        tipoDoc: meta.tipoDoc || 'DNI',
+        numeroDoc: meta.numeroDoc || '',
         role: isAdmin ? 'admin' : (meta.role || 'customer'),
         isAdmin: isAdmin,
         emailVerified: Boolean(sbUser.email_confirmed_at || sbUser.confirmed_at || meta.email_verified),
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token
+        accessToken: datos.access_token,
+        refreshToken: datos.refresh_token
       };
 
       return {
-        success: true,
+        exito: true,
         user: userProfile,
-        data: userProfile,
-        token: data.access_token,
+        datos: userProfile,
+        token: datos.access_token,
         isAdmin
       };
     } catch (err) {

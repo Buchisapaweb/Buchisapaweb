@@ -15,9 +15,9 @@ const BuchisapaCart = {
   isDrinkOrNoSauceItem(product) {
     if (!product) return false;
 
-    const catBadge = String(product.categoryBadge || '').toLowerCase();
-    const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
-    const name = String(product.name || '').toLowerCase();
+    const catBadge = String(product.categoriaBadge || '').toLowerCase();
+    const cat = String(product.id_categoria || product.categoria || product.categoriaPill || '').toLowerCase();
+    const name = String(product.nombre || '').toLowerCase();
 
     // Las promociones, combos y packs NUNCA son bebidas puras (siempre incluyen cremas y salsas de la casa)
     if (
@@ -27,7 +27,7 @@ const BuchisapaCart = {
       return false;
     }
 
-    if (product.includes_sauces === false) return true;
+    if (product.incluye_salsas === false) return true;
 
     if (
       catBadge.includes('bebida') || catBadge.includes('infusion') || catBadge.includes('refresco') ||
@@ -102,7 +102,7 @@ const BuchisapaCart = {
   },
 
   getCategoryBadge(product) {
-    const cat = (product.category_id || product.category || '').toLowerCase();
+    const cat = (product.id_categoria || product.categoria || '').toLowerCase();
     if (cat.includes('promocion') || cat.includes('promo')) return 'PROMOCIONES';
     if (cat.includes('broaster')) return 'BROASTER';
     if (cat.includes('hamburguesa')) return 'HAMBURGUESAS';
@@ -115,8 +115,8 @@ const BuchisapaCart = {
   },
 
   getDefaultAccompaniments(product) {
-    const name = (product.name || '').toLowerCase();
-    const cat = (product.category_id || product.category || '').toLowerCase();
+    const name = (product.nombre || '').toLowerCase();
+    const cat = (product.id_categoria || product.categoria || '').toLowerCase();
     
     if (this.isDrinkOrNoSauceItem(product)) {
       if (cat.includes('infusion') || name.includes('café') || name.includes('cafe') || name.includes('té') || name.includes('te') || name.includes('anís')) {
@@ -148,17 +148,17 @@ const BuchisapaCart = {
     }
 
     // Validación preliminar si el plato viene marcado como no disponible o stock 0
-    if (product.available === false || (typeof product.stock === 'number' && product.stock <= 0)) {
+    if (product.disponible === false || (typeof product.stock === 'number' && product.stock <= 0)) {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.playChime();
         window.BuchisapaPush.showToast({
           title: 'Plato Agotado en Cocina',
-          message: `"${product.name || 'Este plato'}" no tiene stock disponible en este momento.`,
+          mensaje: `"${product.nombre || 'Este plato'}" no tiene stock disponible en este momento.`,
           stage: 'cancelado',
           icon: '🚫'
         });
       } else {
-        alert(`Lo sentimos, "${product.name || 'este plato'}" está agotado en cocina.`);
+        alert(`Lo sentimos, "${product.nombre || 'este plato'}" está agotado en cocina.`);
       }
       return false;
     }
@@ -187,10 +187,10 @@ const BuchisapaCart = {
     } else {
       this.items.push({
         id: product.id,
-        name: product.name,
-        price: parseFloat(product.price || 0),
-        image: product.image || 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400',
-        categoryBadge: catBadge,
+        nombre: product.nombre,
+        precio: parseFloat(product.precio || 0),
+        imagen: product.imagen || 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400',
+        etiquetaCategoria: catBadge,
         accompaniments: accompaniments,
         option: defaultOption,
         quantity: quantity,
@@ -233,15 +233,15 @@ const BuchisapaCart = {
 
     // IDs y nombres ya en el carrito para no recomendar lo que el cliente ya tiene
     const inCartIds = new Set(currentItems.map(it => String(it.id || '').toLowerCase()));
-    const inCartNames = new Set(currentItems.map(it => (it.name || '').toLowerCase().trim()));
+    const inCartNames = new Set(currentItems.map(it => (it.nombre || '').toLowerCase().trim()));
 
     // Filtrar catálogo ÚNICAMENTE para bebidas/refrescos/infusiones disponibles que no estén ya en el carrito
     const availableDrinks = catalog.filter(p => {
       if (!p) return false;
       const pid = String(p.id || '').toLowerCase();
-      const pname = (p.name || '').toLowerCase().trim();
+      const pname = (p.nombre || '').toLowerCase().trim();
       if (inCartIds.has(pid) || inCartNames.has(pname)) return false;
-      if (p.available === false) return false;
+      if (p.disponible === false) return false;
       const stockStatus = this.stockStatusMap[p.id] || this.stockStatusMap[pname];
       if (stockStatus && stockStatus.hasStock === false) return false;
       return this.isDrinkOrNoSauceItem(p);
@@ -257,7 +257,7 @@ const BuchisapaCart = {
     // Asignar badges personalizados según la bebida
     const suggestions = [];
     const getDrinkBadge = (p) => {
-      const n = (p.name || '').toLowerCase();
+      const n = (p.nombre || '').toLowerCase();
       if (n.includes('cocona')) return '🥤 De la Selva';
       if (n.includes('camu')) return '⭐ Vitamina C';
       if (n.includes('chicha')) return '🍇 Tradicional';
@@ -271,7 +271,7 @@ const BuchisapaCart = {
 
     // Priorizar refrescos naturales de la selva
     const naturalDrinks = availableDrinks.filter(p => {
-      const n = (p.name || '').toLowerCase();
+      const n = (p.nombre || '').toLowerCase();
       return n.includes('cocona') || n.includes('camu') || n.includes('chicha') || n.includes('aguajina') || n.includes('maracuy') || n.includes('limonada');
     });
 
@@ -283,7 +283,7 @@ const BuchisapaCart = {
     for (const d of orderedList) {
       suggestions.push({
         ...d,
-        badge: getDrinkBadge(d)
+        etiqueta: getDrinkBadge(d)
       });
       if (suggestions.length >= 4) break;
     }
@@ -298,7 +298,7 @@ const BuchisapaCart = {
   /**
    * AGREGAR PRODUCTO COMPLEMENTARIO DESDE EL CARRITO EN 1 CLIC
    */
-  addCrossSellItem(productId, event) {
+  addCrossSellItem(idProducto, event) {
     if (event) {
       event.stopPropagation();
       event.preventDefault();
@@ -313,14 +313,14 @@ const BuchisapaCart = {
       catalog = window.getFallbackProducts();
     }
 
-    const product = catalog.find(p => String(p.id || '').toLowerCase() === String(productId || '').toLowerCase());
+    const product = catalog.find(p => String(p.id || '').toLowerCase() === String(idProducto || '').toLowerCase());
     if (!product) return;
 
-    if (product.available === false) {
+    if (product.disponible === false) {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.showToast({
           title: 'Plato Agotado',
-          message: `"${product.name}" no está disponible en este momento.`,
+          mensaje: `"${product.nombre}" no está disponible en este momento.`,
           stage: 'cancelado',
           icon: '🚫'
         });
@@ -377,7 +377,7 @@ const BuchisapaCart = {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.showToast({
           title: 'Tu Pedido Está Vacío',
-          message: 'Agrega al menos un plato a tu carrito para continuar.',
+          mensaje: 'Agrega al menos un plato a tu carrito para continuar.',
           stage: 'info',
           icon: '🛒'
         });
@@ -404,7 +404,7 @@ const BuchisapaCart = {
     if (window.BuchisapaPush) {
       window.BuchisapaPush.showToast({
         title: 'Carrito Limpio',
-        message: 'Se retiraron los productos no disponibles. Ya puedes continuar con tu pedido.',
+        mensaje: 'Se retiraron los productos no disponibles. Ya puedes continuar con tu pedido.',
         stage: 'info',
         icon: '🧹'
       });
@@ -412,18 +412,18 @@ const BuchisapaCart = {
   },
 
   // Manejo de eventos SSE de stock en vivo desde la cocina
-  onStockBroadcast(data) {
-    if (!data || !data.productId) return;
-    const itemInCart = this.items.find(it => it.id === data.productId || (it.name && it.name.toLowerCase() === (data.name || '').toLowerCase()));
+  onStockBroadcast(datos) {
+    if (!datos || !datos.idProducto) return;
+    const itemInCart = this.items.find(it => it.id === datos.idProducto || (it.nombre && it.nombre.toLowerCase() === (datos.nombre || '').toLowerCase()));
     if (itemInCart) {
-      console.log(`⚡ Sincronización SSE en vivo: plato ${itemInCart.name} actualizado.`);
+      console.log(`⚡ Sincronización SSE en vivo: plato ${itemInCart.nombre} actualizado.`);
       this.checkRealtimeStock(true);
-      if (data.available === false || data.stock === 0) {
+      if (datos.disponible === false || datos.stock === 0) {
         if (window.BuchisapaPush) {
           window.BuchisapaPush.playChime();
           window.BuchisapaPush.showToast({
             title: '⚠️ Plato Agotado en Cocina',
-            message: `La cocina acaba de marcar "${itemInCart.name}" como agotado. Se actualizó tu carrito.`,
+            mensaje: `La cocina acaba de marcar "${itemInCart.nombre}" como agotado. Se actualizó tu carrito.`,
             stage: 'cancelado',
             icon: '🔥'
           });
@@ -433,21 +433,21 @@ const BuchisapaCart = {
   },
 
   // Herramienta de demostración para probar stock agotado en vivo
-  async toggleTestStock(productId) {
-    const targetId = productId || (this.items[0] ? this.items[0].id : 'ama-1');
+  async toggleTestStock(idProducto) {
+    const targetId = idProducto || (this.items[0] ? this.items[0].id : 'ama-1');
     try {
-      const res = await fetch('/api/products/test-toggle-stock', {
+      const res = await fetch('/api/productos/test-toggle-stock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: targetId })
+        body: JSON.stringify({ idProducto: targetId })
       });
-      const data = await res.json();
-      if (data.success) {
+      const datos = await res.json();
+      if (datos.exito) {
         if (window.BuchisapaPush) {
           window.BuchisapaPush.showToast({
             title: 'Prueba de Stock en Vivo',
-            message: data.message,
-            stage: data.data.available ? 'entregado' : 'cancelado',
+            mensaje: datos.mensaje,
+            stage: datos.datos.disponible ? 'entregado' : 'cancelado',
             icon: '🧪'
           });
         }
@@ -470,7 +470,7 @@ const BuchisapaCart = {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.showToast({
           title: 'Carrito vacío',
-          message: 'Agrega platos antes de aplicar un cupón de descuento.',
+          mensaje: 'Agrega platos antes de aplicar un cupón de descuento.',
           stage: 'cancelado',
           icon: '🛒'
         });
@@ -484,7 +484,7 @@ const BuchisapaCart = {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.showToast({
           title: '¡Cupón Aplicado! 🎉',
-          message: 'Se aplicó un 10% de descuento a tu pedido.',
+          mensaje: 'Se aplicó un 10% de descuento a tu pedido.',
           stage: 'preparando',
           icon: '🎁'
         });
@@ -495,7 +495,7 @@ const BuchisapaCart = {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.showToast({
           title: '¡Cupón Aplicado! 🌴',
-          message: 'Se descontaron S/ 5.00 de tu pedido.',
+          mensaje: 'Se descontaron S/ 5.00 de tu pedido.',
           stage: 'preparando',
           icon: '🌴'
         });
@@ -506,7 +506,7 @@ const BuchisapaCart = {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.showToast({
           title: '¡Envío Gratis! 🛵',
-          message: 'Costo de delivery bonificado al 100%.',
+          mensaje: 'Costo de delivery bonificado al 100%.',
           stage: 'preparando',
           icon: '🚀'
         });
@@ -515,7 +515,7 @@ const BuchisapaCart = {
       if (window.BuchisapaPush) {
         window.BuchisapaPush.showToast({
           title: 'Código no válido',
-          message: 'Prueba con BUCHISAPA10, SELVA20 o ENVIOGRATIS',
+          mensaje: 'Prueba con BUCHISAPA10, SELVA20 o ENVIOGRATIS',
           stage: 'cancelado',
           icon: '⚠️'
         });
@@ -533,7 +533,7 @@ const BuchisapaCart = {
 
   getSubtotal() {
     if (!Array.isArray(this.items)) return 0;
-    return this.items.reduce((sum, item) => sum + ((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1)), 0);
+    return this.items.reduce((sum, item) => sum + ((parseFloat(item.precio) || 0) * (parseInt(item.quantity) || 1)), 0);
   },
 
   getTotal() {
@@ -719,28 +719,28 @@ const BuchisapaCart = {
 
             <div class="cross-sell-vertical-list">
               ${crossSell.items.map(item => {
-                const priceFormatted = (parseFloat(item.price) || 0).toFixed(2);
-                const badge = item.badge || 'RECOMENDADO';
+                const priceFormatted = (parseFloat(item.precio) || 0).toFixed(2);
+                const badge = item.etiqueta || 'RECOMENDADO';
                 const catFallback = (typeof window.getCategoryBannerFallback === 'function') 
-                  ? window.getCategoryBannerFallback(item.category_id || item.category) 
+                  ? window.getCategoryBannerFallback(item.id_categoria || item.categoria) 
                   : '/imagenes/portada/Portada1E.webp';
-                const imgUrl = item.image || catFallback;
-                const desc = item.description || 'Refresco helado y delicioso para acompañar tu plato';
+                const imgUrl = item.imagen || catFallback;
+                const desc = item.descripcion || 'Refresco helado y delicioso para acompañar tu plato';
 
                 return `
-                  <div class="cross-sell-vertical-card" onclick="if(typeof openProductDetailModal === 'function') openProductDetailModal('${item.id}')" title="Ver detalles de ${item.name}">
+                  <div class="cross-sell-vertical-card" onclick="if(typeof openProductDetailModal === 'function') openProductDetailModal('${item.id}')" title="Ver detalles de ${item.nombre}">
                     <div class="cross-sell-v-img-wrap">
-                      <img src="${imgUrl}" alt="${item.name}" class="cross-sell-v-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
+                      <img src="${imgUrl}" alt="${item.nombre}" class="cross-sell-v-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
                       <span class="cross-sell-v-badge">${badge}</span>
                     </div>
                     <div class="cross-sell-v-info">
                       <div class="cross-sell-v-title-row">
-                        <h5 class="cross-sell-v-name">${item.name}</h5>
+                        <h5 class="cross-sell-v-name">${item.nombre}</h5>
                         <span class="cross-sell-v-price">S/ ${priceFormatted}</span>
                       </div>
                       <p class="cross-sell-v-desc">${desc}</p>
                     </div>
-                    <button class="cross-sell-v-add-btn" type="button" onclick="event.stopPropagation(); BuchisapaCart.addCrossSellItem('${item.id}', event)" title="Agregar ${item.name} al carrito">
+                    <button class="cross-sell-v-add-btn" type="button" onclick="event.stopPropagation(); BuchisapaCart.addCrossSellItem('${item.id}', event)" title="Agregar ${item.nombre} al carrito">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                       <span>+ Agregar</span>
                     </button>
@@ -770,15 +770,15 @@ const BuchisapaCart = {
           ${this.items.map((item, idx) => {
             const isDrinkItem = this.isDrinkOrNoSauceItem(item);
             const hasSauces = !isDrinkItem && Array.isArray(item.selectedSauces) && item.selectedSauces.length > 0;
-            const priceFormatted = (parseFloat(item.price) || 0).toFixed(2);
-            const itemSubtotal = ((parseFloat(item.price) || 0) * (item.quantity || 1)).toFixed(2);
-            const categoryBadge = item.categoryBadge || (isDrinkItem ? 'BEBIDAS' : 'PROMOCIONES');
+            const priceFormatted = (parseFloat(item.precio) || 0).toFixed(2);
+            const itemSubtotal = ((parseFloat(item.precio) || 0) * (item.quantity || 1)).toFixed(2);
+            const categoryBadge = item.categoriaBadge || (isDrinkItem ? 'BEBIDAS' : 'PROMOCIONES');
             const optionText = item.option || (isDrinkItem ? 'Bebida Helada' : 'Combo Completo');
             const accompanimentsText = item.accompaniments || this.getDefaultAccompaniments(item);
             const itemFallback = (typeof window.getCategoryBannerFallback === 'function') 
-              ? window.getCategoryBannerFallback(item.category_id || item.category || categoryBadge) 
+              ? window.getCategoryBannerFallback(item.id_categoria || item.categoria || categoryBadge) 
               : '/imagenes/portada/Portada1E.webp';
-            const itemImg = item.image || itemFallback;
+            const itemImg = item.imagen || itemFallback;
 
             const cardClass = 'cart-dish-card';
 
@@ -787,13 +787,13 @@ const BuchisapaCart = {
                 <!-- FILA SUPERIOR: FOTO, BADGE, NOMBRE, PRECIO Y TACHO -->
                 <div class="dish-card-main-row">
                   <div class="dish-card-thumb-wrap">
-                    <img src="${itemImg}" alt="${item.name || 'Plato'}" class="dish-card-thumbnail" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${itemFallback}';">
+                    <img src="${itemImg}" alt="${item.nombre || 'Plato'}" class="dish-card-thumbnail" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${itemFallback}';">
                   </div>
                   
                   <div class="dish-card-info-col">
                     <div class="dish-card-top-badge-row">
                       <span class="dish-card-cat-badge">${categoryBadge}</span>
-                      <button class="dish-card-trash-btn" type="button" onclick="BuchisapaCart.removeItem(${idx})" aria-label="Eliminar ${item.name || 'plato'}" title="Eliminar plato del pedido">
+                      <button class="dish-card-trash-btn" type="button" onclick="BuchisapaCart.removeItem(${idx})" aria-label="Eliminar ${item.nombre || 'plato'}" title="Eliminar plato del pedido">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M3 6h18"/>
                           <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
@@ -804,7 +804,7 @@ const BuchisapaCart = {
                       </button>
                     </div>
 
-                    <h4 class="dish-card-name">${item.name || 'Plato Buchisapa'}</h4>
+                    <h4 class="dish-card-name">${item.nombre || 'Plato Buchisapa'}</h4>
                     <div class="dish-card-price-row">
                       <span class="dish-card-price-red">S/ ${priceFormatted}</span>
                       <span class="dish-card-unit-label">c/u</span>

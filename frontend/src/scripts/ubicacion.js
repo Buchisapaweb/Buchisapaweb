@@ -17,17 +17,17 @@
 
     // Base de datos de referencias locales de Ate / Santa Clara para autocompletado instantáneo
     const LOCAL_PLACES = [
-      { name: 'Av. La Estrella (Santa Clara)', sub: 'Santa Clara, Ate, Lima', lat: -12.01635, lng: -76.88455 },
-      { name: 'Real Plaza Santa Clara', sub: 'Av. Nicolás Ayllón 8694, Ate', lat: -12.01780, lng: -76.88390 },
-      { name: 'Calle 28 de Julio (Santa Clara)', sub: 'Esquina posta médica, Ate, Lima', lat: -12.01610, lng: -76.88500 },
-      { name: 'Av. 15 de Julio (Huaycán)', sub: 'Huaycán Zona A, Ate, Lima', lat: -12.01190, lng: -76.82390 },
-      { name: 'Plaza Principal Huaycán', sub: 'Av. 15 de Julio, Ate', lat: -12.01350, lng: -76.82100 },
-      { name: 'Plaza Vitarte', sub: 'Av. Nicolás Ayllón, Vitarte, Ate', lat: -12.02890, lng: -76.91850 },
-      { name: 'Pariachi (Carretera Central)', sub: 'Km 12.5 Carretera Central, Ate', lat: -12.00950, lng: -76.84500 },
-      { name: 'Horacio Zeballos', sub: 'Ate, Lima', lat: -12.00400, lng: -76.83700 },
-      { name: 'Los Laureles', sub: 'Santa Clara, Ate', lat: -12.01950, lng: -76.88900 },
-      { name: 'Av. Sinchi Roca', sub: 'Santa Clara, Ate', lat: -12.01480, lng: -76.88220 },
-      { name: 'Carretera Central Km 10', sub: 'Santa Clara, Ate', lat: -12.01820, lng: -76.88100 }
+      { nombre: 'Av. La Estrella (Santa Clara)', sub: 'Santa Clara, Ate, Lima', lat: -12.01635, lng: -76.88455 },
+      { nombre: 'Real Plaza Santa Clara', sub: 'Av. Nicolás Ayllón 8694, Ate', lat: -12.01780, lng: -76.88390 },
+      { nombre: 'Calle 28 de Julio (Santa Clara)', sub: 'Esquina posta médica, Ate, Lima', lat: -12.01610, lng: -76.88500 },
+      { nombre: 'Av. 15 de Julio (Huaycán)', sub: 'Huaycán Zona A, Ate, Lima', lat: -12.01190, lng: -76.82390 },
+      { nombre: 'Plaza Principal Huaycán', sub: 'Av. 15 de Julio, Ate', lat: -12.01350, lng: -76.82100 },
+      { nombre: 'Plaza Vitarte', sub: 'Av. Nicolás Ayllón, Vitarte, Ate', lat: -12.02890, lng: -76.91850 },
+      { nombre: 'Pariachi (Carretera Central)', sub: 'Km 12.5 Carretera Central, Ate', lat: -12.00950, lng: -76.84500 },
+      { nombre: 'Horacio Zeballos', sub: 'Ate, Lima', lat: -12.00400, lng: -76.83700 },
+      { nombre: 'Los Laureles', sub: 'Santa Clara, Ate', lat: -12.01950, lng: -76.88900 },
+      { nombre: 'Av. Sinchi Roca', sub: 'Santa Clara, Ate', lat: -12.01480, lng: -76.88220 },
+      { nombre: 'Carretera Central Km 10', sub: 'Santa Clara, Ate', lat: -12.01820, lng: -76.88100 }
     ];
 
     // Capas de mapas
@@ -161,10 +161,10 @@
       try {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
         if (res.ok) {
-          const data = await res.json();
-          if (data && data.display_name) {
-            const road = data.address.road || data.address.pedestrian || data.address.suburb || 'Ubicación seleccionada';
-            const city = (data.address.city || data.address.town || data.address.county || 'Ate') + ', Lima';
+          const datos = await res.json();
+          if (datos && datos.display_name) {
+            const road = datos.address.road || datos.address.pedestrian || datos.address.suburb || 'Ubicación seleccionada';
+            const city = (datos.address.city || datos.address.town || datos.address.county || 'Ate') + ', Lima';
             
             document.getElementById('display-address-title').textContent = road;
             document.getElementById('display-address-sub').textContent = city;
@@ -210,7 +210,7 @@
       }
 
       if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions.query({ name: 'geolocation' }).then(result => {
+        navigator.permissions.query({ nombre: 'geolocation' }).then(result => {
           if (result.state === 'granted') {
             startLiveWatch();
           } else if (result.state === 'prompt') {
@@ -421,7 +421,7 @@
 
       // Filtrado instantáneo en referencias locales
       const localMatches = LOCAL_PLACES.filter(p => 
-        p.name.toLowerCase().includes(val.toLowerCase()) || 
+        p.nombre.toLowerCase().includes(val.toLowerCase()) || 
         p.sub.toLowerCase().includes(val.toLowerCase())
       );
 
@@ -450,10 +450,10 @@
         const fullQuery = query.includes('Lima') || query.includes('Ate') ? query : `${query}, Ate, Lima, Perú`;
         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=5&addressdetails=1`);
         if (res.ok) {
-          const data = await res.json();
-          if (data && data.length > 0) {
-            const formatted = data.map(item => ({
-              name: item.display_name.split(',')[0],
+          const datos = await res.json();
+          if (datos && datos.length > 0) {
+            const formatted = datos.map(item => ({
+              nombre: item.display_name.split(',')[0],
               sub: item.display_name.split(',').slice(1, 4).join(', '),
               lat: parseFloat(item.lat),
               lng: parseFloat(item.lon)
@@ -476,10 +476,10 @@
       }
 
       dropdown.innerHTML = items.map(item => `
-        <div class="loc-suggestion-item" onclick="selectSuggestion('${item.name.replace(/'/g, "\\'")}', '${item.sub.replace(/'/g, "\\'")}', ${item.lat}, ${item.lng})">
+        <div class="loc-suggestion-item" onclick="selectSuggestion('${item.nombre.replace(/'/g, "\\'")}', '${item.sub.replace(/'/g, "\\'")}', ${item.lat}, ${item.lng})">
           <div class="loc-sugg-icon">📍</div>
           <div class="loc-sugg-text-box">
-            <div class="loc-sugg-title">${item.name}</div>
+            <div class="loc-sugg-title">${item.nombre}</div>
             <div class="loc-sugg-sub">${item.sub}</div>
           </div>
         </div>
@@ -526,9 +526,9 @@
       closeSuggestionsDropdown();
 
       // Verificar primero en lugares locales
-      const localFound = LOCAL_PLACES.find(p => p.name.toLowerCase().includes(query.toLowerCase()));
+      const localFound = LOCAL_PLACES.find(p => p.nombre.toLowerCase().includes(query.toLowerCase()));
       if (localFound) {
-        selectSuggestion(localFound.name, localFound.sub, localFound.lat, localFound.lng);
+        selectSuggestion(localFound.nombre, localFound.sub, localFound.lat, localFound.lng);
         return;
       }
 
@@ -536,12 +536,12 @@
         const fullQuery = query.includes('Lima') || query.includes('Ate') ? query : `${query}, Ate, Lima, Perú`;
         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&limit=1`);
         if (res.ok) {
-          const data = await res.json();
-          if (data && data.length > 0) {
-            const lat = parseFloat(data[0].lat);
-            const lng = parseFloat(data[0].lon);
-            const title = data[0].display_name.split(',')[0];
-            const sub = data[0].display_name.split(',').slice(1, 3).join(', ');
+          const datos = await res.json();
+          if (datos && datos.length > 0) {
+            const lat = parseFloat(datos[0].lat);
+            const lng = parseFloat(datos[0].lon);
+            const title = datos[0].display_name.split(',')[0];
+            const sub = datos[0].display_name.split(',').slice(1, 3).join(', ');
             selectSuggestion(title, sub, lat, lng);
           } else {
             alert('No encontramos esa dirección exacta. Puedes tocar o mover el pin rojo en el mapa para ubicarte.');

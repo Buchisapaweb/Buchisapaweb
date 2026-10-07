@@ -4,7 +4,7 @@
 
 const INFORMACION_DATA = {
   historia: {
-    category: "NOSOTROS",
+    categoria: "NOSOTROS",
     title: "Nuestra Historia - El Sabor Único de BuchiSapa",
     content: `
       <p><strong>Buchisapa</strong> nació en el corazón de Santa Clara, Ate, con una visión clara y apasionada: unir la inconfundible sazón amazónica de la selva peruana con los platillos más aclamados al carbón y al estilo broaster.</p>
@@ -17,7 +17,7 @@ const INFORMACION_DATA = {
     `
   },
   vision: {
-    category: "NOSOTROS",
+    categoria: "NOSOTROS",
     title: "Misión y Visión BuchiSapa",
     content: `
       <h3>Nuestra Misión</h3>
@@ -27,7 +27,7 @@ const INFORMACION_DATA = {
     `
   },
   valores: {
-    category: "NOSOTROS",
+    categoria: "NOSOTROS",
     title: "Nuestros Valores Fundamentales",
     content: `
       <ul>
@@ -39,7 +39,7 @@ const INFORMACION_DATA = {
     `
   },
   reservas: {
-    category: "SERVICIOS",
+    categoria: "SERVICIOS",
     title: "Reserva de Mesas y Eventos",
     content: `
       <p>En BuchiSapa ofrecemos atención presencial en salón para celebraciones de cumpleaños, aniversarios y reencuentros familiares o corporativos.</p>
@@ -52,7 +52,7 @@ const INFORMACION_DATA = {
     `
   },
   catering: {
-    category: "SERVICIOS",
+    categoria: "SERVICIOS",
     title: "Servicio de Catering y Banquetes Corporativos",
     content: `
       <p>Llevamos el sazón de BuchiSapa a tus eventos de empresa, aniversarios corporativos o reuniones familiares masivas.</p>
@@ -61,14 +61,14 @@ const INFORMACION_DATA = {
     `
   },
   fiestas: {
-    category: "SERVICIOS",
+    categoria: "SERVICIOS",
     title: "Fiestas Infantiles y Paquetes Especiales",
     content: `
       <p>Contamos con combos infantiles adaptados: tiras de pechuga broaster sin picante, papas nativas doradas, refrescos naturales de camu camu o maracuyá y sorpresas temáticas.</p>
     `
   },
   giftcards: {
-    category: "SERVICIOS",
+    categoria: "SERVICIOS",
     title: "Vales y Giftcards BuchiSapa",
     content: `
       <p>Regala sabor con nuestras Giftcards Digitales BuchiSapa, disponibles desde S/ 50.00 en adelante.</p>
@@ -80,7 +80,7 @@ const INFORMACION_DATA = {
     `
   },
   nutricional: {
-    category: "INFORMACIÓN ADICIONAL",
+    categoria: "INFORMACIÓN ADICIONAL",
     title: "Valores Nutricionales e Insumos",
     content: `
       <p>En BuchiSapa nos esforzamos por brindar alimentos nutritivos y balanceados. Nuestro pollo se marina en hierbas naturales y especias sin conservantes artificiales.</p>
@@ -88,7 +88,7 @@ const INFORMACION_DATA = {
     `
   },
   privacidad: {
-    category: "POLÍTICAS Y TÉRMINOS",
+    categoria: "POLÍTICAS Y TÉRMINOS",
     title: "Políticas de Privacidad y Protección de Datos",
     content: `
       <p>De conformidad con la Ley N° 29733 de Protección de Datos Personales en el Perú, BuchiSapa garantiza la confidencialidad y protección de los datos suministrados por nuestros comensales.</p>
@@ -96,7 +96,7 @@ const INFORMACION_DATA = {
     `
   },
   terminos: {
-    category: "POLÍTICAS Y TÉRMINOS",
+    categoria: "POLÍTICAS Y TÉRMINOS",
     title: "Términos y Condiciones Generales de Servicio",
     content: `
       <p>Al realizar una compra en nuestra plataforma o canal telefónico, el usuario acepta los siguientes términos:</p>
@@ -108,7 +108,7 @@ const INFORMACION_DATA = {
     `
   },
   terminos_giftcard: {
-    category: "POLÍTICAS Y TÉRMINOS",
+    categoria: "POLÍTICAS Y TÉRMINOS",
     title: "Términos de Vales y Giftcards",
     content: `
       <p>Los vales corporativos y giftcards digitales no son canjeables por dinero en efectivo. En caso de saldos remanentes, estos permanecerán activos en la tarjeta hasta la fecha de expiración.</p>
@@ -124,15 +124,15 @@ function getUrlParameter(name) {
 }
 
 function loadSection(sectionKey) {
-  const data = INFORMACION_DATA[sectionKey] || INFORMACION_DATA['historia'];
+  const datos = INFORMACION_DATA[sectionKey] || INFORMACION_DATA['historia'];
   
   const badgeEl = document.getElementById('info-badge');
   const titleEl = document.getElementById('info-title');
   const bodyEl = document.getElementById('info-body');
 
-  if (badgeEl) badgeEl.textContent = data.category;
-  if (titleEl) titleEl.textContent = data.title;
-  if (bodyEl) bodyEl.innerHTML = data.content;
+  if (badgeEl) badgeEl.textContent = datos.categoria;
+  if (titleEl) titleEl.textContent = datos.title;
+  if (bodyEl) bodyEl.innerHTML = datos.content;
 
   // Actualizar clase activa en enlaces laterales
   document.querySelectorAll('.info-nav-link').forEach(link => {
@@ -144,7 +144,7 @@ function loadSection(sectionKey) {
   });
 
   // Actualizar título de la ventana
-  document.title = `${data.title} | BuchiSapa Restaurante`;
+  document.title = `${datos.title} | BuchiSapa Restaurante`;
   
   // Scroll suave al inicio del artículo en móviles
   if (window.innerWidth < 860) {

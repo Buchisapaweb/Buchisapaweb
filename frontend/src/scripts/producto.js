@@ -9,39 +9,39 @@
 
   // Base de datos de salsas de la casa
   const SAUCES_LIST = [
-    { id: 'mayonesa', name: 'Mayonesa Casera', default: true },
-    { id: 'mostaza', name: 'Mostaza Clásica', default: true },
-    { id: 'ketchup', name: 'Ketchup', default: true },
-    { id: 'rocoto', name: 'Ají de Rocoto', default: true },
-    { id: 'tartara', name: 'Tártara Especial', default: false },
-    { id: 'charapita', name: 'Ají Charapita', default: false },
-    { id: 'ocopa', name: 'Ocopa Arequipeña', default: false },
-    { id: 'bbq', name: 'Salsa BBQ Ahumada', default: false },
-    { id: 'vinagreta', name: 'Vinagreta de la Casa', default: false }
+    { id: 'mayonesa', nombre: 'Mayonesa Casera', default: true },
+    { id: 'mostaza', nombre: 'Mostaza Clásica', default: true },
+    { id: 'ketchup', nombre: 'Ketchup', default: true },
+    { id: 'rocoto', nombre: 'Ají de Rocoto', default: true },
+    { id: 'tartara', nombre: 'Tártara Especial', default: false },
+    { id: 'charapita', nombre: 'Ají Charapita', default: false },
+    { id: 'ocopa', nombre: 'Ocopa Arequipeña', default: false },
+    { id: 'bbq', nombre: 'Salsa BBQ Ahumada', default: false },
+    { id: 'vinagreta', nombre: 'Vinagreta de la Casa', default: false }
   ];
 
   // Acompañamientos comunes por categoría
   const ACCOMPANIMENTS_MAP = {
     broaster: [
-      { id: 'papas', name: 'Papas Fritas Artesanales', default: true },
-      { id: 'ensalada', name: 'Ensalada Fresca de Col y Zanahoria', default: true },
-      { id: 'arroz_chaufa', name: 'Cambiar por Arroz Chaufa de la Selva (+S/ 3.00)', price: 3.00, default: false }
+      { id: 'papas', nombre: 'Papas Fritas Artesanales', default: true },
+      { id: 'ensalada', nombre: 'Ensalada Fresca de Col y Zanahoria', default: true },
+      { id: 'arroz_chaufa', nombre: 'Cambiar por Arroz Chaufa de la Selva (+S/ 3.00)', precio: 3.00, default: false }
     ],
     amazonico: [
-      { id: 'tacacho', name: 'Tacacho Artesanal con Cecina', default: true },
-      { id: 'patacones', name: 'Patacones de Plátano Bellaco', default: true },
-      { id: 'salsa_criolla', name: 'Salsa Criolla Amazónica con Cocona', default: true }
+      { id: 'tacacho', nombre: 'Tacacho Artesanal con Cecina', default: true },
+      { id: 'patacones', nombre: 'Patacones de Plátano Bellaco', default: true },
+      { id: 'salsa_criolla', nombre: 'Salsa Criolla Amazónica con Cocona', default: true }
     ],
     hamburguesa: [
-      { id: 'papas', name: 'Papas Fritas Crocantes', default: true },
-      { id: 'ensalada', name: 'Ensalada Fresca', default: false }
+      { id: 'papas', nombre: 'Papas Fritas Crocantes', default: true },
+      { id: 'ensalada', nombre: 'Ensalada Fresca', default: false }
     ],
     alitas: [
-      { id: 'papas', name: 'Papas Fritas Rústicas', default: true },
-      { id: 'bastones', name: 'Bastones de Apio y Zanahoria', default: true }
+      { id: 'papas', nombre: 'Papas Fritas Rústicas', default: true },
+      { id: 'bastones', nombre: 'Bastones de Apio y Zanahoria', default: true }
     ],
     default: [
-      { id: 'guarnicion', name: 'Porción estándar de la casa', default: true }
+      { id: 'guarnicion', nombre: 'Porción estándar de la casa', default: true }
     ]
   };
 
@@ -50,61 +50,61 @@
     {
       id: 'C0002_P01',
       code: 'C0002_P01',
-      name: '1/4 Pollo Broaster BuchiSapa',
-      category_id: 'broaster',
-      category: 'Pollo Broaster',
-      categoryBadge: 'Broaster al Carbón',
-      price: 18.90,
+      nombre: '1/4 Pollo Broaster BuchiSapa',
+      id_categoria: 'broaster',
+      categoria: 'Pollo Broaster',
+      etiquetaCategoria: 'Broaster al Carbón',
+      precio: 18.90,
       originalPrice: 22.00,
-      description: 'Crujiente presa de 1/4 de pollo broaster sazonada con nuestra receta secreta amazónica y frita al punto exacto. Acompañada de papas fritas artesanales, ensalada del día y selección de cremas.',
-      badge: 'Más Vendido 🔥',
-      image: '/imagenes/categorias/broaster/banner.webp',
+      descripcion: 'Crujiente presa de 1/4 de pollo broaster sazonada con nuestra receta secreta amazónica y frita al punto exacto. Acompañada de papas fritas artesanales, ensalada del día y selección de cremas.',
+      etiqueta: 'Más Vendido 🔥',
+      imagen: '/imagenes/categorias/broaster/banner.webp',
       stock: 50,
-      available: true
+      disponible: true
     },
     {
       id: 'C0004_P01',
       code: 'C0004_P01',
-      name: 'Tacacho con Cecina Especial',
-      category_id: 'amazonico',
-      category: 'Sabores Amazónicos',
-      categoryBadge: 'Tradición de la Selva',
-      price: 24.50,
+      nombre: 'Tacacho con Cecina Especial',
+      id_categoria: 'amazonico',
+      categoria: 'Sabores Amazónicos',
+      etiquetaCategoria: 'Tradición de la Selva',
+      precio: 24.50,
       originalPrice: 28.00,
-      description: 'Plátano bellaco asado y majado artesanalmente con manteca de cerdo y chicharrón crocante, servido con generosa porción de cecina ahumada traída directamente de Tarapoto.',
-      badge: 'Especialidad',
-      image: '/imagenes/categorias/adicionales/banner.webp',
+      descripcion: 'Plátano bellaco asado y majado artesanalmente con manteca de cerdo y chicharrón crocante, servido con generosa porción de cecina ahumada traída directamente de Tarapoto.',
+      etiqueta: 'Especialidad',
+      imagen: '/imagenes/categorias/adicionales/banner.webp',
       stock: 35,
-      available: true
+      disponible: true
     },
     {
       id: 'C0005_P01',
       code: 'C0005_P01',
-      name: 'Alitas Broaster BBQ Amazónica (6 und)',
-      category_id: 'alitas',
-      category: 'Alitas',
-      categoryBadge: 'Alitas Crocantes',
-      price: 21.00,
+      nombre: 'Alitas Broaster BBQ Amazónica (6 und)',
+      id_categoria: 'alitas',
+      categoria: 'Alitas',
+      etiquetaCategoria: 'Alitas Crocantes',
+      precio: 21.00,
       originalPrice: 25.00,
-      description: '6 crujientes alitas broaster bañadas en nuestra salsa BBQ artesanal con toque de camu camu. Incluye papas fritas y bastones frescos.',
-      badge: 'Para Compartir',
-      image: '/imagenes/categorias/alitas/banner.webp',
+      descripcion: '6 crujientes alitas broaster bañadas en nuestra salsa BBQ artesanal con toque de camu camu. Incluye papas fritas y bastones frescos.',
+      etiqueta: 'Para Compartir',
+      imagen: '/imagenes/categorias/alitas/banner.webp',
       stock: 40,
-      available: true
+      disponible: true
     },
     {
       id: 'C0003_P01',
       code: 'C0003_P01',
-      name: 'Refresco Natural de Cocona (1 Litro)',
-      category_id: 'bebidas',
-      category: 'Bebidas y Refrescos',
-      categoryBadge: 'Bebida Helada',
-      price: 8.50,
-      description: 'Refresco natural de cocona fresca de la selva peruana, endulzado ligeramente y servido bien frío en envase sellado.',
-      badge: 'Refrescante',
-      image: '/imagenes/categorias/bebidas/banner.webp',
+      nombre: 'Refresco Natural de Cocona (1 Litro)',
+      id_categoria: 'bebidas',
+      categoria: 'Bebidas y Refrescos',
+      etiquetaCategoria: 'Bebida Helada',
+      precio: 8.50,
+      descripcion: 'Refresco natural de cocona fresca de la selva peruana, endulzado ligeramente y servido bien frío en envase sellado.',
+      etiqueta: 'Refrescante',
+      imagen: '/imagenes/categorias/bebidas/banner.webp',
       stock: 60,
-      available: true
+      disponible: true
     }
   ];
 
@@ -133,21 +133,21 @@
     try {
       if (targetId) {
         // Intento 1: buscar por ID específico
-        const res = await fetch(`/api/products/${encodeURIComponent(targetId)}`);
+        const res = await fetch(`/api/productos/${encodeURIComponent(targetId)}`);
         if (res.ok) {
           const json = await res.json();
-          if (json.success && json.data) {
-            product = json.data;
+          if (json.exito && json.datos) {
+            product = json.datos;
           }
         }
       }
 
       if (!product) {
         // Intento 2: obtener lista completa
-        const resAll = await fetch('/api/products');
+        const resAll = await fetch('/api/productos');
         if (resAll.ok) {
           const jsonAll = await resAll.json();
-          const list = jsonAll.data || [];
+          const list = jsonAll.datos || [];
           if (targetId) {
             product = list.find(p => p.id === targetId || p.code === targetId || String(p.id).toLowerCase() === targetId.toLowerCase());
           }
@@ -171,31 +171,31 @@
   }
 
   function renderProductDetail(p) {
-    document.title = `${p.name} | BuchiSapa Restaurante`;
+    document.title = `${p.nombre} | BuchiSapa Restaurante`;
 
     // Breadcrumbs
     const bcCat = document.getElementById('bc-category');
     const bcName = document.getElementById('bc-name');
-    if (bcCat) bcCat.textContent = p.category || p.categoryBadge || 'Platos';
-    if (bcName) bcName.textContent = p.name;
+    if (bcCat) bcCat.textContent = p.categoria || p.categoriaBadge || 'Platos';
+    if (bcName) bcName.textContent = p.nombre;
 
     // Imagen
     const imgEl = document.getElementById('prod-img');
     if (imgEl) {
-      imgEl.src = p.image || '/imagenes/categorias/broaster/banner.webp';
-      imgEl.alt = p.name;
+      imgEl.src = p.imagen || '/imagenes/categorias/broaster/banner.webp';
+      imgEl.alt = p.nombre;
     }
 
     // Badges
     const badgeEl = document.getElementById('prod-badge-floating');
     if (badgeEl) {
-      badgeEl.textContent = p.badge || 'Receta Especial BuchiSapa';
+      badgeEl.textContent = p.etiqueta || 'Receta Especial BuchiSapa';
     }
 
     const stockText = document.getElementById('prod-stock-text');
     const stockDot = document.getElementById('prod-stock-dot');
     if (stockText) {
-      const isAvailable = p.available !== false && (typeof p.stock !== 'number' || p.stock > 0);
+      const isAvailable = p.disponible !== false && (typeof p.stock !== 'number' || p.stock > 0);
       stockText.textContent = isAvailable ? 'Disponible al instante' : 'Agotado en Cocina';
       if (stockDot) {
         stockDot.style.background = isAvailable ? '#10b981' : '#ef4444';
@@ -204,15 +204,15 @@
 
     // Textos principales
     const catEl = document.getElementById('prod-cat-pill');
-    if (catEl) catEl.textContent = p.categoryBadge || p.category || 'Pollería Gourmet';
+    if (catEl) catEl.textContent = p.categoriaBadge || p.categoria || 'Pollería Gourmet';
 
     const titleEl = document.getElementById('prod-title');
-    if (titleEl) titleEl.textContent = p.name;
+    if (titleEl) titleEl.textContent = p.nombre;
 
     const descEl = document.getElementById('prod-desc');
     if (descEl) {
-      if (p.description && p.description.trim()) {
-        descEl.textContent = p.description.trim();
+      if (p.descripcion && p.descripcion.trim()) {
+        descEl.textContent = p.descripcion.trim();
         descEl.style.display = 'block';
       } else {
         descEl.textContent = '';
@@ -222,11 +222,11 @@
 
     // Precios
     const priceEl = document.getElementById('prod-price-current');
-    if (priceEl) priceEl.textContent = formatPrice(p.price);
+    if (priceEl) priceEl.textContent = formatPrice(p.precio);
 
     const origEl = document.getElementById('prod-price-original');
     if (origEl) {
-      if (p.originalPrice && p.originalPrice > p.price) {
+      if (p.originalPrice && p.originalPrice > p.precio) {
         origEl.textContent = formatPrice(p.originalPrice);
         origEl.style.display = 'inline';
       } else {
@@ -240,7 +240,7 @@
 
   function updateTotalPrice() {
     if (!currentProduct) return;
-    const total = currentProduct.price;
+    const total = currentProduct.precio;
 
     const btnPriceText = document.getElementById('add-btn-total-text');
     if (btnPriceText) btnPriceText.textContent = `• ${formatPrice(total)}`;
@@ -270,11 +270,11 @@
 
         items.push({
           id: currentProduct.id,
-          name: currentProduct.name,
-          price: currentProduct.price,
+          nombre: currentProduct.nombre,
+          precio: currentProduct.precio,
           quantity: 1,
-          image: currentProduct.image,
-          categoryBadge: currentProduct.categoryBadge || currentProduct.category,
+          imagen: currentProduct.imagen,
+          etiquetaCategoria: currentProduct.categoriaBadge || currentProduct.categoria,
           sauces: [],
           notes: ''
         });
@@ -282,7 +282,7 @@
         localStorage.setItem(cartKey, JSON.stringify(items));
       }
 
-      showAddToast(currentProduct.name, 1);
+      showAddToast(currentProduct.nombre, 1);
       updateCartCount();
 
       // Animación en el botón
@@ -303,7 +303,7 @@
         if (!currentProduct) return;
 
         const text = `Hola BuchiSapa, deseo pedir:
-*1x ${currentProduct.name}* (${formatPrice(currentProduct.price)})
+*1x ${currentProduct.nombre}* (${formatPrice(currentProduct.precio)})
 ¿Podrían confirmarme la disponibilidad y tiempo de entrega por favor?`;
 
         window.open(`https://wa.me/51943312024?text=${encodeURIComponent(text)}`, '_blank');
@@ -315,7 +315,7 @@
     if (btnShareWs) {
       btnShareWs.addEventListener('click', () => {
         if (!currentProduct) return;
-        const text = `¡Mira este delicioso plato en BuchiSapa! 🍗🔥 *${currentProduct.name}* a solo ${formatPrice(currentProduct.price)}: ${window.location.href}`;
+        const text = `¡Mira este delicioso plato en BuchiSapa! 🍗🔥 *${currentProduct.nombre}* a solo ${formatPrice(currentProduct.precio)}: ${window.location.href}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
       });
     }
@@ -397,10 +397,10 @@
 
     let items = [];
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch('/api/productos');
       if (res.ok) {
         const json = await res.json();
-        items = (json.data || []).filter(p => p.id !== current.id);
+        items = (json.datos || []).filter(p => p.id !== current.id);
       }
     } catch (e) {
       items = FALLBACK_PRODUCTS.filter(p => p.id !== current.id);
@@ -420,12 +420,12 @@
       card.className = 'related-card';
       card.innerHTML = `
         <div class="related-card-img-wrap">
-          <img src="${item.image || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.name}" class="related-card-img" loading="lazy">
+          <img src="${item.imagen || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.nombre}" class="related-card-img" loading="lazy">
         </div>
         <div class="related-card-body">
-          <span class="related-card-cat">${item.category || item.categoryBadge || 'BuchiSapa'}</span>
-          <h4 class="related-card-title">${item.name}</h4>
-          <span class="related-card-price">${formatPrice(item.price)}</span>
+          <span class="related-card-cat">${item.categoria || item.categoriaBadge || 'BuchiSapa'}</span>
+          <h4 class="related-card-title">${item.nombre}</h4>
+          <span class="related-card-price">${formatPrice(item.precio)}</span>
         </div>
       `;
       grid.appendChild(card);

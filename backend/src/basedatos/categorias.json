@@ -1,0 +1,92 @@
+[
+  {
+    "id": "C0001",
+    "nombre": "ADICIONALES",
+    "icono": "Plus",
+    "descripcion": "Complementos y adicionales para personalizar los pedidos.",
+    "banner": "/imagenes/categorias/adicionales/banner.webp",
+    "orden": 1,
+    "slug": "adicionales"
+  },
+  {
+    "id": "C0002",
+    "nombre": "ALITAS",
+    "icono": "Drumstick",
+    "descripcion": "Alitas crujientes en salsa acevichada y BBQ.",
+    "banner": "/imagenes/categorias/alitas/banner.webp",
+    "orden": 2,
+    "slug": "alitas"
+  },
+  {
+    "id": "C0003",
+    "nombre": "BEBIDAS",
+    "icono": "Coffee",
+    "descripcion": "Gaseosas heladas, agua y bebidas en botella.",
+    "banner": "/imagenes/categorias/bebidas/banner.webp",
+    "orden": 3,
+    "slug": "bebidas"
+  },
+  {
+    "id": "C0004",
+    "nombre": "BROASTER",
+    "icono": "Drumstick",
+    "descripcion": "Pollo broaster ultra crocante con papas, arroz y cremas.",
+    "banner": "/imagenes/categorias/broaster/banner.webp",
+    "orden": 4,
+    "slug": "broaster"
+  },
+  {
+    "id": "C0005",
+    "nombre": "HAMBURGUESAS",
+    "icono": "Beef",
+    "descripcion": "Hamburguesas artesanales, choripanes y sándwiches especiales.",
+    "banner": "/imagenes/categorias/hamburguesas/banner.webp",
+    "orden": 5,
+    "slug": "hamburguesas"
+  },
+  {
+    "id": "C0006",
+    "nombre": "INFUSIONES",
+    "icono": "CupSoda",
+    "descripcion": "Infusiones calientes y café aromático pasado.",
+    "banner": "/imagenes/categorias/infusiones/banner.webp",
+    "orden": 6,
+    "slug": "infusiones"
+  },
+  {
+    "id": "C0007",
+    "nombre": "PLATOS AMAZÓNICOS",
+    "icono": "Flame",
+    "descripcion": "Auténticos sabores de la selva peruana: tacacho, cecina, juanes y patacones.",
+    "banner": "/imagenes/categorias/platos-amazonicos/banner.webp",
+    "orden": 7,
+    "slug": "platos-amazonicos"
+  },
+  {
+    "id": "C0008",
+    "nombre": "PROMOCIONES",
+    "icono": "Sparkles",
+    "descripcion": "Promociones y combos especiales de BuchiSapa.",
+    "banner": "/imagenes/categorias/promociones/banner.webp",
+    "orden": 8,
+    "slug": "promociones"
+  },
+  {
+    "id": "C0009",
+    "nombre": "REFRESCOS",
+    "icono": "GlassWater",
+    "descripcion": "Refrescos naturales de frutas amazónicas: cocona, aguajina y maracuyá.",
+    "banner": "/imagenes/categorias/refrescos/banner.webp",
+    "orden": 9,
+    "slug": "refrescos"
+  },
+  {
+    "id": "C0010",
+    "nombre": "SALCHIPAPAS Y SALCHIBROASTERS",
+    "icono": "Flame",
+    "descripcion": "Papas crocantes, salchichas, chorizos y combinaciones broaster.",
+    "banner": "/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp",
+    "orden": 10,
+    "slug": "salchipapas"
+  }
+]

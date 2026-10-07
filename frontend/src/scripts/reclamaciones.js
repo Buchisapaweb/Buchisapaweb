@@ -60,14 +60,14 @@ function handleTextareaCounter(textarea) {
 }
 
 // Cambio de tipo de documento
-function onDocTypeChange(docType) {
+function onDocTypeChange(tipoDoc) {
   const docNumInput = document.getElementById('claim-doc-num');
   if (!docNumInput) return;
 
-  if (docType === 'DNI') {
+  if (tipoDoc === 'DNI') {
     docNumInput.maxLength = 8;
     docNumInput.placeholder = '8 dígitos';
-  } else if (docType === 'RUC') {
+  } else if (tipoDoc === 'RUC') {
     docNumInput.maxLength = 11;
     docNumInput.placeholder = '11 dígitos';
   } else {
@@ -212,8 +212,8 @@ function handleFileDrop(e) {
   const dropzone = document.getElementById('claim-dropzone');
   if (dropzone) dropzone.classList.remove('dragover');
 
-  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-    processFile(e.dataTransfer.files[0]);
+  if (e.datosTransfer && e.datosTransfer.files && e.datosTransfer.files.length > 0) {
+    processFile(e.datosTransfer.files[0]);
   }
 }
 
@@ -228,7 +228,7 @@ function processFile(file) {
 
   // Validar formato (PNG, JPG, PDF)
   const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
-  const ext = file.name.split('.').pop().toLowerCase();
+  const ext = file.nombre.split('.').pop().toLowerCase();
   if (!allowed.includes(file.type) && !['png', 'jpg', 'jpeg', 'pdf'].includes(ext)) {
     alert('Formato no permitido. Solo se aceptan archivos PNG, JPG o PDF.');
     return;
@@ -249,7 +249,7 @@ function processFile(file) {
   const filesizeEl = document.getElementById('claim-preview-filesize');
 
   if (previewBox && filenameEl && filesizeEl) {
-    filenameEl.textContent = file.name;
+    filenameEl.textContent = file.nombre;
     const kb = (file.size / 1024).toFixed(1);
     filesizeEl.textContent = `(${kb} KB)`;
     previewBox.style.display = 'flex';
@@ -281,13 +281,13 @@ async function handleClaimSubmit(e) {
 
   // Recopilar datos
   const branch = document.getElementById('claim-local')?.value || 'BuchiSapa - Sede Central: Av. La Estrella con Calle 28 de Julio (Santa Clara, Ate - Lima)';
-  const firstName = document.getElementById('claim-firstname')?.value?.trim() || '';
+  const primerNombre = document.getElementById('claim-firstname')?.value?.trim() || '';
   const lastname1 = document.getElementById('claim-lastname1')?.value?.trim() || '';
   const lastname2 = document.getElementById('claim-lastname2')?.value?.trim() || '';
-  const fullName = [firstName, lastname1, lastname2].filter(Boolean).join(' ');
+  const fullName = [primerNombre, lastname1, lastname2].filter(Boolean).join(' ');
 
-  const docType = document.getElementById('claim-doc-type')?.value || 'DNI';
-  const docNumber = document.getElementById('claim-doc-num')?.value?.trim() || '';
+  const tipoDoc = document.getElementById('claim-doc-type')?.value || 'DNI';
+  const numeroDoc = document.getElementById('claim-doc-num')?.value?.trim() || '';
   const email = document.getElementById('claim-email')?.value?.trim() || '';
   const phone = document.getElementById('claim-phone')?.value?.trim() || '';
 
@@ -325,11 +325,11 @@ async function handleClaimSubmit(e) {
     claimCode,
     branch,
     fullName,
-    firstName,
+    primerNombre,
     paternalSurname: lastname1,
     maternalSurname: lastname2,
-    docType,
-    docNumber,
+    tipoDoc,
+    numeroDoc,
     phone,
     email,
     department,
@@ -344,17 +344,17 @@ async function handleClaimSubmit(e) {
     claimType: claimTypeOption.toLowerCase().includes('queja') ? 'queja' : 'reclamo',
     consumerRequest,
     detail: consumerRequest,
-    attachmentName: currentAttachedFile ? currentAttachedFile.name : ''
+    attachmentName: currentAttachedFile ? currentAttachedFile.nombre : ''
   };
 
   try {
-    const res = await fetch('/api/claims', {
+    const res = await fetch('/api/reclamaciones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const result = await res.json();
-    if (!result.success && result.error) {
+    if (!result.exito && result.error) {
       console.warn('Backend aviso:', result.error);
     }
   } catch (err) {
@@ -383,19 +383,19 @@ async function handleClaimSubmit(e) {
 }
 
 // Modal de éxito y resumen
-function showClaimSuccessModal(data) {
+function showClaimSuccessModal(datos) {
   const modal = document.getElementById('claim-success-modal');
   const codeEl = document.getElementById('modal-claim-code');
   const summaryEl = document.getElementById('modal-claim-summary');
 
-  if (codeEl) codeEl.textContent = data.claimCode;
+  if (codeEl) codeEl.textContent = datos.claimCode;
 
   if (summaryEl) {
     summaryEl.innerHTML = `
-      <div><strong>Reclamante:</strong> ${escapeHtml(data.fullName)} (${data.docType}: ${escapeHtml(data.docNumber)})</div>
-      <div><strong>Local:</strong> ${escapeHtml(data.branch)}</div>
-      <div><strong>Tipo:</strong> ${data.claimType === 'queja' ? 'Queja' : 'Reclamo'}</div>
-      <div><strong>Contacto:</strong> ${escapeHtml(data.email)} | ${escapeHtml(data.phone)}</div>
+      <div><strong>Reclamante:</strong> ${escapeHtml(datos.fullName)} (${datos.tipoDoc}: ${escapeHtml(datos.numeroDoc)})</div>
+      <div><strong>Local:</strong> ${escapeHtml(datos.branch)}</div>
+      <div><strong>Tipo:</strong> ${datos.claimType === 'queja' ? 'Queja' : 'Reclamo'}</div>
+      <div><strong>Contacto:</strong> ${escapeHtml(datos.email)} | ${escapeHtml(datos.phone)}</div>
       <div><strong>Plazo legal de respuesta:</strong> Hasta 15 días hábiles conforme a ley.</div>
     `;
   }
@@ -481,7 +481,7 @@ function downloadClaimSheetPDF() {
     y += 6;
     doc.text(`Nombre Completo: ${d.fullName}`, 15, y);
     y += 5;
-    doc.text(`Documento: ${d.docType} ${d.docNumber}    |    Teléfono: ${d.phone}    |    Email: ${d.email}`, 15, y);
+    doc.text(`Documento: ${d.tipoDoc} ${d.numeroDoc}    |    Teléfono: ${d.phone}    |    Email: ${d.email}`, 15, y);
     y += 5;
     doc.text(`Dirección: ${d.address} (${d.district}, ${d.province}, ${d.department})`, 15, y);
     if (d.isMinor && d.tutorName) {

@@ -33,7 +33,7 @@
     // Actualizar URL sin recargar
     try {
       const newUrl = `${window.location.pathname}?cat=${encodeURIComponent(normalizedCat)}`;
-      window.history.pushState({ category: normalizedCat }, '', newUrl);
+      window.history.pushState({ categoria: normalizedCat }, '', newUrl);
     } catch (e) {}
 
     // Renderizar platos de la categoría
@@ -98,20 +98,25 @@
     searchList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b; font-weight: 700;">Buscando platos...</div>';
 
     let products = [];
-    try {
-      const res = await fetch('/api/products');
-      if (res.ok) {
-        const json = await res.json();
-        products = json.data || [];
+    if (window.currentProducts && Array.isArray(window.currentProducts) && window.currentProducts.length > 0) {
+      products = window.currentProducts;
+    } else {
+      try {
+        const res = await fetch('/api/productos');
+        if (res.ok) {
+          const json = await res.json();
+          products = json.datos || [];
+          window.currentProducts = products;
+        }
+      } catch (e) {
+        products = [];
       }
-    } catch (e) {
-      products = [];
     }
 
     const filtered = products.filter(p => {
-      const name = (p.name || '').toLowerCase();
-      const desc = (p.description || '').toLowerCase();
-      const cat = (p.category || '').toLowerCase();
+      const name = (p.nombre || '').toLowerCase();
+      const desc = (p.descripcion || '').toLowerCase();
+      const cat = (p.categoria || '').toLowerCase();
       return name.includes(cleanQuery) || desc.includes(cleanQuery) || cat.includes(cleanQuery);
     });
 
@@ -143,14 +148,14 @@
       card.innerHTML = `
         <a href="/producto?id=${encodeURIComponent(item.id || item.code)}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
           <div style="position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #f1f5f9; border-radius: 16px 16px 0 0;">
-            <img src="${item.image || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.name}" class="dish-card-img" loading="lazy">
-            ${item.badge ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.badge}</span>` : ''}
+            <img src="${item.imagen || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.nombre}" class="dish-card-img" loading="lazy">
+            ${item.etiqueta ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.etiqueta}</span>` : ''}
           </div>
           <div class="dish-card-content">
-            <span class="dish-card-cat-label">${item.categoryBadge || item.category || 'BuchiSapa'}</span>
-            <h3 class="dish-card-title">${item.name}</h3>
+            <span class="dish-card-cat-label">${item.categoriaBadge || item.categoria || 'BuchiSapa'}</span>
+            <h3 class="dish-card-title">${item.nombre}</h3>
             <div class="dish-card-footer">
-              <span class="dish-card-price">S/ ${Number(item.price || 0).toFixed(2)}</span>
+              <span class="dish-card-price">S/ ${Number(item.precio || 0).toFixed(2)}</span>
               <button type="button" class="dish-card-add-btn" onclick="event.preventDefault(); window.location.href='/producto?id=${encodeURIComponent(item.id || item.code)}'">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; display: inline-block; vertical-align: middle;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                 <span style="vertical-align: middle;">Agregar</span>
@@ -176,10 +181,10 @@
       products = window.currentProducts;
     } else {
       try {
-        const res = await fetch('/api/products');
+        const res = await fetch('/api/productos');
         if (res.ok) {
           const json = await res.json();
-          products = json.data || [];
+          products = json.datos || [];
           window.currentProducts = products; // Guardar en caché global del cliente
         } else {
           console.warn("API general de productos devolvió estado no-ok:", res.status);
@@ -193,10 +198,10 @@
     if ((!products || products.length === 0) && catId) {
       try {
         console.log(`Intentando fallback API específico para categoría: ${catId}`);
-        const res = await fetch(`/api/products?category=${encodeURIComponent(catId)}`);
+        const res = await fetch(`/api/productos?category=${encodeURIComponent(catId)}`);
         if (res.ok) {
           const json = await res.json();
-          products = json.data || [];
+          products = json.datos || [];
         }
       } catch (err) {
         console.error("Error en fallback API de categoría específica:", err);
@@ -225,8 +230,8 @@
       
       // Lógica de filtrado dual robusta: compara contra el category_id y también contra el nombre de la categoría (case-insensitive)
       filtered = products.filter(p => {
-        const pCatId = String(p.category_id || '').toUpperCase().trim();
-        const pCatName = String(p.category || '').toLowerCase().trim();
+        const pCatId = String(p.id_categoria || '').toUpperCase().trim();
+        const pCatName = String(p.categoria || '').toLowerCase().trim();
         return pCatId === targetCatId || pCatName === catIdNorm;
       });
     }
@@ -253,14 +258,14 @@
       card.innerHTML = `
         <a href="/producto?id=${encodeURIComponent(item.id || item.code)}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
           <div style="position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #f1f5f9; border-radius: 16px 16px 0 0;">
-            <img src="${item.image || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.name}" class="dish-card-img" loading="lazy">
-            ${item.badge ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.badge}</span>` : ''}
+            <img src="${item.imagen || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.nombre}" class="dish-card-img" loading="lazy">
+            ${item.etiqueta ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.etiqueta}</span>` : ''}
           </div>
           <div class="dish-card-content">
-            <span class="dish-card-cat-label">${item.categoryBadge || item.category || 'BuchiSapa'}</span>
-            <h3 class="dish-card-title">${item.name}</h3>
+            <span class="dish-card-cat-label">${item.categoriaBadge || item.categoria || 'BuchiSapa'}</span>
+            <h3 class="dish-card-title">${item.nombre}</h3>
             <div class="dish-card-footer">
-              <span class="dish-card-price">S/ ${Number(item.price || 0).toFixed(2)}</span>
+              <span class="dish-card-price">S/ ${Number(item.precio || 0).toFixed(2)}</span>
               <button type="button" class="dish-card-add-btn" onclick="event.preventDefault(); window.location.href='/producto?id=${encodeURIComponent(item.id || item.code)}'">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; display: inline-block; vertical-align: middle;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                 <span style="vertical-align: middle;">Agregar</span>

@@ -32,18 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const stored = localStorage.getItem('buchisapa_admin_user') || sessionStorage.getItem('buchisapa_admin_user');
       if (stored) {
         const u = JSON.parse(stored);
-        if (userNameEl && u.name) userNameEl.textContent = u.name;
+        if (userNameEl && u.nombre) userNameEl.textContent = u.nombre;
         if (userAvatarEl && u.avatar) userAvatarEl.src = u.avatar;
       }
-      const res = await fetch('/api/auth/me');
+      const res = await fetch('/api/autenticacion/me');
       if (res.ok) {
-        const data = await res.json();
-        if (data && data.user) {
-          if (userNameEl && (data.user.name || data.user.full_name)) {
-            userNameEl.textContent = data.user.name || data.user.full_name;
+        const datos = await res.json();
+        if (datos && datos.user) {
+          if (userNameEl && (datos.user.nombre || datos.user.full_name)) {
+            userNameEl.textContent = datos.user.nombre || datos.user.full_name;
           }
-          if (userAvatarEl && data.user.avatar) {
-            userAvatarEl.src = data.user.avatar;
+          if (userAvatarEl && datos.user.avatar) {
+            userAvatarEl.src = datos.user.avatar;
           }
         }
       }
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.stopPropagation();
     }
     try {
-      await fetch('/api/auth/admin-logout', { 
+      await fetch('/api/autenticacion/admin-logout', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });

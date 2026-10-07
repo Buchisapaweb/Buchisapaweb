@@ -16,7 +16,7 @@ const BuchisapaBusinessHours = {
     if (this.config.is24Hours) {
       return {
         isOpen: true,
-        message: 'Abierto 24 Horas',
+        mensaje: 'Abierto 24 Horas',
         warning: null
       };
     }

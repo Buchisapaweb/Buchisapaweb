@@ -114,9 +114,11 @@ function toggleSearchBar(forceState) {
   const wrap = document.getElementById('buchisapa-search-bar-wrap');
   if (!wrap) return;
 
-  const shouldShow = typeof forceState === 'boolean' ? forceState : (wrap.style.display === 'none' || wrap.style.display === '');
+  const isHidden = wrap.classList.contains('is-hidden');
+  const shouldShow = typeof forceState === 'boolean' ? forceState : isHidden;
 
   if (shouldShow) {
+    wrap.classList.remove('is-hidden');
     wrap.style.display = 'block';
     wrap.classList.add('search-bar-visible', 'mobile-search-visible');
     const mobileInput = document.getElementById('main-search-input');
@@ -124,6 +126,7 @@ function toggleSearchBar(forceState) {
       setTimeout(() => mobileInput.focus(), 100);
     }
   } else {
+    wrap.classList.add('is-hidden');
     wrap.style.display = 'none';
     wrap.classList.remove('search-bar-visible', 'mobile-search-visible');
   }
@@ -143,8 +146,16 @@ function onSearchInputChanged(value) {
   const clearDesktopBtn = document.getElementById('desktop-search-clear-btn');
   const clearMobileBtn = document.getElementById('search-clear-btn');
   
-  if (clearDesktopBtn) clearDesktopBtn.style.display = query.length > 0 ? 'flex' : 'none';
-  if (clearMobileBtn) clearMobileBtn.style.display = query.length > 0 ? 'flex' : 'none';
+  if (clearDesktopBtn) {
+    if (query.length > 0) clearDesktopBtn.classList.remove('is-hidden');
+    else clearDesktopBtn.classList.add('is-hidden');
+    clearDesktopBtn.style.display = query.length > 0 ? 'flex' : 'none';
+  }
+  if (clearMobileBtn) {
+    if (query.length > 0) clearMobileBtn.classList.remove('is-hidden');
+    else clearMobileBtn.classList.add('is-hidden');
+    clearMobileBtn.style.display = query.length > 0 ? 'flex' : 'none';
+  }
 
   // Ejecutar filtro global si existe la función handleSearchInput
   if (typeof window.handleSearchInput === 'function') {
@@ -365,6 +376,25 @@ function initEncabezadoEvents() {
   const mobileInput = document.getElementById('main-search-input');
   if (mobileInput) {
     mobileInput.addEventListener('input', (e) => onSearchInputChanged(e.target.value));
+  }
+
+  // Manejo de envío de formularios de búsqueda
+  const desktopForm = document.getElementById('desktop-search-form');
+  if (desktopForm) {
+    desktopForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('desktop-search-input');
+      if (input) onSearchInputChanged(input.value);
+    });
+  }
+
+  const mobileForm = document.getElementById('mobile-search-form');
+  if (mobileForm) {
+    mobileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('main-search-input');
+      if (input) onSearchInputChanged(input.value);
+    });
   }
 }
 

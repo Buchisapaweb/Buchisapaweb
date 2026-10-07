@@ -1,7 +1,7 @@
 /**
  * RESTAURANTE BUCHISAPA - CONTROLADOR DE CHECKOUT Y PAGO (checkout.js)
  * Procesa la información del formulario de checkout, calcula totales,
- * envía la orden al backend Express /api/orders y vacía el carrito.
+ * envía la orden al backend Express /api/pedidos y vacía el carrito.
  */
 
 (function () {
@@ -50,7 +50,7 @@
     listEl.innerHTML = '';
 
     items.forEach(item => {
-      const price = Number(item.price || item.unitPrice || 0);
+      const price = Number(item.precio || item.unitPrice || 0);
       const qty = Number(item.quantity || item.qty || 1);
       const itemTotal = price * qty;
       subtotal += itemTotal;
@@ -58,7 +58,7 @@
       const row = document.createElement('div');
       row.style.cssText = 'display: flex; justify-content: space-between; font-size: 13px; color: #334155;';
       row.innerHTML = `
-        <span><strong>${qty}x</strong> ${item.name}</span>
+        <span><strong>${qty}x</strong> ${item.nombre}</span>
         <span style="font-weight: 700;">S/ ${itemTotal.toFixed(2)}</span>
       `;
       listEl.appendChild(row);
@@ -79,7 +79,7 @@
     const email = document.getElementById('chk-email')?.value?.trim();
     const address = document.getElementById('chk-address')?.value?.trim();
     const reference = document.getElementById('chk-reference')?.value?.trim() || '';
-    const paymentMethod = document.getElementById('chk-payment-method')?.value || 'yape';
+    const metodoPago = document.getElementById('chk-payment-method')?.value || 'yape';
 
     let items = [];
     try {
@@ -94,19 +94,19 @@
     }
 
     const orderData = {
-      customerName: name,
-      customerPhone: phone,
-      customerEmail: email,
+      nombreCliente: name,
+      telefonoCliente: phone,
+      emailCliente: email,
       deliveryAddress: address,
       deliveryReference: reference,
-      paymentMethod,
+      metodoPago,
       orderType: 'delivery',
       items,
       notes: reference
     };
 
     try {
-      const res = await fetch('/api/orders', {
+      const res = await fetch('/api/pedidos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
@@ -115,7 +115,7 @@
       if (res.ok) {
         const json = await res.json();
         localStorage.removeItem('buchisapa_cart');
-        alert(`¡Pedido #${json.data?.orderNumber || json.data?.id || ''} enviado con éxito! Gracias por elegir BuchiSapa.`);
+        alert(`¡Pedido #${json.datos?.orderNumber || json.datos?.id || ''} enviado con éxito! Gracias por elegir BuchiSapa.`);
         window.location.href = '/';
       } else {
         alert('Hubo un inconveniente al registrar la orden. Por favor intenta de nuevo.');

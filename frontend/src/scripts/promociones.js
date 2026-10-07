@@ -80,26 +80,26 @@ function renderPromocionesGrid(customContainer) {
       <article class="promo-item-card" id="card-${promo.id}">
         <div class="promo-item-img-box">
           <img 
-            src="${promo.image}" 
-            alt="${escapeHtml(promo.name)}" 
+            src="${promo.imagen}" 
+            alt="${escapeHtml(promo.nombre)}" 
             class="promo-item-img"
             loading="${idx < 4 ? 'eager' : 'lazy'}"
             onerror="this.onerror=null; this.src='${promo.fallbackImg}';"
           >
         </div>
         <div class="promo-item-body">
-          <h2 class="promo-item-title">${escapeHtml(promo.name)}</h2>
+          <h2 class="promo-item-title">${escapeHtml(promo.nombre)}</h2>
           <p class="promo-item-desc">
             ${escapeHtml(promo.shortDesc)}
             <button type="button" class="promo-ver-mas-inline" onclick="openPromoModal('${promo.id}')">VER MÁS</button>
           </p>
           <div class="promo-item-footer">
-            <span class="promo-item-price">S/ ${promo.price.toFixed(2)}</span>
+            <span class="promo-item-price">S/ ${promo.precio.toFixed(2)}</span>
             <button 
               type="button" 
               class="promo-btn-agregar" 
               onclick="addPromoDirectlyToCart('${promo.id}')"
-              aria-label="Agregar ${escapeHtml(promo.name)} al carrito"
+              aria-label="Agregar ${escapeHtml(promo.nombre)} al carrito"
             >
               <svg class="promo-basket-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
@@ -121,12 +121,12 @@ function addPromoDirectlyToCart(promoId) {
 
   const productData = {
     id: promo.id,
-    name: promo.name,
-    price: promo.price,
-    image: promo.image,
-    category: 'PROMOCIONES',
-    category_id: 'promociones',
-    includes_sauces: promo.includes_sauces
+    nombre: promo.nombre,
+    precio: promo.precio,
+    imagen: promo.imagen,
+    categoria: 'PROMOCIONES',
+    id_categoria: 'promociones',
+    incluye_salsas: promo.incluye_salsas
   };
 
   // Si existe BuchisapaCart, agregar directamente
@@ -172,12 +172,12 @@ function openPromoModal(promoId) {
   const addBtn = document.getElementById('promo-modal-add-btn');
 
   if (img) {
-    img.src = promo.image;
+    img.src = promo.imagen;
     img.onerror = () => { img.src = promo.fallbackImg; };
   }
-  if (title) title.textContent = promo.name;
+  if (title) title.textContent = promo.nombre;
   if (desc) desc.textContent = promo.fullDesc;
-  if (price) price.textContent = `S/ ${promo.price.toFixed(2)}`;
+  if (price) price.textContent = `S/ ${promo.precio.toFixed(2)}`;
 
   if (addBtn) {
     addBtn.onclick = () => {

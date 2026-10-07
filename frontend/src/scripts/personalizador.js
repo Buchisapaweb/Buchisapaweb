@@ -9,18 +9,18 @@
 (function () {
   // Base de datos de salsas oficiales
   const ALL_SAUCES = [
-    { id: 'mayonesa', name: 'Mayonesa', default: true },
-    { id: 'mostaza', name: 'Mostaza', default: true },
-    { id: 'ketchup', name: 'Ketchup', default: true },
-    { id: 'aji-rocoto', name: 'Ají de Rocoto', default: true },
-    { id: 'tartara', name: 'Tártara', default: false },
-    { id: 'aji-charapita', name: 'Ají Charapita', default: false },
-    { id: 'acevichada', name: 'Acevichada', default: false },
-    { id: 'salsa-bbq', name: 'Salsa BBQ', default: false },
-    { id: 'salsa-golf', name: 'Salsa Golf', default: false },
-    { id: 'ocopa', name: 'Ocopa', default: false },
-    { id: 'aceituna', name: 'Aceituna', default: false },
-    { id: 'vinagreta', name: 'Vinagreta', default: false }
+    { id: 'mayonesa', nombre: 'Mayonesa', default: true },
+    { id: 'mostaza', nombre: 'Mostaza', default: true },
+    { id: 'ketchup', nombre: 'Ketchup', default: true },
+    { id: 'aji-rocoto', nombre: 'Ají de Rocoto', default: true },
+    { id: 'tartara', nombre: 'Tártara', default: false },
+    { id: 'aji-charapita', nombre: 'Ají Charapita', default: false },
+    { id: 'acevichada', nombre: 'Acevichada', default: false },
+    { id: 'salsa-bbq', nombre: 'Salsa BBQ', default: false },
+    { id: 'salsa-golf', nombre: 'Salsa Golf', default: false },
+    { id: 'ocopa', nombre: 'Ocopa', default: false },
+    { id: 'aceituna', nombre: 'Aceituna', default: false },
+    { id: 'vinagreta', nombre: 'Vinagreta', default: false }
   ];
 
   // Estado activo del producto en personalización
@@ -36,9 +36,9 @@
    */
   function isExcludedCategory(product) {
     if (!product) return false;
-    const cat = String(product.category_id || product.category || product.categoryPill || product.categoria || product.category_slug || '').toLowerCase().trim();
-    const catBadge = String(product.categoryBadge || '').toLowerCase().trim();
-    const name = String(product.name || '').toLowerCase().trim();
+    const cat = String(product.id_categoria || product.categoria || product.categoriaPill || product.categoria || product.categoria_slug || '').toLowerCase().trim();
+    const catBadge = String(product.categoriaBadge || '').toLowerCase().trim();
+    const name = String(product.nombre || '').toLowerCase().trim();
 
     // 1. ADICIONALES (C0001), BEBIDAS (C0003), INFUSIONES (C0006), REFRESCOS (C0009)
     if (
@@ -75,8 +75,8 @@
       return [];
     }
 
-    const name = (product.name || '').toLowerCase().trim();
-    const cat = (product.category_id || product.category || '').toLowerCase().trim();
+    const name = (product.nombre || '').toLowerCase().trim();
+    const cat = (product.id_categoria || product.categoria || '').toLowerCase().trim();
 
     // 1. PLATOS AMAZÓNICOS
     if (name.includes('patacones con chorizo') || (name.includes('patacon') && name.includes('chorizo'))) {
@@ -318,8 +318,8 @@
 
     let d = '';
     // 1. Prioridad: usar directamente la descripción oficial del objeto producto
-    if (product.description && typeof product.description === 'string' && product.description.trim().length > 0) {
-      d = product.description.trim();
+    if (product.descripcion && typeof product.descripcion === 'string' && product.descripcion.trim().length > 0) {
+      d = product.descripcion.trim();
     } else {
       // 2. Buscar en la lista global de productos (window.currentProducts o getFallbackProducts)
       const list = (Array.isArray(window.currentProducts) && window.currentProducts.length > 0)
@@ -328,11 +328,11 @@
 
       if (Array.isArray(list) && list.length > 0) {
         const targetId = product.id ? String(product.id).trim().toLowerCase() : '';
-        const targetName = product.name ? String(product.name).trim().toLowerCase() : '';
+        const targetName = product.nombre ? String(product.nombre).trim().toLowerCase() : '';
 
-        const match = list.find(p => (targetId && String(p.id).toLowerCase() === targetId) || (targetName && String(p.name).toLowerCase() === targetName));
-        if (match && match.description && match.description.trim().length > 0) {
-          d = match.description.trim();
+        const match = list.find(p => (targetId && String(p.id).toLowerCase() === targetId) || (targetName && String(p.nombre).toLowerCase() === targetName));
+        if (match && match.descripcion && match.descripcion.trim().length > 0) {
+          d = match.descripcion.trim();
         }
       }
     }
@@ -354,7 +354,7 @@
    * Obtiene la categoría formateada para el badge superior
    */
   function getCategoryPillLabel(product) {
-    const cat = (product.category_id || product.category || '').toLowerCase();
+    const cat = (product.id_categoria || product.categoria || '').toLowerCase();
     if (cat.includes('hamburguesa') || cat.includes('burger')) return 'HAMBURGUESAS';
     if (cat.includes('amazon') || cat.includes('selva')) return 'PLATOS AMAZÓNICOS';
     if (cat.includes('broaster')) return 'BROASTER';
@@ -364,16 +364,16 @@
     if (cat.includes('refresco')) return 'REFRESCOS';
     if (cat.includes('bebida')) return 'BEBIDAS';
     if (cat.includes('infusion')) return 'INFUSIONES';
-    return (product.category_id || product.category || 'CARTA GENERAL').toUpperCase();
+    return (product.id_categoria || product.categoria || 'CARTA GENERAL').toUpperCase();
   }
 
   /**
    * Obtiene el badge superior de la imagen (ej: 🔥 MÁS VENDIDO)
    */
   function getHeroBadgeText(product) {
-    if (product.badge) return product.badge;
-    const name = (product.name || '').toLowerCase();
-    const cat = (product.category_id || product.category || '').toLowerCase();
+    if (product.etiqueta) return product.etiqueta;
+    const name = (product.nombre || '').toLowerCase();
+    const cat = (product.id_categoria || product.categoria || '').toLowerCase();
     if (name.includes('amazónica') || name.includes('amazonica')) return '🔥 EDICIÓN ESPECIAL';
     if (name.includes('clásica') || name.includes('tacacho') || name.includes('broaster')) return '🔥 MÁS VENDIDO';
     if (name.includes('juane') || cat.includes('amazon')) return '🌴 TRADICIÓN SELVÁTICA';
@@ -383,7 +383,7 @@
   /**
    * Abre la pantalla de personalización del producto
    */
-  window.openProductDetailModal = function (productIdOrObject) {
+  window.openProductDetailModal = function (idProductoOrObject) {
     let product = null;
 
     const list = (Array.isArray(window.currentProducts) && window.currentProducts.length > 0)
@@ -394,13 +394,13 @@
       window.currentProducts = list;
     }
 
-    if (typeof productIdOrObject === 'object' && productIdOrObject !== null) {
-      product = productIdOrObject;
-    } else if (typeof productIdOrObject === 'string') {
-      const target = productIdOrObject.trim().toLowerCase();
-      product = list.find(p => p.id === productIdOrObject || String(p.id).toLowerCase() === target) ||
-                list.find(p => (p.name || '').toLowerCase() === target) ||
-                list.find(p => (p.name || '').toLowerCase().includes(target));
+    if (typeof idProductoOrObject === 'object' && idProductoOrObject !== null) {
+      product = idProductoOrObject;
+    } else if (typeof idProductoOrObject === 'string') {
+      const target = idProductoOrObject.trim().toLowerCase();
+      product = list.find(p => p.id === idProductoOrObject || String(p.id).toLowerCase() === target) ||
+                list.find(p => (p.nombre || '').toLowerCase() === target) ||
+                list.find(p => (p.nombre || '').toLowerCase().includes(target));
     }
 
     if (!product && list.length > 0) {
@@ -408,7 +408,7 @@
     }
 
     if (!product) {
-      console.warn('Producto no encontrado para personalizar:', productIdOrObject);
+      console.warn('Producto no encontrado para personalizar:', idProductoOrObject);
       return;
     }
 
@@ -417,13 +417,13 @@
 
     // Inicializar acompañamientos (todos seleccionados por defecto)
     availableAccompaniments = getProductAccompaniments(product);
-    selectedAccompaniments = [...availableAccompaniments];
+    selectedAccompaniments = [...disponibleAccompaniments];
 
     // Inicializar salsas (NUNCA para bebidas, infusiones, refrescos o postres)
     if (isDrinkOrNoSauceItem(product)) {
       selectedSauces = [];
     } else {
-      selectedSauces = ALL_SAUCES.filter(s => s.default).map(s => s.name);
+      selectedSauces = ALL_SAUCES.filter(s => s.default).map(s => s.nombre);
     }
 
     // Recordar página de procedencia
@@ -467,9 +467,9 @@
   function isDrinkOrNoSauceItem(product) {
     if (!product) return false;
 
-    const catBadge = String(product.categoryBadge || '').toLowerCase();
-    const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
-    const name = String(product.name || '').toLowerCase();
+    const catBadge = String(product.categoriaBadge || '').toLowerCase();
+    const cat = String(product.id_categoria || product.categoria || product.categoriaPill || '').toLowerCase();
+    const name = String(product.nombre || '').toLowerCase();
 
     // Las promociones, combos y packs NUNCA son bebidas puras (siempre incluyen cremas y salsas de la casa)
     if (
@@ -479,7 +479,7 @@
       return false;
     }
 
-    if (product.includes_sauces === false) return true;
+    if (product.incluye_salsas === false) return true;
 
     if (isExcludedCategory(product)) {
       return true;
@@ -578,16 +578,16 @@
     const catLabel = getCategoryPillLabel(p);
     const heroBadge = getHeroBadgeText(p);
     const desc = getProductDescription(p);
-    const priceNum = parseFloat(p.price || 0);
+    const priceNum = parseFloat(p.precio || 0);
     const totalPrice = (priceNum * currentQty).toFixed(2);
     const catFallback = (typeof window.getCategoryBannerFallback === 'function') 
-      ? window.getCategoryBannerFallback(p.category_id || p.category) 
+      ? window.getCategoryBannerFallback(p.id_categoria || p.categoria) 
       : '/imagenes/portada/Portada1E.webp';
-    const imgSrc = p.image || catFallback;
+    const imgSrc = p.imagen || catFallback;
 
     const isDrink = isDrinkOrNoSauceItem(p);
     const hasAccompaniments = availableAccompaniments && availableAccompaniments.length > 0;
-    const showSauces = !isDrink && p.includes_sauces !== false;
+    const showSauces = !isDrink && p.incluye_salsas !== false;
 
     const backLabelText = (window._lastActivePageView === 'category') ? 'Volver a Categorías' : 'Volver al inicio';
 
@@ -611,7 +611,7 @@
             <!-- COLUMNA IZQUIERDA: FOTOGRAFÍA CUADRADA DEL PLATO -->
             <div class="product-detail-left-col">
               <div class="product-hero-card">
-                <img src="${imgSrc}" alt="${escapeHtml(p.name)}" class="product-hero-img" loading="eager" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
+                <img src="${imgSrc}" alt="${escapeHtml(p.nombre)}" class="product-hero-img" loading="eager" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
                 <div class="product-hero-badge">
                   <span>${heroBadge}</span>
                 </div>
@@ -623,7 +623,7 @@
               
               <!-- CARD INFORMACIÓN DEL PLATO -->
               <div class="product-main-info-card">
-                <h1 class="product-main-title">${escapeHtml(p.name)}</h1>
+                <h1 class="product-main-title">${escapeHtml(p.nombre)}</h1>
                 <div class="product-meta-row">
                   <span class="product-main-cat-label">CATEGORÍA: ${catLabel}</span>
                 </div>
@@ -749,14 +749,14 @@
 
   function renderSaucesList() {
     return ALL_SAUCES.map(s => {
-      const isSelected = selectedSauces.includes(s.name);
+      const isSelected = selectedSauces.includes(s.nombre);
       return `
-        <div class="product-item-toggle-card ${isSelected ? 'active' : ''}" onclick="window.customizerToggleSauce('${escapeHtmlAttr(s.name)}')">
+        <div class="product-item-toggle-card ${isSelected ? 'active' : ''}" onclick="window.customizerToggleSauce('${escapeHtmlAttr(s.nombre)}')">
           <div class="product-item-left">
             <div class="product-item-checkbox">
               <span class="product-item-checkbox-check">✓</span>
             </div>
-            <span class="product-item-name">${escapeHtml(s.name)}</span>
+            <span class="product-item-name">${escapeHtml(s.nombre)}</span>
           </div>
           <span class="product-item-badge">${isSelected ? 'Incluido' : 'Sin esto'}</span>
         </div>
@@ -778,7 +778,7 @@
 
   window.customizerSetAllAccompaniments = function (includeAll) {
     if (includeAll) {
-      selectedAccompaniments = [...availableAccompaniments];
+      selectedAccompaniments = [...disponibleAccompaniments];
     } else {
       selectedAccompaniments = [];
     }
@@ -799,7 +799,7 @@
 
   window.customizerSetSaucesPreset = function (preset) {
     if (preset === 'all') {
-      selectedSauces = ALL_SAUCES.map(s => s.name);
+      selectedSauces = ALL_SAUCES.map(s => s.nombre);
     } else if (preset === 'classics') {
       selectedSauces = ['Mayonesa', 'Mostaza', 'Ketchup', 'Ají de Rocoto'];
     } else if (preset === 'none') {
@@ -815,7 +815,7 @@
     const priceEl = document.getElementById('customizer-total-price');
     if (qtyEl) qtyEl.textContent = currentQty;
     if (priceEl && currentProduct) {
-      const total = (parseFloat(currentProduct.price || 0) * currentQty).toFixed(2);
+      const total = (parseFloat(currentProduct.precio || 0) * currentQty).toFixed(2);
       priceEl.textContent = `S/ ${total}`;
     }
   };

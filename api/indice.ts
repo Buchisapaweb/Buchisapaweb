@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import app from '../server.ts';
+import aplicacion from '../servidor.ts';
 
 export default function handler(req: Request, res: Response) {
   // Extract original requested path from Vercel headers if available
@@ -16,5 +16,5 @@ export default function handler(req: Request, res: Response) {
     req.url = `/api${req.url.startsWith('/') ? '' : '/'}${req.url}`;
   }
   
-  return app(req, res);
+  return aplicacion(req, res);
 }

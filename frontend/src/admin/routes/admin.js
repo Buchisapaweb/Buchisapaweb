@@ -48,7 +48,7 @@
       }
 
       try {
-        const res = await fetch('/api/auth/admin-session', {
+        const res = await fetch('/api/autenticacion/admin-session', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -58,12 +58,10 @@
           body: JSON.stringify({ token: storedToken, user: parsedUser })
         });
         
-        if (res.ok) {
-          const data = await res.json().catch(() => null);
-          if (data && data.user) {
-            localStorage.setItem('buchisapa_admin_session', JSON.stringify(data.user));
+          const datos = await res.json().catch(() => null);
+          if (datos && datos.user) {
+            localStorage.setItem('buchisapa_admin_session', JSON.stringify(datos.user));
           }
-        }
       } catch (err) {
         console.warn('Verificación remota de sesión completada con respaldo local:', err);
       }
@@ -103,14 +101,14 @@
         if (!target) return;
 
         if (target.classList.contains('btn-view-order')) {
-          const orderId = target.getAttribute('data-order-id');
-          if (orderId && typeof window.viewOrderDetail === 'function') {
-            window.viewOrderDetail(orderId);
+          const idPedido = target.getAttribute('data-order-id');
+          if (idPedido && typeof window.viewOrderDetail === 'function') {
+            window.viewOrderDetail(idPedido);
           }
         } else if (target.classList.contains('btn-edit-product')) {
-          const productId = target.getAttribute('data-product-id');
+          const idProducto = target.getAttribute('data-product-id');
           if (typeof window.openEditProductModal === 'function') {
-            window.openEditProductModal(productId);
+            window.openEditProductModal(idProducto);
           }
         } else if (target.classList.contains('btn-edit-category')) {
           const catId = target.getAttribute('data-cat-id');
@@ -145,12 +143,12 @@
       try {
         const res = await fetch('/api/admin/dashboard-stats');
         if (res.ok) {
-          const data = await res.json();
-          if (data.success) {
-            const numClients = parseInt(data.totalClients) || 0;
-            const numProducts = parseInt(data.totalProducts) || 0;
-            const numOrders = parseInt(data.totalOrders) || 0;
-            const numCategories = parseInt(data.totalCategories) || 0;
+          const datos = await res.json();
+          if (datos.exito) {
+            const numClients = parseInt(datos.totalClients) || 0;
+            const numProducts = parseInt(datos.totalProducts) || 0;
+            const numOrders = parseInt(datos.totalOrders) || 0;
+            const numCategories = parseInt(datos.totalCategories) || 0;
 
             const kpiClients = document.getElementById('kpi-val-clientes');
             const kpiProducts = document.getElementById('kpi-val-productos');
@@ -174,10 +172,10 @@
 
     loadOrders: async function () {
       try {
-        const res = await fetch('/api/orders');
+        const res = await fetch('/api/pedidos');
         if (res.ok) {
-          const data = await res.json();
-          const orders = Array.isArray(data.orders) ? data.orders : (Array.isArray(data) ? data : []);
+          const datos = await res.json();
+          const orders = Array.isArray(datos.orders) ? datos.orders : (Array.isArray(datos) ? datos : []);
           this.renderOrdersTable(orders);
           
           const kpiOrders = document.getElementById('kpi-val-pedidos');
@@ -205,9 +203,9 @@
 
       const rowsHtml = orders.slice(0, 10).map(ord => {
         const code = ord.id ? `#BS-${String(ord.id).slice(-4).toUpperCase()}` : '#BS-0000';
-        const client = ord.customerName || ord.user_name || 'Cliente Particular';
+        const client = ord.nombreCliente || ord.user_name || 'Cliente Particular';
         const total = (parseFloat(ord.total) || 0).toFixed(2);
-        const status = ord.status || 'pendiente';
+        const status = ord.estado || 'pendiente';
         const badgeClass = status === 'entregado' ? 'badge-success' : (status === 'cancelado' ? 'badge-danger' : 'badge-warning');
 
         return `
@@ -230,7 +228,7 @@
 
     loadProducts: async function () {
       try {
-        const res = await fetch('/api/products');
+        const res = await fetch('/api/productos');
         if (res.ok) {
           const products = await res.json();
           const list = Array.isArray(products) ? products : [];
@@ -254,13 +252,13 @@
       }
 
       tbody.innerHTML = products.map(p => {
-        const price = (parseFloat(p.price) || 0).toFixed(2);
-        const img = p.image || '/imagenes/portada/Portada1E.webp';
+        const price = (parseFloat(p.precio) || 0).toFixed(2);
+        const img = p.imagen || '/imagenes/portada/Portada1E.webp';
         return `
           <tr>
-            <td><img src="${img}" class="product-table-img" alt="${p.name}"></td>
-            <td><strong>${p.name}</strong></td>
-            <td><span class="badge badge-neutral">${(p.category || 'General').toUpperCase()}</span></td>
+            <td><img src="${img}" class="product-table-img" alt="${p.nombre}"></td>
+            <td><strong>${p.nombre}</strong></td>
+            <td><span class="badge badge-neutral">${(p.categoria || 'General').toUpperCase()}</span></td>
             <td><strong>S/ ${price}</strong></td>
             <td>${p.stock !== undefined ? p.stock : 25} un.</td>
             <td><span class="badge badge-success">ACTIVO</span></td>
@@ -274,27 +272,27 @@
 
     loadCategories: async function () {
       const defaultCategories = [
-        { id: 'C0001', code: 'C0001', slug: 'adicionales', name: 'ADICIONALES', banner: '/imagenes/categorias/adicionales/banner.webp', order: 1 },
-        { id: 'C0002', code: 'C0002', slug: 'alitas', name: 'ALITAS', banner: '/imagenes/categorias/alitas/banner.webp', order: 2 },
-        { id: 'C0003', code: 'C0003', slug: 'bebidas', name: 'BEBIDAS', banner: '/imagenes/categorias/bebidas/banner.webp', order: 3 },
-        { id: 'C0004', code: 'C0004', slug: 'broaster', name: 'BROASTER', banner: '/imagenes/categorias/broaster/banner.webp', order: 4 },
-        { id: 'C0005', code: 'C0005', slug: 'hamburguesas', name: 'HAMBURGUESAS', banner: '/imagenes/categorias/hamburguesas/banner.webp', order: 5 },
-        { id: 'C0006', code: 'C0006', slug: 'infusiones', name: 'INFUSIONES', banner: '/imagenes/categorias/infusiones/banner.webp', order: 6 },
-        { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', name: 'PLATOS AMAZÓNICOS', banner: '/imagenes/categorias/platos-amazonicos/banner.webp', order: 7 },
-        { id: 'C0008', code: 'C0008', slug: 'promociones', name: 'PROMOCIONES', banner: '/imagenes/categorias/promociones/banner.webp', order: 8 },
-        { id: 'C0009', code: 'C0009', slug: 'refrescos', name: 'REFRESCOS', banner: '/imagenes/categorias/refrescos/banner.webp', order: 9 },
-        { id: 'C0010', code: 'C0010', slug: 'salchipapas', name: 'SALCHIPAPAS Y SALCHIBROASTERS', banner: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp', order: 10 }
+        { id: 'C0001', code: 'C0001', slug: 'adicionales', nombre: 'ADICIONALES', banner: '/imagenes/categorias/adicionales/banner.webp', order: 1 },
+        { id: 'C0002', code: 'C0002', slug: 'alitas', nombre: 'ALITAS', banner: '/imagenes/categorias/alitas/banner.webp', order: 2 },
+        { id: 'C0003', code: 'C0003', slug: 'bebidas', nombre: 'BEBIDAS', banner: '/imagenes/categorias/bebidas/banner.webp', order: 3 },
+        { id: 'C0004', code: 'C0004', slug: 'broaster', nombre: 'BROASTER', banner: '/imagenes/categorias/broaster/banner.webp', order: 4 },
+        { id: 'C0005', code: 'C0005', slug: 'hamburguesas', nombre: 'HAMBURGUESAS', banner: '/imagenes/categorias/hamburguesas/banner.webp', order: 5 },
+        { id: 'C0006', code: 'C0006', slug: 'infusiones', nombre: 'INFUSIONES', banner: '/imagenes/categorias/infusiones/banner.webp', order: 6 },
+        { id: 'C0007', code: 'C0007', slug: 'platos-amazonicos', nombre: 'PLATOS AMAZÓNICOS', banner: '/imagenes/categorias/platos-amazonicos/banner.webp', order: 7 },
+        { id: 'C0008', code: 'C0008', slug: 'promociones', nombre: 'PROMOCIONES', banner: '/imagenes/categorias/promociones/banner.webp', order: 8 },
+        { id: 'C0009', code: 'C0009', slug: 'refrescos', nombre: 'REFRESCOS', banner: '/imagenes/categorias/refrescos/banner.webp', order: 9 },
+        { id: 'C0010', code: 'C0010', slug: 'salchipapas', nombre: 'SALCHIPAPAS Y SALCHIBROASTERS', banner: '/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp', order: 10 }
       ];
 
       try {
-        const res = await fetch('/api/categories');
+        const res = await fetch('/api/categorias');
         let list = [];
         if (res.ok) {
           const cats = await res.json();
           if (Array.isArray(cats) && cats.length > 0) {
             list = cats;
-          } else if (cats && Array.isArray(cats.data) && cats.data.length > 0) {
-            list = cats.data;
+          } else if (cats && Array.isArray(cats.datos) && cats.datos.length > 0) {
+            list = cats.datos;
           }
         }
         
@@ -329,13 +327,13 @@
         container.innerHTML = cats.map(c => `
           <div class="category-item-card" data-cat-id="${c.id || c.code || c.slug}">
             <div class="category-card-banner-wrap">
-              <img src="${c.banner || c.image || '/imagenes/categorias/adicionales/banner.webp'}" alt="${c.name}" class="category-card-banner-img" onerror="this.src='/imagenes/portada/Portada1E.webp'">
+              <img src="${c.banner || c.imagen || '/imagenes/categorias/adicionales/banner.webp'}" alt="${c.nombre}" class="category-card-banner-img" onerror="this.src='/imagenes/portada/Portada1E.webp'">
               <div class="category-card-banner-overlay"></div>
               <span class="category-code-badge">${c.code || c.slug || c.id}</span>
               <span class="category-order-badge">#${c.order || 1}</span>
             </div>
             <div class="category-card-body">
-              <h3 class="category-card-name" title="${c.name}">${c.name}</h3>
+              <h3 class="category-card-name" title="${c.nombre}">${c.nombre}</h3>
               <div class="category-card-footer">
                 <button class="btn btn-xs btn-primary btn-edit-category" data-cat-id="${c.id || c.code || c.slug}" type="button">
                   <span>Editar</span>
@@ -354,9 +352,9 @@
           <tr>
             <td><span class="badge badge-gold">#${c.order || 1}</span></td>
             <td><code>${c.code || c.id}</code></td>
-            <td><img src="${c.banner || c.image || '/imagenes/portada/Portada1E.webp'}" class="category-table-banner" alt="${c.name}"></td>
-            <td><strong class="category-table-title">${c.name}</strong></td>
-            <td class="category-table-desc">${c.description || '-'}</td>
+            <td><img src="${c.banner || c.imagen || '/imagenes/portada/Portada1E.webp'}" class="category-table-banner" alt="${c.nombre}"></td>
+            <td><strong class="category-table-title">${c.nombre}</strong></td>
+            <td class="category-table-desc">${c.descripcion || '-'}</td>
             <td class="table-cell-right">
               <button class="btn btn-xs btn-primary btn-edit-category" data-cat-id="${c.id || c.code || c.slug}" type="button">Editar</button>
               <button class="btn btn-xs btn-danger btn-delete-category" data-cat-id="${c.id || c.code || c.slug}" type="button">Eliminar</button>
@@ -370,8 +368,8 @@
       try {
         const res = await fetch('/api/admin/clients');
         if (res.ok) {
-          const data = await res.json();
-          const clients = Array.isArray(data.clients) ? data.clients : [];
+          const datos = await res.json();
+          const clients = Array.isArray(datos.clients) ? datos.clients : [];
           this.renderClientsTable(clients);
 
           const kpiClients = document.getElementById('kpi-val-clientes');
@@ -393,7 +391,7 @@
 
       tbody.innerHTML = clients.map(c => `
         <tr>
-          <td><strong>${c.name || 'Usuario BuchiSapa'}</strong></td>
+          <td><strong>${c.nombre || 'Usuario BuchiSapa'}</strong></td>
           <td>${c.email || '-'}</td>
           <td>${c.phone || '-'}</td>
           <td>${c.dni || '-'}</td>
@@ -453,10 +451,10 @@
     if (backdrop) backdrop.classList.add('active');
   };
 
-  window.openEditProductModal = function (productId) {
+  window.openEditProductModal = function (idProducto) {
     const backdrop = document.getElementById('modal-product-backdrop');
     const title = document.getElementById('modal-product-title');
-    if (title) title.textContent = `Editar Producto #${productId}`;
+    if (title) title.textContent = `Editar Producto #${idProducto}`;
     if (backdrop) backdrop.classList.add('active');
   };
 
@@ -467,11 +465,11 @@
     if (backdrop) backdrop.classList.add('active');
   };
 
-  window.viewOrderDetail = function (orderId) {
+  window.viewOrderDetail = function (idPedido) {
     const backdrop = document.getElementById('modal-order-backdrop');
     const body = document.getElementById('modal-order-body');
     if (body) {
-      body.innerHTML = `<p class="p-4 text-center">Cargando detalles de comanda #${orderId}...</p>`;
+      body.innerHTML = `<p class="p-4 text-center">Cargando detalles de comanda #${idPedido}...</p>`;
     }
     if (backdrop) backdrop.classList.add('active');
   };

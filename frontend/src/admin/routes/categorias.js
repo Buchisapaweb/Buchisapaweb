@@ -69,7 +69,7 @@
 
         // Intentar guardar en backend
         try {
-          await fetch('/api/categories', {
+          await fetch('/api/categorias', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: catId, name, slug, order, banner })
@@ -104,12 +104,12 @@
 
     if (catId) {
       const cat = categories.find(c => String(c.id) === String(catId) || String(c.code) === String(catId) || String(c.slug) === String(catId));
-      if (title) title.textContent = cat ? `Editar Categoría: ${cat.name}` : `Editar Categoría #${catId}`;
+      if (title) title.textContent = cat ? `Editar Categoría: ${cat.nombre}` : `Editar Categoría #${catId}`;
       if (idInput) idInput.value = catId;
-      if (nameInput) nameInput.value = cat ? cat.name : '';
+      if (nameInput) nameInput.value = cat ? cat.nombre : '';
       if (slugInput) slugInput.value = cat ? (cat.slug || cat.code || cat.id) : '';
       if (orderInput) orderInput.value = cat ? (cat.order || 1) : 1;
-      if (bannerInput) bannerInput.value = cat ? (cat.banner || cat.image || '') : '';
+      if (bannerInput) bannerInput.value = cat ? (cat.banner || cat.imagen || '') : '';
     } else {
       if (title) title.textContent = 'Nueva Categoría';
       if (idInput) idInput.value = '';
@@ -125,14 +125,14 @@
   window.deleteCategory = function (catId) {
     let categories = window.BuchiSapaAdmin?.categories || [];
     const cat = categories.find(c => String(c.id) === String(catId) || String(c.code) === String(catId) || String(c.slug) === String(catId));
-    const catName = cat ? cat.name : catId;
+    const catName = cat ? cat.nombre : catId;
 
     if (confirm(`¿Estás seguro de que deseas eliminar la categoría "${catName}" de la carta digital?`)) {
       categories = categories.filter(c => String(c.id) !== String(catId) && String(c.code) !== String(catId) && String(c.slug) !== String(catId));
       window.BuchiSapaAdmin.categories = categories;
 
       try {
-        fetch(`/api/categories/${catId}`, { method: 'DELETE' });
+        fetch(`/api/categorias/${catId}`, { method: 'DELETE' });
       } catch (err) {}
 
       if (typeof window.BuchiSapaAdmin?.renderCategoriesView === 'function') {

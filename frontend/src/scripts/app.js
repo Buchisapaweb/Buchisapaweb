@@ -15,72 +15,72 @@
     {
       id: 'p1',
       title: '1/4 Pollo a la Brasa + Papas + Ensalada',
-      price: 22.00,
+      precio: 22.00,
       oldPrice: 25.00,
-      category: 'broaster',
-      image: '/imagenes/portada/Portada1M.webp',
-      badge: 'MÁS VENDIDO',
-      description: 'Jugoso cuarto de pollo sazonado con especias secretas al carbón, acompañado de crocantes papas fritas y ensalada fresca.'
+      categoria: 'broaster',
+      imagen: '/imagenes/portada/Portada1M.webp',
+      etiqueta: 'MÁS VENDIDO',
+      descripcion: 'Jugoso cuarto de pollo sazonado con especias secretas al carbón, acompañado de crocantes papas fritas y ensalada fresca.'
     },
     {
       id: 'p2',
       title: '1/2 Pollo a la Brasa Familiar',
-      price: 42.00,
+      precio: 42.00,
       oldPrice: 48.00,
-      category: 'broaster',
-      image: '/imagenes/portada/Portada2M.webp',
-      badge: 'PROMO',
-      description: 'Medio pollo dorado a la perfección con porción familiar de papas fritas y cremas artesanales.'
+      categoria: 'broaster',
+      imagen: '/imagenes/portada/Portada2M.webp',
+      etiqueta: 'PROMO',
+      descripcion: 'Medio pollo dorado a la perfección con porción familiar de papas fritas y cremas artesanales.'
     },
     {
       id: 'p3',
       title: '1 Pollo a la Brasa Entero + Inca Kola 1.5L',
-      price: 78.00,
+      precio: 78.00,
       oldPrice: 88.00,
-      category: 'broaster',
-      image: '/imagenes/portada/Portada1E.webp',
-      badge: 'COMBO FAMILIAR',
-      description: 'Un pollo entero jugoso al carbón, papas familiares, ensalada grande y bebida Inca Kola de 1.5 Litros.'
+      categoria: 'broaster',
+      imagen: '/imagenes/portada/Portada1E.webp',
+      etiqueta: 'COMBO FAMILIAR',
+      descripcion: 'Un pollo entero jugoso al carbón, papas familiares, ensalada grande y bebida Inca Kola de 1.5 Litros.'
     },
     {
       id: 'p4',
       title: 'Hamburguesa Buchisapa Especial Doble Carne',
-      price: 18.50,
+      precio: 18.50,
       oldPrice: 22.00,
-      category: 'hamburguesas',
-      image: '/imagenes/portada/Portada2E.webp',
-      badge: 'RECOMENDADO',
-      description: 'Doble carne artesanal de 150g, queso cheddar fundido, tocino crocante, huevo frito y papas al hilo.'
+      categoria: 'hamburguesas',
+      imagen: '/imagenes/portada/Portada2E.webp',
+      etiqueta: 'RECOMENDADO',
+      descripcion: 'Doble carne artesanal de 150g, queso cheddar fundido, tocino crocante, huevo frito y papas al hilo.'
     },
     {
       id: 'p5',
       title: 'Juane Amazónico Tradicional con Cecina',
-      price: 24.00,
+      precio: 24.00,
       oldPrice: 28.00,
-      category: 'amazonicos',
-      image: '/imagenes/portada/Portada1M.webp',
-      badge: 'SABOR AMAZÓNICO',
-      description: 'Juane de arroz sazonado con palillo y hierbas de la selva, acompañado de jugosa cecina ahumada y tacacho.'
+      categoria: 'amazonicos',
+      imagen: '/imagenes/portada/Portada1M.webp',
+      etiqueta: 'SABOR AMAZÓNICO',
+      descripcion: 'Juane de arroz sazonado con palillo y hierbas de la selva, acompañado de jugosa cecina ahumada y tacacho.'
     },
     {
       id: 'p6',
       title: 'Alitas BBQ Crocantes (8 piezas)',
-      price: 26.00,
+      precio: 26.00,
       oldPrice: 30.00,
-      category: 'alitas',
-      image: '/imagenes/portada/Portada2M.webp',
-      badge: 'NUEVO',
-      description: '8 jugosas alitas empanizadas bañadas en salsa BBQ dulce y ahumada, servidas con papas doradas.'
+      categoria: 'alitas',
+      imagen: '/imagenes/portada/Portada2M.webp',
+      etiqueta: 'NUEVO',
+      descripcion: '8 jugosas alitas empanizadas bañadas en salsa BBQ dulce y ahumada, servidas con papas doradas.'
     },
     {
       id: 'p7',
       title: 'Chicha Morada Artesanal (1 Litro)',
-      price: 12.00,
+      precio: 12.00,
       oldPrice: 14.00,
-      category: 'bebidas',
-      image: '/imagenes/portada/Portada1E.webp',
-      badge: 'REFRESCANTE',
-      description: 'Chicha morada natural preparada con maíz morado, piña, membrillo, manzana y gotas de limón.'
+      categoria: 'bebidas',
+      imagen: '/imagenes/portada/Portada1E.webp',
+      etiqueta: 'REFRESCANTE',
+      descripcion: 'Chicha morada natural preparada con maíz morado, piña, membrillo, manzana y gotas de limón.'
     }
   ];
 
@@ -106,14 +106,14 @@
     gridEl.innerHTML = products.map(prod => `
       <article class="category-banner-card product-card-item" onclick="openProductDetailModal('${prod.id}')">
         <div class="product-card-img-wrap">
-          <img src="${prod.image}" alt="${prod.title}" class="category-banner-img" loading="lazy">
-          ${prod.badge ? `<span class="category-banner-tag">${prod.badge}</span>` : ''}
+          <img src="${prod.imagen}" alt="${prod.title}" class="category-banner-img" loading="lazy">
+          ${prod.etiqueta ? `<span class="category-banner-tag">${prod.etiqueta}</span>` : ''}
         </div>
         <div class="category-banner-overlay">
           <h3 class="category-banner-title" style="font-size: 16px; margin-bottom: 4px;">${prod.title}</h3>
-          <p style="font-size: 12.5px; color: #64748b; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${prod.description || ''}</p>
+          <p style="font-size: 12.5px; color: #64748b; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${prod.descripcion || ''}</p>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto;">
-            <span style="font-size: 18px; font-weight: 900; color: #dc2626;">S/ ${Number(prod.price).toFixed(2)}</span>
+            <span style="font-size: 18px; font-weight: 900; color: #dc2626;">S/ ${Number(prod.precio).toFixed(2)}</span>
             <button type="button" class="promo-btn-agregar" onclick="event.stopPropagation(); quickAddToCart('${prod.id}')">
               + Agregar
             </button>
@@ -130,8 +130,8 @@
     const filtered = currentCategory === 'all' 
       ? all 
       : all.filter(p => {
-          const pCatName = String(p.category || '').toLowerCase().trim();
-          const pCatId = String(p.category_id || p.categoryId || '').toLowerCase().trim();
+          const pCatName = String(p.categoria || '').toLowerCase().trim();
+          const pCatId = String(p.id_categoria || p.categoriaId || '').toLowerCase().trim();
           const target = String(currentCategory).toLowerCase().trim();
           
           // Mapeos de slug de categoría a ID exacto
@@ -169,15 +169,15 @@
   };
 
   // Agregar rápido al carrito
-  window.quickAddToCart = function (productId) {
+  window.quickAddToCart = function (idProducto) {
     const all = getAllProducts();
-    const prod = all.find(p => p.id === productId);
+    const prod = all.find(p => p.id === idProducto);
     if (prod && window.BuchisapaCart) {
       window.BuchisapaCart.addItem({
         id: prod.id,
-        title: prod.title || prod.name,
-        price: prod.price,
-        image: prod.image,
+        title: prod.title || prod.nombre,
+        precio: prod.precio,
+        imagen: prod.imagen,
         qty: 1
       });
       window.BuchisapaCart.openDrawer();
@@ -185,27 +185,27 @@
   };
 
   // Abrir detalle de producto modal / página
-  window.openProductDetailModal = function (productId) {
-    window.location.href = `/producto?id=${productId}`;
+  window.openProductDetailModal = function (idProducto) {
+    window.location.href = `/producto?id=${idProducto}`;
   };
 
   // Función asíncrona para cargar productos de la base de datos
   async function loadDatabaseProducts() {
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch('/api/productos');
       if (res.ok) {
         const json = await res.json();
-        const apiProducts = json.data || [];
+        const apiProducts = json.datos || [];
         if (Array.isArray(apiProducts) && apiProducts.length > 0) {
           // Mapear campos de la base de datos para compatibilidad con la UI de app.js
           const mappedProducts = apiProducts.map(p => ({
             ...p,
             id: p.id || p.code,
-            title: p.name,
-            price: Number(p.price || 0),
-            image: p.image || '/imagenes/categorias/broaster/banner.webp',
-            badge: p.badge || (p.popular ? '🔥 POPULAR' : ''),
-            description: p.description || ''
+            title: p.nombre,
+            precio: Number(p.precio || 0),
+            imagen: p.imagen || '/imagenes/categorias/broaster/banner.webp',
+            etiqueta: p.etiqueta || (p.popular ? '🔥 POPULAR' : ''),
+            descripcion: p.descripcion || ''
           }));
           
           allMenuProducts = mappedProducts;

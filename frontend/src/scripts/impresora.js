@@ -85,19 +85,19 @@
     let hours12 = (hours24 % 12 || 12).toString().padStart(2, '0');
     const hora = `${hours12}:${minutes}:${seconds} ${ampm}`;
 
-    const cliente = o.customer_name || o.customerName || o.cliente || 'Cliente';
-    const estado = o.status ? (o.status.charAt(0).toUpperCase() + o.status.slice(1).toLowerCase()) : 'Pendiente';
-    const telefono = o.customer_phone || o.customerPhone || o.phone || '';
+    const cliente = o.customer_name || o.nombreCliente || o.cliente || 'Cliente';
+    const estado = o.estado ? (o.estado.charAt(0).toUpperCase() + o.estado.slice(1).toLowerCase()) : 'Pendiente';
+    const telefono = o.customer_phone || o.telefonoCliente || o.phone || '';
     const tipo = (o.order_type || o.orderType || o.tipo || 'Delivery');
     const direccion = o.delivery_address || o.address || o.direccion || '';
-    const pago = (o.payment_method || o.paymentMethod || o.payment || 'Efectivo');
+    const pago = (o.payment_method || o.metodoPago || o.payment || 'Efectivo');
     const items = normalizeOrderItems(o);
 
     let totalCalculated = 0;
     let totalItemsCount = 0;
     items.forEach(i => {
       const q = parseInt(i.cant || i.quantity || 1) || 1;
-      const p = parseFloat(i.precio || i.price || (i.item && i.item.price) || 0);
+      const p = parseFloat(i.precio || i.precio || (i.item && i.item.precio) || 0);
       totalCalculated += (q * p);
       totalItemsCount += q;
     });
@@ -127,8 +127,8 @@
     const itemsText = d.items.length > 0
       ? d.items.map(i => {
           const cant = parseInt(i.cant || i.quantity || 1) || 1;
-          const nombre = i.nombre || i.name || (i.item && i.item.name) || 'Encuentro';
-          const precio = parseFloat(i.precio || i.price || (i.item && i.item.price) || 0).toFixed(2);
+          const nombre = i.nombre || i.nombre || (i.item && i.item.nombre) || 'Encuentro';
+          const precio = parseFloat(i.precio || i.precio || (i.item && i.item.precio) || 0).toFixed(2);
           const sub = (cant * parseFloat(precio)).toFixed(2);
           return `${cant} ${nombre}\n S/ ${precio} c/u                                   S/ ${sub}`;
         }).join('\n')
@@ -173,8 +173,8 @@ TOTAL                                  S/ ${d.total}
     if (d.items.length > 0) {
       itemsHtml = d.items.map(i => {
         const cant = parseInt(i.cant || i.quantity || 1) || 1;
-        const nombre = escapeHtml(i.nombre || i.name || (i.item && i.item.name) || 'Encuentro');
-        const precio = parseFloat(i.precio || i.price || (i.item && i.item.price) || 0).toFixed(2);
+        const nombre = escapeHtml(i.nombre || i.nombre || (i.item && i.item.nombre) || 'Encuentro');
+        const precio = parseFloat(i.precio || i.precio || (i.item && i.item.precio) || 0).toFixed(2);
         const sub = (cant * parseFloat(precio)).toFixed(2);
         return `
           <div style="margin-bottom: 6px; font-family: 'Courier New', Courier, monospace;">
@@ -387,7 +387,7 @@ TOTAL                                  S/ ${d.total}
     let hiddenIframe = document.querySelector('iframe[name="print_hidden"]');
     if (!hiddenIframe) {
       hiddenIframe = document.createElement('iframe');
-      hiddenIframe.name = 'print_hidden';
+      hiddenIframe.nombre = 'print_hidden';
       hiddenIframe.id = 'print_hidden';
       hiddenIframe.style.display = 'none';
       document.body.appendChild(hiddenIframe);
@@ -407,7 +407,7 @@ TOTAL                                  S/ ${d.total}
 
     const input = document.createElement('input');
     input.type = 'hidden';
-    input.name = 'printcontent';
+    input.nombre = 'printcontent';
     input.value = ticketText;
 
     form.appendChild(input);
@@ -439,7 +439,7 @@ TOTAL                                  S/ ${d.total}
         latencyMs,
         scope: 'client',
         ip,
-        message: `✓ Conexión LAN directa con la impresora (${ip}) exitosa`
+        mensaje: `✓ Conexión LAN directa con la impresora (${ip}) exitosa`
       };
     } catch (clientErr) {}
 
@@ -447,8 +447,8 @@ TOTAL                                  S/ ${d.total}
     try {
       const res = await fetch(`/api/printer/ping?ip=${encodeURIComponent(ip)}&port=80`);
       if (res.ok) {
-        const data = await res.json();
-        return data;
+        const datos = await res.json();
+        return datos;
       }
     } catch (serverErr) {}
 
@@ -458,7 +458,7 @@ TOTAL                                  S/ ${d.total}
       latencyMs: totalLatency,
       scope: 'both',
       ip,
-      message: `Sin respuesta en http://${ip}:80`
+      mensaje: `Sin respuesta en http://${ip}:80`
     };
   }
 
