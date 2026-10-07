@@ -234,135 +234,22 @@
       }
     }
 
-    // Renderizar Salsas
-    renderSaucesSection(p);
-
-    // Renderizar Acompañamientos
-    renderAccompanimentsSection(p);
-
     // Actualizar totales
     updateTotalPrice();
   }
 
-  function isDrinkOrNoSauce(p) {
-    const cat = String(p.category_id || p.category || '').toLowerCase();
-    const name = String(p.name || '').toLowerCase();
-    return cat.includes('bebida') || cat.includes('refresco') || cat.includes('infusion') || name.includes('agua') || name.includes('gaseosa');
-  }
-
-  function renderSaucesSection(p) {
-    const box = document.getElementById('sauces-box');
-    const wrap = document.getElementById('sauces-chips-wrap');
-    if (!box || !wrap) return;
-
-    if (isDrinkOrNoSauce(p)) {
-      box.style.display = 'none';
-      return;
-    }
-
-    box.style.display = 'block';
-    wrap.innerHTML = '';
-
-    SAUCES_LIST.forEach(sauce => {
-      const label = document.createElement('label');
-      label.className = `sauce-chip-label ${selectedSauces.has(sauce.id) ? 'active' : ''}`;
-      label.innerHTML = `
-        <input type="checkbox" class="sauce-chip-checkbox" value="${sauce.id}" ${selectedSauces.has(sauce.id) ? 'checked' : ''}>
-        <span>${sauce.name}</span>
-      `;
-
-      label.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (selectedSauces.has(sauce.id)) {
-          selectedSauces.delete(sauce.id);
-          label.classList.remove('active');
-        } else {
-          selectedSauces.add(sauce.id);
-          label.classList.add('active');
-        }
-      });
-
-      wrap.appendChild(label);
-    });
-  }
-
-  function renderAccompanimentsSection(p) {
-    const box = document.getElementById('accompaniments-box');
-    const wrap = document.getElementById('options-chips-wrap');
-    if (!box || !wrap) return;
-
-    if (isDrinkOrNoSauce(p)) {
-      box.style.display = 'none';
-      return;
-    }
-
-    box.style.display = 'block';
-    wrap.innerHTML = '';
-
-    const catKey = String(p.category_id || '').toLowerCase();
-    let options = ACCOMPANIMENTS_MAP[catKey] || ACCOMPANIMENTS_MAP.default;
-    if (catKey.includes('broaster')) options = ACCOMPANIMENTS_MAP.broaster;
-    if (catKey.includes('selva') || catKey.includes('amazon')) options = ACCOMPANIMENTS_MAP.amazonico;
-
-    options.forEach((opt, idx) => {
-      const card = document.createElement('label');
-      const isSelected = idx === 0;
-      card.className = `option-radio-card ${isSelected ? 'active' : ''}`;
-      card.innerHTML = `
-        <input type="radio" name="acc_option" value="${opt.id}" data-price="${opt.price || 0}" ${isSelected ? 'checked' : ''}>
-        <span class="option-radio-text">${opt.name}</span>
-      `;
-
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.option-radio-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        selectedAccompaniment = opt.id;
-        extraAccPrice = opt.price || 0;
-        updateTotalPrice();
-      });
-
-      wrap.appendChild(card);
-    });
-  }
-
   function updateTotalPrice() {
     if (!currentProduct) return;
-    const unitPrice = Number(currentProduct.price || 0) + extraAccPrice;
-    const total = unitPrice * currentQuantity;
+    const total = currentProduct.price;
 
     const btnPriceText = document.getElementById('add-btn-total-text');
     if (btnPriceText) btnPriceText.textContent = `• ${formatPrice(total)}`;
 
     const mobilePrice = document.getElementById('mobile-bar-total');
     if (mobilePrice) mobilePrice.textContent = formatPrice(total);
-
-    const qtyDisplay = document.getElementById('qty-num');
-    if (qtyDisplay) qtyDisplay.textContent = String(currentQuantity);
   }
 
   function setupEventListeners() {
-    // Stepper
-    const btnMinus = document.getElementById('qty-btn-minus');
-    const btnPlus = document.getElementById('qty-btn-plus');
-
-    if (btnMinus) {
-      btnMinus.addEventListener('click', () => {
-        if (currentQuantity > 1) {
-          currentQuantity--;
-          updateTotalPrice();
-        }
-      });
-    }
-
-    if (btnPlus) {
-      btnPlus.addEventListener('click', () => {
-        if (currentQuantity < 20) {
-          currentQuantity++;
-          updateTotalPrice();
-        }
-      });
-    }
-
     // Agregar al carrito
     const btnAdd = document.getElementById('btn-add-to-cart');
     const btnAddMobile = document.getElementById('btn-add-to-cart-mobile');
@@ -370,16 +257,9 @@
     const handleAddToCart = () => {
       if (!currentProduct) return;
 
-      const notesInput = document.getElementById('special-notes');
-      const notes = notesInput ? notesInput.value.trim() : '';
-      const saucesArray = Array.from(selectedSauces).map(sId => {
-        const found = SAUCES_LIST.find(s => s.id === sId);
-        return found ? found.name : sId;
-      });
-
       // Añadir mediante BuchisapaCart si está cargado
       if (window.BuchisapaCart && typeof window.BuchisapaCart.addItem === 'function') {
-        window.BuchisapaCart.addItem(currentProduct, currentQuantity, saucesArray, notes);
+        window.BuchisapaCart.addItem(currentProduct, 1, [], '');
       } else {
         // Fallback directo a localStorage
         const cartKey = 'buchisapa_cart_v1';
@@ -392,17 +272,17 @@
           id: currentProduct.id,
           name: currentProduct.name,
           price: currentProduct.price,
-          quantity: currentQuantity,
+          quantity: 1,
           image: currentProduct.image,
           categoryBadge: currentProduct.categoryBadge || currentProduct.category,
-          sauces: saucesArray,
-          notes: notes
+          sauces: [],
+          notes: ''
         });
 
         localStorage.setItem(cartKey, JSON.stringify(items));
       }
 
-      showAddToast(currentProduct.name, currentQuantity);
+      showAddToast(currentProduct.name, 1);
       updateCartCount();
 
       // Animación en el botón
@@ -421,14 +301,9 @@
       btnWs.addEventListener('click', (e) => {
         e.preventDefault();
         if (!currentProduct) return;
-        const saucesStr = Array.from(selectedSauces).map(s => {
-          const f = SAUCES_LIST.find(x => x.id === s);
-          return f ? f.name : s;
-        }).join(', ');
 
         const text = `Hola BuchiSapa, deseo pedir:
-*${currentQuantity}x ${currentProduct.name}* (${formatPrice(currentProduct.price * currentQuantity)})
-${saucesStr ? `*Cremas:* ${saucesStr}` : ''}
+*1x ${currentProduct.name}* (${formatPrice(currentProduct.price)})
 ¿Podrían confirmarme la disponibilidad y tiempo de entrega por favor?`;
 
         window.open(`https://wa.me/51943312024?text=${encodeURIComponent(text)}`, '_blank');

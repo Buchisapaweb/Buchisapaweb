@@ -668,17 +668,7 @@ const BuchisapaCart = {
           <h3 class="cart-empty-title">Tu pedido está vacío</h3>
           <p class="cart-empty-desc">Aún no has seleccionado ningún plato. Explora nuestras especialidades al carbón, broaster crocante y delicias amazónicas.</p>
           
-          <div class="cart-empty-quick-categories">
-            <span class="quick-cat-label">Explorar por categoría:</span>
-            <div class="quick-cat-chips">
-              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('hamburguesas', 'HAMBURGUESAS');">🍔 Hamburguesas</button>
-              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('broaster', 'BROASTER');">🍗 Broaster</button>
-              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('platos-amazonicos', 'PLATOS AMAZÓNICOS');">🌴 Amazónicos</button>
-              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('alitas', 'ALITAS');">🍗 Alitas</button>
-              <button type="button" class="quick-cat-chip" onclick="BuchisapaCart.closeDrawer(); if(typeof openCategoryView==='function') openCategoryView('bebidas', 'BEBIDAS');">🥤 Bebidas</button>
-            </div>
-          </div>
-
+          
           <button class="cart-empty-action-btn" type="button" onclick="BuchisapaCart.closeDrawer(); if(typeof window.scrollToCategoryBanners==='function'){window.scrollToCategoryBanners();}else{window.scrollTo({top:0,behavior:'smooth'});}">
             <span>Explorar la Carta y Pedir</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

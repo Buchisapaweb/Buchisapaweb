@@ -62,8 +62,8 @@ body.cart-drawer-open .cart-drawer {
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
+  background: transparent !important;
+  border: none !important;
   padding: 8px 14px !important;
   border-radius: 9999px !important;
   font-size: 13px !important;
@@ -72,7 +72,7 @@ body.cart-drawer-open .cart-drawer {
   cursor: pointer !important;
   transition: all 0.15s ease !important;
 }
-.cart-nav-back-btn:hover { background: #f1f5f9 !important; color: #dc2626 !important; }
+.cart-nav-back-btn:hover { background: transparent !important; color: #dc2626 !important; }
 
 .cart-header-title-wrap { display: flex !important; align-items: center !important; gap: 10px !important; }
 .cart-header-icon-badge { width: 34px !important; height: 34px !important; border-radius: 10px !important; background: #fef2f2 !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid #fee2e2 !important; }

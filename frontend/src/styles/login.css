@@ -1,7 +1,4 @@
-/* =========================================================
-   BUCHISAPA RESTAURANTE - ESTILOS DE AUTENTICACIÓN Y MODALES (login.css)
-   Estilos dedicados e integrados para Ventana de Ingreso, Registro, Perfil y OTP
-   ========================================================= */
+/* Estilos de autenticación y modales */
 
 /* --- 1. BACKDROP Y CONTENEDOR MODAL DE AUTENTICACIÓN --- */
 .modal-backdrop,
@@ -69,8 +66,8 @@ body.modal-open .modal-backdrop {
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
+  background: transparent !important;
+  border: none !important;
   padding: 6px 14px !important;
   border-radius: 9999px !important;
   font-size: 13px !important;
@@ -78,7 +75,7 @@ body.modal-open .modal-backdrop {
   color: #0f172a !important;
   cursor: pointer !important;
 }
-.auth-window-back-btn:hover { background: #f1f5f9 !important; color: #dc2626 !important; }
+.auth-window-back-btn:hover { background: transparent !important; color: #dc2626 !important; }
 
 .auth-close-btn-top {
   width: 36px !important;

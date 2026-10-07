@@ -149,7 +149,6 @@
           <div class="dish-card-content">
             <span class="dish-card-cat-label">${item.categoryBadge || item.category || 'BuchiSapa'}</span>
             <h3 class="dish-card-title">${item.name}</h3>
-            <p class="dish-card-desc">${item.description || ''}</p>
             <div class="dish-card-footer">
               <span class="dish-card-price">S/ ${Number(item.price || 0).toFixed(2)}</span>
               <button type="button" class="dish-card-add-btn" onclick="event.preventDefault(); window.location.href='/producto?id=${encodeURIComponent(item.id || item.code)}'">
@@ -260,7 +259,6 @@
           <div class="dish-card-content">
             <span class="dish-card-cat-label">${item.categoryBadge || item.category || 'BuchiSapa'}</span>
             <h3 class="dish-card-title">${item.name}</h3>
-            <p class="dish-card-desc">${item.description || ''}</p>
             <div class="dish-card-footer">
               <span class="dish-card-price">S/ ${Number(item.price || 0).toFixed(2)}</span>
               <button type="button" class="dish-card-add-btn" onclick="event.preventDefault(); window.location.href='/producto?id=${encodeURIComponent(item.id || item.code)}'">

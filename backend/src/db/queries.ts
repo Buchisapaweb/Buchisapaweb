@@ -38,19 +38,6 @@ export interface Sauce {
   is_signature: boolean;
 }
 
-export interface Promotion {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  badge: string;
-  active?: boolean;
-  order?: number;
-  features?: string[];
-  createdAt?: string;
-}
 
 export interface Order {
   id: string;
@@ -211,12 +198,6 @@ const initialProducts: Product[] = JSON.parse(
   fs.readFileSync(path.join(process.cwd(), 'backend/src/db/products.json'), 'utf8')
 );
 
-// 4. PROMOCIONES
-const initialPromotions: Promotion[] = JSON.parse(
-  fs.readFileSync(path.join(process.cwd(), 'backend/src/db/promotions.json'), 'utf8')
-);
-
-let promotionsStore: Promotion[] = [...initialPromotions];
 
 // IN-MEMORY STORES
 const categoriesStore = [...initialCategories];
@@ -298,66 +279,6 @@ export async function getSauces(): Promise<Sauce[]> {
   return saucesStore;
 }
 
-export async function getPromotions(includeInactive = false): Promise<Promotion[]> {
-  let list = [...promotionsStore];
-  if (!includeInactive) {
-    list = list.filter(p => p.active !== false);
-  }
-  return list.sort((a, b) => (a.order || 0) - (b.order || 0));
-}
-
-export async function getPromotionById(id: string): Promise<Promotion | null> {
-  const p = promotionsStore.find(item => item.id === id);
-  return p || null;
-}
-
-export async function createPromotion(data: Partial<Promotion>): Promise<Promotion> {
-  const newPromo: Promotion = {
-    id: data.id || `promo-${Date.now()}`,
-    title: data.title || 'NUEVA PROMOCIÓN',
-    description: data.description || 'Promoción especial BuchiSapa',
-    price: Number(data.price) || 0,
-    originalPrice: Number(data.originalPrice) || Number(data.price) || 0,
-    image: data.image || '/imagenes/portada/Portada1E.webp',
-    badge: data.badge || '🔥 OFERTA',
-    active: data.active !== undefined ? data.active : true,
-    order: data.order !== undefined ? data.order : promotionsStore.length + 1,
-    features: Array.isArray(data.features) ? data.features : (typeof data.features === 'string' ? (data.features as string).split('\n').filter(Boolean) : ['✦ CALIDAD BUCHISAPA', '🔥 PREPARADO AL MOMENTO']),
-    createdAt: new Date().toISOString()
-  };
-
-  promotionsStore.push(newPromo);
-  return newPromo;
-}
-
-export async function updatePromotion(id: string, data: Partial<Promotion>): Promise<Promotion | null> {
-  const index = promotionsStore.findIndex(item => item.id === id);
-  if (index === -1) return null;
-
-  const current = promotionsStore[index];
-  promotionsStore[index] = {
-    ...current,
-    ...data,
-    price: data.price !== undefined ? Number(data.price) : current.price,
-    originalPrice: data.originalPrice !== undefined ? Number(data.originalPrice) : current.originalPrice,
-    id // preserve id
-  };
-  return promotionsStore[index];
-}
-
-export async function deletePromotion(id: string): Promise<boolean> {
-  const initialLength = promotionsStore.length;
-  promotionsStore = promotionsStore.filter(item => item.id !== id);
-  return promotionsStore.length < initialLength;
-}
-
-export async function reorderPromotions(orderedIds: string[]): Promise<Promotion[]> {
-  orderedIds.forEach((id, index) => {
-    const p = promotionsStore.find(item => item.id === id);
-    if (p) p.order = index + 1;
-  });
-  return promotionsStore.sort((a, b) => (a.order || 0) - (b.order || 0));
-}
 
 export async function getOrders(status?: string, email?: string): Promise<Order[]> {
   let list = [...ordersStore];
