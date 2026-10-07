@@ -1072,3 +1072,23 @@ export async function reorderPortadas(orderedIds: string[]): Promise<PortadaBann
 }
 
 
+
+export async function getPromotions(): Promise<any[]> {
+  return [];
+}
+
+export async function createPromotion(data: any): Promise<any> {
+  return { id: 'prom-1', ...data };
+}
+
+export async function updatePromotion(id: string, data: any): Promise<any> {
+  return { id, ...data };
+}
+
+export async function deletePromotion(id: string): Promise<boolean> {
+  return true;
+}
+
+export async function reorderPromotions(ids: string[]): Promise<any[]> {
+  return [];
+}
