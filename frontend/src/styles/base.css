@@ -141,3 +141,30 @@ main,
   color: var(--primary);
   transform: translateX(-3px);
 }
+
+/* ELIMINAR CUALQUIER FORMATO CIRCULAR EN LOS LOGOS DE LA MARCA - USAR LOGO ORIGINAL */
+.brand-logo-img,
+.mobile-drawer-logo,
+.auth-logo-img,
+.info-brand-logo,
+.nosotros-brand-logo,
+.politicas-brand-logo,
+.servicios-brand-logo,
+.contactanos-brand-logo,
+.subpage-brand-logo,
+.app-logo-avatar,
+.app-logo-avatar img {
+  border-radius: 0 !important;
+  border-radius: 0px !important;
+  clip-path: none !important;
+  mask: none !important;
+  -webkit-mask: none !important;
+  border: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  object-fit: contain !important;
+}
+

@@ -142,7 +142,7 @@
       card.className = 'buchisapa-dish-card';
       card.innerHTML = `
         <a href="/producto?id=${encodeURIComponent(item.id || item.code)}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
-          <div style="position: relative; width: 100%; aspect-ratio: 4/3; overflow: hidden; background: #f1f5f9;">
+          <div style="position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #f1f5f9; border-radius: 16px 16px 0 0;">
             <img src="${item.image || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.name}" class="dish-card-img" loading="lazy">
             ${item.badge ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.badge}</span>` : ''}
           </div>
@@ -153,7 +153,8 @@
             <div class="dish-card-footer">
               <span class="dish-card-price">S/ ${Number(item.price || 0).toFixed(2)}</span>
               <button type="button" class="dish-card-add-btn" onclick="event.preventDefault(); window.location.href='/producto?id=${encodeURIComponent(item.id || item.code)}'">
-                <span>Ver Plato</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; display: inline-block; vertical-align: middle;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <span style="vertical-align: middle;">Agregar</span>
               </button>
             </div>
           </div>
@@ -252,7 +253,7 @@
       card.className = 'buchisapa-dish-card';
       card.innerHTML = `
         <a href="/producto?id=${encodeURIComponent(item.id || item.code)}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
-          <div style="position: relative; width: 100%; aspect-ratio: 4/3; overflow: hidden; background: #f1f5f9;">
+          <div style="position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #f1f5f9; border-radius: 16px 16px 0 0;">
             <img src="${item.image || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.name}" class="dish-card-img" loading="lazy">
             ${item.badge ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.badge}</span>` : ''}
           </div>
@@ -263,7 +264,8 @@
             <div class="dish-card-footer">
               <span class="dish-card-price">S/ ${Number(item.price || 0).toFixed(2)}</span>
               <button type="button" class="dish-card-add-btn" onclick="event.preventDefault(); window.location.href='/producto?id=${encodeURIComponent(item.id || item.code)}'">
-                <span>Ver Plato</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; display: inline-block; vertical-align: middle;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <span style="vertical-align: middle;">Agregar</span>
               </button>
             </div>
           </div>
