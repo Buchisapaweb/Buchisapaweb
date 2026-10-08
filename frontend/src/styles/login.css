@@ -1,557 +1,393 @@
-/* Estilos de autenticación y modales */
+/* =================================
+   CONFIGURACIÓN GENERAL
+================================= */
 
-/* --- 1. BACKDROP Y CONTENEDOR MODAL DE AUTENTICACIÓN --- */
-.modal-backdrop,
-#email-verification-modal.modal-backdrop,
-#location-modal.modal-backdrop,
-#device-gps-diag-modal.modal-backdrop {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 99999 !important;
-  background: rgba(15, 23, 42, 0.75) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  display: none !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 16px !important;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.25s ease, visibility 0.25s ease !important;
-  overflow-y: auto !important;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-.modal-backdrop.open,
-.modal-backdrop.active,
-#email-verification-modal.open,
-#email-verification-modal.active,
-body.modal-open .modal-backdrop {
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
+body {
+    min-height: 100vh;
+
+    background: #ffffff;
+
+    color: #202020;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
 
-.modal-box,
-.location-modal-box,
-.gps-diag-box {
-  background: #ffffff !important;
-  width: 100% !important;
-  max-width: 480px !important;
-  border-radius: 24px !important;
-  padding: clamp(18px, 3vw, 28px) clamp(16px, 2.5vw, 24px) !important;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35) !important;
-  border: 1px solid #f1f5f9 !important;
-  position: relative !important;
-  max-height: 90vh !important;
-  max-height: 90dvh !important;
-  overflow-y: auto !important;
-  text-align: left !important;
-  z-index: 100000 !important;
+
+/* =================================
+   CABECERA
+================================= */
+
+.cabecera {
+    width: 100%;
+    height: 108px;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    padding: 0 35px;
+
+    border-bottom: 1px solid #eeeeee;
 }
 
-/* --- MODAL DE LOGIN COMPACTO Y CENTRADO --- */
-#login-modal.modal-backdrop {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 99999 !important;
-  background: rgba(15, 23, 42, 0.72) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  display: none !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 16px !important;
-  margin: 0 !important;
-  opacity: 0;
-  visibility: hidden;
-  overflow-y: auto !important;
-  transition: opacity 0.22s ease, visibility 0.22s ease !important;
+
+/* BOTÓN CERRAR */
+
+.btn-cerrar {
+    width: 48px;
+    height: 48px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #c91520;
+
+    font-size: 42px;
+    font-weight: 300;
+
+    line-height: 1;
+
+    cursor: pointer;
 }
 
-#login-modal.open,
-#login-modal.active {
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
+
+/* =================================
+   CONTENEDOR LOGIN
+================================= */
+
+.login-container {
+    width: 100%;
+    max-width: 630px;
+
+    margin: 0 auto;
+
+    padding: 62px 32px 80px;
+
+    text-align: center;
 }
 
-#login-modal .buchisapa-auth-modal-box {
-  background: #ffffff !important;
-  width: 100% !important;
-  max-width: 440px !important;
-  min-height: auto !important;
-  max-height: 92vh !important;
-  max-height: 92dvh !important;
-  border-radius: 24px !important;
-  border: 1px solid #f1f5f9 !important;
-  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35) !important;
-  margin: auto !important;
-  padding: 24px 24px 28px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  justify-content: flex-start !important;
-  overflow-y: auto !important;
-  position: relative !important;
-  z-index: 100000 !important;
+
+/* =================================
+   LOGO
+================================= */
+
+.logo {
+    width: 150px;
+    height: 150px;
+
+    display: block;
+
+    object-fit: contain;
+
+    margin: 0 auto 32px;
 }
 
-#login-modal .auth-window-topbar,
-#login-modal #auth-view-login,
-#login-modal #auth-view-register,
-#login-modal #auth-view-recovery,
-#login-modal .google-dark-footer {
-  width: 100% !important;
-  max-width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+
+/* =================================
+   TÍTULO
+================================= */
+
+h1 {
+    margin-bottom: 34px;
+
+    color: #171717;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 34px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
 }
 
-/* --- 2. BARRA SUPERIOR (TOPBAR) & LOGO --- */
-.auth-window-topbar {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  margin-bottom: 18px !important;
+
+/* =================================
+   CAMPOS
+================================= */
+
+.campo {
+    width: 100%;
+
+    margin-bottom: 23px;
+
+    text-align: left;
 }
 
-.auth-window-back-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  background: transparent !important;
-  border: none !important;
-  padding: 6px 14px !important;
-  border-radius: 9999px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  color: #0f172a !important;
-  cursor: pointer !important;
-}
-.auth-window-back-btn:hover { background: transparent !important; color: #dc2626 !important; }
+.campo label {
+    display: block;
 
-.auth-close-btn-top {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 50% !important;
-  background: #f1f5f9 !important;
-  border: none !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-.auth-close-btn-top:hover { background: #fee2e2 !important; }
+    margin-bottom: 9px;
 
-.auth-logo-center-wrap { display: flex !important; justify-content: center !important; margin-bottom: 14px !important; }
-.auth-logo-img { max-height: 68px !important; width: auto !important; object-fit: contain !important; }
+    color: #292929;
 
-.auth-welcome-title,
-.auth-register-heading,
-.auth-recovery-title {
-  font-size: 22px !important;
-  font-weight: 900 !important;
-  color: #0f172a !important;
-  text-align: center !important;
-  margin: 0 0 4px !important;
+    font-size: 19px;
+
+    font-weight: 600;
 }
 
-.auth-welcome-subtitle,
-.auth-recovery-desc {
-  font-size: 13.5px !important;
-  color: #64748b !important;
-  text-align: center !important;
-  margin: 0 0 18px !important;
+
+/* INPUT */
+
+.campo input {
+    width: 100%;
+    height: 68px;
+
+    padding: 0 22px;
+
+    border: 1px solid #dddddd;
+
+    border-radius: 19px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #333333;
+
+    font-size: 20px;
+
+    transition: 0.2s;
 }
 
-/* Alertas */
-.auth-status-alert {
-  padding: 10px 14px !important;
-  border-radius: 12px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  margin-bottom: 16px !important;
-  display: none;
-}
-.auth-status-alert.error { display: block !important; background: #fef2f2 !important; border: 1px solid #fee2e2 !important; color: #dc2626 !important; }
-.auth-status-alert.success { display: block !important; background: #f0fdf4 !important; border: 1px solid #dcfce7 !important; color: #16a34a !important; }
-
-/* --- 3. CAMPOS E INPUTS --- */
-.auth-form-group { margin-bottom: 14px !important; display: flex !important; flex-direction: column !important; }
-.auth-input-label { font-size: 13px !important; font-weight: 800 !important; color: #0f172a !important; margin-bottom: 6px !important; display: block !important; }
-.auth-required-star { color: #dc2626 !important; margin-left: 2px !important; }
-
-.auth-text-input,
-.auth-doc-input {
-  width: 100% !important;
-  height: 44px !important;
-  background: #f8fafc !important;
-  border: 1.5px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  padding: 0 14px !important;
-  font-size: 14px !important;
-  color: #0f172a !important;
-  outline: none !important;
-  transition: all 0.15s ease !important;
-}
-.auth-text-input:focus,
-.auth-doc-input:focus {
-  background: #ffffff !important;
-  border-color: #dc2626 !important;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+.campo input::placeholder {
+    color: #999999;
 }
 
-.auth-password-wrapper { position: relative !important; display: flex !important; align-items: center !important; width: 100% !important; }
-.auth-eye-toggle-btn { position: absolute !important; right: 10px !important; background: transparent !important; border: none !important; color: #64748b !important; cursor: pointer !important; padding: 6px !important; }
+.campo input:focus {
+    border-color: #cfcfcf;
 
-/* Documentos (DNI, CE, RUC) */
-.auth-doc-combined-row { display: flex !important; gap: 10px !important; }
-.auth-doc-select-box { position: relative !important; width: 110px !important; flex-shrink: 0 !important; }
-.auth-doc-select {
-  width: 100% !important;
-  height: 44px !important;
-  background: #f8fafc !important;
-  border: 1.5px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  padding: 0 28px 0 12px !important;
-  font-size: 13.5px !important;
-  font-weight: 700 !important;
-  color: #0f172a !important;
-  appearance: none !important;
-  outline: none !important;
-}
-.auth-select-arrow { position: absolute !important; right: 10px !important; top: 50% !important; transform: translateY(-50%) !important; pointer-events: none !important; }
-
-/* --- 4. BOTONES --- */
-.auth-submit-btn {
-  width: 100% !important;
-  height: 48px !important;
-  background: #dc2626 !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 9999px !important;
-  font-size: 15px !important;
-  font-weight: 800 !important;
-  cursor: pointer !important;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin-top: 8px !important;
-}
-.auth-submit-btn:disabled { background: #cbd5e1 !important; box-shadow: none !important; cursor: not-allowed !important; }
-.auth-submit-btn:hover:not(:disabled) { background: #b91c1c !important; }
-
-.auth-google-btn {
-  width: 100% !important;
-  height: 46px !important;
-  background: #ffffff !important;
-  border: 1.5px solid #e2e8f0 !important;
-  border-radius: 9999px !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  color: #0f172a !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 10px !important;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05) !important;
+    box-shadow:
+        0 0 0 2px rgba(200, 200, 200, 0.10);
 }
 
-.auth-switch-footer { font-size: 13.5px !important; color: #64748b !important; text-align: center !important; margin-top: 18px !important; padding-top: 14px !important; border-top: 1px solid #f1f5f9 !important; }
-.auth-switch-btn { background: transparent !important; border: none !important; color: #dc2626 !important; font-size: 13.5px !important; font-weight: 800 !important; cursor: pointer !important; margin-left: 4px !important; }
 
-/* --- 5. MODAL CÓDIGO OTP (#email-verification-modal) --- */
-#email-verification-modal.modal-backdrop { z-index: 100005 !important; }
-.otp-modal-box { background: #ffffff !important; width: 100% !important; max-width: 440px !important; border-radius: 24px !important; padding: 24px !important; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.4) !important; border: 1px solid #f1f5f9 !important; text-align: center !important; margin: auto !important; }
-.otp-digits-container { display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; margin: 16px 0 18px !important; }
-.otp-digit-box { width: 44px !important; height: 52px !important; border: 2px solid #e2e8f0 !important; border-radius: 12px !important; background: #f8fafc !important; font-size: 22px !important; font-weight: 900 !important; color: #0f172a !important; text-align: center !important; outline: none !important; }
-.otp-digit-box:focus { background: #ffffff !important; border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important; }
-.otp-main-submit-btn { width: 100% !important; height: 48px !important; background: #dc2626 !important; color: #ffffff !important; border: none !important; border-radius: 9999px !important; font-size: 15px !important; font-weight: 800 !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3) !important; }
+/* =================================
+   CONTRASEÑA
+================================= */
 
-/* --- 6. MEJORAS DE DISEÑO: BOTONES SECUNDARIOS, DIVISORES, TEXTOS --- */
-.auth-forgot-row {
-  display: flex !important;
-  justify-content: flex-end !important;
-  margin-top: -6px !important;
-  margin-bottom: 18px !important;
+.password-box {
+    position: relative;
+
+    width: 100%;
 }
 
-.auth-forgot-link {
-  background: transparent !important;
-  border: none !important;
-  color: #dc2626 !important;
-  font-size: 13.5px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  padding: 0 !important;
-  text-decoration: underline !important;
-  transition: opacity 0.15s ease !important;
+.password-box input {
+    padding-right: 65px;
 }
 
-.auth-forgot-link:hover {
-  opacity: 0.8 !important;
+
+/* OJO */
+
+.btn-ojo {
+    position: absolute;
+
+    right: 18px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 35px;
+    height: 35px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #999999;
+
+    font-size: 19px;
+
+    cursor: pointer;
 }
 
-.auth-guest-row {
-  display: flex !important;
-  justify-content: center !important;
-  margin: 14px 0 !important;
+
+/* =================================
+   RECUPERAR CONTRASEÑA
+================================= */
+
+.recuperar-container {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: -2px;
+
+    margin-bottom: 28px;
 }
 
-.auth-guest-link {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  background: transparent !important;
-  border: none !important;
-  color: #475569 !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  padding: 8px 16px !important;
-  border-radius: 9999px !important;
-  transition: all 0.2s ease !important;
+.recuperar {
+    color: #bd1720;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    text-decoration: none;
 }
 
-.auth-guest-link:hover {
-  color: #dc2626 !important;
-  background: #f8fafc !important;
+.recuperar:hover {
+    text-decoration: underline;
 }
 
-.auth-divider {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  margin: 18px 0 !important;
+
+/* =================================
+   BOTÓN INGRESAR
+================================= */
+
+.btn-ingresar {
+    width: 100%;
+    height: 70px;
+
+    border: none;
+
+    border-radius: 18px;
+
+    background: #dddddd;
+
+    color: #aaaaaa;
+
+    font-size: 22px;
+
+    font-weight: 600;
+
+    cursor: not-allowed;
+
+    transition: 0.2s;
 }
 
-.auth-divider-line {
-  flex: 1 !important;
-  height: 1.5px !important;
-  background: #e2e8f0 !important;
+
+/* CUANDO ESTÁ ACTIVO */
+
+.btn-ingresar.activo {
+    background: #e32229;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 18px rgba(227, 34, 41, 0.16);
 }
 
-.auth-divider-text {
-  font-size: 13.5px !important;
-  color: #94a3b8 !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
+.btn-ingresar.activo:hover {
+    background: #cc171e;
 }
 
-.auth-legal-text {
-  font-size: 12px !important;
-  color: #64748b !important;
-  text-align: center !important;
-  line-height: 1.5 !important;
-  margin-top: 14px !important;
+
+/* =================================
+   INVITADO
+================================= */
+
+.btn-invitado {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-top: 33px;
+
+    padding: 8px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #bd1720;
+
+    font-size: 19px;
+
+    font-weight: 600;
+
+    cursor: pointer;
 }
 
-.auth-legal-text a {
-  color: #dc2626 !important;
-  text-decoration: underline !important;
-  font-weight: 700 !important;
+.icono-usuario {
+    font-size: 25px;
+
+    line-height: 1;
 }
 
-.auth-legal-text a:hover {
-  color: #b91c1c !important;
+
+/* =================================
+   REGISTRO
+================================= */
+
+.registro {
+    margin-top: 35px;
+
+    color: #444444;
+
+    font-size: 18px;
 }
 
-/* --- 7. AJUSTES FINOS EN MÓVILES --- */
-@media (max-width: 640px) {
-  #login-modal .buchisapa-auth-modal-box {
-    padding: 14px 16px 28px 16px !important;
-  }
+.registro a {
+    color: #bd1720;
 
-  /* Reducir márgenes del logo para mejor ajuste vertical */
-  #login-modal .auth-logo-center-wrap {
-    margin-bottom: 10px !important;
-  }
-  
-  #login-modal .auth-logo-img {
-    max-height: 56px !important;
-  }
+    font-weight: 600;
 
-  /* Separadores más compactos */
-  #login-modal .auth-divider {
-    margin: 12px 0 !important;
-  }
-
-  #login-modal .auth-welcome-title {
-    font-size: 20px !important;
-    margin-bottom: 2px !important;
-  }
-
-  #login-modal .auth-welcome-subtitle {
-    font-size: 13px !important;
-    margin-bottom: 12px !important;
-  }
+    text-decoration: none;
 }
 
-/* --- 8. GOOGLE DARK FOOTER STYLING --- */
-.google-dark-footer {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  margin-top: 24px !important;
-  padding-top: 16px !important;
-  border-top: 1px solid #f1f5f9 !important;
-  font-size: 12px !important;
-  color: #64748b !important;
-  width: 100% !important;
+.registro a:hover {
+    text-decoration: underline;
 }
 
-.google-lang-selector {
-  display: flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  cursor: pointer !important;
-  user-select: none !important;
-  font-weight: 500 !important;
-}
 
-.google-lang-selector:hover {
-  color: #dc2626 !important;
-}
+/* =================================
+   RESPONSIVE
+================================= */
 
-.google-footer-links {
-  display: flex !important;
-  gap: 12px !important;
-}
+@media (max-width: 600px) {
 
-.google-footer-links a {
-  color: #64748b !important;
-  text-decoration: none !important;
-  font-weight: 500 !important;
-  transition: color 0.15s ease !important;
-}
+    .cabecera {
+        height: 80px;
 
-.google-footer-links a:hover {
-  color: #dc2626 !important;
-}
+        padding: 0 20px;
+    }
 
-/* Forzar que el footer se empuje al fondo en móviles */
-@media (max-width: 640px) {
-  .google-dark-footer {
-    margin-top: auto !important;
-    padding-top: 20px !important;
-  }
-}
+    .btn-cerrar {
+        font-size: 36px;
+    }
 
-/* =========================================================
-   PÁGINA DEDICADA DE LOGIN (STANDALONE FULL-PAGE)
-   ========================================================= */
-.auth-page-body {
-  min-height: 100vh;
-  min-height: 100dvh;
-  background: #0f172a !important;
-  color: #1e293b;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  background-image: radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.15) 0%, transparent 60%), radial-gradient(circle at 100% 100%, rgba(234, 179, 8, 0.08) 0%, transparent 50%) !important;
-  background-attachment: fixed !important;
-}
+    .login-container {
+        padding: 35px 20px 50px;
+    }
 
-.auth-page-navbar {
-  background: rgba(15, 23, 42, 0.85) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
+    .logo {
+        width: 120px;
 
-.auth-page-navbar .subpage-brand-title {
-  color: #f8fafc !important;
-}
+        height: 120px;
+    }
 
-.auth-page-navbar .clean-back-btn {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
+    h1 {
+        font-size: 27px;
+    }
 
-.auth-page-navbar .clean-back-btn:hover {
-  background: #dc2626 !important;
-  border-color: #dc2626 !important;
-  color: #ffffff !important;
-}
+    .campo input {
+        height: 62px;
+    }
 
-.auth-page-main {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 16px 48px;
-  width: 100%;
-  box-sizing: border-box;
-}
+    .btn-ingresar {
+        height: 64px;
+    }
 
-.auth-page-card {
-  background: #ffffff !important;
-  width: 100%;
-  max-width: 460px;
-  border-radius: 24px;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
-  padding: clamp(24px, 4vw, 36px) clamp(20px, 3.5vw, 32px) !important;
-  box-sizing: border-box;
-  animation: authCardFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-
-@keyframes authCardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(14px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.auth-subview-topbar {
-  margin-bottom: 18px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.auth-subview-topbar .auth-window-back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  color: #0f172a;
-  font-weight: 700;
-  font-size: 13.5px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: all 0.15s ease;
-}
-
-.auth-subview-topbar .auth-window-back-btn:hover {
-  background: #f1f5f9;
-  color: #dc2626;
-}
-
-@media (max-width: 480px) {
-  .auth-page-main {
-    padding: 16px 12px 32px;
-  }
-  .auth-page-card {
-    border-radius: 20px;
-    padding: 20px 16px 24px !important;
-  }
-}
-
