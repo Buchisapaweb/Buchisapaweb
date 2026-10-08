@@ -227,11 +227,14 @@
     },
 
     loadProducts: async function () {
+      if (typeof window.loadProductsList === 'function') {
+        return window.loadProductsList();
+      }
       try {
         const res = await fetch('/api/productos');
         if (res.ok) {
-          const products = await res.json();
-          const list = Array.isArray(products) ? products : [];
+          const json = await res.json();
+          const list = Array.isArray(json) ? json : (json && Array.isArray(json.datos) ? json.datos : []);
           this.renderProductsTable(list);
 
           const kpiProducts = document.getElementById('kpi-val-productos');
@@ -243,6 +246,9 @@
     },
 
     renderProductsTable: function (products) {
+      if (typeof window.filterAndRenderProducts === 'function') {
+        return window.filterAndRenderProducts();
+      }
       const tbody = document.getElementById('products-page-tbody');
       if (!tbody) return;
 

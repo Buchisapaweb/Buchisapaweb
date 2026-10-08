@@ -78,6 +78,15 @@ export async function verificarStockCarrito(itemsAChequear: { id: string; cantid
   };
 }
 
+function persistirProductosEnDisco() {
+  try {
+    const ruta = path.join(process.cwd(), 'backend/src/basedatos/productos.json');
+    fs.writeFileSync(ruta, JSON.stringify(almacenProductos, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Error guardando productos en disco:', err);
+  }
+}
+
 export async function reducirStockCarrito(itemsAChequear: { id: string; cantidad: number; nombre?: string }[]) {
   for (const item of itemsAChequear) {
     const producto = almacenProductos.find(p => p.id === item.id);
@@ -88,6 +97,7 @@ export async function reducirStockCarrito(itemsAChequear: { id: string; cantidad
       }
     }
   }
+  persistirProductosEnDisco();
 }
 
 export async function actualizarStockProducto(id: string, disponible: boolean, stock?: number): Promise<Producto | null> {
@@ -100,14 +110,17 @@ export async function actualizarStockProducto(id: string, disponible: boolean, s
       producto.disponible = false;
     }
   }
+  persistirProductosEnDisco();
   return producto;
 }
 
 export async function crearProducto(datos: Partial<Producto>): Promise<Producto> {
+  const nuevoId = datos.id || `PL${String(almacenProductos.length + 1).padStart(5, '0')}`;
   const nuevoProducto: Producto = {
-    id: datos.id || `prod-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    id: nuevoId,
     nombre: datos.nombre || 'Nuevo Producto',
-    id_categoria: datos.id_categoria || 'hamburguesas',
+    categoria: datos.categoria || 'HAMBURGUESAS',
+    id_categoria: datos.id_categoria || 'C0005',
     precio: Number(datos.precio) || 10,
     descripcion: datos.descripcion || '',
     etiqueta: datos.etiqueta || null,
@@ -120,6 +133,7 @@ export async function crearProducto(datos: Partial<Producto>): Promise<Producto>
     tiene_notas: Boolean(datos.tiene_notas)
   };
   almacenProductos.unshift(nuevoProducto);
+  persistirProductosEnDisco();
   return nuevoProducto;
 }
 
@@ -131,13 +145,19 @@ export async function actualizarProducto(id: string, datos: Partial<Producto>): 
     ...almacenProductos[indice],
     ...datos,
     precio: datos.precio !== undefined ? Number(datos.precio) : almacenProductos[indice].precio,
-    stock: datos.stock !== undefined ? Number(datos.stock) : almacenProductos[indice].stock
+    stock: datos.stock !== undefined ? Number(datos.stock) : almacenProductos[indice].stock,
+    disponible: datos.disponible !== undefined ? Boolean(datos.disponible) : almacenProductos[indice].disponible
   };
+  persistirProductosEnDisco();
   return almacenProductos[indice];
 }
 
 export async function eliminarProducto(id: string): Promise<boolean> {
   const longInicial = almacenProductos.length;
   almacenProductos = almacenProductos.filter(p => p.id !== id);
-  return almacenProductos.length < longInicial;
+  const seElimino = almacenProductos.length < longInicial;
+  if (seElimino) {
+    persistirProductosEnDisco();
+  }
+  return seElimino;
 }

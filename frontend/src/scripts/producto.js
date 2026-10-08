@@ -7,44 +7,6 @@
 (function () {
   'use strict';
 
-  // Base de datos de salsas de la casa
-  const SAUCES_LIST = [
-    { id: 'mayonesa', nombre: 'Mayonesa Casera', default: true },
-    { id: 'mostaza', nombre: 'Mostaza Clásica', default: true },
-    { id: 'ketchup', nombre: 'Ketchup', default: true },
-    { id: 'rocoto', nombre: 'Ají de Rocoto', default: true },
-    { id: 'tartara', nombre: 'Tártara Especial', default: false },
-    { id: 'charapita', nombre: 'Ají Charapita', default: false },
-    { id: 'ocopa', nombre: 'Ocopa Arequipeña', default: false },
-    { id: 'bbq', nombre: 'Salsa BBQ Ahumada', default: false },
-    { id: 'vinagreta', nombre: 'Vinagreta de la Casa', default: false }
-  ];
-
-  // Acompañamientos comunes por categoría
-  const ACCOMPANIMENTS_MAP = {
-    broaster: [
-      { id: 'papas', nombre: 'Papas Fritas Artesanales', default: true },
-      { id: 'ensalada', nombre: 'Ensalada Fresca de Col y Zanahoria', default: true },
-      { id: 'arroz_chaufa', nombre: 'Cambiar por Arroz Chaufa de la Selva (+S/ 3.00)', precio: 3.00, default: false }
-    ],
-    amazonico: [
-      { id: 'tacacho', nombre: 'Tacacho Artesanal con Cecina', default: true },
-      { id: 'patacones', nombre: 'Patacones de Plátano Bellaco', default: true },
-      { id: 'salsa_criolla', nombre: 'Salsa Criolla Amazónica con Cocona', default: true }
-    ],
-    hamburguesa: [
-      { id: 'papas', nombre: 'Papas Fritas Crocantes', default: true },
-      { id: 'ensalada', nombre: 'Ensalada Fresca', default: false }
-    ],
-    alitas: [
-      { id: 'papas', nombre: 'Papas Fritas Rústicas', default: true },
-      { id: 'bastones', nombre: 'Bastones de Apio y Zanahoria', default: true }
-    ],
-    default: [
-      { id: 'guarnicion', nombre: 'Porción estándar de la casa', default: true }
-    ]
-  };
-
   // Fallback de productos si el servidor está offline o cargando
   const FALLBACK_PRODUCTS = [
     {
@@ -109,10 +71,6 @@
   ];
 
   let currentProduct = null;
-  let currentQuantity = 1;
-  let selectedSauces = new Set(['mayonesa', 'mostaza', 'ketchup', 'rocoto']);
-  let selectedAccompaniment = 'papas';
-  let extraAccPrice = 0;
 
   function getQueryParam(key) {
     const params = new URLSearchParams(window.location.search);
@@ -166,7 +124,6 @@
 
     currentProduct = product;
     renderProductDetail(product);
-    loadRelatedProducts(product);
     setupEventListeners();
   }
 
@@ -388,47 +345,6 @@
     badges.forEach(b => {
       b.textContent = String(count);
       b.style.display = count > 0 ? 'inline-flex' : 'none';
-    });
-  }
-
-  async function loadRelatedProducts(current) {
-    const grid = document.getElementById('related-grid');
-    if (!grid) return;
-
-    let items = [];
-    try {
-      const res = await fetch('/api/productos');
-      if (res.ok) {
-        const json = await res.json();
-        items = (json.datos || []).filter(p => p.id !== current.id);
-      }
-    } catch (e) {
-      items = FALLBACK_PRODUCTS.filter(p => p.id !== current.id);
-    }
-
-    if (items.length === 0) {
-      items = FALLBACK_PRODUCTS.filter(p => p.id !== current.id);
-    }
-
-    // Tomar 4 productos
-    const toShow = items.slice(0, 4);
-    grid.innerHTML = '';
-
-    toShow.forEach(item => {
-      const card = document.createElement('a');
-      card.href = `/producto?id=${encodeURIComponent(item.id || item.code)}`;
-      card.className = 'related-card';
-      card.innerHTML = `
-        <div class="related-card-img-wrap">
-          <img src="${item.imagen || '/imagenes/categorias/broaster/banner.webp'}" alt="${item.nombre}" class="related-card-img" loading="lazy">
-        </div>
-        <div class="related-card-body">
-          <span class="related-card-cat">${item.categoria || item.categoriaBadge || 'BuchiSapa'}</span>
-          <h4 class="related-card-title">${item.nombre}</h4>
-          <span class="related-card-price">${formatPrice(item.precio)}</span>
-        </div>
-      `;
-      grid.appendChild(card);
     });
   }
 

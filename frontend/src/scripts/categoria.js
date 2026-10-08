@@ -68,9 +68,32 @@
     } catch (e) {}
   };
 
+  // Función utilitaria para normalizar texto (sin tildes, minúsculas, limpio)
+  function normalizeSearchText(str) {
+    return String(str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  // Diccionario de equivalencias y raíces gastronómicas comunes
+  const SEARCH_SYNONYMS = {
+    'ala': ['alita', 'alitas'],
+    'alas': ['alita', 'alitas'],
+    'alita': ['alitas'],
+    'burger': ['hamburguesa', 'hamburguesas'],
+    'hambur': ['hamburguesa', 'hamburguesas'],
+    'salchi': ['salchipapa', 'salchipapas', 'salchibroaster'],
+    'broas': ['broaster'],
+    'papas': ['papa'],
+    'platano': ['platano', 'bellaco', 'patacones', 'tacacho'],
+    'selva': ['amazonico', 'amazonicos', 'tacacho', 'cecina', 'juane']
+  };
+
   window.handleSearchInput = async function (query) {
-    const cleanQuery = (query || '').toLowerCase().trim();
-    if (!cleanQuery) {
+    const rawQuery = String(query || '').trim();
+    if (!rawQuery) {
       exitSearchMode();
       return;
     }
@@ -83,7 +106,11 @@
     const searchList = document.getElementById('search-view-list');
     const carousel = document.querySelector('.hero-carousel-container');
 
-    if (!searchSection || !searchList) return;
+    // Si no estamos en la página principal, redirigir con ?q=
+    if (!searchSection || !searchList) {
+      window.location.href = `/?q=${encodeURIComponent(rawQuery)}`;
+      return;
+    }
 
     if (bannersSection) bannersSection.style.display = 'none';
     if (titleWrap) titleWrap.style.display = 'none';
@@ -93,14 +120,13 @@
     searchSection.style.display = 'block';
 
     if (searchTitle) searchTitle.textContent = 'Resultados de Búsqueda';
-    if (searchSubtitle) searchSubtitle.textContent = `Mostrando resultados para "${query}"`;
-
-    searchList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b; font-weight: 700;">Buscando platos...</div>';
+    if (searchSubtitle) searchSubtitle.textContent = `Mostrando resultados para "${rawQuery}"`;
 
     let products = [];
     if (window.currentProducts && Array.isArray(window.currentProducts) && window.currentProducts.length > 0) {
       products = window.currentProducts;
     } else {
+      searchList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b; font-weight: 700;">Cargando platos...</div>';
       try {
         const res = await fetch('/api/productos');
         if (res.ok) {
@@ -113,22 +139,41 @@
       }
     }
 
+    // Normalizar la consulta del usuario
+    const normalizedQuery = normalizeSearchText(rawQuery);
+    const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
+
+    // Filtrar productos EXCLUSIVAMENTE por el nombre del producto (sin descripción ni otras propiedades)
     const filtered = products.filter(p => {
-      const name = (p.nombre || '').toLowerCase();
-      const desc = (p.descripcion || '').toLowerCase();
-      const cat = (p.categoria || '').toLowerCase();
-      return name.includes(cleanQuery) || desc.includes(cleanQuery) || cat.includes(cleanQuery);
+      const normName = normalizeSearchText(p.nombre);
+      if (!normName) return false;
+
+      // 1. Coincidencia directa de la frase en el nombre del producto
+      if (normName.includes(normalizedQuery)) return true;
+
+      // 2. Coincidencia token por token en el nombre del producto
+      return tokens.every(tok => {
+        if (normName.includes(tok)) return true;
+
+        // Comprobar sinónimos / variantes gastronómicas si aplican al nombre del producto
+        const syns = SEARCH_SYNONYMS[tok];
+        if (syns && syns.some(s => normName.includes(s))) {
+          return true;
+        }
+
+        return false;
+      });
     });
 
     const countBadge = document.getElementById('search-view-count');
-    if (countBadge) countBadge.textContent = `${filtered.length} platos encontrados`;
+    if (countBadge) countBadge.textContent = `${filtered.length} plato${filtered.length === 1 ? '' : 's'} encontrado${filtered.length === 1 ? '' : 's'}`;
 
     if (filtered.length === 0) {
       searchList.innerHTML = `
         <div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; background: #ffffff; border-radius: 20px; border: 1px solid #f1f5f9;">
           <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
-          <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No se encontraron resultados</h3>
-          <p style="font-size: 13.5px; color: #64748b; margin-bottom: 16px;">Intenta buscando con otro término.</p>
+          <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No se encontraron resultados para "${rawQuery}"</h3>
+          <p style="font-size: 13.5px; color: #64748b; margin-bottom: 16px;">Prueba buscando por alitas, broaster, hamburguesa, tacacho o bebidas.</p>
           <button type="button" class="btn-volver" onclick="exitSearchMode()">Ver Todas las Categorías</button>
         </div>
       `;
@@ -295,11 +340,20 @@
       exitBtn.addEventListener('click', exitSearchMode);
     }
 
-    // Auto abrir si viene query ?cat= en la URL
+    // Auto abrir si viene query ?cat= o ?q= en la URL
     const urlParams = new URLSearchParams(window.location.search);
     const catQuery = urlParams.get('cat');
     if (catQuery) {
       openCategoryView(catQuery, catQuery.toUpperCase());
+    }
+
+    const searchQuery = urlParams.get('q');
+    if (searchQuery) {
+      const desktopInput = document.getElementById('desktop-search-input');
+      const mobileInput = document.getElementById('main-search-input');
+      if (desktopInput) desktopInput.value = searchQuery;
+      if (mobileInput) mobileInput.value = searchQuery;
+      handleSearchInput(searchQuery);
     }
   }
 

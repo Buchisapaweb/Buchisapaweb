@@ -125,11 +125,16 @@
         <div class="form-group">
           <label class="form-label">Categoría *</label>
           <select id="modal-product-category" class="form-select" required>
-            <option value="hamburguesas">Hamburguesas</option>
-            <option value="broaster">Broaster</option>
-            <option value="salchipapas">Salchipapas</option>
-            <option value="bebidas">Bebidas</option>
-            <option value="combos">Combos</option>
+            <option value="C0005" data-name="HAMBURGUESAS">HAMBURGUESAS</option>
+            <option value="C0004" data-name="BROASTER">BROASTER</option>
+            <option value="C0002" data-name="ALITAS">ALITAS</option>
+            <option value="C0007" data-name="PLATOS AMAZÓNICOS">PLATOS AMAZÓNICOS</option>
+            <option value="C0010" data-name="SALCHIPAPAS Y SALCHIBROASTERS">SALCHIPAPAS Y SALCHIBROASTERS</option>
+            <option value="C0003" data-name="BEBIDAS">BEBIDAS</option>
+            <option value="C0009" data-name="REFRESCOS">REFRESCOS</option>
+            <option value="C0006" data-name="INFUSIONES">INFUSIONES</option>
+            <option value="C0001" data-name="ADICIONALES">ADICIONALES</option>
+            <option value="C0008" data-name="PROMOCIONES">PROMOCIONES</option>
           </select>
         </div>
         <div class="form-group">
@@ -139,25 +144,48 @@
       </div>
       <div class="form-grid-2col">
         <div class="form-group">
-          <label class="form-label">Stock Inicial *</label>
+          <label class="form-label">Stock Actual *</label>
           <input type="number" id="modal-product-stock" class="form-input" value="25" min="0" required>
         </div>
         <div class="form-group">
+          <label class="form-label">Estado de Disponibilidad *</label>
+          <select id="modal-product-disponible" class="form-select">
+            <option value="true">🟢 Disponible para Pedidos</option>
+            <option value="false">🔴 Agotado en Cocina</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid-2col">
+        <div class="form-group">
           <label class="form-label">Código / SKU</label>
-          <input type="text" id="modal-product-code" class="form-input" placeholder="PRD001">
+          <input type="text" id="modal-product-code" class="form-input" placeholder="Ej: PL00025">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Insignia / Etiqueta</label>
+          <input type="text" id="modal-product-badge" class="form-input" placeholder="Ej: Más Vendido 🔥, Especial">
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Descripción</label>
-        <textarea id="modal-product-desc" class="form-textarea" rows="2" placeholder="Ingredientes, detalles de preparación..."></textarea>
+        <label class="form-label">Descripción del Plato</label>
+        <textarea id="modal-product-desc" class="form-textarea" rows="2" placeholder="Ingredientes, preparación, acompañamientos..."></textarea>
       </div>
       <div class="form-group">
         <label class="form-label">URL de Imagen</label>
-        <input type="text" id="modal-product-img" class="form-input" placeholder="/imagenes/menu/hamburguesa-clasica.webp">
+        <input type="text" id="modal-product-img" class="form-input" placeholder="https://... o /imagenes/...">
+      </div>
+      <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #cbd5e1; cursor: pointer;">
+          <input type="checkbox" id="modal-product-salsas" style="accent-color: #eab308;">
+          <span>Incluye selección de cremas</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #cbd5e1; cursor: pointer;">
+          <input type="checkbox" id="modal-product-acompanamiento" style="accent-color: #eab308;">
+          <span>Tiene acompañamiento configurable</span>
+        </label>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="btn-cancel-product-modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar Producto</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-product">Guardar Plato</button>
       </div>
     </form>
   </div>

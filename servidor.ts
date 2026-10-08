@@ -9,7 +9,6 @@ function obtenerHtmlIndiceCompilado(): string {
     'ENCABEZADO': 'frontend/src/components/html/encabezado.html',
     'CARRUSEL_PORTADA': 'frontend/src/components/html/carrusel-portada.html',
     'CATEGORIA': 'frontend/src/components/html/categoria.html',
-    'LOGIN': 'frontend/src/components/html/login.html',
     'PIE_PAGINA': 'frontend/src/components/html/pie-pagina.html'
   };
 
@@ -461,6 +460,69 @@ aplicacion.use(express.urlencoded({ extended: true, limit: '10mb' }));
       res.json({ exito: eliminado });
     } catch (error: any) {
       res.status(500).json({ exito: false, error: error.message || 'Error eliminando producto' });
+    }
+  });
+
+  // Cambiar disponibilidad rápida de producto
+  aplicacion.patch('/api/productos/:id/disponibilidad', async (req: Request, res: Response) => {
+    try {
+      const idProducto = req.params.id as string;
+      const { disponible } = req.body;
+      const actualizado = await actualizarProducto(idProducto, { disponible: Boolean(disponible) });
+      if (!actualizado) return res.status(404).json({ exito: false, error: 'Producto no encontrado' });
+      transmitirActualizacionStockProducto(actualizado);
+      res.json({ exito: true, datos: actualizado });
+    } catch (error: any) {
+      res.status(500).json({ exito: false, error: error.message });
+    }
+  });
+
+  // Estadísticas para Dashboard Admin
+  aplicacion.get('/api/admin/dashboard-stats', async (_req: Request, res: Response) => {
+    try {
+      const productos = await obtenerProductos();
+      const categorias = await obtenerCategorias();
+      const pedidos = await obtenerPedidos();
+      let totalUsuarios = 0;
+      try {
+        const usuarios = await obtenerTodosLosUsuarios();
+        totalUsuarios = usuarios.length;
+      } catch (e) {
+        totalUsuarios = 1;
+      }
+
+      res.json({
+        exito: true,
+        totalProducts: productos.length,
+        totalCategories: categorias.length,
+        totalOrders: pedidos.length,
+        totalClients: totalUsuarios
+      });
+    } catch (error: any) {
+      res.status(500).json({ exito: false, error: error.message });
+    }
+  });
+
+  // Lista de clientes para vista Clientes del Admin
+  aplicacion.get('/api/admin/clients', async (_req: Request, res: Response) => {
+    try {
+      const usuarios = await obtenerTodosLosUsuarios();
+      const pedidos = await obtenerPedidos();
+      const clientes = usuarios.map(u => {
+        const orderCount = pedidos.filter(p => p.emailCliente === u.email || p.idUsuario === u.id).length;
+        const nombreCompleto = u.nombre || `${u.primerNombre || ''} ${u.apellido || ''}`.trim() || u.email;
+        return {
+          id: u.id,
+          nombre: nombreCompleto,
+          email: u.email,
+          phone: u.telefono || '-',
+          dni: u.numeroDoc || '-',
+          orderCount: Math.max(1, orderCount)
+        };
+      });
+      res.json({ exito: true, clients: clientes });
+    } catch (error: any) {
+      res.status(500).json({ exito: false, error: error.message });
     }
   });
 
@@ -2371,11 +2433,15 @@ aplicacion.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   aplicacion.use('/admin', express.static(path.join(process.cwd(), 'frontend/src/admin'), { ...opcionesEstaticos, index: false }));
 
-  // 4. Archivos estáticos de css, js, html y raíz pública (index: false para que '/' siempre pase por el render compilado de partials)
+  // 4. Rutas directas de páginas HTML (prioridad máxima antes de archivos estáticos)
+  aplicacion.get(['/login', '/login/', '/login.html', '/iniciar-sesion'], (_req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/login.html'));
+  });
+
   aplicacion.use('/imagenes', express.static(path.join(process.cwd(), 'frontend/src/assets/images'), opcionesEstaticos));
   aplicacion.use(express.static(path.join(process.cwd(), 'public'), { ...opcionesEstaticos, index: false }));
   aplicacion.use('/public', express.static(path.join(process.cwd(), 'public'), { ...opcionesEstaticos, index: false }));
-  aplicacion.use(express.static(path.join(process.cwd(), 'dist'), { ...opcionesEstaticos, index: false }));
 
   aplicacion.get(['/reclamaciones', '/reclamaciones.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/reclamaciones.html'));
@@ -2413,9 +2479,20 @@ aplicacion.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/checkout.html'));
   });
 
+  aplicacion.get(['/carrito', '/carrito.html'], (_req: Request, res: Response) => {
+    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/carrito.html'));
+  });
+
   aplicacion.get(['/reservas', '/reservas.html', '/catering', '/catering.html', '/giftcards', '/giftcards.html'], (_req: Request, res: Response) => {
     res.redirect(301, '/servicios');
   });
+
+  aplicacion.get(['/perfil', '/perfil.html'], (_req: Request, res: Response) => {
+    res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/perfil.html'));
+  });
+
+  // Archivos estáticos de dist
+  aplicacion.use(express.static(path.join(process.cwd(), 'dist'), { ...opcionesEstaticos, index: false }));
 
   aplicacion.get(['/informacion', '/informacion.html'], (_req: Request, res: Response) => {
     res.sendFile(path.join(process.cwd(), 'frontend/src/pages/html/informacion.html'));

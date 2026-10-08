@@ -384,7 +384,13 @@ function initEncabezadoEvents() {
     desktopForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const input = document.getElementById('desktop-search-input');
-      if (input) onSearchInputChanged(input.value);
+      const val = input ? input.value.trim() : '';
+      if (!val) return;
+      if (typeof window.handleSearchInput === 'function') {
+        window.handleSearchInput(val);
+      } else {
+        window.location.href = `/?q=${encodeURIComponent(val)}`;
+      }
     });
   }
 
@@ -393,7 +399,13 @@ function initEncabezadoEvents() {
     mobileForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const input = document.getElementById('main-search-input');
-      if (input) onSearchInputChanged(input.value);
+      const val = input ? input.value.trim() : '';
+      if (!val) return;
+      if (typeof window.handleSearchInput === 'function') {
+        window.handleSearchInput(val);
+      } else {
+        window.location.href = `/?q=${encodeURIComponent(val)}`;
+      }
     });
   }
 }

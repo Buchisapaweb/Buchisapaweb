@@ -114,7 +114,8 @@
     "imagen": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&auto=format&fit=crop&q=80",
     "tiene_acompanamiento": true,
     "incluye_salsas": true,
-    "tiene_notas": true
+    "tiene_notas": true,
+    "disponible": true
   },
   {
     "id": "PL00010",

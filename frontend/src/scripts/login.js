@@ -2,28 +2,21 @@
   'use strict';
 
   window.openLoginModal = function (viewName = 'login') {
-    const modal = document.getElementById('login-modal');
-    if (!modal) return;
-
-    modal.classList.add('active', 'open');
-    document.body.classList.add('search-open');
-
-    if (typeof window.switchAuthView === 'function') {
-      window.switchAuthView(viewName);
-    }
-
-    // Auto enfocar el primer input
-    setTimeout(() => {
-      const emailInput = document.getElementById('auth-login-email');
-      if (emailInput && viewName === 'login') {
-        emailInput.focus();
+    const isLoginPage = window.location.pathname === '/login' || window.location.pathname === '/login.html';
+    if (isLoginPage) {
+      if (typeof window.switchAuthView === 'function') {
+        window.switchAuthView(viewName);
       }
-    }, 120);
+      return;
+    }
+    // Navegar a la página completa de login
+    window.location.href = viewName === 'login' ? '/login' : `/login?view=${encodeURIComponent(viewName)}`;
   };
 
   window.closeLoginModal = function (event) {
-    if (event && event.target && event.target.id !== 'login-modal' && !event.target.classList.contains('auth-close-btn-top')) {
-      // Si el clic fue dentro de la caja sin querer cerrar, evitar cierre
+    if (window.location.pathname === '/login' || window.location.pathname === '/login.html') {
+      window.location.href = '/';
+      return;
     }
     const modal = document.getElementById('login-modal');
     if (modal) {
@@ -33,7 +26,7 @@
   };
 
   window.switchAuthView = function (viewName) {
-    const views = ['auth-view-login', 'auth-view-register', 'auth-view-recovery', 'auth-view-profile'];
+    const views = ['auth-view-login', 'auth-view-register', 'auth-view-recovery'];
     views.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
@@ -43,16 +36,13 @@
     if (target) {
       target.style.display = 'block';
     }
-
-    const topbarTitle = document.getElementById('auth-topbar-title');
-    if (topbarTitle) {
-      topbarTitle.classList.toggle('is-hidden', viewName !== 'profile');
-    }
   };
 
   window.handleAuthBackNav = function () {
-    const profileMain = document.getElementById('profile-screen-main');
-    if (profileMain && profileMain.style.display !== 'none') {
+    const loginView = document.getElementById('auth-view-login');
+    const isLoginActive = loginView && (window.getComputedStyle(loginView).display !== 'none');
+
+    if (isLoginActive) {
       window.closeLoginModal();
     } else {
       window.switchAuthView('login');
@@ -122,10 +112,12 @@
         setTimeout(() => {
           if (datos.isAdmin && datos.redirectUrl) {
             window.location.href = datos.redirectUrl;
+          } else if (window.location.pathname === '/login' || window.location.pathname === '/login.html') {
+            window.location.href = '/';
           } else {
-            window.location.reload(); // Recargar para actualizar UI de cliente
+            window.location.reload();
           }
-        }, 1000);
+        }, 800);
       } else {
         throw new Error(datos.error || 'Error al iniciar sesión');
       }
@@ -269,7 +261,7 @@
   };
 
   window.continueAsGuest = function () {
-    window.closeLoginModal();
+    window.location.href = '/';
   };
 
   window.handleUserIconClick = function () {
@@ -278,28 +270,24 @@
       try {
         const user = JSON.parse(userStr);
         if (user && user.email) {
-          window.openLoginModal('profile');
+          window.location.href = '/perfil';
           return;
         }
       } catch (e) {}
     }
-    window.openLoginModal('login');
+    window.location.href = '/login';
   };
 
   window.updateAuthUI = function () {
     const userStr = localStorage.getItem('buchisapa_user');
     const headerAuthBtn = document.getElementById('header-auth-btn');
     const drawerLoginBtn = document.getElementById('drawer-login-btn');
-    const adminRedirectBtn = document.getElementById('profile-admin-redirect-btn');
-    const profileNameEl = document.getElementById('profile-user-fullname');
-    const profileEmailEl = document.getElementById('profile-user-email');
-    const profileInitialEl = document.getElementById('profile-avatar-initial');
 
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
         if (user && user.email) {
-          const label = user.isAdmin ? 'ADMIN' : (user.primerNombre || 'MI CUENTA').toUpperCase();
+          const label = 'INGRESAR';
           
           if (headerAuthBtn) {
             const labelEl = headerAuthBtn.querySelector('.header-auth-btn-label');
@@ -308,16 +296,6 @@
           if (drawerLoginBtn) {
             const labelEl = drawerLoginBtn.querySelector('.header-auth-btn-label');
             if (labelEl) labelEl.textContent = label;
-          }
-          
-          if (profileNameEl) profileNameEl.textContent = user.nombre || 'Usuario BuchiSapa';
-          if (profileEmailEl) profileEmailEl.textContent = user.email;
-          if (profileInitialEl) profileInitialEl.textContent = (user.nombre || user.email || 'U')[0].toUpperCase();
-
-          if (user.isAdmin) {
-            if (adminRedirectBtn) adminRedirectBtn.classList.remove('is-hidden');
-          } else {
-            if (adminRedirectBtn) adminRedirectBtn.classList.add('is-hidden');
           }
           return;
         }
@@ -333,7 +311,6 @@
       const labelEl = drawerLoginBtn.querySelector('.header-auth-btn-label');
       if (labelEl) labelEl.textContent = 'INGRESAR';
     }
-    if (adminRedirectBtn) adminRedirectBtn.classList.add('is-hidden');
   };
 
   // Inicialización cuando el DOM esté cargado

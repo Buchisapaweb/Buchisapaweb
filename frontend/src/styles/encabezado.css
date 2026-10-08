@@ -235,6 +235,55 @@
   color: #94a3b8;
 }
 
+/* Eliminar la X nativa rectangular o rota del navegador */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration,
+input::-webkit-search-cancel-button,
+input::-webkit-search-decoration {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  display: none !important;
+}
+
+/* Botón X de limpiar búsqueda estilizado moderno y sutil */
+.search-clear-btn-inline,
+.search-clear-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  border-radius: 50% !important;
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  border: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.search-clear-btn-inline:hover,
+.search-clear-btn:hover {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  transform: scale(1.1) !important;
+}
+
+.search-clear-btn-inline:active,
+.search-clear-btn:active {
+  transform: scale(0.92) !important;
+}
+
+.search-clear-btn-inline svg,
+.search-clear-btn svg {
+  stroke: currentColor !important;
+  stroke-width: 2.8 !important;
+  pointer-events: none !important;
+}
+
 /* Grupo de Acciones Derecha (Pedido & Ingresar) */
 .header-actions {
   display: flex;

@@ -67,15 +67,23 @@
 
         window.BuchiSapaAdmin.categories = categories;
 
-        // Intentar guardar en backend
+        // Guardar en backend
         try {
-          await fetch('/api/categorias', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: catId, name, slug, order, banner })
-          });
+          if (catId) {
+            await fetch(`/api/categorias/${encodeURIComponent(catId)}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombre: name, slug, orden: order, banner })
+            });
+          } else {
+            await fetch('/api/categorias', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombre: name, slug, orden: order, banner })
+            });
+          }
         } catch (err) {
-          console.warn('Nota: guardado local de categoría efectuado.');
+          console.warn('Nota: guardado local de categoría efectuado:', err);
         }
 
         if (typeof window.BuchiSapaAdmin?.renderCategoriesView === 'function') {

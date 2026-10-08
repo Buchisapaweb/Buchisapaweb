@@ -1,14 +1,40 @@
 <div class="main-page-card">
   <div class="view-header">
     <div class="view-header-title-wrap">
-      <h2 class="view-title">Catálogo de Productos y Platillos</h2>
-      <p class="view-subtitle">Administra el menú oficial de BuchiSapa, precios, imágenes y disponibilidad.</p>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+        <h2 class="view-title" style="margin: 0;">Catálogo de Productos y Platillos</h2>
+        <span class="badge badge-gold" id="products-count-badge">0 Platos</span>
+      </div>
+      <p class="view-subtitle">Control total del menú de BuchiSapa: precios, stock, categorías, imágenes y disponibilidad en tiempo real.</p>
     </div>
     <div class="view-actions">
-      <button class="btn btn-primary" id="btn-open-new-product">
+      <button class="btn btn-primary" id="btn-open-new-product" type="button">
         <span>+ Nuevo Producto</span>
       </button>
     </div>
+  </div>
+
+  <!-- BARRA DE BÚSQUEDA Y FILTROS POR CATEGORÍA -->
+  <div class="admin-products-toolbar" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; align-items: center; background: rgba(255,255,255,0.02); padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+    <div style="flex: 1; min-width: 220px; position: relative;">
+      <input type="text" id="admin-product-search" class="form-input" placeholder="Buscar por nombre, código o ingrediente..." style="padding-left: 36px; height: 42px; font-size: 13.5px;">
+      <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; opacity: 0.5;">🔍</span>
+    </div>
+    <div style="min-width: 200px;">
+      <select id="admin-product-category-filter" class="form-select" style="height: 42px; font-size: 13.5px;">
+        <option value="all">Todas las Categorías</option>
+      </select>
+    </div>
+    <div style="min-width: 160px;">
+      <select id="admin-product-status-filter" class="form-select" style="height: 42px; font-size: 13.5px;">
+        <option value="all">Todos los Estados</option>
+        <option value="available">Solo Disponibles</option>
+        <option value="unavailable">Agotados</option>
+      </select>
+    </div>
+    <button class="btn btn-secondary" id="btn-refresh-products" type="button" style="height: 42px; padding: 0 16px;">
+      🔄 Recargar
+    </button>
   </div>
 
   <div class="table-responsive">
@@ -19,9 +45,9 @@
           <th>Producto</th>
           <th>Categoría</th>
           <th>Precio</th>
-          <th>Stock / Disp.</th>
-          <th>Estado</th>
-          <th>Acciones</th>
+          <th>Stock</th>
+          <th>Disponibilidad</th>
+          <th style="text-align: right;">Acciones</th>
         </tr>
       </thead>
       <tbody id="products-page-tbody">
