@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crear Cuenta - BuchiSapa</title>
+
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="icon" type="image/webp" href="/imagenes/logo/logo-buchisapa.webp">
+</head>
+
+<body>
+
+    <!-- CABECERA -->
+    <header class="cabecera">
+        <button class="btn-cerrar" type="button" id="btnCerrar" onclick="window.location.href='/'">
+            ×
+        </button>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="login-container">
+
+        <!-- LOGO -->
+        <img
+            src="/imagenes/logo/logo-buchisapa.webp"
+            alt="BuchiSapa"
+            class="logo"
+        >
+
+        <!-- TÍTULO -->
+        <h1>
+            Crear Cuenta en Buchisapa
+        </h1>
+
+        <div id="registro-msg-banner" style="display: none; padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; font-size: 15px; font-weight: 600;"></div>
+
+        <!-- FORMULARIO DE REGISTRO -->
+        <form id="registroForm">
+
+            <!-- NOMBRE -->
+            <div class="campo">
+                <label for="nombre">
+                    Nombre y Apellido
+                </label>
+                <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    placeholder="Ej: Carlos Huamán"
+                    required
+                >
+            </div>
+
+            <!-- TELÉFONO -->
+            <div class="campo">
+                <label for="telefono">
+                    Teléfono / Celular
+                </label>
+                <input
+                    type="tel"
+                    id="telefono"
+                    name="telefono"
+                    placeholder="Ej: 987654321"
+                    required
+                >
+            </div>
+
+            <!-- DIRECCIÓN -->
+            <div class="campo">
+                <label for="direccion">
+                    Dirección en Santa Clara / Ate
+                </label>
+                <input
+                    type="text"
+                    id="direccion"
+                    name="direccion"
+                    placeholder="Calle / Av., Nro, Referencia"
+                >
+            </div>
+
+            <!-- CORREO -->
+            <div class="campo">
+                <label for="correo">
+                    Correo electrónico
+                </label>
+                <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    placeholder="tu@email.com"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <!-- CONTRASEÑA -->
+            <div class="campo">
+                <label for="password">
+                    Contraseña
+                </label>
+                <div class="password-box">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="••••••••"
+                        autocomplete="new-password"
+                        required
+                    >
+                    <button
+                        type="button"
+                        class="btn-ojo"
+                        id="btnOjo"
+                        aria-label="Mostrar contraseña"
+                    >
+                        👁
+                    </button>
+                </div>
+            </div>
+
+            <!-- REGISTRARME -->
+            <button
+                type="submit"
+                class="btn-ingresar activo"
+                id="btnRegistrar"
+                style="margin-top: 10px;"
+            >
+                Crear Mi Cuenta
+            </button>
+
+        </form>
+
+        <!-- VOLVER A LOGIN -->
+        <p class="registro">
+            ¿Ya tienes una cuenta?
+            <a href="/login" id="linkLogin">
+                Ingresa aquí
+            </a>
+        </p>
+
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const registroForm = document.getElementById('registroForm');
+        const btnOjo = document.getElementById('btnOjo');
+        const passwordInput = document.getElementById('password');
+        const msgBanner = document.getElementById('registro-msg-banner');
+        const btnRegistrar = document.getElementById('btnRegistrar');
+
+        if (btnOjo && passwordInput) {
+          btnOjo.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+              passwordInput.type = 'text';
+              btnOjo.textContent = '🙈';
+            } else {
+              passwordInput.type = 'password';
+              btnOjo.textContent = '👁';
+            }
+          });
+        }
+
+        function mostrarMensaje(texto, tipo = 'error') {
+          msgBanner.style.display = 'block';
+          if (tipo === 'error') {
+            msgBanner.style.backgroundColor = '#fee2e2';
+            msgBanner.style.color = '#b91c1c';
+            msgBanner.style.border = '1px solid #f87171';
+          } else {
+            msgBanner.style.backgroundColor = '#d1fae5';
+            msgBanner.style.color = '#065f46';
+            msgBanner.style.border = '1px solid #34d399';
+          }
+          msgBanner.textContent = texto;
+        }
+
+        if (registroForm) {
+          registroForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('nombre').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const direccion = document.getElementById('direccion').value.trim();
+            const email = document.getElementById('correo').value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!nombre || !email || !password) return;
+
+            btnRegistrar.disabled = true;
+            btnRegistrar.textContent = 'Registrando...';
+
+            try {
+              const res = await fetch('/api/autenticacion/registro', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, telefono, direccion, email, password })
+              });
+
+              const data = await res.json();
+              if (data.exito && data.user) {
+                mostrarMensaje('¡Cuenta creada con éxito! Redirigiendo...', 'success');
+                localStorage.setItem('buchisapa_user', JSON.stringify(data.user));
+                localStorage.setItem('buchisapa_token', data.token || 'auth_token');
+                setTimeout(() => {
+                  window.location.href = '/';
+                }, 1000);
+              } else {
+                mostrarMensaje(data.error || 'No se pudo crear la cuenta.');
+                btnRegistrar.disabled = false;
+                btnRegistrar.textContent = 'Crear Mi Cuenta';
+              }
+            } catch (err) {
+              mostrarMensaje('Error de conexión al registrar usuario.');
+              btnRegistrar.disabled = false;
+              btnRegistrar.textContent = 'Crear Mi Cuenta';
+            }
+          });
+        }
+      });
+    </script>
+</body>
+</html>

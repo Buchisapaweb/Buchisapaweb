@@ -103,6 +103,49 @@
       });
     }
 
+    // Enlace de registro
+    const linkRegistro = document.getElementById('linkRegistro');
+    if (linkRegistro) {
+      linkRegistro.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = '/registro';
+      });
+    }
+
+    // Enlace de recuperar contraseña
+    const linkRecuperar = document.getElementById('linkRecuperar');
+    if (linkRecuperar) {
+      linkRecuperar.addEventListener('click', (e) => {
+        e.preventDefault();
+        mostrarMensaje('Comuníquese a WhatsApp +51 987 654 321 o acérquese a nuestro local en Av. La Estrella con Calle 28 de Julio para recuperar su acceso.', 'info');
+      });
+    }
+
+    function mostrarMensaje(texto, tipo = 'error') {
+      let msgBox = document.getElementById('auth-msg-banner');
+      if (!msgBox) {
+        msgBox = document.createElement('div');
+        msgBox.id = 'auth-msg-banner';
+        msgBox.style.padding = '12px 16px';
+        msgBox.style.borderRadius = '12px';
+        msgBox.style.marginBottom = '20px';
+        msgBox.style.fontSize = '15px';
+        msgBox.style.fontWeight = '600';
+        msgBox.style.textAlign = 'center';
+        loginForm.parentNode.insertBefore(msgBox, loginForm);
+      }
+      if (tipo === 'error') {
+        msgBox.style.backgroundColor = '#fee2e2';
+        msgBox.style.color = '#b91c1c';
+        msgBox.style.border = '1px solid #f87171';
+      } else {
+        msgBox.style.backgroundColor = '#fef3c7';
+        msgBox.style.color = '#92400e';
+        msgBox.style.border = '1px solid #fcd34d';
+      }
+      msgBox.textContent = texto;
+    }
+
     // Envío del formulario de Login
     if (loginForm) {
       loginForm.addEventListener('submit', async (e) => {
@@ -135,13 +178,13 @@
               window.location.href = '/';
             }
           } else {
-            alert(datos.error || 'Correo o contraseña incorrectos.');
+            mostrarMensaje(datos.error || 'Correo o contraseña incorrectos.');
             btnIngresar.disabled = false;
             btnIngresar.classList.add('activo');
             btnIngresar.textContent = 'Ingresar';
           }
         } catch (err) {
-          alert('Error de conexión al intentar ingresar.');
+          mostrarMensaje('Error de conexión al intentar ingresar.');
           btnIngresar.disabled = false;
           btnIngresar.classList.add('activo');
           btnIngresar.textContent = 'Ingresar';

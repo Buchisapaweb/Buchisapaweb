@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node dist/servidor.cjs",
-    "start": "node dist/servidor.cjs",
+    "dev": "node server.js",
+    "start": "node server.js",
     "build": "node -e 'console.log(\"Build successful\")'",
     "lint": "node -e 'console.log(\"No lint errors\")'"
   },
