@@ -1,14 +1,17 @@
 {
-  "name": "buchisapa-app",
+  "name": "buchisapa",
+  "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js",
-    "build": "node -e 'console.log(\"Build successful\")'",
+    "dev": "vite --port 3000 --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --port 3000 --host 0.0.0.0",
     "lint": "node -e 'console.log(\"No lint errors\")'"
   },
-  "dependencies": {
-    "express": "^4.19.2"
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0"
   }
 }
