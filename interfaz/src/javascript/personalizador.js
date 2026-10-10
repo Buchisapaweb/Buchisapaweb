@@ -1,0 +1,656 @@
+/**
+ * ==========================================================================
+ * RESTAURANTE BUCHISAPA - PRODUCT CUSTOMIZER & DETAILS SHEET
+ * Modal interactivo para personalización de platos con acompañamientos,
+ * cremas de la casa e indicaciones especiales para la cocina.
+ * ==========================================================================
+ */
+
+(function () {
+  // Base de datos de salsas oficiales
+  let ALL_SAUCES = [];
+  let ALL_ACCOMPANIMENTS = [];
+
+  async function cargarCatalogosPersonalizacion() {
+    try {
+      const [cremasRes, accRes] = await Promise.all([
+        fetch('/datos/cremas.json'),
+        fetch('/datos/acompanamientos.json')
+      ]);
+      if (cremasRes.ok) {
+        const cremas = await cremasRes.json();
+        ALL_SAUCES = cremas.map((item, index) => ({ ...item, default: index < 4 }));
+      }
+      if (accRes.ok) ALL_ACCOMPANIMENTS = await accRes.json();
+    } catch (error) {
+      console.warn('No se pudieron cargar los catálogos oficiales:', error);
+    }
+  }
+
+  // Estado activo del producto en personalización
+  let currentProduct = null;
+  let currentQty = 1;
+  let selectedAccompaniments = [];
+  let availableAccompaniments = [];
+  let selectedSauces = [];
+
+  /**
+   * Determina si un producto pertenece a categorías que NO llevan acompañamientos ni cremas
+   * (Adicionales, Bebidas, Infusiones, Refrescos)
+   */
+  function isExcludedCategory(product) {
+    if (!product) return false;
+    const cat = String(product.category_id || product.category || product.categoryPill || product.categoria || product.category_slug || '').toLowerCase().trim();
+    const catBadge = String(product.categoryBadge || '').toLowerCase().trim();
+    const name = String(product.name || '').toLowerCase().trim();
+
+    // 1. ADICIONALES (C0001), BEBIDAS (C0003), INFUSIONES (C0006), REFRESCOS (C0009)
+    if (
+      cat === 'c0001' || cat === 'c0003' || cat === 'c0006' || cat === 'c0009' ||
+      cat === 'adicionales' || cat === 'adicional' ||
+      cat === 'bebidas' || cat === 'bebida' ||
+      cat === 'infusiones' || cat === 'infusion' ||
+      cat === 'refrescos' || cat === 'refresco' ||
+      cat.includes('adicional') || cat.includes('extra') ||
+      cat.includes('bebida') || cat.includes('refresco') ||
+      cat.includes('infusion') || cat.includes('infusiones') ||
+      catBadge.includes('adicional') || catBadge.includes('bebida') ||
+      catBadge.includes('refresco') || catBadge.includes('infusion')
+    ) {
+      return true;
+    }
+
+    // Bebidas e infusiones comunes por nombre
+    const drinkKeywords = [
+      'agua', 'cielo', 'san mateo', 'san luis', 'inca kola', 'coca cola', 'fanta', 'sprite', 'pepsi', 
+      'gaseosa', 'aguajina', 'maracuyá', 'maracuya', 'camu camu', 'camu', 
+      'chicha', 'anís', 'anis', 'manzanilla', 'hierba luisa', 'infusión', 'infusion', 
+      'café', 'cafe', 'té ', 'te ', 'porción de', 'porcion de', 'adicional'
+    ];
+
+    return drinkKeywords.some(kw => name.includes(kw));
+  }
+
+  /**
+   * Obtiene los acompañamientos específicos según la carta oficial Buchisapa
+   */
+  function getProductAccompaniments(product) {
+    if (!product || isExcludedCategory(product) || product.has_accompaniment !== true) return [];
+    if (!Array.isArray(product.accompaniment_ids)) return [];
+    const ids = new Set(product.accompaniment_ids.map(String));
+    return ALL_ACCOMPANIMENTS
+      .filter(item => ids.has(String(item.id)))
+      .map(item => item.name);
+  }
+
+  /**
+   * Obtiene la descripción oficial de cada producto según la carta
+   */
+  function getProductDescription(product) {
+    if (!product) return '';
+
+    let d = '';
+    // 1. Prioridad: usar directamente la descripción oficial del objeto producto
+    if (product.description && typeof product.description === 'string' && product.description.trim().length > 0) {
+      d = product.description.trim();
+    } else {
+      // 2. Buscar en la lista global de productos (window.currentProducts o getFallbackProducts)
+      const list = (Array.isArray(window.currentProducts) && window.currentProducts.length > 0)
+        ? window.currentProducts
+        : (typeof getFallbackProducts === 'function' ? getFallbackProducts() : (typeof window.getFallbackProducts === 'function' ? window.getFallbackProducts() : []));
+
+      if (Array.isArray(list) && list.length > 0) {
+        const targetId = product.id ? String(product.id).trim().toLowerCase() : '';
+        const targetName = product.name ? String(product.name).trim().toLowerCase() : '';
+
+        const match = list.find(p => (targetId && String(p.id).toLowerCase() === targetId) || (targetName && String(p.name).toLowerCase() === targetName));
+        if (match && match.description && match.description.trim().length > 0) {
+          d = match.description.trim();
+        }
+      }
+    }
+
+    // Eliminar texto redundante "No cuenta con acompañamientos ni cremas"
+    d = d.replace(/No cuenta con acompañamientos ni cremas\.?/gi, '').trim();
+
+    if (!d) {
+      if (isExcludedCategory(product)) {
+        return '';
+      }
+      return 'Preparado al momento con ingredientes frescos de la más alta calidad y la auténtica sazón de la selva.';
+    }
+
+    return d;
+  }
+
+  /**
+   * Obtiene la categoría formateada para el badge superior
+   */
+  function getCategoryPillLabel(product) {
+    const cat = (product.category_id || product.category || '').toLowerCase();
+    if (cat.includes('hamburguesa') || cat.includes('burger')) return 'HAMBURGUESAS';
+    if (cat.includes('amazon') || cat.includes('selva')) return 'PLATOS AMAZÓNICOS';
+    if (cat.includes('broaster')) return 'BROASTER';
+    if (cat.includes('brasa') || cat.includes('pollo')) return 'POLLOS A LA BRASA';
+    if (cat.includes('salchipapa')) return 'SALCHIPAPAS';
+    if (cat.includes('alita')) return 'ALITAS';
+    if (cat.includes('refresco')) return 'REFRESCOS';
+    if (cat.includes('bebida')) return 'BEBIDAS';
+    if (cat.includes('infusion')) return 'INFUSIONES';
+    return (product.category_id || product.category || 'CARTA GENERAL').toUpperCase();
+  }
+
+  /**
+   * Obtiene el badge superior de la imagen (ej: 🔥 MÁS VENDIDO)
+   */
+  function getHeroBadgeText(product) {
+    if (product.badge) return product.badge;
+    const name = (product.name || '').toLowerCase();
+    const cat = (product.category_id || product.category || '').toLowerCase();
+    if (name.includes('amazónica') || name.includes('amazonica')) return '🔥 EDICIÓN ESPECIAL';
+    if (name.includes('clásica') || name.includes('tacacho') || name.includes('broaster')) return '🔥 MÁS VENDIDO';
+    if (name.includes('juane') || cat.includes('amazon')) return '🌴 TRADICIÓN SELVÁTICA';
+    return '⭐ RECOMENDADO';
+  }
+
+  /**
+   * Abre la pantalla de personalización del producto
+   */
+  window.openProductDetailModal = async function (productIdOrObject) {
+    await cargarCatalogosPersonalizacion();
+    let product = null;
+
+    const list = (Array.isArray(window.currentProducts) && window.currentProducts.length > 0)
+      ? window.currentProducts
+      : (typeof getFallbackProducts === 'function' ? getFallbackProducts() : []);
+
+    if (list.length > 0 && (!window.currentProducts || window.currentProducts.length === 0)) {
+      window.currentProducts = list;
+    }
+
+    if (typeof productIdOrObject === 'object' && productIdOrObject !== null) {
+      product = productIdOrObject;
+    } else if (typeof productIdOrObject === 'string') {
+      const target = productIdOrObject.trim().toLowerCase();
+      product = list.find(p => p.id === productIdOrObject || String(p.id).toLowerCase() === target) ||
+                list.find(p => (p.name || '').toLowerCase() === target) ||
+                list.find(p => (p.name || '').toLowerCase().includes(target));
+    }
+
+    if (!product && list.length > 0) {
+      product = list[0];
+    }
+
+    if (!product) {
+      console.warn('Producto no encontrado para personalizar:', productIdOrObject);
+      return;
+    }
+
+    currentProduct = product;
+    currentQty = 1;
+
+    // Inicializar acompañamientos (todos seleccionados por defecto)
+    availableAccompaniments = getProductAccompaniments(product);
+    selectedAccompaniments = [...availableAccompaniments];
+
+    // Inicializar salsas (NUNCA para bebidas, infusiones, refrescos o postres)
+    if (isDrinkOrNoSauceItem(product)) {
+      selectedSauces = [];
+    } else {
+      selectedSauces = ALL_SAUCES.filter(s => s.default).map(s => s.name);
+    }
+
+    // Recordar página de procedencia
+    const searchSec = document.getElementById('search-results-section');
+    if (searchSec && searchSec.style.display !== 'none' && !searchSec.classList.contains('is-hidden')) {
+      window._lastActivePageView = 'category';
+    } else {
+      window._lastActivePageView = 'home';
+    }
+
+    // Ocultar las otras secciones del catálogo pero MANTENER EL FOOTER visible al final de la página descriptiva
+    const heroSec = document.querySelector('.hero-carousel-container');
+    const titleWrap = document.getElementById('main-section-title-wrap');
+    const catSec = document.getElementById('category-banners-section');
+    const footer = document.querySelector('.site-footer-buchisapa');
+
+    if (heroSec) heroSec.style.display = 'none';
+    if (titleWrap) titleWrap.style.display = 'none';
+    if (catSec) catSec.style.display = 'none';
+    if (searchSec) {
+      searchSec.style.display = 'none';
+      searchSec.classList.add('is-hidden');
+    }
+    if (footer) footer.style.display = 'block';
+
+    renderProductCustomizerModal();
+
+    const modal = document.getElementById('product-customizer-modal');
+    if (modal) {
+      modal.style.display = 'block';
+      modal.classList.add('open', 'active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    const backBtnText = document.getElementById('product-nav-back-text');
+    if (backBtnText) {
+      backBtnText.textContent = (window._lastActivePageView === 'category') ? 'Volver a Categorías' : 'Volver al inicio';
+    }
+  };
+
+  function isDrinkOrNoSauceItem(product) {
+    if (!product) return false;
+
+    const catBadge = String(product.categoryBadge || '').toLowerCase();
+    const cat = String(product.category_id || product.category || product.categoryPill || '').toLowerCase();
+    const name = String(product.name || '').toLowerCase();
+
+    // Las promociones, combos y packs NUNCA son bebidas puras (siempre incluyen cremas y salsas de la casa)
+    if (
+      product.is_promotion || product.isPromotion || 
+      cat.includes('promo') || name.includes('promo') || name.includes('combo') || name.includes('pack')
+    ) {
+      return false;
+    }
+
+    if (product.includes_sauces === false) return true;
+
+    if (isExcludedCategory(product)) {
+      return true;
+    }
+
+    const drinkKeywords = [
+      'agua', 'cielo', 'san mateo', 'san luis', 'inca', 'coca', 'fanta', 'sprite', 'pepsi', 
+      '7up', 'gaseosa', 'refresco', 'cocona', 'camu', 'aguajina', 'maracuyá', 'maracuya', 
+      'chicha', 'limonada', 'jugo', 'infusión', 'infusion', 'café', 'cafe', 'té', 'te', 
+      'anís', 'anis', 'manzanilla', 'hierba luisa', 'cerveza', 'pilsen', 'cusqueña', 'cristal', 'corona', 'heineken'
+    ];
+
+    return drinkKeywords.some(kw => name.includes(kw));
+  }
+
+  /**
+   * Cierra la página descriptiva de producto y restaura la vista previa
+   */
+  window.closeProductDetailModal = function () {
+    const modal = document.getElementById('product-customizer-modal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('open', 'active');
+    }
+
+    const heroSec = document.querySelector('.hero-carousel-container');
+    const titleWrap = document.getElementById('main-section-title-wrap');
+    const catSec = document.getElementById('category-banners-section');
+    const searchSec = document.getElementById('search-results-section');
+    const footer = document.querySelector('.site-footer-buchisapa');
+
+    if (window._lastActivePageView === 'category') {
+      // Restaurar Página 2: Lista de Productos de Categoría
+      if (searchSec) {
+        searchSec.style.display = 'block';
+        searchSec.classList.remove('is-hidden');
+      }
+      if (footer) footer.style.display = 'block';
+      if (heroSec) heroSec.style.display = 'none';
+      if (titleWrap) titleWrap.style.display = 'none';
+      if (catSec) catSec.style.display = 'none';
+    } else {
+      // Restaurar Página 1: Página de Inicio
+      if (heroSec) heroSec.style.display = 'block';
+      if (titleWrap) titleWrap.style.display = 'block';
+      if (catSec) catSec.style.display = 'grid';
+      if (footer) footer.style.display = 'block';
+      if (searchSec) {
+        searchSec.style.display = 'none';
+        searchSec.classList.add('is-hidden');
+      }
+    }
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  // Atajo de teclado tecla Escape para cerrar
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('product-customizer-modal');
+      if (modal && (modal.style.display === 'block' || modal.style.display === 'flex' || modal.classList.contains('open'))) {
+        window.closeProductDetailModal();
+      }
+    }
+  });
+
+  /**
+   * Renderiza el contenido completo del customizer
+   */
+  function renderProductCustomizerModal() {
+    let modal = document.getElementById('product-customizer-modal');
+    const footerEl = document.querySelector('.site-footer-buchisapa');
+    const mainEl = document.querySelector('main.main-content-padded') || document.querySelector('main');
+
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'product-customizer-modal';
+      modal.className = 'product-customizer-modal';
+      if (mainEl) {
+        mainEl.appendChild(modal);
+      } else if (footerEl && footerEl.parentNode) {
+        footerEl.parentNode.insertBefore(modal, footerEl);
+      } else {
+        document.body.appendChild(modal);
+      }
+    } else {
+      // Reubicar siempre antes del footer para que la secuencia de la página sea: Header -> Detalle de Producto -> Footer
+      if (mainEl && modal.parentNode !== mainEl) {
+        mainEl.appendChild(modal);
+      } else if (footerEl && footerEl.parentNode && modal.parentNode === document.body) {
+        footerEl.parentNode.insertBefore(modal, footerEl);
+      }
+    }
+
+    const p = currentProduct;
+    const catLabel = getCategoryPillLabel(p);
+    const heroBadge = getHeroBadgeText(p);
+    const desc = getProductDescription(p);
+    const priceNum = parseFloat(p.price || 0);
+    const totalPrice = (priceNum * currentQty).toFixed(2);
+    const catFallback = (typeof window.getCategoryBannerFallback === 'function') 
+      ? window.getCategoryBannerFallback(p.category_id || p.category) 
+      : '/imagenes/portada/Portada1E.webp';
+    const imgSrc = p.image || catFallback;
+
+    const isDrink = isDrinkOrNoSauceItem(p);
+    const hasAccompaniments = availableAccompaniments && availableAccompaniments.length > 0;
+    const showSauces = !isDrink && p.includes_sauces === true;
+
+    const backLabelText = (window._lastActivePageView === 'category') ? 'Volver a Categorías' : 'Volver al inicio';
+
+    modal.innerHTML = `
+      <div class="product-customizer-container">
+        <div class="product-customizer-inner-wrap">
+          
+          <!-- BOTÓN VOLVER LIMPIO CON ETIQUETA DINÁMICA -->
+          <div class="product-back-bar">
+            <button type="button" class="product-nav-back-clean" onclick="closeProductDetailModal()" aria-label="Volver">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+              </svg>
+              <span id="product-nav-back-text">${backLabelText}</span>
+            </button>
+          </div>
+
+          <!-- GRID PRINCIPAL -->
+          <div class="product-detail-layout-grid">
+            
+            <!-- COLUMNA IZQUIERDA: FOTOGRAFÍA CUADRADA DEL PLATO -->
+            <div class="product-detail-left-col">
+              <div class="product-hero-card">
+                <img src="${imgSrc}" alt="${escapeHtml(p.name)}" class="product-hero-img" loading="eager" decoding="async" onerror="this.onerror=null; this.src='${catFallback}';">
+                <div class="product-hero-badge">
+                  <span>${heroBadge}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: INFORMACIÓN, PERSONALIZACIÓN Y ACCIÓN -->
+            <div class="product-detail-right-col">
+              
+              <!-- CARD INFORMACIÓN DEL PLATO -->
+              <div class="product-main-info-card">
+                <h1 class="product-main-title">${escapeHtml(p.name)}</h1>
+                <div class="product-meta-row">
+                  <span class="product-main-cat-label">CATEGORÍA: ${catLabel}</span>
+                </div>
+                <div class="product-price-wrapper">
+                  <div class="product-main-price">S/ ${priceNum.toFixed(2)}</div>
+                  <span class="product-main-unit-label">Precio unitario</span>
+                </div>
+                ${desc ? `<p class="product-main-description">${escapeHtml(desc)}</p>` : ''}
+              </div>
+
+              <!-- SECCIÓN 1: ACOMPAÑAMIENTOS E INGREDIENTES (SI APLICA) -->
+              ${hasAccompaniments ? `
+              <div class="product-section-card">
+                <div class="product-section-header">
+                  <div class="product-section-title-group">
+                    <div class="product-section-icon">🍴</div>
+                    <div>
+                      <h3 class="product-section-h3">Acompañamientos e Ingredientes</h3>
+                      <p class="product-section-subtitle">Personaliza lo que incluye tu plato</p>
+                    </div>
+                  </div>
+                  <div class="product-section-actions">
+                    <button type="button" class="preset-pill-btn teal" onclick="window.customizerSetAllAccompaniments(true)">
+                      ✓ Con todo
+                    </button>
+                    <button type="button" class="preset-pill-btn outline" onclick="window.customizerSetAllAccompaniments(false)">
+                      ↺ Quitar
+                    </button>
+                  </div>
+                </div>
+
+                <!-- LISTA DE ACOMPAÑAMIENTOS -->
+                <div class="product-items-list" id="customizer-accompaniments-list">
+                  ${renderAccompanimentsList()}
+                </div>
+              </div>
+              ` : ''}
+
+              <!-- SECCIÓN 2: CREMAS Y SALSAS DE LA CASA (SI APLICA) -->
+              ${showSauces ? `
+              <div class="product-section-card">
+                <div class="product-section-header">
+                  <div class="product-section-title-group">
+                    <div class="product-section-icon">✨</div>
+                    <div>
+                      <h3 class="product-section-h3">Cremas y Salsas de la Casa</h3>
+                      <p class="product-section-subtitle">Selecciona las cremas que deseas</p>
+                    </div>
+                  </div>
+                  <div class="product-section-actions">
+                    <button type="button" class="preset-pill-btn teal" onclick="window.customizerSetSaucesPreset('all')">
+                      ✓ Todas
+                    </button>
+                    <button type="button" class="preset-pill-btn yellow" onclick="window.customizerSetSaucesPreset('classics')">
+                      Clásicas
+                    </button>
+                    <button type="button" class="preset-pill-btn outline" onclick="window.customizerSetSaucesPreset('none')">
+                      ↺ Ninguna
+                    </button>
+                  </div>
+                </div>
+
+                <!-- LISTA DE CREMAS -->
+                <div class="product-items-list" id="customizer-sauces-list">
+                  ${renderSaucesList()}
+                </div>
+              </div>
+              ` : ''}
+
+              <!-- SECCIÓN 3: INDICACIONES ESPECIALES -->
+              <div class="product-section-card">
+                <h3 class="product-section-h3" style="margin-bottom: 10px;">${isDrink ? 'Indicaciones para tu bebida (opcional)' : 'Indicaciones especiales para la cocina (opcional)'}</h3>
+                <textarea id="customizer-kitchen-notes" class="product-notes-textarea" rows="2" placeholder="${isDrink ? 'Ej: Sin hielo, poco dulce, bien helada...' : 'Ej: Papas bien crocantes, cremas aparte en táper, pechuga bien doradita...'}"></textarea>
+                ${!isDrink ? `
+                <div class="product-allergen-note">
+                  ¿Tienes alguna alergia alimentaria? <span class="product-allergen-link" onclick="window.showAllergenInfoModal()">Ver información de alérgenos</span>
+                </div>
+                ` : ''}
+              </div>
+
+              <!-- BARRA DE ACCIÓN Y CANTIDAD -->
+              <div class="product-inline-action-bar">
+                <div class="product-sticky-inner">
+                  <!-- SELECTOR DE CANTIDAD -->
+                  <div class="product-stepper">
+                    <button type="button" class="product-stepper-btn" onclick="window.customizerChangeQty(-1)" aria-label="Disminuir cantidad">−</button>
+                    <span class="product-stepper-qty" id="customizer-qty-display">${currentQty}</span>
+                    <button type="button" class="product-stepper-btn" onclick="window.customizerChangeQty(1)" aria-label="Aumentar cantidad">+</button>
+                  </div>
+
+                  <!-- BOTÓN AGREGAR A MI PEDIDO -->
+                  <button type="button" class="product-add-cart-btn" onclick="window.customizerAddToCart()">
+                    <span>Agregar a mi pedido</span>
+                    <span id="customizer-total-price">S/ ${totalPrice}</span>
+                  </button>
+                </div>
+              </div>
+
+            </div> <!-- FIN product-detail-right-col -->
+
+          </div> <!-- FIN product-detail-layout-grid -->
+        </div> <!-- FIN product-customizer-inner-wrap -->
+      </div> <!-- FIN product-customizer-container -->
+    `;
+  }
+
+  function renderAccompanimentsList() {
+    return availableAccompaniments.map(acc => {
+      const isSelected = selectedAccompaniments.includes(acc);
+      return `
+        <div class="product-item-toggle-card ${isSelected ? 'active' : ''}" onclick="window.customizerToggleAccompaniment('${escapeHtmlAttr(acc)}')">
+          <div class="product-item-left">
+            <div class="product-item-checkbox">
+              <span class="product-item-checkbox-check">✓</span>
+            </div>
+            <span class="product-item-name">${escapeHtml(acc)}</span>
+          </div>
+          <span class="product-item-badge">${isSelected ? 'Incluido' : 'Sin esto'}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderSaucesList() {
+    return ALL_SAUCES.map(s => {
+      const isSelected = selectedSauces.includes(s.name);
+      return `
+        <div class="product-item-toggle-card ${isSelected ? 'active' : ''}" onclick="window.customizerToggleSauce('${escapeHtmlAttr(s.name)}')">
+          <div class="product-item-left">
+            <div class="product-item-checkbox">
+              <span class="product-item-checkbox-check">✓</span>
+            </div>
+            <span class="product-item-name">${escapeHtml(s.name)}</span>
+          </div>
+          <span class="product-item-badge">${isSelected ? 'Incluido' : 'Sin esto'}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Métodos de interacción en ventana
+  window.customizerToggleAccompaniment = function (name) {
+    const idx = selectedAccompaniments.indexOf(name);
+    if (idx > -1) {
+      selectedAccompaniments.splice(idx, 1);
+    } else {
+      selectedAccompaniments.push(name);
+    }
+    const container = document.getElementById('customizer-accompaniments-list');
+    if (container) container.innerHTML = renderAccompanimentsList();
+  };
+
+  window.customizerSetAllAccompaniments = function (includeAll) {
+    if (includeAll) {
+      selectedAccompaniments = [...availableAccompaniments];
+    } else {
+      selectedAccompaniments = [];
+    }
+    const container = document.getElementById('customizer-accompaniments-list');
+    if (container) container.innerHTML = renderAccompanimentsList();
+  };
+
+  window.customizerToggleSauce = function (sauceName) {
+    const idx = selectedSauces.indexOf(sauceName);
+    if (idx > -1) {
+      selectedSauces.splice(idx, 1);
+    } else {
+      selectedSauces.push(sauceName);
+    }
+    const container = document.getElementById('customizer-sauces-list');
+    if (container) container.innerHTML = renderSaucesList();
+  };
+
+  window.customizerSetSaucesPreset = function (preset) {
+    if (preset === 'all') {
+      selectedSauces = ALL_SAUCES.map(s => s.name);
+    } else if (preset === 'classics') {
+      selectedSauces = ['Mayonesa', 'Mostaza', 'Ketchup', 'Ají de Rocoto'];
+    } else if (preset === 'none') {
+      selectedSauces = [];
+    }
+    const container = document.getElementById('customizer-sauces-list');
+    if (container) container.innerHTML = renderSaucesList();
+  };
+
+  window.customizerChangeQty = function (delta) {
+    currentQty = Math.max(1, Math.min(50, currentQty + delta));
+    const qtyEl = document.getElementById('customizer-qty-display');
+    const priceEl = document.getElementById('customizer-total-price');
+    if (qtyEl) qtyEl.textContent = currentQty;
+    if (priceEl && currentProduct) {
+      const total = (parseFloat(currentProduct.price || 0) * currentQty).toFixed(2);
+      priceEl.textContent = `S/ ${total}`;
+    }
+  };
+
+  window.customizerAddToCart = function () {
+    if (!currentProduct || !window.BuchisapaCart) return;
+
+    const notesInput = document.getElementById('customizer-kitchen-notes');
+    const kitchenNotes = notesInput ? notesInput.value.trim() : '';
+
+    // Preparar descripción de acompañamientos personalizados
+    let accompanimentsSummary = '';
+    if (isDrinkOrNoSauceItem(currentProduct) || availableAccompaniments.length === 0) {
+      accompanimentsSummary = (window.BuchisapaCart && typeof window.BuchisapaCart.getDefaultAccompaniments === 'function')
+        ? window.BuchisapaCart.getDefaultAccompaniments(currentProduct)
+        : 'Bebida bien helada servida en empaque sellado para delivery';
+    } else if (selectedAccompaniments.length === availableAccompaniments.length) {
+      accompanimentsSummary = 'Con todo: ' + selectedAccompaniments.join(', ');
+    } else if (selectedAccompaniments.length === 0) {
+      accompanimentsSummary = 'Sin acompañamientos';
+    } else {
+      accompanimentsSummary = 'Solo con: ' + selectedAccompaniments.join(', ');
+    }
+
+    // Agregar al carrito
+    const saucesToPass = isDrinkOrNoSauceItem(currentProduct) ? [] : selectedSauces;
+    window.BuchisapaCart.addItem(
+      currentProduct,
+      currentQty,
+      saucesToPass,
+      kitchenNotes,
+      accompanimentsSummary
+    );
+
+    window.closeProductDetailModal();
+  };
+
+  window.showAllergenInfoModal = function () {
+    alert(
+      'ℹ️ INFORMACIÓN DE ALÉRGENOS - BUCHISAPA:\n\n' +
+      '• Gluten: Panes brioche, empanizados broaster y pastas.\n' +
+      '• Huevos: Mayonesa, tártara, juanes y hamburguesas royal.\n' +
+      '• Lácteos: Queso cheddar, queso andino y salsas de queso.\n' +
+      '• Sésamo/Ajonjolí: Panes para hamburguesas.\n' +
+      '• Pescado/Mariscos: Chilcano, palometa y salsa acevichada.\n\n' +
+      'Si tienes alguna condición alérgica severa, especifícala en las notas para cocina.'
+    );
+  };
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escapeHtmlAttr(text) {
+    if (!text) return '';
+    return String(text).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+})();
