@@ -1,0 +1,260 @@
+BUCHISAPA/
+│
+├── interfaz/
+│   │
+│   ├── LEEME.md
+│   │
+│   └── src/
+│       │
+│       ├── componentes/
+│       │   ├── carrusel-portada.html
+│       │   ├── categoria.html
+│       │   ├── encabezado.html
+│       │   ├── inicio-sesion.html
+│       │   └── pie-pagina.html
+│       │
+│       ├── paginas/
+│       │   ├── carrito.html
+│       │   ├── contacto.html
+│       │   ├── historia.html
+│       │   ├── informacion.html
+│       │   ├── nosotros.html
+│       │   ├── pago.html
+│       │   ├── politicas.html
+│       │   ├── privacidad.html
+│       │   ├── producto-detalle.html
+│       │   ├── reclamaciones.html
+│       │   ├── servicios.html
+│       │   ├── terminos.html
+│       │   ├── ubicacion.html
+│       │   ├── valores.html
+│       │   ├── valores-nutricionales.html
+│       │   └── vision.html
+│       │
+│       ├── estilos/
+│       │   ├── variables.css
+│       │   ├── responsivo.css
+│       │   ├── carrusel-portada.css
+│       │   ├── categoria.css
+│       │   ├── encabezado.css
+│       │   ├── inicio-sesion.css
+│       │   ├── pie-pagina.css
+│       │   ├── carrito.css
+│       │   ├── contacto.css
+│       │   ├── historia.css
+│       │   ├── informacion.css
+│       │   ├── nosotros.css
+│       │   ├── pago.css
+│       │   ├── politicas.css
+│       │   ├── privacidad.css
+│       │   ├── producto-detalle.css
+│       │   ├── reclamaciones.css
+│       │   ├── servicios.css
+│       │   ├── terminos.css
+│       │   ├── ubicacion.css
+│       │   ├── valores.css
+│       │   ├── valores-nutricionales.css
+│       │   └── vision.css
+│       │
+│       ├── javascript/
+│       │   ├── inicio.js
+│       │   ├── encabezado.js
+│       │   ├── inicio-sesion.js
+│       │   ├── categorias.js
+│       │   ├── carrusel-portada.js
+│       │   ├── categoria.js
+│       │   ├── carrito.js
+│       │   ├── contacto.js
+│       │   ├── informacion.js
+│       │   ├── nosotros.js
+│       │   ├── pago.js
+│       │   ├── politicas.js
+│       │   ├── privacidad.js
+│       │   ├── producto-detalle.js
+│       │   ├── reclamaciones.js
+│       │   ├── servicios.js
+│       │   ├── terminos.js
+│       │   ├── ubicacion.js
+│       │   ├── valores.js
+│       │   ├── valores-nutricionales.js
+│       │   ├── vision.js
+│       │   ├── cliente-supabase.js
+│       │   ├── horario.js
+│       │   ├── impresora.js
+│       │   ├── personalizador.js
+│       │   └── ubigeo-peru.js
+│       │
+│       ├── administracion/
+│       │   │
+│       │   ├── admin.html
+│       │   │
+│       │   ├── componentes/
+│       │   │   └── encabezado.html
+│       │   │
+│       │   ├── paginas/
+│       │   │   ├── categorias.html
+│       │   │   ├── clientes.html
+│       │   │   ├── comprobante.html
+│       │   │   ├── configuracion.html
+│       │   │   ├── insumos.html
+│       │   │   ├── panel.html
+│       │   │   ├── pedidos.html
+│       │   │   ├── portada.html
+│       │   │   ├── productos.html
+│       │   │   └── utensilios.html
+│       │   │
+│       │   ├── rutas/
+│       │   │   ├── administracion.js
+│       │   │   ├── categorias.js
+│       │   │   ├── clientes.js
+│       │   │   ├── comprobante.js
+│       │   │   ├── configuracion.js
+│       │   │   ├── encabezado.js
+│       │   │   ├── insumos.js
+│       │   │   ├── panel.js
+│       │   │   ├── pedidos.js
+│       │   │   ├── portada.js
+│       │   │   ├── productos.js
+│       │   │   └── utensilios.js
+│       │   │
+│       │   └── estilos/
+│       │       ├── categorias.css
+│       │       ├── clientes.css
+│       │       ├── comprobante.css
+│       │       ├── configuracion.css
+│       │       ├── encabezado.css
+│       │       ├── insumos.css
+│       │       ├── panel.css
+│       │       ├── pedidos.css
+│       │       ├── portada.css
+│       │       ├── productos.css
+│       │       └── utensilios.css
+│       │
+│       └── recursos/
+│           └── imagenes/
+│               │
+│               ├── administracion/
+│               │
+│               ├── logo/
+│               │
+│               ├── portada/
+│               │   ├── Portada1E.webp
+│               │   ├── Portada1M.webp
+│               │   ├── Portada2E.webp
+│               │   ├── Portada2M.webp
+│               │   ├── Portada3E.webp
+│               │   ├── Portada3M.webp
+│               │   ├── Portada4E.webp
+│               │   └── Portada4M.webp
+│               │
+│               └── categorias/
+│                   │
+│                   ├── adicionales/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   ├── alitas/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   ├── bebidas/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   ├── broaster/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   ├── hamburguesas/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   ├── infusiones/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   ├── platos-amazonicos/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   ├── promociones/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   ├── refrescos/
+│                   │   ├── banner.webp
+│                   │   └── productos/
+│                   │
+│                   └── salchipapas-y-salchibroasters/
+│                       ├── banner.webp
+│                       └── productos/
+│
+├── datos/
+│   ├── categorias.json
+│   ├── productos.json
+│   ├── acompanamientos.json
+│   └── cremas.json
+│
+├── servidor/
+│   │
+│   └── src/
+│       │
+│       ├── base-datos/
+│       │   ├── consultas.ts
+│       │   └── usuarios.ts
+│       │
+│       ├── intermediarios/
+│       │   └── autenticacion.ts
+│       │
+│       ├── servicios/
+│       │   └── verificacion-correo.ts
+│       │
+│       └── utilidades/
+│           └── supabase/
+│               ├── cliente.ts
+│               ├── intermediario.ts
+│               └── servidor.ts
+│
+├── api/
+│   └── index.ts
+│
+├── publico/
+│   ├── manifiesto.json
+│   └── trabajador-servicio.js
+│
+├── supabase/
+│   ├── config.toml
+│   └── migraciones/
+│
+├── scripts/
+│   └── compilar-html.js
+│
+├── index.html
+│
+├── servidor.ts
+│
+├── package.json
+│
+├── tsconfig.json
+│
+├── tsconfig.node.json
+│
+├── vite.config.ts
+│
+├── vercel.json
+│
+├── Dockerfile
+│
+├── .env.example
+│
+├── .gitignore
+│
+├── .dockerignore
+│
+├── LEEME.md
+│
+├── ESTRUCTURA-ADMIN.md
+│
+├── ESTRUCTURA-COMPLETA.txt
+│
+└── VERIFICACION-INICIO-SESION-ADMIN.md

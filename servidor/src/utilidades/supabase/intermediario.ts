@@ -1,0 +1,2 @@
+// Intermediario Supabase
+export {};
