@@ -1,49 +1,23 @@
-# Estructura de Administración - BUCHISAPA
+# BuchiSapa — Panel administrativo base
 
-```
-administracion/
-│
-├── admin.html
-│
-├── componentes/
-│   └── encabezado.html
-│
-├── paginas/
-│   ├── categorias.html
-│   ├── clientes.html
-│   ├── comprobante.html
-│   ├── configuracion.html
-│   ├── insumos.html
-│   ├── panel.html
-│   ├── pedidos.html
-│   ├── portada.html
-│   ├── productos.html
-│   └── utensilios.html
-│
-├── rutas/
-│   ├── administracion.js
-│   ├── categorias.js
-│   ├── clientes.js
-│   ├── comprobante.js
-│   ├── configuracion.js
-│   ├── encabezado.js
-│   ├── insumos.js
-│   ├── panel.js
-│   ├── pedidos.js
-│   ├── portada.js
-│   ├── productos.js
-│   └── utensilios.js
-│
-└── estilos/
-    ├── categorias.css
-    ├── clientes.css
-    ├── comprobante.css
-    ├── configuracion.css
-    ├── encabezado.css
-    ├── insumos.css
-    ├── panel.css
-    ├── pedidos.css
-    ├── portada.css
-    ├── productos.css
-    └── utensilios.css
-```
+## Diseño conservado
+- Dashboard: conserva únicamente su diseño visual de referencia.
+- Fondo general: imagen proporcionada por el usuario.
+- El encabezado superior del panel no queda fijo.
+
+## Módulos del panel
+1. Dashboard — con diseño base.
+2. Clientes — vacío.
+3. Productos — vacío.
+4. Categorías — vacío.
+5. Portadas — vacío.
+6. Pedidos — vacío.
+7. Ticket — vacío.
+8. Insumos — vacío.
+9. Utensilios — vacío.
+10. Configuración — vacío.
+
+Los módulos 2 al 10 no contienen tablas, formularios, tarjetas, estadísticas ni datos de presentación. Se diseñarán desde cero, uno por uno.
+
+## Datos conservados
+Los datos existentes del catálogo y sus archivos de imágenes no se eliminan. La limpieza afecta al diseño/interfaz interna del panel, no al contenido base del catálogo.

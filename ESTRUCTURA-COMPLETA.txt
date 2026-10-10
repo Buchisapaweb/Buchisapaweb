@@ -1,18 +1,97 @@
 BUCHISAPA/
-│
 ├── interfaz/
-│   │
 │   ├── LEEME.md
-│   │
 │   └── src/
-│       │
+│       ├── administracion/
+│       │   ├── administracion.html
+│       │   ├── componentes/
+│       │   │   └── encabezado.html
+│       │   ├── paginas/
+│       │   │   ├── categorias.html
+│       │   │   ├── clientes.html
+│       │   │   ├── comprobante.html
+│       │   │   ├── configuracion.html
+│       │   │   ├── insumos.html
+│       │   │   ├── panel.html
+│       │   │   ├── pedidos.html
+│       │   │   ├── portada.html
+│       │   │   ├── productos.html
+│       │   │   └── utensilios.html
+│       │   ├── rutas/
+│       │   │   ├── administracion.js
+│       │   │   ├── categorias.js
+│       │   │   ├── clientes.js
+│       │   │   ├── comprobante.js
+│       │   │   ├── configuracion.js
+│       │   │   ├── encabezado.js
+│       │   │   ├── insumos.js
+│       │   │   ├── panel.js
+│       │   │   ├── pedidos.js
+│       │   │   ├── portada.js
+│       │   │   ├── productos.js
+│       │   │   └── utensilios.js
+│       │   └── estilos/
+│       │       ├── categorias.css
+│       │       ├── clientes.css
+│       │       ├── comprobante.css
+│       │       ├── configuracion.css
+│       │       ├── encabezado.css
+│       │       ├── insumos.css
+│       │       ├── panel.css
+│       │       ├── pedidos.css
+│       │       ├── portada.css
+│       │       ├── productos.css
+│       │       └── utensilios.css
 │       ├── componentes/
 │       │   ├── carrusel-portada.html
 │       │   ├── categoria.html
 │       │   ├── encabezado.html
 │       │   ├── inicio-sesion.html
 │       │   └── pie-pagina.html
-│       │
+│       ├── estilos/
+│       │   ├── carrito.css
+│       │   ├── carrusel-portada.css
+│       │   ├── categoria.css
+│       │   ├── contacto.css
+│       │   ├── encabezado.css
+│       │   ├── historia.css
+│       │   ├── informacion.css
+│       │   ├── inicio-sesion.css
+│       │   ├── nosotros.css
+│       │   ├── pago.css
+│       │   ├── pie-pagina.css
+│       │   ├── politicas.css
+│       │   ├── privacidad.css
+│       │   ├── producto-detalle.css
+│       │   ├── reclamaciones.css
+│       │   ├── responsivo.css
+│       │   ├── servicios.css
+│       │   ├── terminos.css
+│       │   ├── ubicacion.css
+│       │   ├── valores-nutricionales.css
+│       │   ├── valores.css
+│       │   ├── variables.css
+│       │   └── vision.css
+│       ├── javascript/
+│       │   ├── carrito.js
+│       │   ├── categorias.js
+│       │   ├── cliente-supabase.js
+│       │   ├── contacto.js
+│       │   ├── encabezado.js
+│       │   ├── horario.js
+│       │   ├── impresora.js
+│       │   ├── informacion.js
+│       │   ├── inicio-sesion.js
+│       │   ├── inicio.js
+│       │   ├── nosotros.js
+│       │   ├── pago.js
+│       │   ├── personalizador.js
+│       │   ├── politicas.js
+│       │   ├── producto-detalle.js
+│       │   ├── reclamaciones.js
+│       │   ├── servicios.js
+│       │   ├── ubicacion.js
+│       │   └── ubigeo-peru.js
 │       ├── paginas/
 │       │   ├── carrito.html
 │       │   ├── contacto.html
@@ -27,116 +106,16 @@ BUCHISAPA/
 │       │   ├── servicios.html
 │       │   ├── terminos.html
 │       │   ├── ubicacion.html
-│       │   ├── valores.html
 │       │   ├── valores-nutricionales.html
+│       │   ├── valores.html
 │       │   └── vision.html
-│       │
-│       ├── estilos/
-│       │   ├── variables.css
-│       │   ├── responsivo.css
-│       │   ├── carrusel-portada.css
-│       │   ├── categoria.css
-│       │   ├── encabezado.css
-│       │   ├── inicio-sesion.css
-│       │   ├── pie-pagina.css
-│       │   ├── carrito.css
-│       │   ├── contacto.css
-│       │   ├── historia.css
-│       │   ├── informacion.css
-│       │   ├── nosotros.css
-│       │   ├── pago.css
-│       │   ├── politicas.css
-│       │   ├── privacidad.css
-│       │   ├── producto-detalle.css
-│       │   ├── reclamaciones.css
-│       │   ├── servicios.css
-│       │   ├── terminos.css
-│       │   ├── ubicacion.css
-│       │   ├── valores.css
-│       │   ├── valores-nutricionales.css
-│       │   └── vision.css
-│       │
-│       ├── javascript/
-│       │   ├── inicio.js
-│       │   ├── encabezado.js
-│       │   ├── inicio-sesion.js
-│       │   ├── categorias.js
-│       │   ├── carrusel-portada.js
-│       │   ├── categoria.js
-│       │   ├── carrito.js
-│       │   ├── contacto.js
-│       │   ├── informacion.js
-│       │   ├── nosotros.js
-│       │   ├── pago.js
-│       │   ├── politicas.js
-│       │   ├── privacidad.js
-│       │   ├── producto-detalle.js
-│       │   ├── reclamaciones.js
-│       │   ├── servicios.js
-│       │   ├── terminos.js
-│       │   ├── ubicacion.js
-│       │   ├── valores.js
-│       │   ├── valores-nutricionales.js
-│       │   ├── vision.js
-│       │   ├── cliente-supabase.js
-│       │   ├── horario.js
-│       │   ├── impresora.js
-│       │   ├── personalizador.js
-│       │   └── ubigeo-peru.js
-│       │
-│       ├── administracion/
-│       │   │
-│       │   ├── admin.html
-│       │   │
-│       │   ├── componentes/
-│       │   │   └── encabezado.html
-│       │   │
-│       │   ├── paginas/
-│       │   │   ├── categorias.html
-│       │   │   ├── clientes.html
-│       │   │   ├── comprobante.html
-│       │   │   ├── configuracion.html
-│       │   │   ├── insumos.html
-│       │   │   ├── panel.html
-│       │   │   ├── pedidos.html
-│       │   │   ├── portada.html
-│       │   │   ├── productos.html
-│       │   │   └── utensilios.html
-│       │   │
-│       │   ├── rutas/
-│       │   │   ├── administracion.js
-│       │   │   ├── categorias.js
-│       │   │   ├── clientes.js
-│       │   │   ├── comprobante.js
-│       │   │   ├── configuracion.js
-│       │   │   ├── encabezado.js
-│       │   │   ├── insumos.js
-│       │   │   ├── panel.js
-│       │   │   ├── pedidos.js
-│       │   │   ├── portada.js
-│       │   │   ├── productos.js
-│       │   │   └── utensilios.js
-│       │   │
-│       │   └── estilos/
-│       │       ├── categorias.css
-│       │       ├── clientes.css
-│       │       ├── comprobante.css
-│       │       ├── configuracion.css
-│       │       ├── encabezado.css
-│       │       ├── insumos.css
-│       │       ├── panel.css
-│       │       ├── pedidos.css
-│       │       ├── portada.css
-│       │       ├── productos.css
-│       │       └── utensilios.css
-│       │
 │       └── recursos/
 │           └── imagenes/
-│               │
 │               ├── administracion/
-│               │
+│               │   └── fondo-administracion-neon.webp
 │               ├── logo/
-│               │
+│               │   ├── logo-buchisapa.webp
+│               │   └── logo-ticket-bn.webp
 │               ├── portada/
 │               │   ├── Portada1E.webp
 │               │   ├── Portada1M.webp
@@ -146,115 +125,81 @@ BUCHISAPA/
 │               │   ├── Portada3M.webp
 │               │   ├── Portada4E.webp
 │               │   └── Portada4M.webp
-│               │
 │               └── categorias/
-│                   │
 │                   ├── adicionales/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   ├── alitas/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   ├── bebidas/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   ├── broaster/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   ├── hamburguesas/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   ├── infusiones/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   ├── platos-amazonicos/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   ├── promociones/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   ├── refrescos/
-│                   │   ├── banner.webp
-│                   │   └── productos/
-│                   │
+│                       ├── banner.webp
+│                       └── productos/
 │                   └── salchipapas-y-salchibroasters/
 │                       ├── banner.webp
 │                       └── productos/
-│
 ├── datos/
 │   ├── categorias.json
-│   ├── productos.json
-│   ├── acompanamientos.json
-│   └── cremas.json
-│
+│   └── productos.json
 ├── servidor/
-│   │
+│   ├── LEEME.md
 │   └── src/
-│       │
 │       ├── base-datos/
 │       │   ├── consultas.ts
 │       │   └── usuarios.ts
-│       │
 │       ├── intermediarios/
 │       │   └── autenticacion.ts
-│       │
 │       ├── servicios/
 │       │   └── verificacion-correo.ts
-│       │
 │       └── utilidades/
 │           └── supabase/
 │               ├── cliente.ts
-│               ├── intermediario.ts
 │               └── servidor.ts
-│
-├── api/
-│   └── index.ts
-│
 ├── publico/
 │   ├── manifiesto.json
 │   └── trabajador-servicio.js
-│
+├── api/
+│   └── index.ts
+├── scripts/
+│   ├── compilar-html.js
+│   ├── convertir-logo-blanco-negro.js
+│   └── generar-recursos.sh
 ├── supabase/
 │   ├── config.toml
-│   └── migraciones/
-│
-├── scripts/
-│   └── compilar-html.js
-│
-├── index.html
-│
+│   └── migrations/
+│       └── base-datos-buchisapa.sql
 ├── servidor.ts
-│
+├── index.html
 ├── package.json
-│
 ├── tsconfig.json
-│
 ├── tsconfig.node.json
-│
 ├── vite.config.ts
-│
 ├── vercel.json
-│
 ├── Dockerfile
-│
 ├── .env.example
-│
 ├── .gitignore
-│
 ├── .dockerignore
-│
+├── LICENSE
+├── README.md
 ├── LEEME.md
-│
 ├── ESTRUCTURA-ADMIN.md
-│
 ├── ESTRUCTURA-COMPLETA.txt
-│
 └── VERIFICACION-INICIO-SESION-ADMIN.md

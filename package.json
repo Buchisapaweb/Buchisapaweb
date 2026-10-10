@@ -1,16 +1,29 @@
 {
-  "name": "buchisapa",
+  "name": "buchisapa-restaurante",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000 --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview --port 3000 --host 0.0.0.0",
-    "lint": "node -e 'console.log(\"No lint errors\")'"
+    "desarrollo": "tsx servidor.ts",
+    "construir": "vite build && node scripts/compilar-html.js && esbuild servidor.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/servidor.cjs",
+    "iniciar": "node dist/servidor.cjs",
+    "verificar": "tsc --noEmit",
+    "dev": "tsx servidor.ts",
+    "build": "vite build && node scripts/compilar-html.js && esbuild servidor.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/servidor.cjs",
+    "start": "node dist/servidor.cjs",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "express": "^5.2.1"
   },
   "devDependencies": {
-    "typescript": "^5.4.5",
-    "vite": "^5.2.0"
+    "@types/express": "^5.0.6",
+    "esbuild": "^0.28.2",
+    "sharp": "^0.35.5",
+    "tsx": "^4.23.13",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0",
+    "@types/node": "^22.15.0"
   }
 }
