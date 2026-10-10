@@ -1,0 +1,102 @@
+[
+  {
+    "id": "AC001",
+    "name": "Papa crocante"
+  },
+  {
+    "id": "AC002",
+    "name": "Ensalada fresca"
+  },
+  {
+    "id": "AC003",
+    "name": "Arroz"
+  },
+  {
+    "id": "AC004",
+    "name": "Patacones"
+  },
+  {
+    "id": "AC005",
+    "name": "Plátano maduro"
+  },
+  {
+    "id": "AC006",
+    "name": "Cecina"
+  },
+  {
+    "id": "AC007",
+    "name": "Chorizo"
+  },
+  {
+    "id": "AC008",
+    "name": "Huevo"
+  },
+  {
+    "id": "AC009",
+    "name": "Huevo frito"
+  },
+  {
+    "id": "AC010",
+    "name": "Jamón"
+  },
+  {
+    "id": "AC011",
+    "name": "Queso"
+  },
+  {
+    "id": "AC012",
+    "name": "Queso cheddar"
+  },
+  {
+    "id": "AC013",
+    "name": "Piña"
+  },
+  {
+    "id": "AC014",
+    "name": "Carne artesanal"
+  },
+  {
+    "id": "AC015",
+    "name": "Carne casera"
+  },
+  {
+    "id": "AC016",
+    "name": "Pollo deshilachado"
+  },
+  {
+    "id": "AC017",
+    "name": "Pollo crispy"
+  },
+  {
+    "id": "AC018",
+    "name": "Tocino"
+  },
+  {
+    "id": "AC019",
+    "name": "Hamburguesa de pollo"
+  },
+  {
+    "id": "AC020",
+    "name": "Hamburguesa de chorizo"
+  },
+  {
+    "id": "AC021",
+    "name": "Aceituna"
+  },
+  {
+    "id": "AC022",
+    "name": "Yuca sancochada"
+  },
+  {
+    "id": "AC023",
+    "name": "Maduros fritos"
+  },
+  {
+    "id": "AC024",
+    "name": "Salsa criolla"
+  },
+  {
+    "id": "AC025",
+    "name": "Hamburguesa artesanal"
+  }
+]

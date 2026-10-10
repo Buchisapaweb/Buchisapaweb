@@ -1,0 +1,50 @@
+[
+  {
+    "id": "CR001",
+    "name": "Mayonesa"
+  },
+  {
+    "id": "CR002",
+    "name": "Mostaza"
+  },
+  {
+    "id": "CR003",
+    "name": "Ketchup"
+  },
+  {
+    "id": "CR004",
+    "name": "Ají de Rocoto"
+  },
+  {
+    "id": "CR005",
+    "name": "Tártara"
+  },
+  {
+    "id": "CR006",
+    "name": "Ají Charapita"
+  },
+  {
+    "id": "CR007",
+    "name": "Acevichada"
+  },
+  {
+    "id": "CR008",
+    "name": "Salsa BBQ"
+  },
+  {
+    "id": "CR009",
+    "name": "Salsa Golf"
+  },
+  {
+    "id": "CR010",
+    "name": "Ocopa"
+  },
+  {
+    "id": "CR011",
+    "name": "Aceituna"
+  },
+  {
+    "id": "CR012",
+    "name": "Vinagreta"
+  }
+]
