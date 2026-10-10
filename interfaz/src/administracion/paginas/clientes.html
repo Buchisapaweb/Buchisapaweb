@@ -1,0 +1,32 @@
+<div class="main-page-card">
+  <div class="view-header">
+    <div class="view-header-title-wrap">
+      <h2 class="view-title">Clientes Registrados</h2>
+      <p class="view-subtitle">Gestión de la base de datos de clientes, datos de contacto y frecuencia de consumo.</p>
+    </div>
+    <div class="view-actions">
+      <input type="text" id="input-search-clients" placeholder="Buscar por nombre, DNI o teléfono..." class="form-input search-input">
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Correo Electrónico</th>
+          <th>Teléfono / WhatsApp</th>
+          <th>DNI / RUC</th>
+          <th>Pedidos Realizados</th>
+        </tr>
+      </thead>
+      <tbody id="clients-page-tbody">
+        <tr>
+          <td colspan="5" class="table-empty-cell">
+            Cargando lista de clientes...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
