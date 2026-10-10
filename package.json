@@ -9,17 +9,7 @@
     "preview": "vite preview --port 3000 --host 0.0.0.0",
     "lint": "node -e 'console.log(\"No lint errors\")'"
   },
-  "dependencies": {
-    "lucide-react": "^1.54.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0"
-  },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "tailwindcss": "^4.3.3",
     "typescript": "^5.4.5",
     "vite": "^5.2.0"
   }
