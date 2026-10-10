@@ -1,0 +1,149 @@
+/* =========================================================
+   BUCHISAPA RESTAURANTE - CARRUSEL DE PORTADA (carrusel-portada.css)
+   Estilos dedicados para el componente carrusel-portada.html
+   ========================================================= */
+
+.hero-carousel-container {
+  position: relative;
+  width: calc(100% - 16px);
+  max-width: 1200px;
+  margin: 6px auto 14px;
+  border-radius: 16px;
+  background: transparent;
+  color: #f8fafc;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  aspect-ratio: 4 / 5;
+  min-height: 380px;
+  max-height: 540px;
+  transition: transform 0.3s ease;
+  contain: layout style;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  will-change: transform;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  position: relative;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  contain: layout paint;
+}
+
+.carousel-slide::before { display: none !important; }
+
+.carousel-slide-picture {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: transparent;
+}
+
+.carousel-slide-img {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  color: transparent;
+  font-size: 0;
+  background: transparent;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.carousel-arrow,
+.carousel-arrow-prev,
+.carousel-arrow-next {
+  display: none !important;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+  padding: 5px 12px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.carousel-dot.active {
+  background: #ffffff;
+  width: 22px;
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+@media (min-width: 480px) {
+  .hero-carousel-container {
+    width: calc(100% - 24px);
+    aspect-ratio: 1 / 1;
+    min-height: 400px;
+    max-height: 500px;
+    border-radius: 18px;
+  }
+}
+
+@media (min-width: 640px) {
+  .hero-carousel-container {
+    width: calc(100% - 32px);
+    margin: 8px auto 16px;
+    border-radius: 20px;
+    aspect-ratio: 16 / 9;
+    min-height: 380px;
+    max-height: 520px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-carousel-container {
+    width: 100%;
+    margin: 10px auto 16px;
+    border-radius: 24px;
+    aspect-ratio: 16 / 9;
+    min-height: 440px;
+    max-height: 560px;
+  }
+  .carousel-slide-img {
+    object-position: center 30%;
+  }
+}

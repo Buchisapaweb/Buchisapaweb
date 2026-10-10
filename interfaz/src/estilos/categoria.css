@@ -1,0 +1,213 @@
+/* =========================================================
+   BUCHISAPA RESTAURANTE - COMPONENTE DE CATEGORÍAS (categoria.css)
+   Estilos dedicados para Banners de Categorías y Vista de Platos por Categoría
+   ========================================================= */
+
+.section-title-wrap {
+  text-align: center;
+  margin: 28px 0 20px;
+}
+
+.section-kicker {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ea580c;
+  margin-bottom: 4px;
+}
+
+.section-heading {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .section-heading { font-size: 34px; }
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* GRID DE BANNERS DE CATEGORÍA */
+.desktop-category-cards-grid,
+.mobile-category-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto 32px;
+}
+
+@media (min-width: 480px) {
+  .desktop-category-cards-grid,
+  .mobile-category-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  .desktop-category-cards-grid,
+  .mobile-category-cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+
+.category-banner-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+  background-color: #0b0f19;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.category-banner-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
+}
+
+.category-banner-card:active {
+  transform: scale(0.97);
+}
+
+/* Fondos por Atributo de Datos */
+.category-banner-card[data-category="adicionales"] { background-image: url('/imagenes/categorias/adicionales/banner.webp'); }
+.category-banner-card[data-category="alitas"] { background-image: url('/imagenes/categorias/alitas/banner.webp'); }
+.category-banner-card[data-category="bebidas"] { background-image: url('/imagenes/categorias/bebidas/banner.webp'); }
+.category-banner-card[data-category="broaster"] { background-image: url('/imagenes/categorias/broaster/banner.webp'); }
+.category-banner-card[data-category="hamburguesas"] { background-image: url('/imagenes/categorias/hamburguesas/banner.webp'); }
+.category-banner-card[data-category="infusiones"] { background-image: url('/imagenes/categorias/infusiones/banner.webp'); }
+.category-banner-card[data-category="platos-amazonicos"] { background-image: url('/imagenes/categorias/platos-amazonicos/banner.webp'); }
+.category-banner-card[data-category="promociones"] { background-image: url('/imagenes/categorias/promociones/banner.webp'); }
+.category-banner-card[data-category="refrescos"] { background-image: url('/imagenes/categorias/refrescos/banner.webp'); }
+.category-banner-card[data-category="salchipapas-y-salchibroasters"] { background-image: url('/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp'); }
+
+.category-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 15, 25, 0.05) 0%, rgba(11, 15, 25, 0.4) 50%, rgba(11, 15, 25, 0.88) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.category-banner-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.3px;
+}
+
+@media (min-width: 640px) {
+  .category-banner-title { font-size: 20px; }
+}
+
+/* VISTA DE PRODUCTOS POR CATEGORÍA SELECCIONADA */
+.search-view-section {
+  padding: 16px 0;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.search-view-section.is-hidden {
+  display: none !important;
+}
+
+.search-view-header {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.search-view-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  transition: all 0.18s ease;
+}
+
+.btn-volver:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+  transform: translateX(-2px);
+}
+
+.search-view-count-badge {
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 9999px;
+}
+
+.search-view-title-wrap {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.search-view-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 4px 0;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .search-view-title { font-size: 34px; }
+}
