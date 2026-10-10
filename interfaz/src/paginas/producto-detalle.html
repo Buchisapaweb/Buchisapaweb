@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle del Plato | BuchiSapa Restaurante</title>
+  <meta name="description" content="Personaliza tu plato, selecciona tus guarniciones, cremas de la casa y ordénalo al instante en BuchiSapa Restaurante.">
+  <link rel="icon" type="image/png" href="/imagenes/logo/logo-buchisapa.webp">
+
+  <!-- Tipografías -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Estilos del Sistema y del Producto -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/producto-detalle.css">
+  <link rel="stylesheet" href="/css/responsivo.css">
+</head>
+<body class="producto-page-body">
+
+  <!-- NAVBAR DE SUBPÁGINA -->
+  <header class="subpage-navbar">
+    <div class="subpage-nav-wrap">
+      <a href="/" class="subpage-brand" title="BuchiSapa - Inicio">
+        <img src="/imagenes/logo/logo-buchisapa.webp" alt="BuchiSapa Logo" class="subpage-brand-logo">
+        <span class="subpage-brand-title">BUCHISAPA</span>
+      </a>
+      
+      <div class="subpage-nav-actions">
+        <a href="/" class="clean-back-btn" title="Volver al menú">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <span>Carta</span>
+        </a>
+        <a href="/carrito" class="clean-cart-btn" title="Ver Carrito">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span>Pedido</span>
+          <span class="clean-cart-badge" style="display: none;">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="producto-page-main">
+    
+    <!-- BREADCRUMBS -->
+    <nav class="producto-breadcrumbs" aria-label="Navegación">
+      <a href="/">Inicio</a>
+      <span class="sep">›</span>
+      <a href="/" id="bc-category">Platos</a>
+      <span class="sep">›</span>
+      <span class="current" id="bc-name">Cargando plato...</span>
+    </nav>
+
+    <!-- GRID DE DETALLE -->
+    <section class="producto-detail-grid">
+      
+      <!-- COLUMNA IZQUIERDA: IMAGEN + BADGES + COMPARTIR -->
+      <div class="producto-media-col">
+        <div class="producto-image-card">
+          <span class="producto-badge-floating" id="prod-badge-floating">Especialidad</span>
+          <img src="/imagenes/categorias/broaster/banner.webp" alt="Foto del plato" id="prod-img" class="producto-main-img">
+          <div class="producto-stock-badge">
+            <span class="producto-stock-dot" id="prod-stock-dot"></span>
+            <span id="prod-stock-text">Disponible</span>
+          </div>
+        </div>
+
+        <div class="producto-media-actions">
+          <button type="button" class="share-action-btn share-whatsapp" id="btn-share-whatsapp" title="Compartir en WhatsApp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>Compartir por WhatsApp</span>
+          </button>
+          <button type="button" class="share-action-btn" id="btn-copy-link" title="Copiar enlace">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            <span>Copiar Enlace</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA: INFORMACIÓN + PERSONALIZADOR -->
+      <div class="producto-info-col">
+        <div class="producto-header-meta">
+          <span class="producto-category-pill" id="prod-cat-pill">Pollería Gourmet</span>
+          <h1 class="producto-title" id="prod-title">Cargando...</h1>
+          
+          <div class="producto-pricing-row">
+            <span class="producto-price-current" id="prod-price-current">S/ 0.00</span>
+            <span class="producto-price-original" id="prod-price-original" style="display: none;">S/ 0.00</span>
+            <span class="producto-discount-pill" id="prod-discount-pill" style="display: none;">OFERTA</span>
+          </div>
+        </div>
+
+        <p class="producto-description" id="prod-desc">
+          Preparado al momento con ingredientes seleccionados y la auténtica sazón de BuchiSapa.
+        </p>
+
+        <!-- SPECS CHIPS -->
+        <div class="producto-specs-grid">
+          <div class="spec-chip">
+            <span class="spec-chip-icon">⏱️</span>
+            <span class="spec-chip-title">Tiempo estimado</span>
+            <span class="spec-chip-val">15 - 25 min</span>
+          </div>
+          <div class="spec-chip">
+            <span class="spec-chip-icon">🍗</span>
+            <span class="spec-chip-title">Porción</span>
+            <span class="spec-chip-val">Generosa</span>
+          </div>
+          <div class="spec-chip">
+            <span class="spec-chip-icon">🔥</span>
+            <span class="spec-chip-title">Cocción</span>
+            <span class="spec-chip-val">Recién Hecho</span>
+          </div>
+        </div>
+
+        <!-- SECCIÓN GUARNICIONES / ACOMPAÑAMIENTOS -->
+        <div class="customizer-box" id="accompaniments-box">
+          <h3 class="customizer-section-title">
+            <span>Acompañamiento Incluido</span>
+            <span class="customizer-section-badge">Elige tu guarnición</span>
+          </h3>
+          <div class="options-chips-wrap" id="options-chips-wrap">
+            <!-- Inyectado por JS -->
+          </div>
+        </div>
+
+        <!-- SECCIÓN CREMAS Y SALSAS -->
+        <div class="customizer-box" id="sauces-box">
+          <h3 class="customizer-section-title">
+            <span>Cremas & Salsas de la Casa</span>
+            <span class="customizer-section-badge">Selecciona tus preferidas</span>
+          </h3>
+          <div class="sauces-chips-wrap" id="sauces-chips-wrap">
+            <!-- Inyectado por JS -->
+          </div>
+        </div>
+
+        <!-- NOTAS ESPECIALES -->
+        <div class="customizer-box">
+          <h3 class="customizer-section-title">
+            <span>Indicaciones Especiales (Opcional)</span>
+          </h3>
+          <textarea class="notes-input-control" id="special-notes" placeholder="Ej: Sin cebolla, papas bien doradas, salsa aparte..."></textarea>
+        </div>
+
+        <!-- ACCIONES DE COMPRA -->
+        <div class="purchase-action-bar">
+          <div class="qty-stepper-box">
+            <button type="button" class="qty-step-btn" id="qty-btn-minus" aria-label="Disminuir cantidad">−</button>
+            <span class="qty-val-num" id="qty-num">1</span>
+            <button type="button" class="qty-step-btn" id="qty-btn-plus" aria-label="Aumentar cantidad">+</button>
+          </div>
+
+          <button type="button" class="btn-add-cart-primary" id="btn-add-to-cart">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span>Agregar al Pedido</span>
+            <span id="add-btn-total-text">• S/ 0.00</span>
+          </button>
+
+          <a href="#" class="btn-ws-direct-order" id="btn-ws-order" title="Pedir directo a WhatsApp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </a>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- PRODUCTOS RELACIONADOS -->
+    <section class="related-products-section">
+      <h2 class="related-section-title">
+        <span>🍗</span>
+        <span>También te puede gustar</span>
+      </h2>
+      <div class="related-grid" id="related-grid">
+        <!-- Inyectado por JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BARRA FLOTANTE MÓVIL (STICKY BUY BAR) -->
+  <div class="mobile-sticky-buy-bar">
+    <div class="mobile-bar-price-wrap">
+      <span class="mobile-bar-label">Total estimado:</span>
+      <span class="mobile-bar-price" id="mobile-bar-total">S/ 0.00</span>
+    </div>
+    <button type="button" class="mobile-bar-btn" id="btn-add-to-cart-mobile">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span>Agregar</span>
+    </button>
+  </div>
+
+  <!-- FOOTER SENCILLO -->
+  <footer class="subpage-simple-footer">
+    <p>© 2026 BuchiSapa Restaurante. Tradición y Sabor Amazónico al Carbón. Santa Clara, Ate, Lima.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/js/carrito.js"></script>
+  <script src="/js/producto-detalle.js"></script>
+</body>
+</html>
