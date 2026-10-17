@@ -4,67 +4,6 @@ import fs from 'fs';
 import crypto from 'crypto';
 import { optionalAuth, requireAuth, type AuthRequest } from './servidor/src/intermediarios/autenticacion.ts';
 
-function getCompiledIndexHtml(): string {
-  const partials: Record<string, string> = {
-    'ENCABEZADO': 'interfaz/src/componentes/encabezado.html',
-    'CARRUSEL_PORTADA': 'interfaz/src/componentes/carrusel-portada.html',
-    'CATEGORIA': 'interfaz/src/componentes/categoria.html',
-    'LOGIN': 'interfaz/src/componentes/inicio-sesion.html',
-    'PIE_PAGINA': 'interfaz/src/componentes/pie-pagina.html'
-  };
-
-  let template = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');
-  for (const [key, filePath] of Object.entries(partials)) {
-    const absPath = path.join(process.cwd(), filePath);
-    if (fs.existsSync(absPath)) {
-      const content = fs.readFileSync(absPath, 'utf8');
-      template = template.replace(new RegExp(`<!-- PARTIAL: ${key} -->`, 'g'), content);
-    }
-  }
-  const runtimeConfigScript = `
-  <script>
-    window.SUPABASE_URL = ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ckgvgfpcxeqyilfphnsu.supabase.co')};
-    window.SUPABASE_ANON_KEY = ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M')};
-    window.GOOGLE_CLIENT_ID = ${JSON.stringify(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '953347930157-111mqqngt4hq55dgco230jk1bvcba8fa.apps.googleusercontent.com')};
-  </script>
-  `;
-  template = template.replace('</head>', `${runtimeConfigScript}</head>`);
-  return template;
-}
-
-function getCompiledAdminHtml(): string {
-  const partials: Record<string, string> = {
-    'ENCABEZADO': 'interfaz/src/administracion/componentes/encabezado.html',
-    'VIEW_DASHBOARD': 'interfaz/src/administracion/paginas/panel.html',
-    'VIEW_CLIENTES': 'interfaz/src/administracion/paginas/clientes.html',
-    'VIEW_PRODUCTOS': 'interfaz/src/administracion/paginas/productos.html',
-    'VIEW_CATEGORIAS': 'interfaz/src/administracion/paginas/categorias.html',
-    'VIEW_PORTADA': 'interfaz/src/administracion/paginas/portada.html',
-    'VIEW_PEDIDOS': 'interfaz/src/administracion/paginas/pedidos.html',
-    'VIEW_TICKET': 'interfaz/src/administracion/paginas/comprobante.html',
-    'VIEW_INSUMOS': 'interfaz/src/administracion/paginas/insumos.html',
-    'VIEW_UTENSILIOS': 'interfaz/src/administracion/paginas/utensilios.html',
-    'VIEW_CONFIGURACION': 'interfaz/src/administracion/paginas/configuracion.html'
-  };
-
-  let template = fs.readFileSync(path.join(process.cwd(), 'interfaz/src/administracion/administracion.html'), 'utf8');
-  for (const [key, filePath] of Object.entries(partials)) {
-    const absPath = path.join(process.cwd(), filePath);
-    if (fs.existsSync(absPath)) {
-      const content = fs.readFileSync(absPath, 'utf8');
-      template = template.replace(new RegExp(`<!-- PARTIAL: ${key} -->`, 'g'), content);
-    }
-  }
-  const runtimeConfigScript = `
-  <script>
-    window.SUPABASE_URL = ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ckgvgfpcxeqyilfphnsu.supabase.co')};
-    window.SUPABASE_ANON_KEY = ${JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_XLQDJByokKbI5m0UVkJHEw_KRTygH9M')};
-    window.GOOGLE_CLIENT_ID = ${JSON.stringify(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '953347930157-111mqqngt4hq55dgco230jk1bvcba8fa.apps.googleusercontent.com')};
-  </script>
-  `;
-  template = template.replace('</head>', `${runtimeConfigScript}</head>`);
-  return template;
-}
 import { sendVerificationEmail, verifyCode } from './servidor/src/servicios/verificacion-correo.ts';
 import {
   getOrCreateUser,
@@ -2767,9 +2706,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   };
 
   // 2. Archivos de imágenes generales con caché optimizada
+  app.use('/imagenes', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
   app.use('/imagenes', express.static(path.join(process.cwd(), 'interfaz/src/recursos/imagenes'), imageStaticOptions));
-  app.use('/images', express.static(path.join(process.cwd(), 'interfaz/src/recursos/imagenes'), imageStaticOptions));
-  app.use('/img', express.static(path.join(process.cwd(), 'interfaz/src/recursos/imagenes'), imageStaticOptions));
+  app.use('/images', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
+  app.use('/img', express.static(path.join(process.cwd(), 'public/imagenes'), imageStaticOptions));
   app.use('/publico/imagenes', express.static(path.join(process.cwd(), 'interfaz/src/recursos/imagenes'), imageStaticOptions));
   app.use(encodeURI('/público/imágenes'), express.static(path.join(process.cwd(), 'interfaz/src/recursos/imagenes'), imageStaticOptions));
 
@@ -2790,127 +2730,47 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use('/scripts', express.static(path.join(process.cwd(), 'interfaz/src/javascript'), staticOptions));
   app.use('/scripts', express.static(path.join(process.cwd(), 'dist/js'), staticOptions));
 
-  // 3. Panel de Administración Oficial BuchiSapa (Servido directo desde interfaz/src/administracion/)
-  app.get(['/admin', '/admin.html', /^\/admin(?:\/.*)?$/], (req: Request, res: Response, next) => {
-    if (path.extname(req.path)) return next();
-
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.send(getCompiledAdminHtml());
-  });
-
-  app.use('/admin', express.static(path.join(process.cwd(), 'interfaz/src/administracion'), { ...staticOptions, index: false }));
-
-  // 4. Archivos estáticos de css, js, html y raíz pública (index: false para que '/' siempre pase por el render compilado de partials)
-  app.use(express.static(path.join(process.cwd(), 'publico'), { ...staticOptions, index: false }));
-  app.use('/publico', express.static(path.join(process.cwd(), 'publico'), { ...staticOptions, index: false }));
-  app.use(express.static(path.join(process.cwd(), 'dist'), { ...staticOptions, index: false }));
-
-  app.get(['/reclamaciones', '/reclamaciones.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/reclamaciones.html'));
-  });
-
-  app.get(['/nosotros', '/nosotros.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/nosotros.html'));
-  });
-
-  app.get(['/historia', '/historia.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/historia.html'));
-  });
-
-  app.get(['/vision', '/vision.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/vision.html'));
-  });
-
-  app.get(['/valores', '/valores.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/valores.html'));
-  });
-
-  app.get(['/servicios', '/servicios.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/servicios.html'));
-  });
-
-  app.get(['/producto', '/producto.html', '/producto-detalle'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/producto-detalle.html'));
-  });
-
-  app.get(['/producto-detalle', '/producto-detalle.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/producto-detalle.html'));
-  });
-
-  app.get(['/checkout', '/checkout.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/pago.html'));
-  });
-
-  app.get(['/reservas', '/reservas.html', '/catering', '/catering.html', '/giftcards', '/giftcards.html'], (_req: Request, res: Response) => {
-    res.redirect(301, '/servicios');
-  });
-
-  app.get(['/informacion', '/informacion.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/informacion.html'));
-  });
-
-  app.get(['/valores-nutricionales', '/valores-nutricionales.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/valores-nutricionales.html'));
-  });
-
-  app.get(['/politicas', '/politicas.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/politicas.html'));
-  });
-
-  app.get(['/politicas-privacidad', '/politicas-privacidad.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/privacidad.html'));
-  });
-
-  app.get(['/terminos', '/terminos.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/terminos.html'));
-  });
-
-  app.get(['/contactanos', '/contactanos.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/contacto.html'));
-  });
-
-  app.get(['/restaurantes', '/restaurantes.html', '/cartilla-alergenos', '/cartilla-alergenos.html', '/trabaja', '/trabaja.html', '/proveedores', '/proveedores.html'], (_req: Request, res: Response) => {
-    res.redirect('/');
-  });
-
-  app.get(['/ubicacion', '/ubicacion.html'], (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'interfaz/src/paginas/ubicacion.html'));
-  });
-
-  // 3. Página de Inicio (HTML5 con parciales compilados)
-  app.get(['/', '/index.html'], (_req: Request, res: Response) => {
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.send(getCompiledIndexHtml());
-  });
-
-  // Fallback a index.html para SPA/rutas directas
-  app.get(/.*/, (req: Request, res: Response) => {
-    if (path.extname(req.path) || req.path.startsWith('/js/') || req.path.startsWith('/css/') || req.path.startsWith('/api/') || req.path.startsWith('/admin/')) {
-      return res.status(404).send('404 Not Found');
-    }
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.send(getCompiledIndexHtml());
-  });
+  // Servir archivos estáticos generados por la compilación de Vite
+  app.use(express.static(path.join(process.cwd(), 'dist')));
 
   const isServerless = Boolean(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
-  if (!isServerless) {
-    try {
-      app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server running on http://0.0.0.0:${PORT}`);
-      });
-    } catch (e) {
-      console.warn('Could not bind to port:', e);
+  async function startServer() {
+    if (process.env.NODE_ENV !== 'production' && !isServerless) {
+      try {
+        const { createServer: createViteServer } = await import('vite');
+        const vite = await createViteServer({
+          server: { middlewareMode: true },
+          appType: 'spa',
+        });
+        app.use(vite.middlewares);
+      } catch (err) {
+        console.warn('Vite middleware initialization notice:', err);
+      }
+    }
+
+    // Fallback a index.html para la aplicación React SPA
+    app.get(/.*/, (_req: Request, res: Response) => {
+      const distIndex = path.join(process.cwd(), 'dist/index.html');
+      const rootIndex = path.join(process.cwd(), 'index.html');
+      if (fs.existsSync(distIndex)) {
+        res.sendFile(distIndex);
+      } else {
+        res.sendFile(rootIndex);
+      }
+    });
+
+    if (!isServerless) {
+      try {
+        app.listen(PORT, '0.0.0.0', () => {
+          console.log(`Server running on http://0.0.0.0:${PORT}`);
+        });
+      } catch (e) {
+        console.warn('Could not bind to port:', e);
+      }
     }
   }
 
-export default app;
+  startServer();
+
+  export default app;

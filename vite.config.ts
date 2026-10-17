@@ -1,13 +1,16 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
-// Configuración de Vite para servir HTML5, CSS y JavaScript sin React/TSX
+// Configuración de Vite para la aplicación React de BuchiSapa
 export default defineConfig({
+  plugins: [react(), tailwindcss()],
   server: {
     host: '0.0.0.0',
     port: 3000,
     allowedHosts: true,
   },
   build: {
-    target: ['es2015', 'chrome60', 'edge79', 'firefox60', 'safari12'],
+    outDir: 'dist',
   },
-})
+});
