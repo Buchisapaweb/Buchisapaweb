@@ -1,40 +1,56 @@
-<!-- Carrusel de Foto de Portada Oficial BuchiSapa -->
-<section id="seccion-portada" class="seccion-portada">
-  <div class="contenedor-portada">
-    <div class="carrusel-marco">
-      <!-- Diapositivas de portada -->
-      <div class="diapositiva activa" data-indice="0">
-        <picture>
-          <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada1M.webp" type="image/webp">
-          <img src="/imagenes/portada/Portada1E.webp" alt="Pollo a la Brasa BuchiSapa" class="imagen-portada" />
-        </picture>
-      </div>
-      <div class="diapositiva" data-indice="1">
-        <picture>
-          <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada2M.webp" type="image/webp">
-          <img src="/imagenes/portada/Portada2E.webp" alt="Sabor Amazónico y Tradición" class="imagen-portada" />
-        </picture>
-      </div>
-      <div class="diapositiva" data-indice="2">
-        <picture>
-          <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada3M.webp" type="image/webp">
-          <img src="/imagenes/portada/Portada3E.webp" alt="Broaster Crujiente y Alitas" class="imagen-portada" />
-        </picture>
-      </div>
-      <div class="diapositiva" data-indice="3">
-        <picture>
-          <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada4M.webp" type="image/webp">
-          <img src="/imagenes/portada/Portada4E.webp" alt="Hamburguesas y Promociones Nocturnas" class="imagen-portada" />
-        </picture>
-      </div>
-
-      <!-- Indicadores de diapositiva -->
-      <div class="indicadores-portada">
-        <button class="indicador activo" data-slide="0" aria-label="Portada 1"></button>
-        <button class="indicador" data-slide="1" aria-label="Portada 2"></button>
-        <button class="indicador" data-slide="2" aria-label="Portada 3"></button>
-        <button class="indicador" data-slide="3" aria-label="Portada 4"></button>
-      </div>
+<!-- HERO SLIDER / CAROUSEL BANNERS (CARGA WEBP Y LAZY LOADING INTELIGENTE) -->
+<section class="hero-carousel-container" aria-label="Banners de Portada BuchiSapa" aria-roledescription="carrusel" tabindex="0">
+  <div class="carousel-track" id="hero-carousel-track">
+    
+    <!-- SLIDE 1: BROASTER -->
+    <div class="carousel-slide active">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada1M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada1E.webp">
+        <img src="/imagenes/portada/Portada1E.webp" alt="Portada Pollo Broaster BuchiSapa" class="carousel-slide-img" loading="eager" fetchpriority="high" decoding="async">
+      </picture>
     </div>
+
+    <!-- SLIDE 2: PLATOS AMAZÓNICOS -->
+    <div class="carousel-slide">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada2M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada2E.webp">
+        <img src="/imagenes/portada/Portada2E.webp" alt="Portada Platos Amazónicos BuchiSapa" class="carousel-slide-img" loading="eager" decoding="async">
+      </picture>
+    </div>
+
+    <!-- SLIDE 3: HAMBURGUESAS -->
+    <div class="carousel-slide">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada3M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada3E.webp">
+        <img src="/imagenes/portada/Portada3E.webp" alt="Portada Hamburguesas BuchiSapa" class="carousel-slide-img" loading="lazy" decoding="async">
+      </picture>
+    </div>
+
+    <!-- SLIDE 4: HAMBURGUESA AMAZÓNICA -->
+    <div class="carousel-slide">
+      <picture class="carousel-slide-picture">
+        <source media="(max-width: 640px)" srcset="/imagenes/portada/Portada4M.webp">
+        <source media="(min-width: 641px)" srcset="/imagenes/portada/Portada4E.webp">
+        <img src="/imagenes/portada/Portada4E.webp" alt="Portada Hamburguesa Amazónica BuchiSapa" class="carousel-slide-img" loading="lazy" decoding="async">
+      </picture>
+    </div>
+
+
+
   </div>
+
+  <button class="carousel-arrow carousel-arrow-prev" type="button" data-carousel-prev aria-label="Portada anterior">&#10094;</button>
+  <button class="carousel-arrow carousel-arrow-next" type="button" data-carousel-next aria-label="Portada siguiente">&#10095;</button>
+
+  <!-- Indicadores accesibles y anuncio para lectores de pantalla -->
+  <div class="carousel-dots" id="carousel-dots-container" aria-label="Seleccionar portada">
+    <button class="carousel-dot active" type="button" data-slide="0" aria-label="Ir a portada 1" aria-current="true"></button>
+    <button class="carousel-dot" type="button" data-slide="1" aria-label="Ir a portada 2" aria-current="false"></button>
+    <button class="carousel-dot" type="button" data-slide="2" aria-label="Ir a portada 3" aria-current="false"></button>
+    <button class="carousel-dot" type="button" data-slide="3" aria-label="Ir a portada 4" aria-current="false"></button>
+  </div>
+  <span class="carousel-status" aria-live="polite" aria-atomic="true"></span>
 </section>

@@ -1,133 +1,100 @@
-<!-- Sección de Categorías con Imágenes Oficiales BuchiSapa -->
-<section id="seccion-categorias" class="seccion-categorias">
-  <div class="contenedor-categorias">
-    <div class="encabezado-seccion-categorias">
-      <span class="subtitulo-seccion">NUESTRA CARTA</span>
-      <h1 class="titulo-seccion">Explora por Categorías</h1>
-      <p class="descripcion-seccion">Selecciona una categoría para ver los platos, combos y promociones disponibles.</p>
+<!-- SECCIÓN DE RESULTADOS DE BÚSQUEDA Y VISTA DE CATEGORÍAS -->
+<div id="search-results-section" class="search-view-section is-hidden">
+  <div class="search-view-header">
+    <div class="search-view-header-bar">
+      <button class="btn-volver" id="btn-exit-search" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        <span>Volver a Categorías</span>
+      </button>
+      <span id="search-view-count" class="search-view-count-badge"></span>
     </div>
-
-    <!-- Rejilla con las imágenes de cada categoría -->
-    <div class="cuadricula-categorias" id="contenedor-tarjetas-categorias">
-      <!-- 1. Adicionales -->
-      <article class="tarjeta-categoria" data-id="C0001">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/adicionales/banner.webp" alt="Adicionales" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">ADICIONALES</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 2. Alitas -->
-      <article class="tarjeta-categoria" data-id="C0002">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/alitas/banner.webp" alt="Alitas" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">ALITAS</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 3. Bebidas -->
-      <article class="tarjeta-categoria" data-id="C0003">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/bebidas/banner.webp" alt="Bebidas" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">BEBIDAS</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 4. Broaster -->
-      <article class="tarjeta-categoria" data-id="C0004">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/broaster/banner.webp" alt="Broaster" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">BROASTER</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 5. Hamburguesas -->
-      <article class="tarjeta-categoria" data-id="C0005">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/hamburguesas/banner.webp" alt="Hamburguesas" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">HAMBURGUESAS</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 6. Infusiones -->
-      <article class="tarjeta-categoria" data-id="C0006">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/infusiones/banner.webp" alt="Infusiones" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">INFUSIONES</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 7. Platos Amazónicos -->
-      <article class="tarjeta-categoria" data-id="C0007">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/platos-amazonicos/banner.webp" alt="Platos Amazónicos" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">PLATOS AMAZÓNICOS</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 8. Promociones -->
-      <article class="tarjeta-categoria" data-id="C0008">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/promociones/banner.webp" alt="Promociones" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">PROMOCIONES</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 9. Refrescos -->
-      <article class="tarjeta-categoria" data-id="C0009">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/refrescos/banner.webp" alt="Refrescos" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">REFRESCOS</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- 10. Salchipapas y Salchibroasters -->
-      <article class="tarjeta-categoria" data-id="C0010">
-        <div class="imagen-contenedor">
-          <img src="/imagenes/categorias/salchipapas-y-salchibroasters/banner.webp" alt="Salchipapas y Salchibroasters" class="imagen-categoria" loading="lazy" />
-          <div class="superposicion-gradiente"></div>
-          <div class="contenido-tarjeta">
-            <h3 class="nombre-categoria">SALCHIPAPAS Y SALCHIBROASTERS</h3>
-            <span class="cantidad-platos">Ver platillos →</span>
-          </div>
-        </div>
-      </article>
+    <div class="search-view-title-wrap">
+      <span class="section-kicker">CARTA BUCHISAPA</span>
+      <h2 id="search-view-title" class="search-view-title">Resultados</h2>
+      <p id="search-view-subtitle" class="section-subtitle">Selecciona tus platos favoritos y personalízalos a tu gusto.</p>
     </div>
   </div>
-</section>
+  <div id="search-view-list" class="buchisapa-cards-list"></div>
+</div>
+
+<!-- ENCABEZADO DE SECCIÓN PRINCIPAL -->
+<div class="section-title-wrap" id="main-section-title-wrap">
+  <span class="section-kicker">NUESTRA CARTA</span>
+  <h2 class="section-heading">Explora por Categorías</h2>
+  <p class="section-subtitle">Selecciona una categoría para ver los platos, combos y promociones disponibles.</p>
+</div>
+
+<!-- SECCIÓN DE BANNERS DE TODAS LAS CATEGORÍAS (GRID RESPONSIVO) -->
+<div id="category-banners-section" class="mobile-category-cards-grid desktop-category-cards-grid">
+  
+  <!-- 1. ADICIONALES -->
+  <div class="category-banner-card" data-category="adicionales" data-title="ADICIONALES" title="Adicionales">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">ADICIONALES</h2>
+    </div>
+  </div>
+
+  <!-- 2. ALITAS -->
+  <div class="category-banner-card" data-category="alitas" data-title="ALITAS" title="Alitas Broaster & BBQ">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">ALITAS</h2>
+    </div>
+  </div>
+
+  <!-- 3. BEBIDAS -->
+  <div class="category-banner-card" data-category="bebidas" data-title="BEBIDAS" title="Bebidas Frías">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">BEBIDAS</h2>
+    </div>
+  </div>
+
+  <!-- 4. BROASTER -->
+  <div class="category-banner-card" data-category="broaster" data-title="BROASTER" title="Pollo Broaster Crujiente">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">BROASTER</h2>
+    </div>
+  </div>
+
+  <!-- 5. HAMBURGUESAS -->
+  <div class="category-banner-card" data-category="hamburguesas" data-title="HAMBURGUESAS" title="Hamburguesas BuchiSapa">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">HAMBURGUESAS</h2>
+    </div>
+  </div>
+
+  <!-- 6. INFUSIONES -->
+  <div class="category-banner-card" data-category="infusiones" data-title="INFUSIONES" title="Infusiones y Calientes">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">INFUSIONES</h2>
+    </div>
+  </div>
+
+  <!-- 7. PLATOS AMAZÓNICOS -->
+  <div class="category-banner-card" data-category="platos-amazonicos" data-title="PLATOS AMAZÓNICOS" title="Platos Amazónicos BuchiSapa">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">PLATOS AMAZÓNICOS</h2>
+    </div>
+  </div>
+
+  <!-- 8. PROMOCIONES -->
+  <div class="category-banner-card" data-category="promociones" data-title="PROMOCIONES" title="Promociones">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">PROMOCIONES</h2>
+    </div>
+  </div>
+
+  <!-- 9. REFRESCOS -->
+  <div class="category-banner-card" data-category="refrescos" data-title="REFRESCOS" title="Refrescos Naturales Amazónicos">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">REFRESCOS</h2>
+    </div>
+  </div>
+
+  <!-- 10. SALCHIPAPAS Y SALCHIBROASTERS -->
+  <div class="category-banner-card" data-category="salchipapas-y-salchibroasters" data-title="SALCHIPAPAS Y SALCHIBROASTERS" title="Salchipapas y Salchibroasters">
+    <div class="category-banner-overlay">
+      <h2 class="category-banner-title">SALCHIPAPAS Y SALCHIBROASTERS</h2>
+    </div>
+  </div>
+
+</div>
