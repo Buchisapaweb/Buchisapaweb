@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finalizar Pedido | BuchiSapa Restaurante</title>
+  <meta name="description" content="Confirma tus datos de entrega, elige método de pago y completa tu pedido en BuchiSapa.">
+  <link rel="icon" type="image/png" href="/imagenes/logo/logo-buchisapa.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/pago.css">
+  <link rel="stylesheet" href="/css/responsivo.css">
+</head>
+<body class="info-page-body">
+
+  <header class="subpage-navbar">
+    <div class="subpage-nav-wrap">
+      <a href="/" class="subpage-brand" title="BuchiSapa - Inicio">
+        <img src="/imagenes/logo/logo-buchisapa.webp" alt="BuchiSapa Logo" class="subpage-brand-logo">
+        <span class="subpage-brand-title">BUCHISAPA</span>
+      </a>
+      <a href="/carrito" class="clean-back-btn" title="Volver al carrito">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        <span>Volver al Carrito</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="checkout-page-main">
+    <article class="checkout-page-card">
+      
+      <div class="checkout-header-row">
+        <div class="checkout-header-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div>
+          <h1 class="checkout-main-title">Finalizar y Confirmar Pedido</h1>
+          <span class="cart-main-badge">DATOS DE ENTREGA Y PAGO SEGURO</span>
+        </div>
+      </div>
+
+      <form id="checkout-main-form" onsubmit="handleCheckoutSubmit(event)">
+        <div class="checkout-grid-layout">
+          
+          <!-- COLUMNA IZQUIERDA: DATOS DE CONTACTO Y DIRECCIÓN -->
+          <div class="checkout-form-column">
+            
+            <div class="checkout-section-block">
+              <h2 class="checkout-block-title">
+                <span>👤</span> 1. Datos del Cliente
+              </h2>
+              <div class="checkout-form-grid two-cols">
+                <div class="form-group">
+                  <label class="form-label">Nombre completo*</label>
+                  <input type="text" id="chk-name" class="checkout-input-field" placeholder="Ej: Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Teléfono celular*</label>
+                  <input type="tel" id="chk-phone" class="checkout-input-field" placeholder="942 475 459" maxlength="9" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Correo electrónico (para recibo)*</label>
+                <input type="email" id="chk-email" class="checkout-input-field" placeholder="tu@email.com" required>
+              </div>
+            </div>
+
+            <div class="checkout-section-block">
+              <h2 class="checkout-block-title">
+                <span>📍</span> 2. Dirección de Entrega / Recojo
+              </h2>
+              <div class="form-group">
+                <label class="form-label">Dirección exacta (Calle, Av, Número)*</label>
+                <input type="text" id="chk-address" class="checkout-input-field" placeholder="Ej: Av. La Estrella 123, Santa Clara" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Referencia para el repartidor</label>
+                <input type="text" id="chk-reference" class="checkout-input-field" placeholder="Ej: Frente al parque central, casa de 2 pisos">
+              </div>
+            </div>
+
+            <div class="checkout-section-block">
+              <h2 class="checkout-block-title">
+                <span>💳</span> 3. Método de Pago
+              </h2>
+              <div class="payment-methods-grid">
+                <div class="payment-method-card active" onclick="selectPaymentMethod('yape', this)">
+                  <span style="font-size: 24px;">📱</span>
+                  <span class="payment-method-name">Yape / Plin</span>
+                </div>
+                <div class="payment-method-card" onclick="selectPaymentMethod('tarjeta', this)">
+                  <span style="font-size: 24px;">💳</span>
+                  <span class="payment-method-name">Tarjeta Débito/Crédito</span>
+                </div>
+                <div class="payment-method-card" onclick="selectPaymentMethod('efectivo', this)">
+                  <span style="font-size: 24px;">💵</span>
+                  <span class="payment-method-name">Efectivo contra entrega</span>
+                </div>
+              </div>
+              <input type="hidden" id="chk-payment-method" value="yape">
+            </div>
+
+          </div>
+
+          <!-- COLUMNA DERECHA: RESUMEN DE COMPRA Y BOTÓN DE CONFIRMACIÓN -->
+          <div class="checkout-sidebar-column">
+            <div class="cart-summary-box">
+              <h3 class="summary-title">Resumen de tu Pedido</h3>
+              <div id="checkout-summary-items-list" style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Carga dinámica de items del carrito -->
+              </div>
+              <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 4px 0;">
+              <div class="summary-line-row">
+                <span>Subtotal</span>
+                <span id="chk-subtotal-val">S/ 0.00</span>
+              </div>
+              <div class="summary-line-row">
+                <span>Costo de Delivery</span>
+                <span id="chk-delivery-val">S/ 5.00</span>
+              </div>
+              <div class="summary-line-row total-line">
+                <span>Total a Pagar</span>
+                <span class="total-price" id="chk-total-val">S/ 0.00</span>
+              </div>
+
+              <button type="submit" class="btn-submit-order-final">
+                <span>🍗 CONFIRMAR Y ENVIAR PEDIDO</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+    </article>
+  </main>
+
+  <footer class="info-footer">
+    <div class="container">
+      © 2026 Restaurante BuchiSapa. Todos los derechos reservados.
+    </div>
+  </footer>
+
+  <script src="/js/cliente-supabase.js"></script>
+  <script src="/js/carrito.js"></script>
+  <script src="/js/pago.js"></script>
+</body>
+</html>
