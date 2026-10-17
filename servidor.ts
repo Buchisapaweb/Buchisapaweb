@@ -2766,7 +2766,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     maxAge: 30 * 24 * 60 * 60 * 1000,
     immutable: true,
   }));
-  app.use(express.static(path.join(process.cwd(), 'dist'), { index: false }));
+  // Rutas limpias para páginas estáticas, incluido el panel administrativo.
+  app.get(['/admin', '/administracion'], (_req: Request, res: Response) => {
+    res.sendFile(path.join(process.cwd(), 'dist', 'admin.html'));
+  });
+  app.use(express.static(path.join(process.cwd(), 'dist'), { index: false, extensions: ['html'] }));
 
   process.on('uncaughtException', (err: any) => {
     if (err?.code === 'EADDRINUSE' || err?.message?.includes('WebSocket') || err?.message?.includes('24678')) {
