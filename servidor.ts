@@ -2766,7 +2766,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     maxAge: 30 * 24 * 60 * 60 * 1000,
     immutable: true,
   }));
-  app.use(express.static(path.join(process.cwd(), 'dist')));
+  app.use(express.static(path.join(process.cwd(), 'dist'), { index: false }));
 
   process.on('uncaughtException', (err: any) => {
     if (err?.code === 'EADDRINUSE' || err?.message?.includes('WebSocket') || err?.message?.includes('24678')) {
@@ -2795,25 +2795,35 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       }
     }
 
-    // Fallback a index.html para la aplicación React SPA
-    app.get(/.*/, async (req: Request, res: Response, next) => {
-      if (req.path.startsWith('/api')) return next();
-      try {
-        const distIndex = path.join(process.cwd(), 'dist/index.html');
-        if (fs.existsSync(distIndex)) {
-          return res.sendFile(distIndex);
-        }
-        if (viteServer && process.env.NODE_ENV !== 'production') {
-          const rootIndex = path.join(process.cwd(), 'index.html');
-          const template = fs.readFileSync(rootIndex, 'utf-8');
-          const html = await viteServer.transformIndexHtml(req.originalUrl, template);
-          return res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
-        }
-        return res.sendFile(path.join(process.cwd(), 'index.html'));
-      } catch (e) {
-        next(e);
-      }
-    });
+function armarHtmlCompleto(): string {
+  const rootIndex = path.join(process.cwd(), 'index.html');
+  if (!fs.existsSync(rootIndex)) return '<html><body>Index no encontrado</body></html>';
+  let html = fs.readFileSync(rootIndex, 'utf-8');
+
+  const leerComponente = (nombre: string) => {
+    const p = path.join(process.cwd(), 'interfaz/src/componentes', nombre);
+    return fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : '';
+  };
+
+  html = html.replace('<!-- PARTIAL: ENCABEZADO -->', leerComponente('encabezado.html'));
+  html = html.replace('<!-- PARTIAL: CARRUSEL_PORTADA -->', leerComponente('carrusel-portada.html'));
+  html = html.replace('<!-- PARTIAL: CATEGORIA -->', leerComponente('categoria.html'));
+  html = html.replace('<!-- PARTIAL: LOGIN -->', leerComponente('inicio-sesion.html'));
+  html = html.replace('<!-- PARTIAL: PIE_PAGINA -->', leerComponente('pie-pagina.html'));
+
+  return html;
+}
+
+  // Servir página principal armada dinámicamente con sus componentes
+  app.get(/.*/, async (req: Request, res: Response, next) => {
+    if (req.path.startsWith('/api')) return next();
+    try {
+      const htmlCompleto = armarHtmlCompleto();
+      return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).send(htmlCompleto);
+    } catch (e) {
+      next(e);
+    }
+  });
 
     if (!isServerless) {
       try {
