@@ -1,45 +1,28 @@
-<div class="main-page-card">
+<section class="main-page-card">
   <div class="view-header">
     <div class="view-header-title-wrap">
-      <h2 class="view-title">Control de Insumos e Inventario</h2>
-      <p class="view-subtitle">Gestión de ingredientes, stock mínimo de cocina y alertas de reposición.</p>
+      <h2 class="view-title">Resumen del negocio</h2>
+      <p class="view-subtitle">Indicadores generales y pedidos recientes de BuchiSapa.</p>
     </div>
   </div>
-
+  <div class="dashboard-kpi-grid">
+    <article class="kpi-card"><span class="kpi-label">Clientes</span><strong id="kpi-val-clientes">—</strong></article>
+    <article class="kpi-card"><span class="kpi-label">Productos</span><strong id="kpi-val-productos">—</strong></article>
+    <article class="kpi-card"><span class="kpi-label">Pedidos</span><strong id="kpi-val-pedidos">—</strong></article>
+    <article class="kpi-card"><span class="kpi-label">Categorías</span><strong id="kpi-val-categorias">—</strong></article>
+    <article class="kpi-card"><span class="kpi-label">Ventas registradas</span><strong id="kpi-val-ventas">—</strong></article>
+    <article class="kpi-card"><span class="kpi-label">Ticket promedio</span><strong id="kpi-val-ticket">—</strong></article>
+  </div>
+  <div class="view-header dashboard-section-heading">
+    <div class="view-header-title-wrap">
+      <h3 class="view-title">Pedidos recientes</h3>
+      <p class="view-subtitle">Los últimos pedidos registrados por el sistema.</p>
+    </div>
+  </div>
   <div class="table-responsive">
     <table class="table-custom">
-      <thead>
-        <tr>
-          <th>Insumo</th>
-          <th>Unidad</th>
-          <th>Stock Actual</th>
-          <th>Stock Mínimo</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Carne Molida Especial</strong></td>
-          <td>Kg</td>
-          <td>45.0</td>
-          <td>15.0</td>
-          <td><span class="badge badge-success">OK</span></td>
-        </tr>
-        <tr>
-          <td><strong>Papas Amarillas</strong></td>
-          <td>Kg</td>
-          <td>80.0</td>
-          <td>25.0</td>
-          <td><span class="badge badge-success">OK</span></td>
-        </tr>
-        <tr>
-          <td><strong>Aceite Vegetal</strong></td>
-          <td>Litros</td>
-          <td>12.0</td>
-          <td>20.0</td>
-          <td><span class="badge badge-warning">REPOSICIÓN</span></td>
-        </tr>
-      </tbody>
+      <thead><tr><th>Pedido</th><th>Cliente</th><th>Detalle</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
+      <tbody id="dash-orders-tbody"><tr><td colspan="6" class="table-empty-cell">Cargando pedidos…</td></tr></tbody>
     </table>
   </div>
-</div>
+</section>
