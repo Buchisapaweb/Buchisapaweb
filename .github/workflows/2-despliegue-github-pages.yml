@@ -1,8 +1,8 @@
-name: 2. Despliegue en GitHub Pages
+name: "2. Despliegue Automático en GitHub Pages"
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 permissions:
@@ -11,39 +11,39 @@ permissions:
   id-token: write
 
 concurrency:
-  group: 'pages'
-  cancel-in-progress: false
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  despliegue:
+  despliegue-publicacion:
+    name: "Publicar Sitio Web en GitHub Pages"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Descargar repositorio
+      - name: "1. Descargar Código Fuente"
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js
+      - name: "2. Configurar Entorno Node.js (v20)"
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
-      - name: Instalar dependencias
-        run: npm ci || npm install
+      - name: "3. Instalar Dependencias"
+        run: npm install
 
-      - name: Construir proyecto
+      - name: "4. Compilar Aplicación Completa"
         run: npm run build
 
-      - name: Configurar GitHub Pages
+      - name: "5. Configurar GitHub Pages"
         uses: actions/configure-pages@v4
 
-      - name: Subir artefacto de Pages
+      - name: "6. Empaquetar Artefacto de Publicación"
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: dist/
 
-      - name: Desplegar en GitHub Pages
+      - name: "7. Publicar Sitio Web Oficial"
         id: deployment
         uses: actions/deploy-pages@v4
