@@ -1,0 +1,3 @@
+/* Estilos de la página Carrito. La base informativa se reutiliza sin duplicar reglas. */
+@import './informacion.css';
+/* Reglas específicas del carrito */

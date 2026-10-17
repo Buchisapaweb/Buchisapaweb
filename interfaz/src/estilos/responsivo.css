@@ -1,0 +1,202 @@
+/* =========================================================
+   BUCHISAPA RESTAURANTE - ADAPTABILIDAD Y RESPONSIVO (responsivo.css)
+   Media queries consolidadas por breakpoint para cero duplicidades.
+   ========================================================= */
+
+/* --- BREAKPOINT 1: MÓVILES PEQUEÑOS Y DISPOSITIVOS TÁCTILES (<= 768px) --- */
+@media (max-width: 768px) {
+  /* Scrollbar nativa limpia en móviles */
+  ::-webkit-scrollbar,
+  *::-webkit-scrollbar,
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+    background: transparent !important;
+  }
+  
+  html, body, * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  /* Visibilidad móvil */
+  .desktop-only { display: none !important; }
+  .mobile-only { display: inline-flex !important; }
+
+
+  /* Modales en móvil */
+  #login-modal.modal-backdrop {
+    z-index: 99999 !important;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-y: contain !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .otp-modal-box {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    min-height: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+    touch-action: pan-y !important;
+    z-index: 100000 !important;
+    background: #ffffff !important;
+  }
+
+  .otp-modal-header { position: sticky !important; top: 0 !important; flex-shrink: 0 !important; background: #ffffff !important; z-index: 100 !important; }
+  .auth-window-topbar { position: static !important; top: auto !important; flex-shrink: 0 !important; background: transparent !important; z-index: auto !important; }
+  #auth-view-profile { flex: 1 0 auto !important; overflow: visible !important; touch-action: pan-y !important; padding: 0 0 40px !important; }
+
+  .mobile-sticky-buy-bar {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
+
+/* --- BREAKPOINT 2: PANTALLAS COMPACTAS Y PHABLETS (>= 480px) --- */
+@media (min-width: 480px) {
+  .desktop-category-cards-grid,
+  .mobile-category-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px;
+  }
+
+  .hero-carousel-container {
+    width: calc(100% - 24px);
+    aspect-ratio: 1 / 1;
+    min-height: 400px;
+    max-height: 500px;
+    border-radius: 18px;
+  }
+
+  .category-banner-title { font-size: 22px; }
+
+  .options-chips-wrap {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- BREAKPOINT 3: TABLETS Y PANTALLAS MEDIANAS (>= 640px) --- */
+@media (min-width: 640px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .section-heading { font-size: 32px; }
+  .category-banner-title { font-size: 20px; }
+
+  .hero-carousel-container {
+    width: calc(100% - 32px);
+    margin: 8px auto 16px;
+    border-radius: 20px;
+    aspect-ratio: 16 / 9;
+    min-height: 380px;
+    max-height: 520px;
+  }
+
+  .category-banner-card { border-radius: 22px; }
+  .category-banner-overlay { padding: 22px 20px; }
+  .producto-title { font-size: 32px; }
+}
+
+/* --- BREAKPOINT 4: DESKTOP Y TABLET HORIZONTAL (>= 768px) --- */
+@media (min-width: 768px) {
+  .section-heading { font-size: 34px; }
+  .search-view-title { font-size: 34px; }
+
+  .desktop-category-cards-grid,
+  .mobile-category-cards-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 16px;
+  }
+
+  .buchisapa-cards-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 20px !important;
+  }
+
+
+
+  /* Footer responsivo */
+  .footer-accordion-item { border-bottom: none; width: auto; }
+  .footer-accordion-header { cursor: default; padding: 0 0 16px 0; pointer-events: none; justify-content: center; text-align: center; }
+  .footer-accordion-body { padding: 0; gap: 10px; align-items: center; text-align: center; }
+  .footer-reclamaciones-col { margin-top: 0; align-items: center; text-align: center; }
+  .footer-phone-callout { text-align: center; align-items: center; }
+  .footer-bottom-bar-desktop { flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+
+  .related-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+}
+
+/* --- BREAKPOINT 5: PANTALLAS GRANDES Y MONITORES (>= 1024px) --- */
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 28px;
+  }
+
+  .desktop-only { display: inline-flex !important; }
+  .mobile-only { display: none !important; }
+
+  .buchisapa-cards-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 24px !important;
+  }
+
+
+  .hero-carousel-container {
+    width: 100%;
+    margin: 10px auto 16px;
+    border-radius: 24px;
+    aspect-ratio: 16 / 9;
+    min-height: 440px;
+    max-height: 560px;
+  }
+
+  .carousel-slide-img { object-position: center 30%; }
+  .category-banner-card { border-radius: 24px; }
+  .category-banner-overlay { padding: 24px 20px; }
+  .category-banner-title { font-size: 20px; }
+
+  .footer-content-wrap { padding: 0 32px; }
+  .footer-columns-grid {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px 52px;
+    margin-bottom: 36px;
+    max-width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+}
+
+/* --- BREAKPOINT 6: PANTALLAS WIDESCREEN (>= 1366px) --- */
+@media (min-width: 1366px) {
+
+  .category-banner-title { font-size: 22px; }
+}

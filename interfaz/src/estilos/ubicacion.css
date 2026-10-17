@@ -1,0 +1,189 @@
+/* =========================================================
+   BUCHISAPA RESTAURANTE - UBICACIÓN Y MAPA EN TIEMPO REAL (ubicacion.css)
+   Estilos dedicados para la página /ubicacion y el modal #location-modal
+   ========================================================= */
+
+/* --- 1. HEADER DE UBICACIÓN MÓVIL / APP --- */
+.app-loc-header {
+  background: #ffffff;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.app-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #0f172a;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.app-header-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-logo-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #dc2626;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.app-logo-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.app-header-title { font-size: 15px; font-weight: 900; color: #0f172a; }
+.app-header-status { font-size: 11px; font-weight: 700; color: #16a34a; display: flex; align-items: center; gap: 4px; }
+.pulse-dot { width: 7px; height: 7px; background: #16a34a; border-radius: 50%; display: inline-block; }
+
+/* --- 2. LAYOUT Y CONTENEDOR PRINCIPAL --- */
+.loc-main-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 16px;
+  gap: 16px;
+}
+
+@media (min-width: 860px) {
+  .loc-main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    padding: 28px 20px;
+    gap: 28px;
+  }
+}
+
+/* Tarjeta del Mapa Interactive Leaflet */
+.loc-map-container-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.loc-map-frame-box {
+  width: 100%;
+  height: clamp(280px, 45vh, 420px);
+  position: relative;
+  background: #e2e8f0;
+}
+
+/* Formulario de Ubicación y Botones */
+.loc-details-form-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.loc-form-title { font-size: 18px; font-weight: 900; color: #0f172a; margin: 0; }
+.loc-form-sub { font-size: 13px; color: #64748b; margin: 0; }
+
+.loc-input-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.loc-input-field-group label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.loc-input-text {
+  width: 100%;
+  height: 44px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.loc-input-text:focus {
+  background: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.btn-confirm-loc-main {
+  width: 100%;
+  height: 50px;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.28);
+  transition: all 0.18s ease;
+}
+.btn-confirm-loc-main:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* --- 3. ESTILOS DEL MODAL DE UBICACIÓN (#location-modal) --- */
+.loc-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 16px;
+}
+
+.loc-header-left { display: flex; align-items: center; gap: 10px; }
+.loc-header-pin-icon { width: 38px; height: 38px; border-radius: 12px; background: #fef2f2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.loc-modal-title { font-size: 16px; font-weight: 800; color: #0f172a; margin: 0; }
+.loc-modal-subtitle { font-size: 12px; color: #64748b; margin: 2px 0 0; }
+
+.loc-modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: none;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loc-modal-close-btn:hover { background: #fee2e2; color: #dc2626; }

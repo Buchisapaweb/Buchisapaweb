@@ -1,0 +1,289 @@
+/* =========================================================
+   BUCHISAPA RESTAURANTE - PÁGINA DE DETALLE DE PRODUCTO (producto.css)
+   Estilos optimizados para /producto, /producto-detalle y Personalizador
+   ========================================================= */
+
+/* --- 1. LAYOUT PRINCIPAL DEL DETALLE DE PRODUCTO --- */
+.producto-page-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 36px) clamp(12px, 2vw, 24px);
+  width: 100%;
+}
+
+.producto-detail-grid {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  padding: clamp(16px, 3vw, 32px);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(20px, 3vw, 40px);
+}
+
+
+
+/* Galería de Imágenes del Producto */
+.producto-media-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 80px;
+}
+
+.producto-image-card {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #f8fafc;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05);
+}
+
+.producto-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.producto-main-img:hover { transform: scale(1.03); }
+
+/* --- 2. INFORMACIÓN Y SELECCIONABLES DEL PRODUCTO --- */
+.producto-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.producto-category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #fff1f2;
+  border: 1px solid #ffe4e6;
+  color: #dc2626;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: fit-content;
+}
+
+.producto-title {
+  font-size: clamp(22px, 3.5vw, 32px);
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.producto-description {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.producto-pricing-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.producto-price-current {
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 900;
+  color: #dc2626;
+}
+
+.producto-price-original {
+  font-size: 16px;
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-weight: 600;
+}
+
+/* --- 3. GRUPOS DE OPCIONES / ADICIONALES / GUARNICIONES --- */
+.customizer-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.customizer-section-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.options-chips-wrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.option-chip-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.option-chip-item:hover,
+.option-chip-item.selected {
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* --- 4. BARRA DE COMPRA Y CANTIDADES --- */
+.purchase-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.qty-stepper-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 4px 10px;
+}
+
+.qty-step-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.qty-step-btn:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+
+.qty-val-num {
+  font-size: 16px;
+  font-weight: 900;
+  color: #0f172a;
+  min-width: 24px;
+  text-align: center;
+}
+
+.btn-add-cart-primary {
+  flex: 1;
+  height: 52px;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+  transition: all 0.18s ease;
+}
+.btn-add-cart-primary:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+}
+
+/* --- 5. SECCIÓN DE RELACIONADOS --- */
+.related-products-section {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.related-section-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+
+/* Estructura real de la página */
+.producto-page-main { max-width: 1280px; margin: 0 auto; padding: clamp(16px, 3vw, 36px) clamp(12px, 2vw, 24px); width: 100%; }
+.producto-detail-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(24px,4vw,48px); align-items:start; }
+.producto-image-card { width:100%; aspect-ratio:4/3; border-radius:20px; overflow:hidden; background:#f8fafc; position:relative; box-shadow:inset 0 0 0 1px rgba(15,23,42,.05); }
+.producto-media-col { display:flex; flex-direction:column; gap:12px; position:sticky; top:80px; }
+.producto-info-col { display:flex; flex-direction:column; gap:16px; }
+.producto-category-pill { display:inline-flex; align-items:center; width:max-content; padding:5px 12px; background:#fff1f2; border:1px solid #ffe4e6; color:#dc2626; border-radius:9999px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; }
+.producto-pricing-row { display:flex; align-items:baseline; gap:10px; margin:8px 0; }
+.producto-price-current { font-size:clamp(24px,4vw,32px); font-weight:900; color:#dc2626; }
+.producto-price-original { font-size:16px; color:#94a3b8; text-decoration:line-through; font-weight:600; }
+.customizer-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+.customizer-section-title { font-size:14px; font-weight:800; color:#0f172a; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0; }
+.customizer-section-badge { font-size:11px; font-weight:700; color:#64748b; }
+.options-chips-wrap,.sauces-chips-wrap { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; }
+.purchase-action-bar { display:flex; align-items:center; gap:14px; margin-top:12px; padding-top:16px; border-top:1px solid #f1f5f9; }
+.qty-stepper-box { display:inline-flex; align-items:center; gap:10px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:9999px; padding:4px 10px; }
+.qty-step-btn { width:32px; height:32px; border-radius:50%; background:#fff; border:1px solid #cbd5e1; font-size:16px; font-weight:800; color:#0f172a; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.qty-val-num { font-size:16px; font-weight:900; color:#0f172a; min-width:24px; text-align:center; }
+.btn-add-cart-primary { flex:1; min-height:52px; background:#dc2626; color:#fff; border:none; border-radius:9999px; font-size:16px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 16px rgba(220,38,38,.3); }
+.btn-ws-direct-order { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#16a34a; color:#fff; text-decoration:none; }
+.producto-media-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.share-action-btn { border:1px solid #e2e8f0; background:#fff; border-radius:12px; padding:10px 14px; cursor:pointer; display:inline-flex; gap:8px; align-items:center; font-weight:700; }
+.producto-stock-badge { position:absolute; left:12px; bottom:12px; background:rgba(255,255,255,.94); padding:7px 10px; border-radius:999px; display:flex; align-items:center; gap:7px; font-size:12px; font-weight:800; }
+.producto-stock-dot { width:8px; height:8px; border-radius:50%; background:#10b981; }
+.producto-badge-floating { position:absolute; top:12px; left:12px; z-index:2; background:#dc2626; color:#fff; padding:7px 10px; border-radius:999px; font-size:11px; font-weight:800; }
+.producto-breadcrumbs { display:flex; gap:8px; align-items:center; margin-bottom:20px; font-size:13px; color:#64748b; }
+.producto-breadcrumbs a { color:#dc2626; text-decoration:none; }
+.notes-input-control { width:100%; min-height:90px; resize:vertical; border:1px solid #cbd5e1; border-radius:12px; padding:12px; font:inherit; }
+.mobile-sticky-buy-bar { display:none; }
+@media (max-width: 820px) {
+  .producto-detail-grid { grid-template-columns:1fr; }
+  .producto-media-col { position:static; }
+  .purchase-action-bar { flex-wrap:wrap; }
+  .btn-add-cart-primary { min-width:220px; }
+  .mobile-sticky-buy-bar { position:fixed; left:12px; right:12px; bottom:12px; z-index:1000; display:flex; justify-content:space-between; align-items:center; gap:12px; background:#fff; border:1px solid #e2e8f0; border-radius:18px; padding:10px 12px; box-shadow:0 12px 30px rgba(15,23,42,.16); }
+  .mobile-bar-price-wrap { display:flex; flex-direction:column; }
+  .mobile-bar-label { font-size:11px; color:#64748b; }
+  .mobile-bar-price { font-size:18px; font-weight:900; color:#dc2626; }
+  .mobile-bar-btn { border:0; border-radius:12px; background:#dc2626; color:#fff; padding:12px 16px; font-weight:800; display:flex; align-items:center; gap:8px; }
+}
