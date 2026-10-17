@@ -1226,7 +1226,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       const configuredSbUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
       const isConfiguredSupabase = Boolean(
         configuredSbUrl &&
-        !configuredSbUrl.includes('ckgvgfpcxeqyilfphnsu') &&
+        configuredSbUrl.startsWith('https://') &&
         !configuredSbUrl.includes('example.com')
       );
 
