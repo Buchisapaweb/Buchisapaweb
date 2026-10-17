@@ -69,7 +69,7 @@ const PORT = 3000;
 // Nunca se confía únicamente en localStorage para permitir el acceso al panel.
 const ADMIN_SESSION_COOKIE = 'buchisapa_admin_session';
 const ADMIN_SESSION_TTL_MS = 8 * 60 * 60 * 1000;
-const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || 'buchisapa-admin-session-secret-change-in-production';
+const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'buchisapa-local-development-only-secret');
 
 function base64UrlEncode(value: string): string {
   return Buffer.from(value, 'utf8').toString('base64url');
@@ -81,12 +81,14 @@ function base64UrlDecode(value: string): string {
 
 function signAdminSession(payload: Record<string, unknown>): string {
   const encoded = base64UrlEncode(JSON.stringify(payload));
+  if (!ADMIN_SESSION_SECRET) throw new Error('Falta configurar ADMIN_SESSION_SECRET en el entorno de producción.');
   const signature = crypto.createHmac('sha256', ADMIN_SESSION_SECRET).update(encoded).digest('base64url');
   return `${encoded}.${signature}`;
 }
 
 function verifyAdminSession(token: string): any | null {
   try {
+    if (!ADMIN_SESSION_SECRET) return null;
     const [encoded, signature] = String(token || '').split('.');
     if (!encoded || !signature) return null;
     const expected = crypto.createHmac('sha256', ADMIN_SESSION_SECRET).update(encoded).digest('base64url');
@@ -94,7 +96,7 @@ function verifyAdminSession(token: string): any | null {
     const b = Buffer.from(expected);
     if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
     const payload = JSON.parse(base64UrlDecode(encoded));
-    if (payload.role !== 'admin' || !payload.sub || !payload.exp || Date.now() >= Number(payload.exp)) return null;
+    if (payload.role !== 'admin' || String(payload.email || '').trim().toLowerCase() !== 'buchisapaweb@gmail.com' || !payload.sub || !payload.exp || Date.now() >= Number(payload.exp)) return null;
     return payload;
   } catch {
     return null;
@@ -119,10 +121,9 @@ function setAdminSessionCookie(res: Response, user: any) {
     iat: Date.now(),
     exp: Date.now() + ADMIN_SESSION_TTL_MS,
   });
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
   res.setHeader('Set-Cookie', [
-    `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; SameSite=Lax; Max-Age=${Math.floor(ADMIN_SESSION_TTL_MS / 1000)}`,
-    `buchisapa_admin_user=${encodeURIComponent(user.email || 'admin')}; Path=/; SameSite=Lax; Max-Age=${Math.floor(ADMIN_SESSION_TTL_MS / 1000)}`,
-    `buchisapa_admin_token=${encodeURIComponent(token)}; Path=/; SameSite=Lax; Max-Age=${Math.floor(ADMIN_SESSION_TTL_MS / 1000)}`
+    `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${Math.floor(ADMIN_SESSION_TTL_MS / 1000)}${secure}`
   ]);
 }
 
@@ -1216,14 +1217,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
       const emailLower = (email || '').toLowerCase().trim();
       const passClean = (password || '').trim();
 
-      const adminEmails = ['buchisapaweb@gmail.com', 'nexaltustecsac@gmail.com', 'admin@buchisapa.pe'];
-      const isKnownAdminEmail = adminEmails.includes(emailLower) || 
-                                emailLower.includes('admin') || 
-                                emailLower.startsWith('adm') || 
-                                emailLower === '70000001' || 
-                                emailLower === 'buchisapa' || 
-                                emailLower === 'admin1' ||
-                                emailLower.startsWith('c0');
+      // El rol administrativo se concede únicamente a la cuenta oficial autorizada.
+      const isKnownAdminEmail = emailLower === 'buchisapaweb@gmail.com';
 
       // 1. Intentar autenticar primero contra Supabase Auth si se ha configurado una URL válida
       let supabaseUser: any = null;
@@ -1303,45 +1298,21 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
         });
       }
 
-      // 2. Fallback para cuentas locales y administradores registrados
-      let localUser = await getUserByEmail(emailLower);
-      if (!localUser && isKnownAdminEmail) {
-        localUser = {
-          id: `admin_${Date.now()}`,
-          uid: `admin_${Date.now()}`,
-          email: emailLower.includes('@') ? emailLower : `${emailLower}@buchisapa.pe`,
-          name: 'Administrador BuchiSapa',
-          firstName: 'Administrador',
-          lastName: 'BuchiSapa',
-          phone: '942 475 459',
-          docType: 'DNI',
-          docNumber: '70000001',
-          role: 'admin',
-          isAdmin: true,
-          emailVerified: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        await registerCustomer(localUser);
+      // La cuenta administrativa debe validarse con Supabase Auth; no se aceptan claves predeterminadas locales.
+      if (isKnownAdminEmail) {
+        return res.status(401).json({ success: false, error: 'No se pudo validar la cuenta administrativa con Supabase Auth. Verifica la configuración del servidor.' });
       }
 
+      // Fallback local únicamente para cuentas de cliente; nunca puede otorgar privilegios administrativos.
+      const localUser = await getUserByEmail(emailLower);
       if (!localUser) {
         return res.status(401).json({ success: false, error: 'Correo o contraseña incorrectos.' });
       }
-
-      // Validar contraseña rigurosamente para administradores y usuarios
-      const validAdminPasswords = ['BuchiSapa2026*', 'buchisapa2026', 'admin123', 'admin2026', '123456', 'admin'];
-      if (isKnownAdminEmail) {
-        const matchesStored = localUser.password && localUser.password === passClean;
-        const matchesDefault = validAdminPasswords.includes(passClean);
-        if (!matchesStored && !matchesDefault) {
-          return res.status(401).json({ success: false, error: 'Correo o contraseña incorrectos.' });
-        }
-      } else if (localUser.password && localUser.password !== passClean && passClean !== '') {
+      if (localUser.password && localUser.password !== passClean) {
         return res.status(401).json({ success: false, error: 'Correo o contraseña incorrectos.' });
       }
 
-      const isAdminUser = localUser.role === 'admin' || localUser.isAdmin === true || isKnownAdminEmail;
+      const isAdminUser = false;
       if (isAdminUser) {
         setAdminSessionCookie(res, localUser);
         return res.json({
@@ -1370,58 +1341,27 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     }
   });
 
-  // Verificación de rol de administrador en Supabase y sesión
+  // Verificar autorización administrativa mediante token Supabase válido o cookie firmada.
   app.post(['/api/auth/verify-admin', '/api/verify-admin'], async (req: Request, res: Response) => {
     try {
-      const { email, token } = req.body || {};
       const authHeader = req.headers.authorization;
-      const authToken = authHeader ? authHeader.replace(/^Bearer\s+/i, '').trim() : (token || '');
-      const emailClean = (email || '').trim().toLowerCase();
+      const authToken = authHeader ? authHeader.replace(/^Bearer\s+/i, '').trim() : String(req.body?.token || '');
+      const cookieSession = verifyAdminSession(getCookie(req, ADMIN_SESSION_COOKIE) || '');
+      if (cookieSession) return res.json({ success: true, isAdmin: true, user: cookieSession });
 
-      // 1. Verificar contra Supabase Auth si se ha configurado una URL válida
       const configuredSbUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-      const isConfiguredSupabase = Boolean(
-        configuredSbUrl &&
-        !configuredSbUrl.includes('ckgvgfpcxeqyilfphnsu') &&
-        !configuredSbUrl.includes('example.com')
-      );
-
-      if (isConfiguredSupabase && authToken && authToken.startsWith('ey')) {
-        try {
-          const sbKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || '';
-          const sbRes = await fetch(`${configuredSbUrl}/auth/v1/user`, {
-            headers: {
-              'apikey': sbKey,
-              'Authorization': `Bearer ${authToken}`
-            }
-          });
-          if (sbRes.ok) {
-            const sbUser: any = await sbRes.json();
-            const isAdmin = (sbUser.email || '').trim().toLowerCase() === 'buchisapaweb@gmail.com';
-            return res.json({ success: true, isAdmin, user: sbUser });
-          }
-        } catch {
-          // Continuar con verificación local
+      const sbKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+      if (configuredSbUrl && sbKey && authToken) {
+        const sbRes = await fetch(`${configuredSbUrl}/auth/v1/user`, {
+          headers: { apikey: sbKey, Authorization: `Bearer ${authToken}` }
+        });
+        if (sbRes.ok) {
+          const sbUser: any = await sbRes.json();
+          const isAdmin = String(sbUser.email || '').trim().toLowerCase() === 'buchisapaweb@gmail.com';
+          return res.json({ success: true, isAdmin, user: isAdmin ? sbUser : undefined });
         }
       }
-
-      // 2. Verificar por correo electrónico registrado
-      const ADMIN_EMAILS = ['buchisapaweb@gmail.com'];
-      if (emailClean) {
-        const user = await getUserByEmail(emailClean);
-        const isAdmin = Boolean(
-          (user && (user.role === 'admin' || user.isAdmin === true)) ||
-          ADMIN_EMAILS.includes(emailClean)
-        );
-        return res.json({ success: true, isAdmin, user });
-      }
-
-      // 3. Tokens locales válidos de sesión de administrador
-      if (authToken && (authToken.startsWith('admin-token-') || authToken.includes('admin'))) {
-        return res.json({ success: true, isAdmin: true });
-      }
-
-      return res.status(403).json({ success: false, isAdmin: false, error: 'No autorizado' });
+      return res.status(401).json({ success: false, isAdmin: false, error: 'No autorizado' });
     } catch (error: any) {
       res.status(500).json({ success: false, isAdmin: false, error: error.message || 'Error al verificar rol' });
     }
@@ -1435,55 +1375,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
     res.json({ success: true });
   });
 
-  // Verificación de sesión administrativa para el interfaz (Cookie, Header o Query)
+  // Verificar exclusivamente la cookie de sesión firmada que emite el servidor tras el login.
   app.all(['/api/auth/admin-session', '/auth/admin-session', '/api/admin-session'], (req: Request, res: Response) => {
-    const rawToken = req.headers['x-admin-token'] || 
-                     req.headers['authorization']?.replace(/^Bearer\s+/i, '') || 
-                     req.query.token || 
-                     req.body?.token || 
-                     getCookie(req, ADMIN_SESSION_COOKIE) || 
-                     getCookie(req, 'buchisapa_admin_token') ||
-                     '';
-    
-    const userBody = req.body?.user || req.body?.session || null;
-    const cookieUser = getCookie(req, 'buchisapa_admin_user');
-    
-    let session = verifyAdminSession(String(rawToken));
-    
-    if (!session) {
-      const tokenStr = String(rawToken || '').toLowerCase();
-      const adminEmails = ['buchisapaweb@gmail.com', 'nexaltustecsac@gmail.com', 'admin@buchisapa.pe'];
-      const bodyEmail = (userBody?.email || '').toLowerCase().trim();
-      const bodyRole = userBody?.role || (userBody?.isAdmin ? 'admin' : '');
-      const isKnownEmail = adminEmails.includes(bodyEmail) || bodyEmail.includes('admin') || (cookieUser && adminEmails.includes(cookieUser.toLowerCase()));
-
-      if (
-        tokenStr.startsWith('admin-token-') || 
-        tokenStr.includes('admin') || 
-        tokenStr.startsWith('token-') ||
-        tokenStr.startsWith('ey') ||
-        bodyRole === 'admin' ||
-        isKnownEmail
-      ) {
-        session = {
-          role: 'admin',
-          email: userBody?.email || cookieUser || 'buchisapaweb@gmail.com',
-          name: userBody?.name || 'Administrador BuchiSapa',
-          sub: userBody?.id || userBody?.uid || 'admin-buchisapa',
-          isAdmin: true
-        };
-      }
-    }
-
-    if (!session) {
+    const session = verifyAdminSession(getCookie(req, ADMIN_SESSION_COOKIE) || '');
+    if (!session || String(session.email || '').trim().toLowerCase() !== 'buchisapaweb@gmail.com') {
       return res.status(401).json({ success: false, isAdmin: false, error: 'No autorizado' });
     }
-
-    try {
-      setAdminSessionCookie(res, session);
-    } catch (e) {}
-
-    res.json({ success: true, isAdmin: true, user: session, session });
+    return res.json({ success: true, isAdmin: true, user: session, session });
   });
 
   app.post('/api/auth/send-verification-code', async (req: Request, res: Response) => {
