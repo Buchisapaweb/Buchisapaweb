@@ -18,58 +18,30 @@
     },
 
     verifyAdminAuth: async function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const queryToken = urlParams.get('token');
-      if (queryToken) {
-        localStorage.setItem('buchisapa_admin_token', queryToken);
-        sessionStorage.setItem('buchisapa_admin_token', queryToken);
-      }
-
-      const storedToken = localStorage.getItem('buchisapa_admin_token') || 
-                          sessionStorage.getItem('buchisapa_admin_token') ||
-                          queryToken;
-      
-      const rawSession = localStorage.getItem('buchisapa_admin_session') || 
-                         sessionStorage.getItem('buchisapa_admin_session');
-
-      let parsedUser = null;
-      if (rawSession) {
-        try { parsedUser = JSON.parse(rawSession); } catch (e) {}
-      }
-
-      const hasLocalAdmin = Boolean(
-        storedToken ||
-        (parsedUser && (parsedUser.isAdmin || parsedUser.role === 'admin' || (parsedUser.email && parsedUser.email.toLowerCase().includes('admin'))))
-      );
-
-      if (!hasLocalAdmin && !storedToken) {
-        window.location.replace('/index.html?login=admin');
-        return false;
-      }
-
       try {
+        // La autorización depende de la cookie HttpOnly firmada por el servidor.
+        // No se confía en tokens, roles ni correos guardados en el navegador.
         const res = await fetch('/api/auth/admin-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-admin-token': storedToken || '',
-            'Authorization': storedToken ? `Bearer ${storedToken}` : ''
-          },
-          body: JSON.stringify({ token: storedToken, user: parsedUser })
+          method: 'GET',
+          credentials: 'same-origin',
+          headers: { Accept: 'application/json' }
         });
-        
-        if (res.ok) {
-          const data = await res.json().catch(() => null);
-          if (data && data.user) {
-            localStorage.setItem('buchisapa_admin_session', JSON.stringify(data.user));
-          }
+        const data = await res.json().catch(() => null);
+        const email = String(data?.user?.email || '').trim().toLowerCase();
+        if (res.ok && data?.success === true && data?.isAdmin === true && email === 'buchisapaweb@gmail.com') {
+          localStorage.setItem('buchisapa_admin_session', JSON.stringify(data.user));
+          return true;
         }
       } catch (err) {
-        console.warn('Verificación remota de sesión completada con respaldo local:', err);
+        console.warn('No se pudo verificar la sesión administrativa.', err);
       }
 
-      // Si tenemos sesión de administrador confirmada localmente, permitir acceso continuo
-      return true;
+      localStorage.removeItem('buchisapa_admin_token');
+      localStorage.removeItem('buchisapa_admin_session');
+      sessionStorage.removeItem('buchisapa_admin_token');
+      sessionStorage.removeItem('buchisapa_admin_session');
+      window.location.replace('/index.html?login=admin');
+      return false;
     },
 
     bindNavigation: function () {
