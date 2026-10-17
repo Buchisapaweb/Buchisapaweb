@@ -200,3 +200,101 @@
 
   .category-banner-title { font-size: 22px; }
 }
+
+
+/* --- Referencia visual móvil: cabecera compacta, hero alto y carta centrada --- */
+@media (max-width: 639px) {
+  .site-header { box-shadow: none !important; border-bottom: 1px solid #f1f5f9; }
+  .header-nav {
+    height: 76px;
+    min-height: 76px;
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .header-left { gap: 10px; }
+  .nav-toggle-btn { width: 42px; height: 42px; }
+  .nav-toggle-btn svg { width: 30px; height: 30px; }
+  .brand-logo-img { width: 62px; height: 62px; max-width: 62px; }
+  .location-picker-inline {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    justify-content: flex-start;
+    gap: 7px;
+    padding: 7px 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    overflow: hidden;
+  }
+  .location-pin-icon { width: 24px; height: 24px; }
+  .location-text-red {
+    display: block;
+    min-width: 0;
+    max-width: 155px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(14px, 4vw, 20px);
+    font-weight: 800;
+  }
+  .location-arrow-svg { width: 14px; height: 14px; }
+  .header-actions { gap: 12px; margin-left: 0; }
+  #header-search-btn {
+    display: inline-flex !important;
+    width: 40px;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  #header-search-btn svg { width: 32px; height: 32px; }
+  #header-cart-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 42px;
+    padding: 0;
+    background: transparent;
+    color: #080808;
+    border: 0;
+    box-shadow: none;
+  }
+  #header-cart-btn .cart-bag-icon { width: 34px; height: 34px; }
+  #header-cart-btn .desktop-cart-text,
+  #header-auth-btn,
+  .desktop-main-nav,
+  .desktop-search-pill-wrap { display: none !important; }
+  .cart-count-badge { top: -3px; right: -5px; min-width: 20px; height: 20px; font-size: 12px; }
+  .hero-carousel-container {
+    width: calc(100% - 36px);
+    margin: 16px auto 0;
+    aspect-ratio: 0.72 / 1;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    border-radius: 28px;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, .2);
+  }
+  .carousel-slide-img { object-position: center center; }
+  .carousel-arrow { display: none !important; }
+  .carousel-dots { bottom: 24px; gap: 9px; padding: 8px 13px; }
+  .carousel-dot { width: 9px; height: 9px; }
+  .carousel-dot.active { width: 34px; }
+  .section-heading,
+  #category-banners-section .section-heading,
+  #category-banners-section h2 {
+    text-align: center;
+    letter-spacing: .06em;
+  }
+  #category-banners-section { padding-top: 32px; }
+}
+@media (max-width: 380px) {
+  .header-nav { padding: 0 10px; gap: 7px; }
+  .brand-logo-img { width: 52px; height: 52px; }
+  .location-text-red { max-width: 112px; font-size: 13px; }
+  .header-actions { gap: 6px; }
+  .hero-carousel-container { width: calc(100% - 24px); border-radius: 22px; }
+}
