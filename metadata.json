@@ -2,5 +2,7 @@
   "name": "BuchiSapa - Pollería & Sabor Amazónico",
   "description": "Sistema de pedidos y gestión gastronómica para BuchiSapa: carta digital con pollos a la brasa y platos amazónicos, pedidos online, carrito, recojo/delivery y panel administrativo.",
   "permissions": [],
-  "capabilities": []
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

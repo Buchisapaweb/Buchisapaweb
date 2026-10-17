@@ -1,0 +1,23 @@
+:root {
+  --color-fondo: #ffffff;
+  --color-superficie: #ffffff;
+  --color-texto-principal: #111827;
+  --color-texto-secundario: #6b7280;
+  --color-primario: #dc2626;
+  --color-primario-oscuro: #b91c1c;
+  --color-acento-naranja: #ea580c;
+  --color-borde: #f3f4f6;
+  --color-borde-medio: #e5e7eb;
+  --fuente-titulos: 'Playfair Display', Georgia, serif;
+  --fuente-cuerpo: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --radio-borde: 16px;
+  --radio-borde-lg: 24px;
+}
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto-principal);
+  font-family: var(--fuente-cuerpo);
+  margin: 0;
+  padding: 0;
+}

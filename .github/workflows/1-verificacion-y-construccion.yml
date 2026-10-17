@@ -1,0 +1,29 @@
+name: 1. Verificación y Construcción
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verificar-y-construir:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci || npm install
+
+      - name: Verificación de sintaxis y tipos
+        run: npm run lint || npx tsc --noEmit
+
+      - name: Compilación del proyecto
+        run: npm run build

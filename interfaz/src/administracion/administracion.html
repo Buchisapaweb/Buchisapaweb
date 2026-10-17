@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrativo - BuchiSapa</title>
+  <link rel="stylesheet" href="/interfaz/src/estilos/variables.css">
+  <link rel="stylesheet" href="/interfaz/src/administracion/estilos/panel.css">
+  <link rel="stylesheet" href="/interfaz/src/administracion/estilos/encabezado.css">
+</head>
+<body class="admin-body">
+  <div id="admin-root">
+    <!-- Encabezado de administración -->
+    <header id="admin-header" class="admin-header">
+      <div class="admin-header-container">
+        <div class="admin-brand">
+          <img src="/imagenes/logo/logo-buchisapa.webp" alt="Logo" class="admin-logo">
+          <h1>BuchiSapa Admin</h1>
+        </div>
+        <nav class="admin-nav">
+          <button data-tab="panel" class="tab-btn active">Dashboard</button>
+          <button data-tab="pedidos" class="tab-btn">Pedidos</button>
+          <button data-tab="productos" class="tab-btn">Productos</button>
+          <button data-tab="categorias" class="tab-btn">Categorías</button>
+          <button data-tab="portada" class="tab-btn">Portadas</button>
+          <button data-tab="insumos" class="tab-btn">Insumos</button>
+          <button data-tab="utensilios" class="tab-btn">Utensilios</button>
+          <button data-tab="comprobante" class="tab-btn">Tickets</button>
+          <button data-tab="clientes" class="tab-btn">Clientes</button>
+          <button data-tab="configuracion" class="tab-btn">Configuración</button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="admin-content" class="admin-main">
+      <!-- Módulos cargados dinámicamente -->
+      <section id="modulo-activo" class="admin-module"></section>
+    </main>
+  </div>
+  <script type="module" src="/interfaz/src/administracion/rutas/administracion.js"></script>
+</body>
+</html>

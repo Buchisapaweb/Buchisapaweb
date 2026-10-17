@@ -1,0 +1,26 @@
+<!-- Modal de Inicio de Sesión BuchiSapa -->
+<div id="modal-inicio-sesion" class="modal-superposicion oculta">
+  <div class="modal-tarjeta">
+    <button id="btn-cerrar-sesion-modal" class="btn-cerrar">&times;</button>
+    <div class="modal-cabecera">
+      <img src="/imagenes/logo/logo-buchisapa.webp" alt="Logo" class="logo-modal" />
+      <h2>Bienvenido a BuchiSapa</h2>
+      <p>Accede para guardar tus pedidos y favoritos</p>
+    </div>
+    <form id="formulario-login">
+      <div class="grupo-campo">
+        <label for="campo-correo">Correo Electrónico</label>
+        <input type="email" id="campo-correo" placeholder="ejemplo@correo.com" required />
+      </div>
+      <div class="grupo-campo">
+        <label for="campo-nombre">Nombre Completo</label>
+        <input type="text" id="campo-nombre" placeholder="Tu nombre" required />
+      </div>
+      <div class="grupo-campo">
+        <label for="campo-telefono">Teléfono / WhatsApp (opcional)</label>
+        <input type="tel" id="campo-telefono" placeholder="999 999 999" />
+      </div>
+      <button type="submit" class="btn-primario">Continuar</button>
+    </form>
+  </div>
+</div>

@@ -11,11 +11,9 @@ interface OrderTrackingPageProps {
 export const OrderTrackingPage: React.FC<OrderTrackingPageProps> = ({ order: initialOrder, onBackToMenu }) => {
   const [order, setOrder] = useState<Order>(initialOrder);
 
-  // Poll for live status update or listen to SSE
   useEffect(() => {
     let isMounted = true;
 
-    // Check if there are updates from server or localStorage
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/orders/${order.id}`);
@@ -26,7 +24,6 @@ export const OrderTrackingPage: React.FC<OrderTrackingPageProps> = ({ order: ini
           }
         }
       } catch {
-        // Fallback: check localStorage for changes made in same browser (e.g. from admin panel)
         try {
           const savedOrders = JSON.parse(localStorage.getItem('buchisapa_recent_orders') || '[]');
           const match = savedOrders.find((o: Order) => o.id === order.id || o.orderNumber === order.orderNumber);
@@ -93,40 +90,40 @@ export const OrderTrackingPage: React.FC<OrderTrackingPageProps> = ({ order: ini
   const currentStepIdx = getStepIndex(order.status);
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-white py-10 px-4">
+    <div className="min-h-screen bg-white text-gray-900 py-10 px-4">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Back Link */}
         <button
           onClick={onBackToMenu}
-          className="inline-flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-amber-400 transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-bold text-gray-600 hover:text-red-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Volver a la Carta Digital</span>
         </button>
 
         {/* Success Header Card */}
-        <div className="bg-[#111827] border border-gray-800 rounded-3xl p-6 sm:p-8 text-center space-y-3 relative overflow-hidden">
-          <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 mx-auto flex items-center justify-center font-bold text-3xl">
+        <div className="bg-gray-50 border border-gray-100 rounded-3xl p-6 sm:p-8 text-center space-y-3 relative overflow-hidden shadow-sm">
+          <div className="w-16 h-16 rounded-full bg-green-50 text-green-600 mx-auto flex items-center justify-center font-bold text-3xl">
             <CheckCircle2 className="w-9 h-9" />
           </div>
-          <span className="text-xs uppercase font-extrabold tracking-widest text-amber-400">
+          <span className="text-xs uppercase font-black tracking-widest text-red-600">
             ¡PEDIDO CONFIRMADO CON ÉXITO!
           </span>
-          <h1 className="font-['Playfair_Display'] text-2xl sm:text-3xl font-black text-white">
+          <h1 className="font-['Playfair_Display'] text-2xl sm:text-3xl font-black text-gray-900">
             Orden #{order.orderNumber}
           </h1>
-          <p className="text-xs text-gray-300 max-w-md mx-auto">
+          <p className="text-xs text-gray-600 max-w-md mx-auto">
             Gracias por tu preferencia, <strong>{order.customerName}</strong>. Estamos preparando tus platillos con el mejor sabor de Santa Clara.
           </p>
         </div>
 
         {/* Live Progress Timeline */}
-        <div className="bg-[#111827] border border-gray-800 rounded-3xl p-6 sm:p-8 space-y-6">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-amber-400">
+        <div className="bg-gray-50 border border-gray-100 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
+          <h2 className="text-xs font-black uppercase tracking-wider text-red-600">
             Estado de tu Pedido en Vivo
           </h2>
 
-          <div className="relative pl-6 sm:pl-8 border-l-2 border-gray-800 space-y-8">
+          <div className="relative pl-6 sm:pl-8 border-l-2 border-gray-200 space-y-8">
             {steps.map((step, idx) => {
               const isPassed = idx <= currentStepIdx;
               const isCurrent = idx === currentStepIdx;
@@ -137,10 +134,10 @@ export const OrderTrackingPage: React.FC<OrderTrackingPageProps> = ({ order: ini
                   <div
                     className={`absolute -left-[35px] sm:-left-[43px] top-0.5 w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
                       isCurrent
-                        ? 'bg-amber-500 border-white text-gray-950 font-black scale-110 shadow-lg shadow-amber-500/50 animate-pulse'
+                        ? 'bg-amber-500 border-white text-gray-950 font-black scale-110 shadow-md animate-pulse'
                         : isPassed
                         ? 'bg-green-600 border-green-500 text-white'
-                        : 'bg-gray-900 border-gray-700 text-gray-500'
+                        : 'bg-white border-gray-300 text-gray-400'
                     }`}
                   >
                     {step.icon}
@@ -150,20 +147,20 @@ export const OrderTrackingPage: React.FC<OrderTrackingPageProps> = ({ order: ini
                     <h3
                       className={`text-sm sm:text-base font-bold ${
                         isCurrent
-                          ? 'text-amber-400'
+                          ? 'text-red-600'
                           : isPassed
-                          ? 'text-white'
-                          : 'text-gray-500'
+                          ? 'text-gray-900'
+                          : 'text-gray-400'
                       }`}
                     >
                       {step.label}
                       {isCurrent && (
-                        <span className="ml-2 text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
+                        <span className="ml-2 text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold">
                           En Progreso
                         </span>
                       )}
                     </h3>
-                    <p className="text-xs text-gray-400 mt-0.5">{step.desc}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{step.desc}</p>
                   </div>
                 </div>
               );
@@ -172,69 +169,69 @@ export const OrderTrackingPage: React.FC<OrderTrackingPageProps> = ({ order: ini
         </div>
 
         {/* Order Details Breakdown */}
-        <div className="bg-[#111827] border border-gray-800 rounded-3xl p-6 space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-amber-400 pb-2 border-b border-gray-800">
+        <div className="bg-gray-50 border border-gray-100 rounded-3xl p-6 space-y-4 shadow-sm">
+          <h2 className="text-xs font-black uppercase tracking-wider text-red-600 pb-2 border-b border-gray-200">
             Detalles del Pedido
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-300">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-700">
             <div>
-              <span className="text-gray-400 block">Modalidad:</span>
-              <strong className="text-white text-sm">
+              <span className="text-gray-500 block">Modalidad:</span>
+              <strong className="text-gray-900 text-sm">
                 {order.orderType === 'delivery' ? '🛵 Delivery a Domicilio' : '🏪 Recojo en Tienda'}
               </strong>
             </div>
             <div>
-              <span className="text-gray-400 block">Forma de Pago:</span>
-              <strong className="text-white text-sm uppercase">
+              <span className="text-gray-500 block">Forma de Pago:</span>
+              <strong className="text-gray-900 text-sm uppercase">
                 {order.paymentMethod}
               </strong>
             </div>
             {order.deliveryAddress && (
               <div className="sm:col-span-2">
-                <span className="text-gray-400 block">Dirección de Entrega:</span>
-                <div className="flex items-start gap-1.5 text-white font-medium mt-0.5">
-                  <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                <span className="text-gray-500 block">Dirección de Entrega:</span>
+                <div className="flex items-start gap-1.5 text-gray-900 font-medium mt-0.5">
+                  <MapPin className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                   <span>{order.deliveryAddress} {order.deliveryReference ? `(${order.deliveryReference})` : ''}</span>
                 </div>
               </div>
             )}
           </div>
 
-          <div className="pt-3 border-t border-gray-800 space-y-2">
-            <span className="text-xs font-bold text-gray-300 uppercase tracking-wider block">
+          <div className="pt-3 border-t border-gray-200 space-y-2">
+            <span className="text-xs font-bold text-gray-700 uppercase tracking-wider block">
               Platos Ordenados:
             </span>
             <div className="space-y-2 max-h-56 overflow-y-auto">
               {order.items.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center text-xs py-1 border-b border-gray-800/40">
+                <div key={idx} className="flex justify-between items-center text-xs py-1 border-b border-gray-200/50">
                   <div>
-                    <span className="font-bold text-white">{item.quantity}x {item.name}</span>
+                    <span className="font-bold text-gray-900">{item.quantity}x {item.name}</span>
                     {item.accompaniment && (
-                      <span className="text-[11px] text-gray-400 ml-2">({item.accompaniment})</span>
+                      <span className="text-[11px] text-gray-500 ml-2">({item.accompaniment})</span>
                     )}
                   </div>
-                  <span className="font-semibold text-amber-400">S/ {item.totalPrice.toFixed(2)}</span>
+                  <span className="font-bold text-red-600">S/ {item.totalPrice.toFixed(2)}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="pt-3 border-t border-gray-800 flex justify-between items-center text-sm">
-            <span className="font-bold text-white">Total Pagado / A Cobrar:</span>
-            <span className="font-black text-amber-400 text-lg">S/ {order.total.toFixed(2)}</span>
+          <div className="pt-3 border-t border-gray-200 flex justify-between items-center text-sm">
+            <span className="font-bold text-gray-900">Total Pagado / A Cobrar:</span>
+            <span className="font-black text-red-600 text-lg">S/ {order.total.toFixed(2)}</span>
           </div>
         </div>
 
         {/* WhatsApp Support Box */}
-        <div className="bg-[#161f30] border border-gray-800 rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="bg-white border border-gray-200 rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">¿Deseas comunicarte con nosotros?</h4>
-              <p className="text-xs text-gray-400">Atención inmediata en nuestro WhatsApp oficial</p>
+              <h4 className="font-bold text-gray-900 text-sm">¿Deseas comunicarte con nosotros?</h4>
+              <p className="text-xs text-gray-500">Atención inmediata en nuestro WhatsApp oficial</p>
             </div>
           </div>
 
@@ -242,7 +239,7 @@ export const OrderTrackingPage: React.FC<OrderTrackingPageProps> = ({ order: ini
             href={`${STORE_INFO.whatsapp}?text=Hola%20BuchiSapa,%20consulto%20por%20mi%20pedido%20%23${order.orderNumber}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold rounded-full text-xs shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95"
+            className="w-full sm:w-auto px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-full text-xs shadow-md flex items-center justify-center gap-2 transition-transform active:scale-95"
           >
             <span>Consultar por WhatsApp</span>
           </a>

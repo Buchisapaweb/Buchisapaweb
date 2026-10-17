@@ -1,0 +1,23 @@
+name: 3. Auditoría de Seguridad
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Cada domingo a medianoche
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  auditoria:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Ejecutar auditoría de dependencias
+        run: npm audit --audit-level=high || true

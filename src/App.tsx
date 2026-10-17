@@ -26,6 +26,7 @@ import { Category, Product, CoverBanner, Order, SupplyItem, UtensilItem } from '
 export const AppContent: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [trackedOrder, setTrackedOrder] = useState<Order | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // App Master Datasets
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
@@ -65,11 +66,17 @@ export const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0b0f19] text-white">
-      {/* Sticky Header with Logo, Navigation, Location, & Cart Badge */}
-      <Header currentTab={currentTab} onNavigate={handleNavigate} />
+    <div className="min-h-screen flex flex-col bg-white text-gray-900">
+      {/* 1. Sticky Header: White background with Menu, Logo, Santa Clara Location, Search, & Cart */}
+      <Header
+        currentTab={currentTab}
+        onNavigate={handleNavigate}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
 
-      {/* Main Page Routing */}
+      {/* Main Content:
+          In 'home': Foto de Portada -> Explora por Categorías (Imágenes de las Categorías) */}
       <div className="flex-1">
         {currentTab === 'home' && (
           <HomePage
@@ -78,6 +85,8 @@ export const AppContent: React.FC = () => {
             creams={INITIAL_CREAMS}
             accompaniments={INITIAL_ACCOMPANIMENTS}
             covers={covers}
+            searchQuery={searchQuery}
+            onClearSearch={() => setSearchQuery('')}
           />
         )}
 
@@ -120,7 +129,7 @@ export const AppContent: React.FC = () => {
       {/* Authentication Modal */}
       <AuthModal />
 
-      {/* Rich Footer */}
+      {/* Footer */}
       <Footer onNavigate={handleNavigate} />
     </div>
   );

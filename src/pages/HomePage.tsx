@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { HeroCarousel } from '../components/HeroCarousel';
-import { CategoryNav } from '../components/CategoryNav';
 import { ProductCard } from '../components/ProductCard';
 import { ProductModal } from '../components/ProductModal';
 import { useCart } from '../context/CartContext';
 import { Category, Product, Cream, Accompaniment, CoverBanner } from '../types';
-import { Sparkles, Utensils, Star, Flame } from 'lucide-react';
+import { ArrowLeft, MessageCircle } from 'lucide-react';
+import { STORE_INFO } from '../data/initialData';
 
 interface HomePageProps {
   categories: Category[];
@@ -13,6 +13,8 @@ interface HomePageProps {
   creams: Cream[];
   accompaniments: Accompaniment[];
   covers: CoverBanner[];
+  searchQuery?: string;
+  onClearSearch?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
@@ -21,53 +23,45 @@ export const HomePage: React.FC<HomePageProps> = ({
   creams,
   accompaniments,
   covers,
+  searchQuery = '',
+  onClearSearch,
 }) => {
   const { addItem } = useCart();
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [customizingProduct, setCustomizingProduct] = useState<Product | null>(null);
 
   const activeCategories = useMemo(() => {
     return categories.filter((c) => c.active !== false);
   }, [categories]);
 
-  // Filter products by category and search query
-  const filteredProducts = useMemo(() => {
-    return products.filter((prod) => {
-      if (prod.available === false) return false;
+  // If there is an active search, filter products across all categories
+  const searchedProducts = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase().trim();
+    return products.filter(
+      (p) =>
+        p.available !== false &&
+        (p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
+    );
+  }, [products, searchQuery]);
 
-      const matchesCategory =
-        selectedCategoryId === 'all' || prod.category_id === selectedCategoryId;
+  // Products belonging to the selected category
+  const categoryProducts = useMemo(() => {
+    if (!selectedCategory) return [];
+    return products.filter(
+      (p) => p.category_id === selectedCategory.id && p.available !== false
+    );
+  }, [products, selectedCategory]);
 
-      const matchesSearch =
-        searchQuery.trim() === '' ||
-        prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prod.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return matchesCategory && matchesSearch;
-    });
-  }, [products, selectedCategoryId, searchQuery]);
-
-  // Group filtered products by category if 'all' is selected
-  const productsByCategory = useMemo(() => {
-    if (selectedCategoryId !== 'all' || searchQuery.trim() !== '') {
-      return null;
+  const handleCategoryClick = (cat: Category) => {
+    setSelectedCategory(cat);
+    const target = document.getElementById('seccion-categoria');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
     }
-
-    const grouped: { category: Category; items: Product[] }[] = [];
-    activeCategories.forEach((cat) => {
-      const items = products.filter(
-        (p) => p.category_id === cat.id && p.available !== false
-      );
-      if (items.length > 0) {
-        grouped.push({ category: cat, items });
-      }
-    });
-    return grouped;
-  }, [activeCategories, products, selectedCategoryId, searchQuery]);
+  };
 
   const handleQuickAdd = (product: Product) => {
-    // Default 1 qty without extra customizations
     addItem(product, 1);
   };
 
@@ -82,136 +76,52 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-white">
-      {/* Hero Carousel */}
-      <HeroCarousel
-        banners={covers.filter((c) => c.active)}
-        onActionClick={() => {
-          const el = document.getElementById('carta-menu');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
+    <div className="min-h-screen bg-white text-gray-900 pb-12">
+      {/* 1. FOTO DE PORTADA (CARRUSEL) */}
+      <HeroCarousel banners={covers.filter((c) => c.active)} />
 
-      {/* Highlights Strip */}
-      <section className="bg-[#111827] border-b border-gray-800 py-3 px-4">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-around gap-4 text-xs font-semibold text-gray-300">
-          <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-amber-500" />
-            <span>Papas Nativas & Crujientes</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-amber-400" />
-            <span>Receta Original con Ají Charapita</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Utensils className="w-4 h-4 text-red-500" />
-            <span>Cremas Caseras Ilimitadas</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Category Navigation Bar */}
-      <div id="carta-menu">
-        <CategoryNav
-          categories={activeCategories}
-          selectedCategoryId={selectedCategoryId}
-          onSelectCategory={(id) => {
-            setSelectedCategoryId(id);
-          }}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-      </div>
-
-      {/* Main Catalog View */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* If grouped by category */}
-        {productsByCategory ? (
-          <div className="space-y-12">
-            {productsByCategory.map(({ category, items }) => (
-              <section key={category.id} className="space-y-4">
-                <div className="flex items-center justify-between border-b border-gray-800 pb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-3 h-8 bg-red-600 rounded-full" />
-                    <div>
-                      <h2 className="font-['Playfair_Display'] font-black text-xl sm:text-2xl text-white">
-                        {category.name}
-                      </h2>
-                      <p className="text-xs text-gray-400">
-                        {items.length} {items.length === 1 ? 'platillo' : 'platillos'} disponibles
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setSelectedCategoryId(category.id)}
-                    className="text-xs text-amber-400 hover:text-amber-300 font-bold hover:underline"
-                  >
-                    Ver solo esta categoría →
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                  {items.map((prod) => (
-                    <ProductCard
-                      key={prod.id}
-                      product={prod}
-                      categoryName={category.name}
-                      onOpenCustomizer={(p) => setCustomizingProduct(p)}
-                      onQuickAdd={handleQuickAdd}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        ) : (
-          /* Single list filtered view */
+      {/* 2. EXPLORA POR CATEGORÍAS */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6" id="seccion-categoria">
+        {/* Search Results Mode */}
+        {searchQuery.trim() !== '' ? (
           <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
               <div>
-                <h2 className="font-['Playfair_Display'] font-black text-2xl text-white">
-                  {selectedCategoryId === 'all'
-                    ? 'Resultados de búsqueda'
-                    : categories.find((c) => c.id === selectedCategoryId)?.name || 'Platos'}
+                <span className="text-xs font-black uppercase tracking-wider text-orange-600 block">
+                  BÚSQUEDA EN CARTA
+                </span>
+                <h2 className="font-['Playfair_Display'] text-2xl sm:text-3xl font-black text-gray-900">
+                  Resultados para "{searchQuery}"
                 </h2>
-                <p className="text-xs text-gray-400">
-                  {filteredProducts.length} {filteredProducts.length === 1 ? 'platillo encontrado' : 'platillos encontrados'}
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {searchedProducts.length} {searchedProducts.length === 1 ? 'platillo encontrado' : 'platillos encontrados'}
                 </p>
               </div>
-
-              {selectedCategoryId !== 'all' && (
-                <button
-                  onClick={() => setSelectedCategoryId('all')}
-                  className="text-xs text-amber-400 hover:underline font-bold"
-                >
-                  ← Ver todas las categorías
-                </button>
-              )}
+              <button
+                onClick={onClearSearch}
+                className="text-xs font-bold text-red-600 hover:underline"
+              >
+                ← Ver todas las categorías
+              </button>
             </div>
 
-            {filteredProducts.length === 0 ? (
-              <div className="bg-[#111827] rounded-3xl p-12 text-center max-w-md mx-auto space-y-4 border border-gray-800">
-                <div className="w-16 h-16 rounded-full bg-gray-800 text-gray-500 mx-auto flex items-center justify-center text-2xl">
-                  🔍
-                </div>
-                <h3 className="text-lg font-bold text-white">No encontramos platillos</h3>
-                <p className="text-xs text-gray-400">
-                  No hay productos que coincidan con "{searchQuery}". Intenta con otro término o explora las categorías.
+            {searchedProducts.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-3xl p-8 max-w-md mx-auto space-y-3">
+                <span className="text-3xl">🔍</span>
+                <h3 className="font-bold text-base text-gray-900">No encontramos resultados</h3>
+                <p className="text-xs text-gray-500">
+                  Intenta buscar con otra palabra clave como "pollo", "alitas", "hamburguesa" o "chicha".
                 </p>
                 <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategoryId('all');
-                  }}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-full text-xs font-bold transition-colors"
+                  onClick={onClearSearch}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-bold shadow-sm"
                 >
-                  Restablecer filtros
+                  Volver a Categorías
                 </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                {filteredProducts.map((prod) => (
+                {searchedProducts.map((prod) => (
                   <ProductCard
                     key={prod.id}
                     product={prod}
@@ -223,10 +133,114 @@ export const HomePage: React.FC<HomePageProps> = ({
               </div>
             )}
           </div>
+        ) : selectedCategory ? (
+          /* Viewing Specific Category Dishes */
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 flex items-center justify-center transition-colors shrink-0"
+                  aria-label="Volver a categorías"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <div>
+                  <span className="text-xs font-black uppercase tracking-wider text-orange-600 block">
+                    CATEGORÍA SELECCIONADA
+                  </span>
+                  <h2 className="font-['Playfair_Display'] text-2xl sm:text-3xl font-black text-gray-900">
+                    {selectedCategory.name}
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    {categoryProducts.length} {categoryProducts.length === 1 ? 'platillo disponible' : 'platillos disponibles'}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className="text-xs font-bold text-red-600 hover:underline self-start sm:self-auto"
+              >
+                ← Cambiar de categoría
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {categoryProducts.map((prod) => (
+                <ProductCard
+                  key={prod.id}
+                  product={prod}
+                  categoryName={selectedCategory.name}
+                  onOpenCustomizer={(p) => setCustomizingProduct(p)}
+                  onQuickAdd={handleQuickAdd}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Main Root View: Header -> Portada -> Categorías (Imágenes de las Categorías) */
+          <div className="space-y-8">
+            {/* Section Header (matching screenshot) */}
+            <div className="text-center space-y-1.5 max-w-2xl mx-auto">
+              <span className="text-xs font-black uppercase tracking-wider text-[#ea580c] block">
+                NUESTRA CARTA
+              </span>
+              <h1 className="font-['Playfair_Display'] text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
+                Explora por Categorías
+              </h1>
+              <p className="text-gray-500 text-xs sm:text-sm leading-relaxed px-4">
+                Selecciona una categoría para ver los platos, combos y promociones disponibles.
+              </p>
+            </div>
+
+            {/* Category Images Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {activeCategories.map((category) => (
+                <div
+                  key={category.id}
+                  onClick={() => handleCategoryClick(category)}
+                  className="group relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 bg-white transform hover:-translate-y-1"
+                >
+                  {/* Category Banner Image */}
+                  <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full overflow-hidden bg-white">
+                    <img
+                      src={category.banner_url || '/imagenes/logo/logo-buchisapa.webp'}
+                      alt={category.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    
+                    {/* Category Title Overlay */}
+                    <div className="absolute bottom-3 left-4 right-4 text-white">
+                      <h3 className="font-['Playfair_Display'] font-black text-base sm:text-lg tracking-wide uppercase drop-shadow-md group-hover:text-amber-300 transition-colors">
+                        {category.name}
+                      </h3>
+                      <span className="text-[11px] text-gray-300 font-semibold block mt-0.5">
+                        {products.filter((p) => p.category_id === category.id).length} platos disponibles →
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </main>
 
-      {/* Customizer Modal */}
+      {/* 3. BOTÓN FLOTANTE OFICIAL DE WHATSAPP (matching screenshot) */}
+      <a
+        href={STORE_INFO.whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all focus:outline-none"
+        aria-label="Contactar por WhatsApp"
+      >
+        <MessageCircle className="w-8 h-8 fill-white text-[#25D366]" />
+      </a>
+
+      {/* Product Customizer Modal */}
       <ProductModal
         product={customizingProduct}
         isOpen={Boolean(customizingProduct)}
