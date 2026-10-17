@@ -1,0 +1,21 @@
+{
+  "short_name": "BuchiSapa",
+  "name": "BuchiSapa - Pollería & Sabor Amazónico",
+  "icons": [
+    {
+      "src": "/imagenes/logo/logo-buchisapa.webp",
+      "type": "image/webp",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/imagenes/logo/logo-buchisapa.webp",
+      "type": "image/webp",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#dc2626",
+  "display": "standalone",
+  "scope": "/"
+}

@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "desarrollo": "tsx servidor.ts",
-    "construir": "vite build && node scripts/compilar-html.js && esbuild servidor.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/servidor.cjs",
+    "construir": "vite build && esbuild servidor.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/servidor.cjs",
     "iniciar": "node dist/servidor.cjs",
     "verificar": "tsc --noEmit",
     "dev": "tsx servidor.ts",
-    "build": "vite build && node scripts/compilar-html.js && esbuild servidor.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/servidor.cjs",
+    "build": "vite build && esbuild servidor.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/servidor.cjs",
     "start": "node dist/servidor.cjs",
     "lint": "tsc --noEmit"
   },
