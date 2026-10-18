@@ -2847,6 +2847,8 @@ function armarHtmlCompleto(): string {
     }
   }
 
-  startServer();
+  startServer().catch((err) => {
+    console.error('Failed to start server:', err);
+  });
 
   export default app;
