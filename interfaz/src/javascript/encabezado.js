@@ -177,7 +177,7 @@ function toggleSearchBar(forceState) {
 let buchisapaSearchProducts = null;
 let buchisapaSearchLoadPromise = null;
 function normalizeSearchName(value) {
-  return String(value || '').toLocaleLowerCase('es').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').trim();
+  return String(value || '').toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 async function getSearchProducts() {
   if (Array.isArray(buchisapaSearchProducts)) return buchisapaSearchProducts;
