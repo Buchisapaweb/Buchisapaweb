@@ -2814,6 +2814,13 @@ function armarHtmlCompleto(): string {
   return html;
 }
 
+  // Servir la página real de detalle del producto, sin mostrar la portada del inicio.
+  app.get('/producto', (_req: Request, res: Response, next: NextFunction) => {
+    const paginaProducto = path.join(process.cwd(), 'interfaz/src/paginas/producto-detalle.html');
+    if (!fs.existsSync(paginaProducto)) return next();
+    return res.status(200).sendFile(paginaProducto);
+  });
+
   // Servir página principal armada dinámicamente con sus componentes
   app.get(/.*/, async (req: Request, res: Response, next) => {
     if (req.path.startsWith('/api')) return next();

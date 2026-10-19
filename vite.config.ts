@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync } from 'node:fs'
+import { copyFileSync, cpSync, existsSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 
@@ -38,6 +38,13 @@ function copiarRecursosPublicos(): Plugin {
 
         cpSync(origen, destino, { recursive: true, force: true })
       }
+
+      // Publicar la página de detalle bajo /producto (cleanUrls de Vercel).
+      const paginaProducto = resolve(raiz, 'interfaz/src/paginas/producto-detalle.html')
+      if (!existsSync(paginaProducto)) {
+        throw new Error('No se encontró la página requerida: interfaz/src/paginas/producto-detalle.html')
+      }
+      copyFileSync(paginaProducto, resolve(salida, 'producto.html'))
     },
   }
 }
