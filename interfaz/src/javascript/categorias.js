@@ -54,7 +54,7 @@
       searchSection.style.display = 'none';
     }
     if (bannersSection) bannersSection.style.display = 'grid';
-    if (heroSection) heroSection.style.display = '';
+    if (heroSection && (window.location.pathname === '/' || window.location.pathname.endsWith('/index.html'))) heroSection.style.display = '';
     if (titleWrap) titleWrap.style.display = 'block';
 
     try {
@@ -147,14 +147,14 @@
       card.className = 'buchisapa-dish-card';
       card.innerHTML = `
         <a href="/producto?id=${encodeURIComponent(item.id || item.code)}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
-          <div style="position: relative; width: 100%; aspect-ratio: 4/3; overflow: hidden; background: #f1f5f9;">
-            <img src="${item.image_url || item.image || ''}" onerror="this.onerror=null;this.style.display='none'" alt="${item.name}" class="dish-card-img" loading="lazy">
+          <div class="dish-card-image-wrap">
+            <img src="${item.image_url || item.image || ''}" onerror="this.onerror=null;this.removeAttribute('src');this.style.display='none';this.parentElement.classList.add('image-unavailable')" alt="${item.name}" class="dish-card-img" loading="lazy">
             ${item.badge ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.badge}</span>` : ''}
           </div>
           <div class="dish-card-content">
-            <span class="dish-card-cat-label">${item.categoryBadge || item.category || 'BuchiSapa'}</span>
+            <span class="dish-card-cat-label">${item.category_name || item.categoryBadge || item.category || 'BuchiSapa'}</span>
             <h3 class="dish-card-title">${item.name}</h3>
-            <p class="dish-card-desc">${item.description || ''}</p>
+            <!-- La descripción completa se reserva para la página de detalle del producto. -->
             <div class="dish-card-footer">
               <span class="dish-card-price">S/ ${Number(item.price || 0).toFixed(2)}</span>
               <button type="button" class="dish-card-add-btn" onclick="event.preventDefault(); window.location.href='/producto?id=${encodeURIComponent(item.id || item.code)}'">
