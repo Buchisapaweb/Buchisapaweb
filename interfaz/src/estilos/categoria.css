@@ -301,3 +301,11 @@
 }
 @media (min-width:768px) { #products-grid-container { grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; } }
 @media (min-width:1100px) { #products-grid-container { grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px; } }
+
+
+/* La portada es exclusiva de la página inicial. Nunca mostrarla en una vista de categoría. */
+body.category-view-active .hero-carousel-container,
+body.category-view-active #category-banners-section,
+body.category-view-active #main-section-title-wrap {
+  display: none !important;
+}
