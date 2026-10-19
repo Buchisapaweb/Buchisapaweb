@@ -521,7 +521,7 @@ ${saucesStr ? `*Cremas:* ${saucesStr}` : ''}
       card.className = 'related-card';
       card.innerHTML = `
         <div class="related-card-img-wrap">
-          <img src="${item.image || item.image_url || '/imagenes/categorias/broaster/banner.webp'}" onerror="this.onerror=null;this.src='/imagenes/categorias/broaster/banner.webp'" alt="${item.name}" class="related-card-img" loading="lazy">
+          <img src="${item.image_url || item.image || ''}" onerror="this.onerror=null;this.style.display='none'" alt="${item.name}" class="related-card-img" loading="lazy">
         </div>
         <div class="related-card-body">
           <span class="related-card-cat">${item.category || item.categoryBadge || 'BuchiSapa'}</span>
