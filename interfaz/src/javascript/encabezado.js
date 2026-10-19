@@ -126,7 +126,7 @@ function ensureSearchUI() {
       <div class="container search-bar-inner">
         <div class="search-bar-top-row">
           <div class="search-input-pill-wrapper">
-            <svg class="search-pill-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/></svg>
+            <svg class="search-pill-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
             <input type="search" id="main-search-input" class="search-pill-input" placeholder="Busca por nombre de plato..." autocomplete="off" aria-label="Buscar productos por nombre">
             <button id="search-clear-btn" class="search-clear-btn is-hidden" type="button" aria-label="Limpiar búsqueda">×</button>
           </div>
@@ -137,14 +137,12 @@ function ensureSearchUI() {
     if (header) header.insertAdjacentElement('afterend', wrap);
     else document.body.prepend(wrap);
   }
-
   let results = document.getElementById('buchisapa-live-search-results');
   if (!results) {
     results = document.createElement('section');
     results.id = 'buchisapa-live-search-results';
     results.className = 'buchisapa-live-search-results';
     results.setAttribute('aria-live', 'polite');
-    results.setAttribute('aria-label', 'Resultados de búsqueda');
     wrap.insertAdjacentElement('afterend', results);
   }
   return wrap;
@@ -154,25 +152,25 @@ function toggleSearchBar(forceState) {
   const wrap = ensureSearchUI();
   const shouldShow = typeof forceState === 'boolean'
     ? forceState
-    : wrap.classList.contains('is-hidden') || getComputedStyle(wrap).display === 'none';
-
-  wrap.classList.toggle('is-hidden', !shouldShow);
-  wrap.classList.toggle('search-bar-visible', shouldShow);
-  wrap.classList.toggle('mobile-search-visible', shouldShow);
-  wrap.style.display = shouldShow ? 'block' : 'none';
-
-  const results = document.getElementById('buchisapa-live-search-results');
-  if (results) results.style.display = shouldShow ? 'block' : 'none';
-
+    : (wrap.classList.contains('is-hidden') || wrap.style.display === 'none');
   if (shouldShow) {
+    wrap.classList.remove('is-hidden');
+    wrap.style.display = 'block';
+    wrap.classList.add('search-bar-visible', 'mobile-search-visible');
+    const results = document.getElementById('buchisapa-live-search-results');
+    if (results) results.style.display = 'block';
     const input = document.getElementById('main-search-input');
-    if (input) requestAnimationFrame(() => input.focus());
+    if (input) setTimeout(() => input.focus(), 80);
   } else {
-    ['main-search-input', 'desktop-search-input'].forEach(id => {
-      const input = document.getElementById(id);
-      if (input) input.value = '';
-    });
-    if (results) results.replaceChildren();
+    wrap.classList.add('is-hidden');
+    wrap.style.display = 'none';
+    wrap.classList.remove('search-bar-visible', 'mobile-search-visible');
+    const results = document.getElementById('buchisapa-live-search-results');
+    if (results) { results.style.display = 'none'; results.innerHTML = ''; }
+    const input = document.getElementById('main-search-input');
+    if (input) input.value = '';
+    const desktopInput = document.getElementById('desktop-search-input');
+    if (desktopInput) desktopInput.value = '';
   }
 }
 
@@ -184,94 +182,61 @@ function normalizeSearchName(value) {
 async function getSearchProducts() {
   if (Array.isArray(buchisapaSearchProducts)) return buchisapaSearchProducts;
   if (buchisapaSearchLoadPromise) return buchisapaSearchLoadPromise;
-
   buchisapaSearchLoadPromise = (async () => {
     let products = [];
-    for (const url of ['/api/products', '/datos/productos.json']) {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) continue;
+    try {
+      const response = await fetch('/api/products');
+      if (response.ok) {
         const json = await response.json();
-        const list = Array.isArray(json) ? json : (json.data || json.products || json.productos || []);
-        if (Array.isArray(list) && list.length) {
-          products = list;
-          break;
-        }
-      } catch (_) {
-        // Intentar la siguiente fuente disponible.
+        products = Array.isArray(json) ? json : (json.data || []);
       }
+    } catch (e) {}
+    if (!products.length) {
+      try {
+        const response = await fetch('/datos/productos.json');
+        if (response.ok) {
+          const json = await response.json();
+          products = Array.isArray(json) ? json : (json.data || []);
+        }
+      } catch (e) {}
     }
-
-    buchisapaSearchProducts = products.filter(p => p && (p.name || p.nombre || p.title));
+    buchisapaSearchProducts = products.filter(p => p && (p.name || p.nombre));
     return buchisapaSearchProducts;
-  })().catch(() => {
-    buchisapaSearchLoadPromise = null;
-    return [];
-  });
-
+  })();
   return buchisapaSearchLoadPromise;
 }
 
 async function onSearchInputChanged(value) {
   const raw = String(value || '');
   const query = raw.trim();
-  ['desktop-search-input', 'main-search-input'].forEach(id => {
-    const input = document.getElementById(id);
-    if (input && input.value !== raw) input.value = raw;
-  });
-  ['desktop-search-clear-btn', 'search-clear-btn'].forEach(id => {
-    const button = document.getElementById(id);
-    if (button) button.classList.toggle('is-hidden', !query);
-  });
+  const desktopInput = document.getElementById('desktop-search-input');
+  const mobileInput = document.getElementById('main-search-input');
+  if (desktopInput && desktopInput.value !== raw) desktopInput.value = raw;
+  if (mobileInput && mobileInput.value !== raw) mobileInput.value = raw;
+  const clearDesktopBtn = document.getElementById('desktop-search-clear-btn');
+  const clearMobileBtn = document.getElementById('search-clear-btn');
+  if (clearDesktopBtn) clearDesktopBtn.style.display = query ? 'flex' : 'none';
+  if (clearMobileBtn) clearMobileBtn.style.display = query ? 'flex' : 'none';
 
   const results = document.getElementById('buchisapa-live-search-results');
   if (!results) return;
-  if (!query) {
-    results.replaceChildren();
-    return;
-  }
-
+  if (!query) { results.innerHTML = ''; return; }
   results.innerHTML = '<div class="search-results-message">Buscando productos…</div>';
   const products = await getSearchProducts();
-  // No sobrescribir resultados de una búsqueda más reciente.
-  const activeInput = document.activeElement;
-  const latestQuery = activeInput && (activeInput.id === 'main-search-input' || activeInput.id === 'desktop-search-input')
-    ? activeInput.value.trim() : query;
-  if (normalizeSearchName(latestQuery) !== normalizeSearchName(query)) return;
-
   const normalizedQuery = normalizeSearchName(query);
-  const matches = products.filter(product =>
-    normalizeSearchName(product.name || product.nombre || product.title).includes(normalizedQuery)
-  ).slice(0, 30);
-
+  const matches = products.filter(product => normalizeSearchName(product.name || product.nombre).includes(normalizedQuery));
   if (!matches.length) {
     results.innerHTML = '<div class="search-results-message">No encontramos productos con ese nombre.</div>';
     return;
   }
-
-  const list = document.createElement('div');
-  list.className = 'search-results-list';
-  const heading = document.createElement('div');
-  heading.className = 'search-results-heading';
-  heading.textContent = 'Resultados (' + matches.length + ')';
-  results.replaceChildren(heading, list);
-
-  matches.forEach(product => {
-    const id = product.id || product.code || product.codigo || '';
-    const name = product.name || product.nombre || product.title || 'Producto BuchiSapa';
-    const link = document.createElement('a');
-    link.className = 'search-result-item';
-    link.href = '/producto?id=' + encodeURIComponent(id);
-    const label = document.createElement('span');
-    label.className = 'search-result-name';
-    label.textContent = name;
-    const arrow = document.createElement('span');
-    arrow.className = 'search-result-arrow';
-    arrow.setAttribute('aria-hidden', 'true');
-    arrow.textContent = '›';
-    link.append(label, arrow);
-    list.appendChild(link);
-  });
+  results.innerHTML = '<div class="search-results-heading">Resultados (' + matches.length + ')</div><div class="search-results-list">' +
+    matches.slice(0, 30).map(product => {
+      const name = String(product.name || product.nombre || '');
+      const id = product.id || product.code || product.codigo || '';
+      return '<a class="search-result-item" href="/producto?id=' + encodeURIComponent(id) + '"><span class="search-result-name"></span><span class="search-result-arrow" aria-hidden="true">›</span></a>';
+    }).join('') + '</div>';
+  const nameNodes = results.querySelectorAll('.search-result-name');
+  matches.slice(0, 30).forEach((product, index) => { if (nameNodes[index]) nameNodes[index].textContent = String(product.name || product.nombre || ''); });
 }
 
 function clearSearchInput() {
@@ -458,42 +423,35 @@ function initEncabezadoEvents() {
     });
   }
 
-  // 9. Buscador: delegación para que funcione en index y subpáginas.
+  // 9. Búsqueda y botones de limpiar
   ensureSearchUI();
-  if (!document.documentElement.dataset.buchisapaSearchEvents) {
-    document.documentElement.dataset.buchisapaSearchEvents = 'ready';
+  document.querySelectorAll('#header-search-btn, #subpage-search-btn').forEach(button => {
+    button.addEventListener('click', () => toggleSearchBar());
+  });
 
-    document.addEventListener('click', (event) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const searchButton = target.closest('#header-search-btn, #subpage-search-btn, [data-action="open-search"]');
-      if (searchButton) {
-        event.preventDefault();
-        toggleSearchBar();
-        return;
-      }
-      if (target.closest('#search-close-action-btn')) {
-        event.preventDefault();
-        toggleSearchBar(false);
-        return;
-      }
-      if (target.closest('#search-clear-btn, #desktop-search-clear-btn')) {
-        event.preventDefault();
-        clearSearchInput();
-      }
-    });
+  const searchCloseBtn = document.getElementById('search-close-action-btn');
+  if (searchCloseBtn) {
+    searchCloseBtn.addEventListener('click', () => toggleSearchBar(false));
+  }
 
-    document.addEventListener('input', (event) => {
-      const target = event.target;
-      if (target instanceof HTMLInputElement &&
-          (target.id === 'main-search-input' || target.id === 'desktop-search-input')) {
-        onSearchInputChanged(target.value);
-      }
-    });
+  const clearDesktopBtn = document.getElementById('desktop-search-clear-btn');
+  if (clearDesktopBtn) {
+    clearDesktopBtn.addEventListener('click', clearSearchInput);
+  }
 
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') toggleSearchBar(false);
-    });
+  const clearMobileBtn = document.getElementById('search-clear-btn');
+  if (clearMobileBtn) {
+    clearMobileBtn.addEventListener('click', clearSearchInput);
+  }
+
+  const desktopInput = document.getElementById('desktop-search-input');
+  if (desktopInput) {
+    desktopInput.addEventListener('input', (e) => onSearchInputChanged(e.target.value));
+  }
+
+  const mobileInput = document.getElementById('main-search-input');
+  if (mobileInput) {
+    mobileInput.addEventListener('input', (e) => onSearchInputChanged(e.target.value));
   }
 }
 
