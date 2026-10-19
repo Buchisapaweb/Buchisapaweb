@@ -37,7 +37,7 @@
       originalPrice: 22.00,
       description: 'Crujiente presa de 1/4 de pollo broaster sazonada con nuestra receta secreta amazónica y frita al punto exacto. Acompañada de papas fritas artesanales, ensalada del día y selección de cremas.',
       badge: 'Más Vendido 🔥',
-      image: '/imagenes/categorias/broaster/banner.webp',
+      image: '',
       stock: 50,
       available: true
     },
@@ -52,7 +52,7 @@
       originalPrice: 28.00,
       description: 'Plátano bellaco asado y majado artesanalmente con manteca de cerdo y chicharrón crocante, servido con generosa porción de cecina ahumada traída directamente de Tarapoto.',
       badge: 'Especialidad',
-      image: '/imagenes/categorias/adicionales/banner.webp',
+      image: '',
       stock: 35,
       available: true
     },
@@ -67,7 +67,7 @@
       originalPrice: 25.00,
       description: '6 crujientes alitas broaster bañadas en nuestra salsa BBQ artesanal con toque de camu camu. Incluye papas fritas y bastones frescos.',
       badge: 'Para Compartir',
-      image: '/imagenes/categorias/alitas/banner.webp',
+      image: '',
       stock: 40,
       available: true
     },
@@ -81,7 +81,7 @@
       price: 8.50,
       description: 'Refresco natural de cocona fresca de la selva peruana, endulzado ligeramente y servido bien frío en envase sellado.',
       badge: 'Refrescante',
-      image: '/imagenes/categorias/bebidas/banner.webp',
+      image: '',
       stock: 60,
       available: true
     }
@@ -162,7 +162,11 @@
     // Imagen
     const imgEl = document.getElementById('prod-img');
     if (imgEl) {
-      imgEl.src = p.image || p.image_url || '/imagenes/categorias/broaster/banner.webp';
+      imgEl.onerror = () => { imgEl.onerror = null; imgEl.removeAttribute('src'); imgEl.classList.add('producto-image-unavailable'); };
+      imgEl.classList.remove('producto-image-unavailable');
+      const imageUrl = p.image_url || p.image || '';
+      if (imageUrl) imgEl.src = imageUrl;
+      else imgEl.removeAttribute('src');
       imgEl.alt = p.name;
     }
 

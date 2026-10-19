@@ -202,3 +202,8 @@
 @media (prefers-reduced-motion: reduce) {
   .carousel-track, .carousel-dot, .carousel-arrow { transition: none !important; }
 }
+
+
+/* Proporciones definitivas de la portada */
+.hero-carousel-container { aspect-ratio:4 / 5; min-height:0; max-height:none; }
+@media (min-width:640px) { .hero-carousel-container { aspect-ratio:16 / 9; min-height:0; max-height:none; } }

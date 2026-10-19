@@ -211,3 +211,26 @@
 @media (min-width: 768px) {
   .search-view-title { font-size: 34px; }
 }
+
+
+/* Ajustes visuales: navegación plana y tarjetas de producto uniformes */
+.search-view-header-bar { align-items:center; gap:16px; flex-wrap:wrap; }
+.btn-volver { padding:8px 0; border:0; border-radius:0; background:transparent; box-shadow:none; color:#0f172a; }
+.btn-volver:hover { background:transparent; border-color:transparent; color:#dc2626; transform:translateX(-2px); }
+.search-view-count-badge { padding:0; border:0; border-radius:0; background:transparent; color:#dc2626; font-size:14px; white-space:nowrap; }
+#search-view-list.buchisapa-cards-list, #search-view-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:stretch; gap:14px; width:100%; }
+.buchisapa-dish-card { min-width:0; height:100%; overflow:hidden; background:#fff; border:1px solid #e8edf3; border-radius:16px; box-shadow:0 4px 14px rgba(15,23,42,.06); transition:box-shadow .2s ease, transform .2s ease; }
+.buchisapa-dish-card:hover { box-shadow:0 10px 26px rgba(15,23,42,.11); transform:translateY(-2px); }
+.buchisapa-dish-card > a { min-width:0; }
+.buchisapa-dish-card > a > div:first-child { aspect-ratio:1 / 1 !important; background:linear-gradient(135deg,#f8fafc,#eef2f7) !important; }
+.buchisapa-dish-card .dish-card-img { display:block; width:100%; height:100%; aspect-ratio:1 / 1; object-fit:cover; object-position:center; }
+.dish-card-content { display:flex; flex:1; flex-direction:column; gap:8px; padding:14px; }
+.dish-card-cat-label { color:#dc2626; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.dish-card-title { margin:0; color:#111827; font-size:clamp(15px,1.4vw,18px); font-weight:800; line-height:1.35; overflow-wrap:anywhere; }
+.dish-card-desc { display:-webkit-box; overflow:hidden; margin:0; color:#64748b; font-size:13px; line-height:1.55; -webkit-box-orient:vertical; -webkit-line-clamp:3; }
+.dish-card-footer { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:10px; }
+.dish-card-price { color:#dc2626; font-size:clamp(17px,2vw,22px); font-weight:900; }
+.dish-card-add-btn { min-height:40px; padding:9px 13px; border:0; border-radius:8px; background:#dc2626; color:#fff; font:inherit; font-size:13px; font-weight:800; cursor:pointer; }
+@media (max-width:420px) { #search-view-list.buchisapa-cards-list, #search-view-list { gap:10px; } .dish-card-content { padding:10px; gap:6px; } .dish-card-desc { font-size:12px; -webkit-line-clamp:2; } .dish-card-add-btn { width:100%; } }
+@media (min-width:768px) { #search-view-list.buchisapa-cards-list, #search-view-list { grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; } }
+@media (min-width:1100px) { #search-view-list.buchisapa-cards-list, #search-view-list { grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px; } }

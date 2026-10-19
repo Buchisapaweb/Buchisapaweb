@@ -10,6 +10,7 @@
   // Exponer globalmente la función de abrir vista de categoría
   window.openCategoryView = function (catId, catTitle) {
     const bannersSection = document.getElementById('category-banners-section');
+    const heroSection = document.querySelector('.hero-carousel-container');
     const titleWrap = document.getElementById('main-section-title-wrap');
     const searchSection = document.getElementById('search-results-section');
     const searchTitle = document.getElementById('search-view-title');
@@ -19,6 +20,7 @@
     if (!searchSection || !searchList) return;
 
     if (bannersSection) bannersSection.style.display = 'none';
+    if (heroSection) heroSection.style.display = 'none';
     if (titleWrap) titleWrap.style.display = 'none';
 
     searchSection.classList.remove('is-hidden');
@@ -51,6 +53,7 @@
       searchSection.style.display = 'none';
     }
     if (bannersSection) bannersSection.style.display = 'grid';
+    if (heroSection) heroSection.style.display = '';
     if (titleWrap) titleWrap.style.display = 'block';
 
     try {
@@ -144,7 +147,7 @@
       card.innerHTML = `
         <a href="/producto?id=${encodeURIComponent(item.id || item.code)}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
           <div style="position: relative; width: 100%; aspect-ratio: 4/3; overflow: hidden; background: #f1f5f9;">
-            <img src="${item.image || item.image_url || '/imagenes/categorias/broaster/banner.webp'}" onerror="this.onerror=null;this.src='/imagenes/categorias/${crearSlug(item.category || 'broaster')}/banner.webp'" alt="${item.name}" class="dish-card-img" loading="lazy">
+            <img src="${item.image_url || item.image || ''}" onerror="this.onerror=null;this.style.display='none'" alt="${item.name}" class="dish-card-img" loading="lazy">
             ${item.badge ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.badge}</span>` : ''}
           </div>
           <div class="dish-card-content">

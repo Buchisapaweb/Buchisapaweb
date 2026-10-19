@@ -256,3 +256,9 @@
   .header-actions { gap: 6px; }
   .hero-carousel-container { width: calc(100% - 24px); border-radius: 22px; }
 }
+
+
+/* Proporciones acordadas de portada; no se aplican a productos ni categorías */
+@media (max-width:639px) { .hero-carousel-container { width:calc(100% - 32px) !important; aspect-ratio:4 / 5 !important; height:auto !important; min-height:0 !important; max-height:none !important; } }
+@media (min-width:640px) { .hero-carousel-container { aspect-ratio:16 / 9 !important; height:auto !important; min-height:0 !important; max-height:none !important; } }
+.category-banner-card { aspect-ratio:1 / 1 !important; }
