@@ -380,3 +380,69 @@
 .mobile-nav-card:active { background: #fef2f2; border-color: #fee2e2; }
 
 
+
+
+/* BUSCADOR GLOBAL: panel desplegable, accesible desde inicio y páginas internas */
+.buchisapa-search-bar-wrap {
+  position: relative;
+  z-index: 9998;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 8px 20px rgba(15,23,42,.07);
+  padding: 14px clamp(12px, 3.2vw, 40px);
+}
+.buchisapa-search-bar-wrap.is-hidden { display: none !important; }
+.search-bar-inner { width: 100%; max-width: 1440px; margin: 0 auto; }
+.search-bar-top-row { display: flex; align-items: center; gap: 14px; width: 100%; }
+.search-input-pill-wrapper {
+  min-width: 0; flex: 1; display: flex; align-items: center; gap: 12px;
+  min-height: 54px; padding: 0 16px; border: 1.5px solid #dc2626;
+  border-radius: 999px; background: #fff; transition: box-shadow .2s ease;
+}
+.search-input-pill-wrapper:focus-within { box-shadow: 0 0 0 4px rgba(220,38,38,.09); }
+.search-pill-icon { flex: 0 0 auto; width: 24px; height: 24px; }
+.search-pill-input {
+  width: 100%; min-width: 0; border: 0; outline: 0; background: transparent;
+  color: #111827; font: 500 clamp(15px, 2vw, 20px)/1.35 'Plus Jakarta Sans', sans-serif;
+}
+.search-pill-input::placeholder { color: #858585; opacity: 1; }
+.search-clear-btn {
+  flex: 0 0 30px; width: 30px; height: 30px; border: 0; border-radius: 50%;
+  background: #f3f4f6; color: #4b5563; font-size: 22px; line-height: 1;
+  align-items: center; justify-content: center; cursor: pointer;
+}
+.search-clear-btn.is-hidden { display: none !important; }
+.search-action-btn.search-close-x {
+  flex: 0 0 40px; width: 40px; height: 40px; display: inline-flex;
+  align-items: center; justify-content: center; padding: 0; border: 0;
+  border-radius: 50%; background: transparent; color: #374151;
+  font: 400 32px/1 Arial, sans-serif; cursor: pointer;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+.search-action-btn.search-close-x:hover { background: #fef2f2; color: #dc2626; transform: rotate(90deg); }
+.buchisapa-live-search-results {
+  position: relative; z-index: 9997; width: 100%; background: #fff;
+  border-bottom: 1px solid #e5e7eb; box-shadow: 0 10px 18px rgba(15,23,42,.06);
+  padding: 0 clamp(12px, 3.2vw, 40px) 14px;
+}
+.buchisapa-live-search-results:empty { display: none !important; }
+.search-results-heading { max-width: 1360px; margin: 0 auto 8px; color: #64748b; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.search-results-list { display: grid; grid-template-columns: 1fr; max-width: 1360px; margin: 0 auto; gap: 2px; }
+.search-result-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 8px; color: #111827; text-decoration: none; border-bottom: 1px solid #f1f5f9; font-weight: 650; }
+.search-result-item:hover, .search-result-item:focus-visible { color: #dc2626; background: #fffafa; outline: none; }
+.search-result-arrow { color: #dc2626; font-size: 24px; line-height: 1; }
+.search-results-message { max-width: 1360px; margin: 0 auto; padding: 14px 0; color: #64748b; font-size: 14px; }
+.subpage-search-btn { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; padding: 0; border: 0; background: transparent; color: #111827; cursor: pointer; border-radius: 50%; }
+.subpage-search-btn:hover, .subpage-search-btn:focus-visible { color: #dc2626; background: #fef2f2; outline: none; }
+@media (min-width: 821px) {
+  .buchisapa-search-bar-wrap, .buchisapa-live-search-results { padding-left: max(24px, calc((100vw - 1360px)/2)); padding-right: max(24px, calc((100vw - 1360px)/2)); }
+  .search-results-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+}
+@media (max-width: 420px) {
+  .buchisapa-search-bar-wrap { padding: 10px 12px; }
+  .search-bar-top-row { gap: 8px; }
+  .search-input-pill-wrapper { min-height: 48px; padding: 0 12px; gap: 9px; }
+  .search-pill-icon { width: 22px; height: 22px; }
+  .search-action-btn.search-close-x { flex-basis: 36px; width: 36px; height: 36px; }
+}
