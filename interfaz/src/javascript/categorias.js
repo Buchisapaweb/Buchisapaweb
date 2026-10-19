@@ -143,12 +143,15 @@
 
     searchList.innerHTML = '';
     filtered.forEach(item => {
+      const rawImage = String(item.image_url || item.image || '');
+      // Una imagen de banner identifica una categoría, nunca un producto individual.
+      const productImage = /(^|\/)banner\.webp(?:[?#].*)?$/i.test(rawImage) ? '' : rawImage;
       const card = document.createElement('div');
       card.className = 'buchisapa-dish-card';
       card.innerHTML = `
         <a href="/producto?id=${encodeURIComponent(item.id || item.code)}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
           <div class="dish-card-image-wrap">
-            <img src="${item.image_url || item.image || ''}" onerror="this.onerror=null;this.removeAttribute('src');this.style.display='none';this.parentElement.classList.add('image-unavailable')" alt="${item.name}" class="dish-card-img" loading="lazy">
+            <img src="${productImage}" onerror="this.onerror=null;this.removeAttribute('src');this.style.display='none';this.parentElement.classList.add('image-unavailable')" alt="${item.name}" class="dish-card-img" loading="lazy">
             ${item.badge ? `<span style="position: absolute; top: 10px; left: 10px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">${item.badge}</span>` : ''}
           </div>
           <div class="dish-card-content">
