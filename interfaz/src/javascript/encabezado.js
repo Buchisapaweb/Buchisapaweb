@@ -339,29 +339,7 @@ function initDesktopDropdowns() {
 function initEncabezadoEvents() {
   initDesktopDropdowns();
 
-  // 1. Delegación de eventos para banners de categorías en el home
-  const bannersContainer = document.getElementById('category-banners-section');
-  if (bannersContainer) {
-    bannersContainer.addEventListener('click', (e) => {
-      const card = e.target.closest('.category-banner-card');
-      if (!card) return;
-      const catId = card.dataset.category;
-      const catTitle = card.dataset.title || card.getAttribute('title') || (catId ? catId.toUpperCase() : '');
-      if (catId) {
-        openCategoryView(catId, catTitle);
-      }
-    });
-  }
-
-  // 2. Botón volver en sección de búsqueda / resultados
-  const exitSearchBtn = document.getElementById('btn-exit-search');
-  if (exitSearchBtn) {
-    exitSearchBtn.addEventListener('click', () => {
-      if (typeof window.exitSearchMode === 'function') {
-        window.exitSearchMode();
-      }
-    });
-  }
+  // Los banners y el botón volver los gestiona exclusivamente categorias.js.
 
   // 3. Dropdown de categorías del encabezado
   const catDropdownMenu = document.querySelector('#nav-dropdown-categorias .desktop-dropdown-menu');
