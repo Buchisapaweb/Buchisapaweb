@@ -52,9 +52,10 @@
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Layout & Espaciado */
-  --content-gutter: clamp(16px, 3vw, 32px);
-  --section-space: clamp(32px, 5vw, 64px);
+  /* Layout & Espaciado Compacto Unificado (Gaps y Márgenes de 5px) */
+  --content-gutter: clamp(10px, 2vw, 16px);
+  --section-space: 6px;
+  --gap-unified: 5px;
   --content-max: 1440px;
 }
 
@@ -211,3 +212,71 @@ main,
   color: var(--primary);
   transform: translateX(-3px);
 }
+
+/* =========================================================
+   SISTEMA DE ESPACIADO UNIFICADO Y COMPACTO (5PX SYSTEM)
+   Estandariza márgenes, paddings y separaciones en TODAS las páginas
+   ========================================================= */
+
+/* Unificación de márgenes verticales entre bloques y secciones en todas las páginas */
+section,
+header,
+footer,
+main,
+article,
+.category-banners-section,
+.products-grid-section,
+.search-results-section,
+.cart-page-main,
+.producto-detalle-section,
+.info-section,
+.nosotros-section,
+.contacto-section,
+.ubicacion-section,
+.admin-panel-section {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+
+/* Padding interno estandarizado en contenedores principales */
+.main-content-padded,
+.cart-page-main,
+.info-single-column,
+.producto-detalle-container,
+.category-banners-section,
+.products-grid-container {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+
+/* Separación interna unificada en grillas de productos, banners y elementos */
+.category-banners-grid,
+.desktop-category-cards-grid,
+.mobile-category-cards-grid,
+.buchisapa-cards-list,
+.products-grid-container,
+.cart-items-list,
+.options-chips-wrap {
+  gap: 5px !important;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+
+/* Reducción de márgenes excesivos en títulos y separadores */
+.section-heading,
+.category-banner-title,
+.search-view-title,
+.cart-empty-title,
+.producto-title,
+.info-title {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Portada/Carrusel compacto unificado */
+.hero-carousel-container {
+  margin: 5px auto !important;
+}
+
