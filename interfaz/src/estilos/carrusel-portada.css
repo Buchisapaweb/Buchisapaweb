@@ -207,3 +207,36 @@
 /* Proporciones definitivas de la portada */
 .hero-carousel-container { aspect-ratio:4 / 5; min-height:0; max-height:none; }
 @media (min-width:640px) { .hero-carousel-container { aspect-ratio:16 / 9; min-height:0; max-height:none; } }
+
+
+/* Ajuste visual del Index: fondo claro y portada compacta en móviles */
+@media (max-width: 639px) {
+  .hero-carousel-container {
+    width: calc(100% - 32px) !important;
+    aspect-ratio: 4 / 3 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: 420px !important;
+    margin: 16px auto 20px !important;
+    border-radius: 22px !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10) !important;
+  }
+  .carousel-slide-picture,
+  .carousel-slide-img {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .carousel-slide-img {
+    object-fit: contain !important;
+    object-position: center center !important;
+  }
+  .carousel-dots {
+    bottom: 12px !important;
+    background: rgba(255,255,255,.92) !important;
+    border-color: rgba(15,23,42,.08) !important;
+    box-shadow: 0 2px 8px rgba(15,23,42,.10) !important;
+  }
+  .carousel-dot { background: #cbd5e1 !important; }
+  .carousel-dot.active { background: #dc2626 !important; box-shadow: none !important; }
+}
