@@ -45,6 +45,7 @@
 
   window.exitSearchMode = function () {
     const bannersSection = document.getElementById('category-banners-section');
+    const heroSection = document.querySelector('.hero-carousel-container');
     const titleWrap = document.getElementById('main-section-title-wrap');
     const searchSection = document.getElementById('search-results-section');
 
