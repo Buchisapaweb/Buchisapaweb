@@ -126,22 +126,43 @@
   // Filtrar por categoría
   window._appOpenCategoryView = function (catId, catTitle) {
     currentCategory = catId || 'all';
+    const normalized = String(currentCategory).toLowerCase().trim();
+    const hero = document.querySelector('.hero-carousel-container');
+    const banners = document.getElementById('category-banners-section');
+    const mainTitle = document.getElementById('main-section-title-wrap');
+    const searchSection = document.getElementById('search-results-section');
+
+    // La portada/carrusel pertenece exclusivamente a la página inicial sin categoría seleccionada.
+    if (normalized !== 'all' && normalized !== 'todas') {
+      if (hero) hero.style.display = 'none';
+      if (banners) banners.style.display = 'none';
+      if (mainTitle) mainTitle.style.display = 'none';
+      if (searchSection) {
+        searchSection.classList.remove('is-hidden');
+        searchSection.style.display = 'block';
+      }
+      if (typeof window.openCategoryView === 'function') {
+        window.openCategoryView(normalized, catTitle);
+        return;
+      }
+    }
+
     const all = getAllProducts();
-    const filtered = currentCategory === 'all' 
-      ? all 
-      : all.filter(p => String(p.category).toLowerCase() === String(currentCategory).toLowerCase());
+    const filtered = normalized === 'all' || normalized === 'todas'
+      ? all
+      : all.filter(p => {
+          const productCategory = String(p.category || p.category_slug || p.categoria_slug || '').toLowerCase().trim();
+          const productCategoryId = String(p.category_id || '').toLowerCase().trim();
+          return productCategory === normalized || productCategoryId === normalized;
+        });
 
     const titleEl = document.getElementById('category-selected-title');
-    if (titleEl) {
-      titleEl.textContent = catTitle || (currentCategory === 'all' ? 'CARTA COMPLETA' : currentCategory.toUpperCase());
-    }
+    if (titleEl) titleEl.textContent = catTitle || (normalized === 'all' ? 'CARTA COMPLETA' : normalized.toUpperCase());
 
     renderProductsGrid(filtered);
 
     const sectionEl = document.getElementById('products-grid-container') || document.getElementById('category-banners-section');
-    if (sectionEl) {
-      sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (sectionEl) sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // Agregar rápido al carrito
