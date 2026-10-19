@@ -103,24 +103,28 @@
       return;
     }
 
-    gridEl.innerHTML = products.map(prod => `
-      <article class="category-banner-card product-card-item" onclick="openProductDetailModal('${prod.id}')">
-        <div class="product-card-img-wrap">
-          <img src="${prod.image}" alt="${prod.title}" class="category-banner-img" loading="lazy">
-          ${prod.badge ? `<span class="category-banner-tag">${prod.badge}</span>` : ''}
-        </div>
-        <div class="category-banner-overlay">
-          <h3 class="category-banner-title" style="font-size: 16px; margin-bottom: 4px;">${prod.title}</h3>
-          <p style="font-size: 12.5px; color: #64748b; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${prod.description || ''}</p>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto;">
-            <span style="font-size: 18px; font-weight: 900; color: #dc2626;">S/ ${Number(prod.price).toFixed(2)}</span>
-            <button type="button" class="producto-btn-agregar" onclick="event.stopPropagation(); quickAddToCart('${prod.id}')">
-              + Agregar
-            </button>
+    gridEl.innerHTML = products.map(prod => {
+      const id = prod.id || prod.code || prod.codigo || '';
+      const name = prod.name || prod.title || prod.nombre || 'Producto BuchiSapa';
+      const category = prod.category_name || prod.category || prod.categoryBadge || 'BuchiSapa';
+      const image = prod.image_url || prod.image || '';
+      return `
+        <article class="product-grid-card" onclick="openProductDetailModal('${id}')">
+          <div class="product-grid-card-image">
+            <img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.removeAttribute('src');this.style.display='none';this.parentElement.classList.add('image-unavailable')">
+            ${prod.badge ? `<span class="product-grid-card-badge">${prod.badge}</span>` : ''}
           </div>
-        </div>
-      </article>
-    `).join('');
+          <div class="product-grid-card-content">
+            <span class="product-grid-card-category">${category}</span>
+            <h3 class="product-grid-card-title">${name}</h3>
+            <div class="product-grid-card-footer">
+              <span class="product-grid-card-price">S/ ${Number(prod.price || 0).toFixed(2)}</span>
+              <button type="button" class="producto-btn-agregar" onclick="event.stopPropagation(); openProductDetailModal('${id}')">Ver producto</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
   }
 
   // Filtrar por categoría
