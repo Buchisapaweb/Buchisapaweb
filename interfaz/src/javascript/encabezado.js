@@ -116,46 +116,127 @@ function openCartFromDrawer() {
   }
 }
 
+function ensureSearchUI() {
+  let wrap = document.getElementById('buchisapa-search-bar-wrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'buchisapa-search-bar-wrap';
+    wrap.className = 'buchisapa-search-bar-wrap is-hidden';
+    wrap.innerHTML = `
+      <div class="container search-bar-inner">
+        <div class="search-bar-top-row">
+          <div class="search-input-pill-wrapper">
+            <svg class="search-pill-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            <input type="search" id="main-search-input" class="search-pill-input" placeholder="Busca por nombre de plato..." autocomplete="off" aria-label="Buscar productos por nombre">
+            <button id="search-clear-btn" class="search-clear-btn is-hidden" type="button" aria-label="Limpiar búsqueda">×</button>
+          </div>
+          <button id="search-close-action-btn" class="search-action-btn search-close-x" type="button" aria-label="Cerrar buscador" title="Cerrar">×</button>
+        </div>
+      </div>`;
+    const header = document.querySelector('.site-header, .subpage-navbar');
+    if (header) header.insertAdjacentElement('afterend', wrap);
+    else document.body.prepend(wrap);
+  }
+  let results = document.getElementById('buchisapa-live-search-results');
+  if (!results) {
+    results = document.createElement('section');
+    results.id = 'buchisapa-live-search-results';
+    results.className = 'buchisapa-live-search-results';
+    results.setAttribute('aria-live', 'polite');
+    wrap.insertAdjacentElement('afterend', results);
+  }
+  return wrap;
+}
+
 function toggleSearchBar(forceState) {
-  const wrap = document.getElementById('buchisapa-search-bar-wrap');
-  if (!wrap) return;
-
-  const shouldShow = typeof forceState === 'boolean' ? forceState : (wrap.style.display === 'none' || wrap.style.display === '');
-
+  const wrap = ensureSearchUI();
+  const shouldShow = typeof forceState === 'boolean'
+    ? forceState
+    : (wrap.classList.contains('is-hidden') || wrap.style.display === 'none');
   if (shouldShow) {
+    wrap.classList.remove('is-hidden');
     wrap.style.display = 'block';
     wrap.classList.add('search-bar-visible', 'mobile-search-visible');
-    const mobileInput = document.getElementById('main-search-input');
-    if (mobileInput) {
-      setTimeout(() => mobileInput.focus(), 100);
-    }
+    const results = document.getElementById('buchisapa-live-search-results');
+    if (results) results.style.display = 'block';
+    const input = document.getElementById('main-search-input');
+    if (input) setTimeout(() => input.focus(), 80);
   } else {
+    wrap.classList.add('is-hidden');
     wrap.style.display = 'none';
     wrap.classList.remove('search-bar-visible', 'mobile-search-visible');
+    const results = document.getElementById('buchisapa-live-search-results');
+    if (results) { results.style.display = 'none'; results.innerHTML = ''; }
+    const input = document.getElementById('main-search-input');
+    if (input) input.value = '';
+    const desktopInput = document.getElementById('desktop-search-input');
+    if (desktopInput) desktopInput.value = '';
   }
 }
 
-function onSearchInputChanged(value) {
-  const query = (value || '').trim();
-  
-  // Sincronizar inputs
+let buchisapaSearchProducts = null;
+let buchisapaSearchLoadPromise = null;
+function normalizeSearchName(value) {
+  return String(value || '').toLocaleLowerCase('es').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').trim();
+}
+async function getSearchProducts() {
+  if (Array.isArray(buchisapaSearchProducts)) return buchisapaSearchProducts;
+  if (buchisapaSearchLoadPromise) return buchisapaSearchLoadPromise;
+  buchisapaSearchLoadPromise = (async () => {
+    let products = [];
+    try {
+      const response = await fetch('/api/products');
+      if (response.ok) {
+        const json = await response.json();
+        products = Array.isArray(json) ? json : (json.data || []);
+      }
+    } catch (e) {}
+    if (!products.length) {
+      try {
+        const response = await fetch('/datos/productos.json');
+        if (response.ok) {
+          const json = await response.json();
+          products = Array.isArray(json) ? json : (json.data || []);
+        }
+      } catch (e) {}
+    }
+    buchisapaSearchProducts = products.filter(p => p && (p.name || p.nombre));
+    return buchisapaSearchProducts;
+  })();
+  return buchisapaSearchLoadPromise;
+}
+
+async function onSearchInputChanged(value) {
+  const raw = String(value || '');
+  const query = raw.trim();
   const desktopInput = document.getElementById('desktop-search-input');
   const mobileInput = document.getElementById('main-search-input');
-  
-  if (desktopInput && desktopInput.value !== value) desktopInput.value = value;
-  if (mobileInput && mobileInput.value !== value) mobileInput.value = value;
-
-  // Botones de limpiar
+  if (desktopInput && desktopInput.value !== raw) desktopInput.value = raw;
+  if (mobileInput && mobileInput.value !== raw) mobileInput.value = raw;
   const clearDesktopBtn = document.getElementById('desktop-search-clear-btn');
   const clearMobileBtn = document.getElementById('search-clear-btn');
-  
-  if (clearDesktopBtn) clearDesktopBtn.style.display = query.length > 0 ? 'flex' : 'none';
-  if (clearMobileBtn) clearMobileBtn.style.display = query.length > 0 ? 'flex' : 'none';
+  if (clearDesktopBtn) clearDesktopBtn.style.display = query ? 'flex' : 'none';
+  if (clearMobileBtn) clearMobileBtn.style.display = query ? 'flex' : 'none';
 
-  // Ejecutar filtro global si existe la función handleSearchInput
-  if (typeof window.handleSearchInput === 'function') {
-    window.handleSearchInput(query);
+  const results = document.getElementById('buchisapa-live-search-results');
+  if (!results) return;
+  if (!query) { results.innerHTML = ''; return; }
+  results.innerHTML = '<div class="search-results-message">Buscando productos…</div>';
+  const products = await getSearchProducts();
+  const normalizedQuery = normalizeSearchName(query);
+  const matches = products.filter(product => normalizeSearchName(product.name || product.nombre).includes(normalizedQuery));
+  if (!matches.length) {
+    results.innerHTML = '<div class="search-results-message">No encontramos productos con ese nombre.</div>';
+    return;
   }
+  results.innerHTML = '<div class="search-results-heading">Resultados (' + matches.length + ')</div><div class="search-results-list">' +
+    matches.slice(0, 30).map(product => {
+      const name = String(product.name || product.nombre || '');
+      const id = product.id || product.code || product.codigo || '';
+      return '<a class="search-result-item" href="/producto?id=' + encodeURIComponent(id) + '"><span class="search-result-name"></span><span class="search-result-arrow" aria-hidden="true">›</span></a>';
+    }).join('') + '</div>';
+  const nameNodes = results.querySelectorAll('.search-result-name');
+  matches.slice(0, 30).forEach((product, index) => { if (nameNodes[index]) nameNodes[index].textContent = String(product.name || product.nombre || ''); });
 }
 
 function clearSearchInput() {
@@ -343,10 +424,10 @@ function initEncabezadoEvents() {
   }
 
   // 9. Búsqueda y botones de limpiar
-  const headerSearchBtn = document.getElementById('header-search-btn');
-  if (headerSearchBtn) {
-    headerSearchBtn.addEventListener('click', () => toggleSearchBar());
-  }
+  ensureSearchUI();
+  document.querySelectorAll('#header-search-btn, #subpage-search-btn').forEach(button => {
+    button.addEventListener('click', () => toggleSearchBar());
+  });
 
   const searchCloseBtn = document.getElementById('search-close-action-btn');
   if (searchCloseBtn) {
@@ -391,6 +472,7 @@ window.selectCategoryFromDrawer = selectCategoryFromDrawer;
 window.goToPromociones = goToPromociones;
 window.openCartFromDrawer = openCartFromDrawer;
 window.toggleSearchBar = toggleSearchBar;
+window.ensureSearchUI = ensureSearchUI;
 window.onSearchInputChanged = onSearchInputChanged;
 window.clearSearchInput = clearSearchInput;
 window.initDesktopDropdowns = initDesktopDropdowns;
