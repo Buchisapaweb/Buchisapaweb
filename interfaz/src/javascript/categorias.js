@@ -19,9 +19,15 @@
 
     if (!searchSection || !searchList) return;
 
-    if (bannersSection) bannersSection.style.display = 'none';
-    if (heroSection) heroSection.style.display = 'none';
-    if (titleWrap) titleWrap.style.display = 'none';
+    // La vista de categoría nunca debe mostrar la portada. Aplicar una clase global
+    // y ocultar el carrusel con prioridad para evitar que CSS heredado lo vuelva a mostrar.
+    document.body.classList.add('category-view-active');
+    document.querySelectorAll('.hero-carousel-container').forEach((hero) => {
+      hero.style.setProperty('display', 'none', 'important');
+      hero.setAttribute('aria-hidden', 'true');
+    });
+    if (bannersSection) bannersSection.style.setProperty('display', 'none', 'important');
+    if (titleWrap) titleWrap.style.setProperty('display', 'none', 'important');
 
     searchSection.classList.remove('is-hidden');
     searchSection.style.display = 'block';
@@ -49,6 +55,11 @@
     const titleWrap = document.getElementById('main-section-title-wrap');
     const searchSection = document.getElementById('search-results-section');
 
+    document.body.classList.remove('category-view-active');
+    document.querySelectorAll('.hero-carousel-container').forEach((hero) => {
+      hero.style.removeProperty('display');
+      hero.removeAttribute('aria-hidden');
+    });
     if (searchSection) {
       searchSection.classList.add('is-hidden');
       searchSection.style.display = 'none';
@@ -192,6 +203,9 @@
     const urlParams = new URLSearchParams(window.location.search);
     const catQuery = urlParams.get('cat');
     if (catQuery) {
+      // Establecer el estado antes de renderizar productos para evitar que la portada
+      // quede visible al entrar directamente desde un enlace / recargar la categoría.
+      document.body.classList.add('category-view-active');
       openCategoryView(catQuery, catQuery.toUpperCase());
     }
   }
